@@ -1,0 +1,6 @@
+# Temporary folders # (at any level)
+#####################
+.DS_Store
+.DS_Store?
+Thumbs.db
+.idea

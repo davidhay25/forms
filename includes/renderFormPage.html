@@ -1,0 +1,71 @@
+<div>
+
+    <!-- Create an HTML rendering of as a continuous form
+    $scope.formDef must exist...
+    -->
+    <div ng-repeat="item in formDef">
+        <div class="row" >
+            <div class="col-md-4">
+
+                <div ng-show="item.data.type == 'group'">
+                    <strong>{{item.text}}</strong>
+                </div>
+
+
+                <div ng-hide="item.data.type == 'group'">
+                    <div style="padding-left: 8px">{{item.text}}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div ng-switch="item.data.type">
+
+                    <div ng-switch-when="group">
+
+                    </div>
+
+                    <div ng-switch-when="text">
+
+                        <textarea ng-model="form[item.id]" class="form-control"
+                                  ng-blur="makeQR(item.id)"></textarea>
+                    </div>
+
+                    <div ng-switch-when="boolean">
+
+                        <checkbox ng-model="form[item.id]"  ng-blur="makeQR(item.id)"></checkbox>
+                    </div>
+
+
+                    <div ng-switch-when="choice">
+
+
+                        <select class="form-control" ng-model="form[item.id]"
+                                ng-change="makeQR(item.id)"
+                                ng-options = "concept.valueCoding.display for concept in item.data.answerOption">
+
+                        </select>
+
+                        <!--  <select class="form-control" ng-model="form[item.id]"
+                            ng-options = "concept.display for concept in item.data.vs.concepts">
+
+                        </select>-->
+
+
+                    </div>
+                    <div ng-switch-default>
+                        <input type="text"  ng-blur="makeQR(item.id)"
+                               ng-model="form[item.id]" class="form-control"/>
+                    </div>
+
+                </div>
+                <br/>
+
+
+
+            </div>
+
+            <div class="col-md-2">
+                {{item.id}}
+            </div>
+        </div>
+    </div>
+</div>

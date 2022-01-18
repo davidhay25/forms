@@ -1,0 +1,123 @@
+{
+  "resourceType": "ImplementationGuide",
+  "id": "forms.clinfhir.com",
+  "url": "http://forms.clinfhir.com/ImplementationGuide/forms.clinfhir.com",
+  "version": "1.1.0",
+  "name": "ResourcesforForms",
+  "title": "Resources for Forms",
+  "status": "active",
+  "publisher": "David Hay",
+  "contact": [
+    {
+      "name": "David Hay",
+      "telecom": [
+        {
+          "system": "email",
+          "value": "mailto:david.hay25@gmail.com"
+        }
+      ]
+    }
+  ],
+  "description": "Resources for Forms",
+  "packageId": "forms.clinfhir.com",
+  "license": "CC0-1.0",
+  "fhirVersion": [
+    "4.0.1"
+  ],
+  "definition": {
+    "resource": [
+      {
+        "reference": {
+          "reference": "ValueSet/smoking-status"
+        },
+        "name": "Smoking Status",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "ValueSet/resection"
+        },
+        "name": "Nature of the resection",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "ValueSet/site"
+        },
+        "name": "Site and laterality",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "CodeSystem/resection"
+        },
+        "name": "Nature of the resection",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "CodeSystem/site"
+        },
+        "name": "Smoking Status",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "CodeSystem/smoking-status"
+        },
+        "name": "Smoking Status",
+        "exampleBoolean": false
+      },
+      {
+        "reference": {
+          "reference": "Questionnaire/QLungCancer"
+        },
+        "name": "QLungCancer",
+        "description": "Questionnaire for Lung Cancer histology request",
+        "exampleBoolean": true
+      },
+      {
+        "reference": {
+          "reference": "QuestionnaireResponse/QLungCancerInstance"
+        },
+        "name": "QLungCancerInstance",
+        "description": "A QR instance",
+        "exampleBoolean": true
+      },
+      {
+        "reference": {
+          "reference": "Patient/patient1"
+        },
+        "name": "patient1",
+        "exampleBoolean": true
+      },
+      {
+        "reference": {
+          "reference": "Patient/patient2"
+        },
+        "name": "patient2",
+        "exampleBoolean": true
+      }
+    ],
+    "page": {
+      "nameUrl": "toc.html",
+      "title": "Table of Contents",
+      "generation": "html",
+      "page": []
+    },
+    "parameter": [
+      {
+        "code": "copyrightyear",
+        "value": "2021+"
+      },
+      {
+        "code": "releaselabel",
+        "value": "CI Build"
+      },
+      {
+        "code": "show-inherited-invariants",
+        "value": "false"
+      }
+    ]
+  }
+}

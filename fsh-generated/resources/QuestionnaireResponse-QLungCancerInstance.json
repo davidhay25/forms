@@ -1,0 +1,34 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "QLungCancerInstance",
+  "status": "completed",
+  "questionnaire": "http://clinfhir.com/Questionnaire/lungcancer",
+  "subject": {
+    "reference": "Patient/patient1"
+  },
+  "authored": "2022-01-18T12:00:00Z",
+  "item": [
+    {
+      "linkId": "clinicalinfo",
+      "text": "Clinical Information",
+      "item": [
+        {
+          "linkId": "height",
+          "answer": [
+            {
+              "valueDecimal": 160
+            }
+          ]
+        },
+        {
+          "linkId": "weight",
+          "answer": [
+            {
+              "valueDecimal": 80
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
