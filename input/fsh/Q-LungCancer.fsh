@@ -24,10 +24,6 @@ Description: "A QR instance"
 * subject = Reference(Patient/patient1)
 * authored = 2022-01-18T12:00:00Z
 
-
-
-
-
 * item[+].linkId = "clinicalinfo"
 * item[=].text = "Clinical Information"
 
@@ -47,8 +43,7 @@ Description: "Questionnaire for Lung Cancer histology request"
 * status = #draft
 * name = "LungCancerHistologyRequest"
 * title = "A form to capture data to accompany a histology request for lung cancer"
-* useContext.code = http://terminology.hl7.org/CodeSystem/usage-context-type#focus
-* useContext.valueCodeableConcept = http://clinfhir.com#structuredPath
+
 
 
 //-----  clinical information
@@ -61,10 +56,20 @@ Description: "Questionnaire for Lung Cancer histology request"
 * item[=].text = "Clinical Information"
 * item[=].type = #group
 
+* item[=].item[+].linkId = "provdx"
+* item[=].item[=].text = "Provisional Diagnosis"
+* item[=].item[=].type = #choice
+* item[=].item[=].code = $snomed#148006
+* item[=].item[=].code.display = "Provisional Diagnosis" 
+* item[=].item[=].answerValueSet = "http://hl7.org/fhir/ValueSet/condition-code"
+* item[=].item[=].extension[+].url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+* item[=].item[=].extension[=].valueBoolean = true
+
 * item[=].item[+].linkId = "height"
 * item[=].item[=].text = "Current height (m)"
 * item[=].item[=].type = #decimal
 * item[=].item[=].code = $loinc#8302-2
+* item[=].item[=].code.display = "Height" 
 * item[=].item[=].extension[+].url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 * item[=].item[=].extension[=].valueBoolean = true
 * item[=].item[=].extension[+].url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
@@ -75,6 +80,7 @@ Description: "Questionnaire for Lung Cancer histology request"
 * item[=].item[=].text = "Current weight (Kg)"
 * item[=].item[=].type = #decimal
 * item[=].item[=].code = $loinc#29463-7
+* item[=].item[=].code.display = "Weight" 
 * item[=].item[=].extension[+].url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 * item[=].item[=].extension[=].valueBoolean = true
 * item[=].item[=].extension[+].url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
@@ -86,10 +92,16 @@ Description: "Questionnaire for Lung Cancer histology request"
 * item[=].item[+].linkId = "ss"
 * item[=].item[=].text = "Smoking Status"
 * item[=].item[=].type = #choice
-//* item[=].item[=].answerValueSet = $ss-vs
+* item[=].item[=].code = $loinc#272166-2
+* item[=].item[=].code.display = "Smoking Status" 
+
 * item[=].item[=].answerOption[+].valueCoding = $ss-cs#current "current"
 * item[=].item[=].answerOption[+].valueCoding  = $ss-cs#current "ex"
 * item[=].item[=].answerOption[+].valueCoding  = $ss-cs#current "never"
+
+* item[=].item[=].extension[+].url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+* item[=].item[=].extension[=].valueBoolean = true
+
 
 * item[=].item[+].linkId = "absestos"
 * item[=].item[=].text = "Asbestos exposure"

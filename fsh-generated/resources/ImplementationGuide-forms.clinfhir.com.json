@@ -86,6 +86,14 @@
       },
       {
         "reference": {
+          "reference": "Questionnaire/QSystemsReview"
+        },
+        "name": "QSystemsReview",
+        "description": "Questionnaire Systems review",
+        "exampleBoolean": true
+      },
+      {
+        "reference": {
           "reference": "Patient/patient1"
         },
         "name": "patient1",
@@ -96,6 +104,13 @@
           "reference": "Patient/patient2"
         },
         "name": "patient2",
+        "exampleBoolean": true
+      },
+      {
+        "reference": {
+          "reference": "Practitioner/practitioner1"
+        },
+        "name": "practitioner1",
         "exampleBoolean": true
       }
     ],

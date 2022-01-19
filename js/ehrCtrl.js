@@ -7,6 +7,8 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.form = {}
 
+            let validationServer = "http://localhost:9099/baseR4/"
+            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
             // ------------ this code is almost the same as that in the dashboard. ? move to a service
 
@@ -21,18 +23,106 @@ angular.module("formsApp")
             )
 
 
+            //===============  functions for form ===================
+
+            //used by type-ahead for ValueSet based selection
+            $scope.getConcepts = function(val,url) {
+
+                let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
+                qry += "&filter=" + val
+
+                return $http.get(qry).then(
+                    function(data){
+                        //console.log(data.data)
+                        let vs = data.data
+                        if (vs.expansion) {
+                            let ar = []
+                            return vs.expansion.contains
+
+                        } else {
+                            return [{display:"no matching values"}]
+                        }
+
+                        return [{display:"aaa"},{display:'bbbb'}]
+                    },
+                    function(err){
+                        console.log(err)
+                        return [{display:"no matching values"}]
+                    }
+                )
+            };
+
+            //called when a selection in the type-ahead made. We're not using that ATM except to build the QR
+            $scope.selectConcept = function(a,b,c){
+                console.log(a,b,c)
+                $scope.makeQR()
+            }
+
+            //============================
+
+
+            $scope.validateQR = function(QR){
+                let url = validationServer + "QuestionnaireResponse/$validate"
+                $http.post(url,QR).then(
+                    function(data) {
+                        $scope.qrValidationResult = data.data
+                    },function(err){
+                        $scope.qrValidationResult = err.data
+
+                    }
+                )
+            }
+
+            $scope.testExtraction = function(){
+                //let validationServer = "http://localhost:9099/baseR4/"
+                if ($scope.QR) {
+                    let url = "/fr/testextract"
+                    $http.post(url,$scope.QR).then(
+                        function(data) {
+                            console.log(data)
+                            $scope.extractedResources = []
+                            data.data.obs.forEach(function (resource){
+                                let url = validationServer + resource.resourceType + "/$validate"
+                                $http.post(url,resource).then(
+                                    function(data) {
+                                        $scope.extractedResources.push({resource:resource,OO:data.data,valid:true})
+                                    },function(err){
+
+                                        $scope.extractedResources.push({resource:resource,OO:err.data,valida:false})
+
+                                    }
+                                )
+
+                            })
+
+                        }, function(err) {
+                            console.log(err)
+                        }
+                    )
+                }
+            }
+
             $scope.selectQ = function(Q) {
                 $scope.selectedQ = Q
                 let vo = formsSvc.makeTreeFromQ(Q)
                 //$scope.treeData = vo.treeData
                 $scope.hashItem = vo.hash       //all items in teh form hashed by id
 
-                $scope.formDef = vo.treeData
+
+                //$scope.formDef = vo.treeData
+                formsSvc.makeFormDefinition(vo.treeData).then(
+                    function (data) {
+                        $scope.formDef = data
+                    }
+                )
+
+                //$scope.formDef = vo.treeData
+
 
                 $scope.makeQR()
 
 
-              //  drawTree()
+                drawTree(vo.treeData)
               // makeFormDef()
             }
 
@@ -40,14 +130,40 @@ angular.module("formsApp")
 
 
             //invoked whenever an item in the generated form changes...
-            $scope.makeQR = function(key) {
-                $scope.QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
+            $scope.makeQR = function() {
+                delete $scope.qrValidationResult
+                $scope.QR = formsSvc.makeQR($scope.selectedQ,
+                    $scope.form,$scope.hashItem,$scope.selectedPatient,
+                    $scope.selectedPractitioner.resource)
                 console.log($scope.QR)
             }
 
 
             $scope.selectQR = function(QR) {
                 $scope.selectedQR = QR
+
+                let url = "/fr/testextract"
+                $http.post(url,QR).then(
+                    function(data) {
+                        //console.log(data)
+                        if (data.data.obs) {
+                            $scope.resourcesFromExistingQR = data.data.obs
+                        } else {
+                            $scope.resourcesFromExistingQR = data.data
+                        }
+
+                    }, function(err) {
+                        console.log(err)
+                        $scope.resourcesFromExistingQR = err.data
+                    }
+                )
+
+            }
+
+
+            $scope.selectResource = function(item) {
+                $scope.selectedResource = item.resource
+                $scope.selectedResourceValidation = item.OO
             }
 
             $scope.submitForm = function() {
@@ -62,6 +178,7 @@ angular.module("formsApp")
             $scope.selectPatient = function() {
                 $scope.existingQR = []
                 console.log($scope.input.selectedPatient)
+                $scope.selectedPatient = $scope.input.selectedPatient.resource;
                 //get all the QR for this patient from the data server
                 let url = "/ds/fhir/QuestionnaireResponse?patient="+$scope.input.selectedPatient.resource.id
                 $http.get(url).then(
@@ -77,6 +194,35 @@ angular.module("formsApp")
                 )
             }
 
+            let drawTree = function(treeData){
+
+                expandAll(treeData)
+                //deSelectExcept()
+                $('#QTree').jstree('destroy');
+
+                let x = $('#QTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    //seems to be the node selection event...
+
+                    if (data.node) {
+                        $scope.selectedNode = data.node;
+                        console.log(data.node)
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                })
+
+
+            }
+
+            let expandAll = function(treeData) {
+                treeData.forEach(function (item) {
+                    item.state.opened = true;
+                })
+
+            }
+
             //load the patients directly from the data server
             let url = "/ds/fhir/Patient"
             $http.get(url).then(
@@ -87,9 +233,32 @@ angular.module("formsApp")
                         let display = entry.resource.name[0].text
                         $scope.allPatients.push({display:display,resource:entry.resource})
                         $scope.input.selectedPatient = $scope.allPatients[0]
-                        $scope.selectPatient()
-                    })
 
+                    })
+                    $scope.selectPatient()
+
+                }, function(err) {
+                    console.log(err)
                 }
             )
+
+            //load the practitioners directly from the data server
+
+            $http.get("/ds/fhir/Practitioner").then(
+                function (data) {
+
+                    $scope.allPractitioners = [];
+                    data.data.entry.forEach(function (entry){
+                        let display = entry.resource.name[0].text
+                        $scope.allPractitioners.push({display:display,resource:entry.resource})
+
+                        //$scope.selectPractitioner()
+                    })
+                    $scope.selectedPractitioner = $scope.allPractitioners[0]
+                }, function(err) {
+                    console.log(err)
+                }
+            )
+
+
         })

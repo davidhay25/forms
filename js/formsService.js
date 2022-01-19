@@ -2,11 +2,33 @@ angular.module("formsApp")
 
     .service('formsSvc', function($q,$http,$filter,moment) {
 
+        extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+
         return {
+
+
+
+            findExtension : function(item,url) {
+                //return an array with all matching extensions
+                let ar = []
+                //console.log(item)
+                if (item.extension) {
+                    for (var i=0; i <  item.extension.length; i++){
+                        let ext = item.extension[i]
+                        if (ext.url == url) {
+                            ar.push(ext)
+                        }
+                    }
+                }
+                return ar
+
+            },
+
         //make the treeData from the Q
 
 
-            makeQR : function(Q,form,hash) {
+            makeQR : function(Q,form,hash,patient,practitioner) {
                 //make the QuestionnaireResponse from the form data
                 //hash is items from the Q keyed by linkId
                 //form is the data enterd keyed by linkId
@@ -14,8 +36,14 @@ angular.module("formsApp")
                 let err = false
                 console.log(form)
                 console.log(hash)
-                let QR = {resourceType:'QuestionnaireResponse',id:"qr-" + new Date().getTime(),status:'in-progress',item : []}
+                let QR = {resourceType:'QuestionnaireResponse',id:"qr-" + new Date().getTime(),status:'in-progress'}
+                QR.text = {status:'generated'}
+                QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url
+                QR.authored = new Date().toISOString()
+                QR.subject = {reference:"Patient/"+patient.id}
+                QR.author = {reference:"Practitioner/"+practitioner.id}
+                QR.item = []
 
 
 
@@ -42,7 +70,14 @@ angular.module("formsApp")
                         if (value) {
                             switch (item.type) {
                                 case "choice":
-                                    itemToAdd.answer.push({valueCoding : value})    //will be a coding
+                                    console.log(value)
+                                    if (value.valueCoding) {
+                                        itemToAdd.answer.push(value)    //will be a coding
+                                    } else {
+                                        itemToAdd.answer.push({valueCoding : value})
+                                    }
+                                    //itemToAdd.answer.push({valueCoding : value})    //will be a coding
+                                    //itemToAdd.answer.push(value)    //will be a coding
                                     break;
                                 case "decimal" :
                                     let v = parseFloat(value)
@@ -173,26 +208,38 @@ angular.module("formsApp")
             makeFormDefinition : function(treeData) {
                 //create the form definition object from the treeData derived from the Q. Used by the form render include...
                 //needs more thought - this will do...
+                let that = this
+                let deferred = $q.defer()
+
                 let formDef = angular.copy(treeData)
                 formDef.splice(0,1)      //remove the root
 
-                return formDef
 
 
 
-                //expand the valueset into the form def
-                $scope.formDef.forEach(function (def) {
-                    if (def.data && def.data.type == 'choice' && def.data.vsName) {
-                        //find the valueset by name and copy into the model
+/* not sure whether to do this here, or by the QCreator when the Q is created / updated... */
+                // Add a flag so can show
+                formDef.forEach(function (def) {
+                    let ar = that.findExtension(def.data, extUrlObsExtract)
+                    if (ar.length > 0 && ar[0].valueBoolean == true) {
+                        def.meta = {obsExtract:true}
+                    }
 
-                        $scope.QVS.forEach(function (vs) {
-                            if (vs.name == def.data.vsName) {
-                                def.data.vs = angular.copy(vs)      // here are the contents for the form preview
-                            }
-                        })
+                    if (def.data && def.data.type == 'choice' && def.data.answerValueSet) {
+
+                        //is the formcontrl a dropdown
+
+                        //retrieve the VS from the term server and populate the answeroption
 
                     }
                 })
+
+
+
+                deferred.resolve(formDef)
+
+                return deferred.promise
+
 
             },
 
@@ -202,7 +249,6 @@ angular.module("formsApp")
                 let hash = {}
                 let root = {id:'root',text:'Root',parent:'#',state:{},data:{}}
                 treeData.push(root)
-
 
                 Q.item.forEach(function(parentItem){
 
@@ -222,10 +268,13 @@ angular.module("formsApp")
                             let item = {id: child.linkId,state:{},data:{}}
                             item.text = child.text;
                             item.parent = parentItem.linkId;
+                            item.data = child
+                            /*
                             item.data = {type:child.type,text:child.text};
                             item.data.answerOption = child.answerOption
                             item.data.mult = makeMult(child) //mult
                             item.data.description = getDescription(child)
+                            */
                             hash[item.id] = item.data;
                             treeData.push(item)
                         })

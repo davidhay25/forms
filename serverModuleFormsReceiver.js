@@ -75,7 +75,7 @@ function performObservationExtraction(Q,QR) {
         } else {
             //look for the extract Observation extension
             let ar = findExtension(item,extractObsUrl)
-            //console.log('ar',ar)
+            //console.log(item.linkId)
             if (ar.length > 0) {
                 //in this case the extension is a boolean. Assume only 1
                 if (ar[0].valueBoolean) {
@@ -85,7 +85,11 @@ function performObservationExtraction(Q,QR) {
             }
         }
     }
-    parseQ(hashQ,Q.item[0])
+    Q.item.forEach(function(topLevel){
+        //parseQ(hashQ,Q.item[0])
+        parseQ(hashQ,topLevel)
+    })
+
 
     function parseQR(hashQR,item) {
         if (item.item) {
@@ -111,35 +115,61 @@ function performObservationExtraction(Q,QR) {
             let QRItem = hashQR[key]    //the item from the QR
             //console.log('a',QRItem,QItem)
             QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
+                //theAnswer is a single answer value...
                 let observation = {resourceType:'Observation'}
-                observation.code = QItem.code   //the code comes from the Q
+                observation.text = {status:'generated'}
+                let text = ""
+                observation.status = "final"
+                observation.effectiveDateTime = QR.authored
+                observation.subject = QR.subject
+                observation.performer = [QR.author]
+                //the code comes from the Q
+                //The Q.code is an array of coding. Add them all to Observation.code as per the IG
+                let oCode = {coding:[]}
+                if (QItem.code) {
+                    QItem.code.forEach(function (coding){
+                        oCode.coding.push(coding)
+                        text += oCode.display + " "
+                    })
+                }
 
-                console.log(theAnswer)
+                observation.code = oCode
+                observation.derivedFrom = [{reference:"QuestionnaireResponse/" + QR.id}]
+
+                //console.log(theAnswer)
                 //todo - the dtatypes for Observation and Questionnaire aren't the same!
                 if (theAnswer.valueDecimal) {
                     //if a decimal, then look for the unit extension to create a Quantity
                     let ar = findExtension(QItem,unitsUrl)
-                    console.log(ar)
+                    //console.log(ar)
                     if (ar.length > 0) {
                         let coding = ar[0].valueCoding
                         //Can create a Quantity. should only be 1 really...
                         let qty = {value:theAnswer.valueDecimal,system:coding.system,code:coding.code}
-                        observation.valueQuantiy = qty
+                        observation.valueQuantity = qty
+                        text += theAnswer.valueDecimal + " " + coding.display
                     } else {
                         //not sure what to do if there's no extension. Is that a QA that should be applied to the Q? ie that decimal must have the extension?
                     }
 
                 }
 
-                if (theAnswer.answerString) {
-                    observation.valueString = theAnswer.answerString
-                }
 
+                if (theAnswer.valueString) {
+                    observation.valueString = theAnswer.valueString
+                    text += theAnswer.valueString
+                }
+/*
                 if (theAnswer.answerQuantity) {
-                    observation.valueQuantiy = theAnswer.answerQuantity
+                    observation.valueQuantity = theAnswer.answerQuantity
+                }
+*/
+                if (theAnswer.valueCoding) {
+                    observation.valueCodeableConcept = {coding:[theAnswer.valueCoding]}
+                    text += theAnswer.valueCoding.code + " (" + theAnswer.valueCoding.system + ")"
                 }
 
-
+                observation.text.div="<div xmlns='http://www.w3.org/1999/xhtml'> + text + </div>"
 
                 arObservations.push(observation)
 

@@ -1,0 +1,14 @@
+{
+  "resourceType": "Practitioner",
+  "id": "practitioner1",
+  "name": [
+    {
+      "given": [
+        "Marcus"
+      ],
+      "family": "Welby",
+      "text": "Marcus Welby"
+    }
+  ],
+  "gender": "male"
+}

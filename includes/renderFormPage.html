@@ -4,7 +4,7 @@
     $scope.formDef must exist...
     -->
     <div ng-repeat="item in formDef">
-        <div class="row" >
+        <div class="row" ng-class="{obsExtract:item.meta.obsExtract}">
             <div class="col-md-4">
 
                 <div ng-show="item.data.type == 'group'">
@@ -38,11 +38,25 @@
                     <div ng-switch-when="choice">
 
 
-                        <select class="form-control" ng-model="form[item.id]"
-                                ng-change="makeQR(item.id)"
-                                ng-options = "concept.valueCoding.display for concept in item.data.answerOption">
+                        <div ng-show = "item.data.answerOption">
+                            <select class="form-control" ng-model="form[item.id]"
+                                    ng-change="makeQR(item.id)"
+                                    ng-options = "concept.valueCoding.display for concept in item.data.answerOption">
 
-                        </select>
+                            </select>
+                        </div>
+
+                        <div ng-show = "item.data.answerValueSet">
+
+                            <input type="text" class = "form-control" ng-model="form[item.id]"
+                                   placeholder="Minimum 3 characters"
+                                   typeahead-min-length="3"
+                                   typeahead-wait-ms="1000"
+                                   typeahead-on-select="selectConcept($item, $model, $label)"
+                                   uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,item.data.answerValueSet)"/>
+
+
+                        </div>
 
                         <!--  <select class="form-control" ng-model="form[item.id]"
                             ng-options = "concept.display for concept in item.data.vs.concepts">

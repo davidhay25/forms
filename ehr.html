@@ -27,6 +27,10 @@
             overflow-y: scroll;
         }
 
+        .obsExtract {
+            background-color: #ebcccc;
+        }
+
 
     </style>
 
@@ -77,10 +81,9 @@
 
             <div class="col-md-2 col-sm-2">
                 <div class="navbar-text">
-                    {{thisUserId}}
+                    {{selectedPractitioner.display}}
 
-                    <!--
-                    <input type='text' class="form-control" ng-model="thisUserId"/>-->
+
                 </div>
 
             </div>
@@ -97,37 +100,23 @@
             </div>
 
             <div class="col-md-3 col-sm-3">
-                <select class="form-control" ng-model = "input.selectedPatient"
-                        ng-change="selectPatient()"
-                        ng-options = "item.display for item in allPatients"></select>
+                <div class="navbar-text">
+                    <select class="form-control" ng-model = "input.selectedPatient"
+                            ng-change="selectPatient()"
+                            ng-options = "item.display for item in allPatients"></select>
+                </div>
+
             </div>
         </div>
     </nav>
 
     <uib-tabset>
-        <uib-tab heading="Existing Forms">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true}"
-                             ng-click="selectQR(QR)"
-                             ng-repeat="QR in existingQR">
-                            {{QR.display}}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <pre>{{selectedQR | json}}</pre>
-                </div>
-            </div>
 
-
-
-        </uib-tab>
         <uib-tab heading="New form">
+            <br/>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="list-group">
+                    <div class="list-group" style="cursor:pointer;">
                         <div ng-class="{'list-group-item':true}"
                              ng-click="selectQ(Q)"
                              ng-repeat="Q in allQ">
@@ -136,21 +125,128 @@
                     </div>
                 </div>
                 <div class="col-md-9">
-                    <uib-tabset>
+                    <br/>
+                    <uib-tabset ng-show="selectedQ">
                         <uib-tab heading="Form">
                             <ng-include src = "'includes/renderFormPage.html'"></ng-include>
+
+                            <button ng-show = "QR" class="btn btn-danger" ng-click="submitForm()">Submit form</button>
+
                         </uib-tab>
                         <uib-tab heading="QR">
-                            <pre>{{QR | json}}</pre>
+                            <uib-tabset>
+                                <uib-tab heading="Json">
+                                    <pre>{{QR | json}}</pre>
+                                </uib-tab>
+                                <uib-tab heading="Validate">
+                                    <button class="btn btn-link" ng-click=validateQR(QR)>Perform validation</button>
+
+                                    <pre>{{qrValidationResult | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
                         </uib-tab>
+                        <uib-tab heading="Test resource extraction">
+                            <button class="btn btn-link" ng-click=testExtraction()>Extract from QR</button>
+                            <uib-tabset>
+                                <uib-tab heading="Resource">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="list-group">
+                                                <div ng-class="{'list-group-item':true}"
+                                                     ng-click = "selectResource(item)"
+                                                    ng-repeat = "item in extractedResources">
+
+                                                    <span class="pull-right badge">{{item.OO.issue.length}}</span>
+                                                    {{item.resource.resourceType}}
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <uib-tabset>
+                                                <uib-tab heading="Json">
+                                                    <pre>{{selectedResource | json}}</pre>
+                                                </uib-tab>
+                                                <uib-tab heading="Validation result">
+                                                    <pre>{{selectedResourceValidation | json}}</pre>
+
+                                                </uib-tab>
+                                            </uib-tabset>
+
+
+                                        </div>
+                                    </div>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{extractedResources | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+                        </uib-tab>
+                        <uib-tab heading="Questionnaire">
+                            <uib-tabset>
+                                <uib-tab heading="Json">
+                                    <pre>{{selectedQ | json}}</pre>
+                                </uib-tab>
+                                <uib-tab heading="Tree">
+
+                                    <ng-include src="'includes/showQTree.html'"></ng-include>
+
+                                </uib-tab>
+                            </uib-tabset>
+
+
+                        </uib-tab>
+
                     </uib-tabset>
 
 
 
-                    <button class="btn btn-danger" ng-click="submitForm()">Submit form</button>
+
 
                 </div>
             </div>
+
+        </uib-tab>
+        <uib-tab heading="Existing Forms">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true}"
+                             ng-click="selectQR(QRItem.QR)"
+                             ng-repeat="QRItem in existingQR">
+                            {{QRItem.display}}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <uib-tabset>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedQR | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Extracted resources">
+                            <pre>{{resourcesFromExistingQR | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Form">
+                            Use the 'populate' function to generate a form view of the data.
+                            or use the 'new form rendering' plus the data from the QR (setting $scope.form)
+                        </uib-tab>
+                    </uib-tabset>
+
+
+                </div>
+            </div>
+
+
+
+        </uib-tab>
+        <uib-tab heading="Query resources">
+
+            allow user query & display results
 
         </uib-tab>
     </uib-tabset>

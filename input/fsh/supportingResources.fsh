@@ -17,3 +17,13 @@ InstanceOf: Patient
 * name.text = "Jane Doe"
 
 * gender = #female
+
+Instance: practitioner1
+InstanceOf: Practitioner
+
+
+* name.given = "Marcus"
+* name.family = "Welby"
+* name.text = "Marcus Welby"
+
+* gender = #male

@@ -29,10 +29,11 @@ function setup(app,serverRoot) {
 
     })
 
+    //---------------- should there be a 'catch all' query??? ---------------
     //return all the patients (can add query params - like in patcorrect proxy...
     app.get('/ds/fhir/Patient',function(req,res){
         let url = serverRoot + "Patient"
-        console.log(url)
+        //console.log(url)
         axios.get(url)
             .then(function (response){
                 res.status(response.status).json(response.data)
@@ -42,6 +43,20 @@ function setup(app,serverRoot) {
                 res.status(response.status).send(err)
             })
     })
+
+    app.get('/ds/fhir/Practitioner',function(req,res){
+        let url = serverRoot + "Practitioner"
+        //console.log(url)
+        axios.get(url)
+            .then(function (response){
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                console.log(err)
+                res.status(response.status).send(err)
+            })
+    })
+
 }
 
 module.exports = {
