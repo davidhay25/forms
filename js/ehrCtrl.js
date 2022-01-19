@@ -28,7 +28,8 @@ angular.module("formsApp")
             //used by type-ahead for ValueSet based selection
             $scope.getConcepts = function(val,url) {
 
-                let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
+                let qry =  termServer + "ValueSet/$expand?url=" + url
+                //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
                 qry += "&filter=" + val
 
                 return $http.get(qry).then(
@@ -167,7 +168,21 @@ angular.module("formsApp")
             }
 
             $scope.submitForm = function() {
-                $scope.QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
+
+                //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
+
+                if (confirm("Are you sure you're ready to submit this form")){
+                    let url = "/fr/fhir/receiveQR"
+                    $http.post(url,$scope.QR).then(
+                        function(data) {
+                            console.log(data.data)
+                            alert("Form has been saved, and any Observations extracted and saved")
+                        }, function(err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
 
 
 
@@ -190,6 +205,19 @@ angular.module("formsApp")
                                 $scope.existingQR.push({QR:QR,display:QR.questionnaire})
                             })
                         }
+                    }
+                )
+
+                //get all the observations
+                getObservationsForPatient($scope.input.selectedPatient.resource.id)
+            }
+
+            let getObservationsForPatient = function(patId){
+                let url = "/ds/fhir/Observation?patient="+patId
+
+                $http.get(url).then(
+                    function (data) {
+                        $scope.bundleObservations = data.data
                     }
                 )
             }

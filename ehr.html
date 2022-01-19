@@ -74,7 +74,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            EHR sample application
+                            CanShare sample EHR
                         </a>
                     </span>
             </div>
@@ -229,6 +229,7 @@
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>
                         <uib-tab heading="Extracted resources">
+                            <em>Uses test extract operation - not query</em>
                             <pre>{{resourcesFromExistingQR | json}}</pre>
                         </uib-tab>
                         <uib-tab heading="Form">
@@ -246,7 +247,29 @@
         </uib-tab>
         <uib-tab heading="Query resources">
 
-            allow user query & display results
+            <uib-tabset>
+                <uib-tab heading="Observations">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <strong>Code</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Table of Obs</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Selected Obs</strong>
+                        </div>
+                    </div>
+
+                </uib-tab>
+                <uib-tab heading="Json">
+                    <pre>{{bundleObservations | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+
 
         </uib-tab>
     </uib-tabset>

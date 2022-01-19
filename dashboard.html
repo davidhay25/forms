@@ -70,7 +70,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Dashboard
+                            CanShare Dashboard
                         </a>
                     </span>
             </div>
@@ -103,7 +103,7 @@
         </div>
     </nav>
 
-        <uib-tabset>
+    <uib-tabset>
             <uib-tab heading="Questionnaire resources">
                 <br/>
                <div class="row">
@@ -143,6 +143,7 @@
 
                            </uib-tab>
                            <uib-tab heading="Preview">
+
                                <ng-include src = "'includes/renderFormPage.html'"></ng-include>
                            </uib-tab>
                            <uib-tab heading="Json">
@@ -154,7 +155,64 @@
                </div>
 
             </uib-tab>
-            <uib-tab heading="Terminology"></uib-tab>
+            <uib-tab heading="Terminology">
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true}"
+                                 ng-click="selectVS(vs)"
+                                 ng-repeat="vs in vsList">
+                                {{vs.display}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <pre>{{selectedVsItem | json}}</pre>
+                                <br/>
+                                <pre>{{selectedVs | json}}</pre>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Expansion</h4>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-link" ng-click="expandVS(selectedVs.url,input.filter)">Expand</button>
+                                    </div>
+                                </div>
+
+                                <uib-tabset>
+                                    <uib-tab heading="Json">
+                                        <pre>{{expandedVs | json}}</pre>
+                                    </uib-tab>
+                                    <uib-tab heading="List">
+                                        <table class="table table-bordered table-condensed">
+                                            <tr ng-repeat="concept in expandedVs.expansion.contains">
+                                                <td>{{concept.code}}</td>
+                                                <td>{{concept.display}}</td>
+                                                <td>{{concept.system}}</td>
+                                            </tr>
+                                        </table>
+
+                                    </uib-tab>
+
+                                </uib-tabset>
+
+
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </uib-tab>
             <uib-tab heading="External services">
                 <br/>
                 <uib-tabset>

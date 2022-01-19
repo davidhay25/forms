@@ -8,10 +8,45 @@ function setup(app,sr) {
     //routes that are intended to be 'public' routes - ie that matches what the IG requires
 
     //Receive a QR resource. Process and save.
-    app.post('/fr/fhir/QuestionnaireResponse',function(req,res){
+    app.post('/fr/fhir/receiveQR',async function(req,res){
 
-        let Q = reg.body;
-        res.json()
+        let QR = req.body
+        try {
+            let resources = await extractResources(QR)
+            let arObservations = resources.obs     //An array of created observations
+
+            //construct transaction bundle
+            let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
+            bundle.entry.push(createEntry(QR))
+            arObservations.forEach(function (observation){
+                bundle.entry.push(createEntry(observation))
+            })
+
+            axios.post('http://localhost:9099/baseR4/', bundle)
+                .then(function (response) {
+                    //console.log(response);
+                    res.status(response.status).json(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    res.status(error.response.status).json(error.response.data)
+
+
+
+                });
+
+
+
+        } catch (ex) {
+            res.status(500).json(ex.message)
+        }
+
+        function createEntry(resource) {
+            let entry = {}
+            entry.resource = resource
+            entry.request = {method:'POST',url:resource.resourceType}
+            return entry
+        }
 
     })
 
