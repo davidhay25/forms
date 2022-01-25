@@ -9,8 +9,21 @@ angular.module("formsApp")
             $scope.input.codeSystems = codeSystems
             $scope.newItem = item
 
+            //set the code controls
+            if ($scope.newItem.code && $scope.newItem.code.length > 0) {
+                let code = $scope.newItem.code[0]
+                $scope.newItem.tmp = {codeCode : code.code, codeDisplay :code.display }
+
+                $scope.input.codeSystems.forEach(function (cs){
+                    if (cs.url == code.system) {
+                        $scope.newItem.tmp.codeSystem = cs
+                    }
+                })
+
+            }
+
             $scope.save = function() {
-                //todo if units specified, then set extension
+
 
                 if ( $scope.newItem.tmp && $scope.newItem.tmp.units) {
                     let unitsExtension = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit" //defined in the core spec
@@ -24,9 +37,9 @@ angular.module("formsApp")
 
                 }
 
-                //todo ? should also set the code here (rather than in the dashboardCtrl)
 
-                if ($scope.newItem.tmp.codeCode) {
+
+                if ($scope.newItem.tmp && $scope.newItem.tmp.codeCode) {
                     let code = {code:$scope.newItem.tmp.codeCode,system:$scope.newItem.tmp.codeSystem.url,display:$scope.newItem.tmp.codeDisplay}
                     $scope.newItem.code = [code]
                     //delete item.tmp

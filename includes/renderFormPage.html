@@ -64,6 +64,10 @@
 
 
                         </div>
+                        <div ng-hide = "item.data.item.answerValueSet || item.data.item.answerOption">
+                            This question is a choice, but there is no ValueSet or answerOption
+                        </div>
+
 
                         <!--  <select class="form-control" ng-model="form[item.id]"
                             ng-options = "concept.display for concept in item.data.vs.concepts">

@@ -7,6 +7,31 @@ angular.module("formsApp")
 
         return {
 
+            auditQ : function(Q) {
+                //generate audit report for Q
+                let audit = {'missingvs': [],nocode:[]}
+
+                Q.item.forEach(function(item){
+                    if (item.item) {
+                        item.item.forEach(function (child){
+
+                            if (! child.code) {
+                                audit.nocode.push({item:child,parent:item})
+                            }
+
+
+                            if (child.type == 'choice' || child.type == 'open-choice') {
+                                if (! child.valueSet && ! child.answerOption) {
+                                    audit.missingvs.push({item:child,parent:item})
+                                }
+                            }
+                        })
+                    }
+                })
+
+                return audit
+
+            },
 
             getObsExtension : function() {
                 //used by the dashboard...

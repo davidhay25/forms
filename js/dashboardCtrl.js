@@ -25,7 +25,25 @@ angular.module("formsApp")
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
 
+
+            $scope.expandAll = function() {
+                expandAll()
+                drawTree()
+
+            }
+            $scope.showSection = function() {
+                $scope.treeData.forEach(function (item) {
+                    item.state.opened = true
+                    if (item.parent == 'root') {
+                        item.state.opened = false;
+                    }
+                })
+                drawTree()
+            }
+
+
             $scope.input.vsList = $localStorage.formsVS
+
 
 
             if (!  $scope.input.vsList)  {
@@ -204,6 +222,9 @@ angular.module("formsApp")
                         let items = formsSvc.makeQItemsFromTree($scope.treeData)
                         $scope.selectedQ.item = items;
 
+                        $scope.treeIdToSelect = node.id
+
+                        makeFormDef()
                         drawTree()
                         $scope.dirty = true
                         //node.data.item = item
@@ -313,10 +334,10 @@ console.log(item)
 
                     let items = formsSvc.makeQItemsFromTree($scope.treeData)
                     $scope.selectedQ.item = items;
-                    $scope.selectQ($scope.selectedQ)    //sets up tree &
+                    $scope.selectQ($scope.selectedQ)    //sets up tree & draws it
                     $scope.dirty = true
-                    //drawTree()
 
+                            makeFormDef()
 
 
                         })
@@ -416,7 +437,7 @@ console.log(item)
                     let items = formsSvc.makeQItemsFromTree($scope.treeData)
                     $scope.selectedQ.item = items;
                     $scope.selectQ($scope.selectedQ)    //sets up tree &
-                    //drawTree()
+
 
 
                 }
@@ -535,9 +556,12 @@ console.log(item)
             $scope.selectQ = function(Q) {
                 clearWorkArea()
                 $scope.selectedQ = Q
+                $scope.QAudit = formsSvc.auditQ(Q)      //the audit report
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData
                 $scope.hashItem = vo.hash
+                //expandAll()
+                $scope.showSection()
                 drawTree()
                 makeFormDef()
                 $scope.dirty = false
@@ -548,7 +572,7 @@ console.log(item)
                     return
                 }
 
-                expandAll()
+                //expandAll()
                 //deSelectExcept()
                 $('#designTree').jstree('destroy');
 

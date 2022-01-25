@@ -141,11 +141,16 @@
                        <uib-tabset ng-show="treeData">
                            <uib-tab heading="Tree">
 
+
                                <div class="row">
-                                   <div class="col-md-6">
+                                   <div class="col-md-5">
+                                       <div class="pull-right">
+                                           <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
+                                           <button class="btn btn-link" ng-click="showSection()">Show sections</button>
+                                       </div>
                                        <div id="designTree"></div>
                                    </div>
-                                   <div class="col-md-6">
+                                   <div class="col-md-7">
 
                                        <uib-tabset>
 
@@ -202,7 +207,7 @@
                                                    </div>
                                                </div>
                                                <div class="row">
-                                                   <div class="col-md-3  ng-show="selectedNode.data.item.code"">
+                                                   <div class="col-md-3"  ng-show= "selectedNode.data.item.code">
                                                        Code
                                                    </div>
                                                    <div class="col-md-9">
@@ -370,9 +375,11 @@
 
                                                -->
                                            </uib-tab>
+
                                            <uib-tab heading="Json">
                                                <pre>{{selectedNode.data.item | json}}</pre>
                                            </uib-tab>
+
                                        </uib-tabset>
 
                                    </div>
@@ -391,6 +398,41 @@
                                </div>
 
                            </uib-tab>
+
+                           <uib-tab heading="Audit">
+                               <br/>
+                               <uib-tabset>
+                                   <uib-tab heading = "No code">
+                                       <br/>
+                                       <em>These items have no code, so will not be extracted as observations.
+                                           This is not necessarily an error, but if you do wish extraction to occur, then
+                                           the code needs to be added.</em>
+                                       <br/> <br/>
+                                       <table class="table">
+                                           <tr ng-repeat="item in QAudit.nocode">
+                                               <td>{{item.parent.text}} > {{item.item.text}} </td>
+                                           </tr>
+                                       </table>
+
+                                       <br/>
+                                   </uib-tab>
+                                   <uib-tab heading = "No Valueset">
+                                       <br/>
+                                       <em>Coded items missing answerValueSet or answerOptions. These are errors that need correction.</em>
+                                       <br/> <br/>
+                                       <table class="table">
+                                           <tr ng-repeat="item in QAudit.missingvs">
+                                               <td>{{item.parent.text}} > {{item.item.text}} </td>
+                                           </tr>
+                                       </table>
+                                       <br/>
+                                   </uib-tab>
+                               </uib-tabset>
+
+
+
+                           </uib-tab>
+
 
                            <uib-tab heading="Report">
                                <br/>
