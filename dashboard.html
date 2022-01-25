@@ -27,11 +27,15 @@
             overflow-y: scroll;
         }
 
+        .obsExtract {
+            background-color: #ebcccc;
+        }
+
 
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -47,7 +51,8 @@
 
     <script src="js/dashboardCtrl.js"></script>
     <script src="js/formsService.js"></script>
-
+    <script src="js/editItemCtrl.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
 
     <style>
@@ -109,15 +114,31 @@
                <div class="row">
                    <div class="col-md-2">
                        <div class="list-group">
-                           <div ng-class="{'list-group-item':true}"
+                           <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                                style="cursor: pointer"
                                 ng-click="selectQ(Q)"
                                 ng-repeat="Q in allQ">
                                {{Q.name}}
                            </div>
                        </div>
+
+                       <button class="btn btn-link"
+                               ng-click="newQ()">
+                           New Q
+                       </button>
+
+                       <div ng-show="treeData && dirty">
+                           <button class="btn btn-link"
+                                   ng-click="updateQ()">
+                               Update Q
+                           </button>
+                       </div>
+
+
+
                    </div>
                    <div class="col-md-10">
-                       <uib-tabset>
+                       <uib-tabset ng-show="treeData">
                            <uib-tab heading="Tree">
 
                                <div class="row">
@@ -127,10 +148,231 @@
                                    <div class="col-md-6">
 
                                        <uib-tabset>
-                                           <uib-tab heading="Json">
-                                               <pre>{{selectedNode.data | json}}</pre>
-                                           </uib-tab>
 
+                                           <uib-tab heading="Details">
+                                               <!--
+                                               <pre>{{selectedNode.data.level | json}}</pre>
+
+
+
+-->
+
+                                               <h4>Questionnaire Metadata</h4>
+                                               <div class="row">
+                                                   <div class="col-md-2">
+                                                       Id
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                                                   </div>
+                                               </div>
+
+                                               <div class="row">
+                                                   <div class="col-md-2">
+                                                       Url
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+                                                   </div>
+                                               </div>
+
+                                               <div class="row">
+                                                   <div class="col-md-2">
+                                                       Title
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <textarea disabled = 'disabled' class="form-control" ng-model="selectedQ.title">
+
+                                                       </textarea>
+
+                                                   </div>
+                                               </div>
+
+                                               <hr/>
+
+                                               <div ng-show = "selectedNode">
+                                               <H4>Element: {{selectedNode.data.item.text}}</H4>
+
+                                               <div class="row">
+                                                   <div class="col-md-3">
+                                                       Type
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.item.type}}
+                                                   </div>
+                                               </div>
+                                               <div class="row">
+                                                   <div class="col-md-3  ng-show="selectedNode.data.item.code"">
+                                                       Code
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <div ng-repeat = "coding in selectedNode.data.item.code">
+                                                           {{coding.code}}
+                                                           <span style="padding-left: 20px">({{coding.display}})</span>
+                                                           <span style="padding-left: 40px">{{coding.system}}</span>
+                                                       </div>
+
+                                                   </div>
+                                               </div>
+                                               <div class="row" ng-show="selectedNode.data.item.answerValueSet">
+                                                   <div class="col-md-3">
+                                                       ValueSet
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.item.answerValueSet}}
+                                                   </div>
+                                               </div>
+                                               <div class="row" ng-show="selectedNode.data.item.answerOption">
+                                                   <div class="col-md-3">
+                                                       Coded options
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.item.answerOption.length}} options in Q
+                                                   </div>
+                                               </div>
+
+                                               <hr/>
+                                               <div class="row">
+
+                                                   <div class="col-md-2">
+                                                       <button class="btn btn-link"
+                                                               ng-click="editItem(selectedNode)">
+                                                           Edit
+                                                       </button>
+                                                   </div>
+
+                                                   <div class="col-md-3">
+                                                       <div ng-show="selectedNode.data.level == 'root'">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="addItem(selectedNode,'section')">
+                                                               Add new section
+                                                           </button>
+
+                                                       </div>
+                                                       <div ng-show="selectedNode.data.level == 'parent'">
+
+                                                           <button class="btn btn-link"
+                                                                   ng-click="addItem(selectedNode,'element')">
+                                                               Add child element item
+                                                           </button>
+
+                                                       </div>
+                                                       <div ng-show="selectedNode.data.level == 'child'">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="addItem(selectedNode,'element')">
+                                                               Add sibling element
+                                                           </button>
+                                                       </div>
+
+                                                   </div>
+
+
+                                                   <div class="col-md-2">
+                                                       <div ng-show="selectedNode">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="moveUp(selectedNode)">
+                                                               Move up
+                                                           </button>
+                                                       </div>
+                                                   </div>
+                                                   <div class="col-md-2">
+                                                       <div ng-show="selectedNode">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="moveDown(selectedNode)">
+                                                               Move Down
+                                                           </button>
+                                                       </div>
+                                                   </div>
+
+                                                   <div class="col-md-2">
+                                                       <div ng-show="selectedNode">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="removeElement(selectedNode)">
+                                                               Remove element
+                                                           </button>
+                                                       </div>
+                                                   </div>
+                                               </div>
+
+                                               </div>
+
+                                               <!-- UI to add item-->
+                                               <!--
+                                               <div ng-show="newItem">
+                                                   <table class="table">
+                                                       <tr>
+                                                           <td>LinkId</td>
+                                                           <td><input type="text"
+                                                                      placeholder="A unique (in this Q) identifier for the item"
+                                                                      ng-model="newItem.linkId" class="form-control"/> </td>
+
+                                                       </tr>
+                                                       <tr>
+                                                           <td>Text</td>
+                                                           <td><input type="text"
+                                                                      placeholder="Text to display to the user"
+                                                                      ng-model="newItem.text" class="form-control"/> </td>
+
+                                                       </tr>
+                                                       <tr>
+                                                           <td>Type</td>
+                                                           <td>
+                                                               <select class="form-control" ng-model="newItem.type"
+                                                                       ng-options = "itemType for itemType in input.itemTypes"></select>
+                                                           </td>
+
+                                                       </tr>
+
+                                                       <tr ng-show = "newItem.type == 'choice' || newItem.type == 'open-choice'">
+                                                           <td>ValueSet</td>
+                                                           <td>
+                                                               <select class="form-control" ng-model="newItem.answerValueSet"
+                                                                       ng-options = "vs.display for vs in input.vsList"></select>
+                                                           </td>
+                                                       </tr>
+
+                                                       <tr>
+                                                           <td>Code</td>
+                                                           <td>
+
+                                                               <div class="row">
+                                                                   <div class="col-md-4">
+                                                                       <input class="form-control" type="text" ng-model="newItem.tmp.codeCode"
+                                                                              placeholder="Code"/>
+                                                                   </div>
+                                                                   <div class="col-md-4">
+                                                                       <select class="form-control" ng-model="newItem.tmp.codeSystem"
+                                                                               ng-options = "system.display for system in input.codeSystems"></select>
+                                                                   </div>
+                                                                   <div class="col-md-4">
+                                                                       <input class="form-control" type="text" ng-model="newItem.tmp.codeDisplay"
+                                                                              placeholder="Display"/>
+                                                                   </div>
+                                                               </div>
+
+
+
+
+                                                               <div><em>If a code is supplied, the item will be extracted as an Observation</em></div>
+                                                           </td>
+                                                       </tr>
+
+
+                                                   </table>
+
+                                                   <button class="btn btn-danger"
+                                                           ng-click="saveItem(selectedNode)">
+                                                       Add item
+                                                   </button>
+
+                                               </div>
+
+
+                                               -->
+                                           </uib-tab>
+                                           <uib-tab heading="Json">
+                                               <pre>{{selectedNode.data.item | json}}</pre>
+                                           </uib-tab>
                                        </uib-tabset>
 
                                    </div>
@@ -144,8 +386,55 @@
                            </uib-tab>
                            <uib-tab heading="Preview">
 
-                               <ng-include src = "'includes/renderFormPage.html'"></ng-include>
+                               <div class="myScroll">
+                                   <ng-include src = "'includes/renderFormPage.html'"></ng-include>
+                               </div>
+
                            </uib-tab>
+
+                           <uib-tab heading="Report">
+                               <br/>
+                              <table class="table-bordered table table-condensed">
+                                  <tr><th>Text</th><th>Type</th><th>Flags</th><th>Code</th><th>Coded info</th></tr>
+                                  <tr ng-repeat="row in treeData">
+
+                                      <td>
+                                          <div ng-show = "row.parent == 'root'">
+                                              <strong>{{row.data.item.text}}</strong>
+                                          </div>
+                                          <div ng-hide = "row.parent == 'root'">
+                                              {{row.data.item.text}}
+                                          </div>
+
+
+                                      </td>
+                                      <td>{{row.data.item.type}}</td>
+                                      <td>
+                                          <div ng-show = "row.data.item.required == true">
+                                              Req.
+                                          </div>
+                                      </td>
+
+                                      <td>{{row.data.item.code[0].code}} {{row.data.item.code[0].system}}</td>
+
+                                      <td>
+                                          {{row.data.item.answerValueSet}}
+                                          <div ng-repeat="option in row.data.item.answerOption">
+                                              {{option.valueCoding.code}} &nbsp; &nbsp; ({{option.valueCoding.display}})
+                                              <span class="pull-right">{{option.valueCoding.system}}</span>
+                                          </div>
+
+                                      </td>
+
+                                  </tr>
+                              </table>
+                           </uib-tab>
+
+                           <uib-tab heading="FSH">
+                               >>todo use gofsh to convert to FSH
+                           </uib-tab>
+
+
                            <uib-tab heading="Json">
                                <pre>{{selectedQ | json}}</pre>
                            </uib-tab>
@@ -159,10 +448,13 @@
 
                 <div class="row">
                     <div class="col-md-2">
+                        <br/>
+                        <button class="btn btn-link " ng-click="addVS()">Add VS</button>
+                        <br/>
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true}"
                                  ng-click="selectVS(vs)"
-                                 ng-repeat="vs in vsList">
+                                 ng-repeat="vs in input.vsList">
                                 {{vs.display}}
                             </div>
                         </div>
@@ -213,7 +505,7 @@
 
 
             </uib-tab>
-            <uib-tab heading="External services">
+            <uib-tab ng-show="false" heading="External services">
                 <br/>
                 <uib-tabset>
                     <uib-tab heading="NHI"></uib-tab>

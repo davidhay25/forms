@@ -116,8 +116,8 @@
             <br/>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="list-group" style="cursor:pointer;">
-                        <div ng-class="{'list-group-item':true}"
+                    <div class="list-group lis" style="cursor:pointer;">
+                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
                              ng-click="selectQ(Q)"
                              ng-repeat="Q in allQ">
                             {{Q.name}}
@@ -128,9 +128,17 @@
                     <br/>
                     <uib-tabset ng-show="selectedQ">
                         <uib-tab heading="Form">
+
+                            <div class="row">
+                                <div class="col-md-12" >
+                                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                                </div>
+                            </div>
+
+
                             <ng-include src = "'includes/renderFormPage.html'"></ng-include>
 
-                            <button ng-show = "QR" class="btn btn-danger" ng-click="submitForm()">Submit form</button>
+
 
                         </uib-tab>
                         <uib-tab heading="QR">
@@ -143,6 +151,12 @@
 
                                     <pre>{{qrValidationResult | json}}</pre>
                                 </uib-tab>
+
+                                <uib-tab heading="Tree of data">
+                                    tree to the left, selected value to the right
+
+                                </uib-tab>
+
                             </uib-tabset>
 
 
@@ -214,7 +228,7 @@
         </uib-tab>
         <uib-tab heading="Existing Forms">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="list-group">
                         <div ng-class="{'list-group-item':true}"
                              ng-click="selectQR(QRItem.QR)"
@@ -223,11 +237,50 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-10">
                     <uib-tabset>
                         <uib-tab heading="Json">
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>
+                        <uib-tab heading="Report">
+
+                            <div ng-repeat = "topItem in selectedQR.item">
+
+
+
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <strong>{{topItem.text}}</strong>
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                    </div>
+                                </div>
+
+
+                                <div ng-repeat = "item in topItem.item">
+                                    <div class="row" style="padding: 8px">
+                                        <div class="col-md-1">
+                                        </div>
+                                        <div class="col-md-2">
+                                            {{item.text}}
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            {{item.answer}}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                </div>
+
+
+
+                        </uib-tab>
+
                         <uib-tab heading="Extracted resources">
                             <em>Uses test extract operation - not query</em>
                             <pre>{{resourcesFromExistingQR | json}}</pre>
@@ -235,6 +288,9 @@
                         <uib-tab heading="Form">
                             Use the 'populate' function to generate a form view of the data.
                             or use the 'new form rendering' plus the data from the QR (setting $scope.form)
+
+
+
                         </uib-tab>
                     </uib-tabset>
 
@@ -246,18 +302,38 @@
 
         </uib-tab>
         <uib-tab heading="Query resources">
-
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn-link btn pull-right" ng-click="updateQuery()">Refresh</button>
+                </div>
+            </div>
             <uib-tabset>
                 <uib-tab heading="Observations">
                     <div class="row">
                         <div class="col-md-2">
                             <strong>Code</strong>
+                            <div class="list-group">
+                                <div class="list-group-item"
+                                     ng-click="selectObservationGroup(value)"
+                                     ng-repeat = "(key,value) in hashObservations ">
+                                    <span class="pull-right badge">{{value.resources.length}}</span>
+                                    {{value.display}}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-7">
                             <strong>Table of Obs</strong>
+                            <table class="table table-condensed table-bordered">
+                                <tr ng-repeat = "obs in observationGroup.resources"  ng-click="input.selectedObs = obs">
+                                    <td>{{obs.effectiveDateTime}}</td>
+                                    <td><pre>{{obs.valueCodeableConcept}}{{obs.valueQuantity}}{{obs.valueString}}
+                                    </pre></td>
+                                </tr>
+                            </table>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-34">
                             <strong>Selected Obs</strong>
+                            <pre>{{input.selectedObs | json}}</pre>
                         </div>
                     </div>
 
@@ -270,6 +346,12 @@
 
 
 
+
+        </uib-tab>
+        <uib-tab heading = "Clinical Perspective">
+
+
+            continuous page list of episodes problems, meds, allergies. Can see at a glance. Clincial dashboard
 
         </uib-tab>
     </uib-tabset>

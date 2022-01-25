@@ -28,6 +28,7 @@ angular.module("formsApp")
             //used by type-ahead for ValueSet based selection
             $scope.getConcepts = function(val,url) {
 
+                $scope.showWaiting = true;
                 let qry =  termServer + "ValueSet/$expand?url=" + url
                 //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
                 qry += "&filter=" + val
@@ -44,11 +45,15 @@ angular.module("formsApp")
                             return [{display:"no matching values"}]
                         }
 
-                        return [{display:"aaa"},{display:'bbbb'}]
+                        //return [{display:"aaa"},{display:'bbbb'}]
                     },
                     function(err){
                         console.log(err)
                         return [{display:"no matching values"}]
+                    }
+                ).finally(
+                    function() {
+                        $scope.showWaiting = false
                     }
                 )
             };
@@ -140,8 +145,14 @@ angular.module("formsApp")
             }
 
 
+            //an existing QR is selected
             $scope.selectQR = function(QR) {
                 $scope.selectedQR = QR
+
+                //set the data for the form
+                $scope.formDef
+                $scope.form
+
 
                 let url = "/fr/testextract"
                 $http.post(url,QR).then(
@@ -158,7 +169,6 @@ angular.module("formsApp")
                         $scope.resourcesFromExistingQR = err.data
                     }
                 )
-
             }
 
 
@@ -177,6 +187,7 @@ angular.module("formsApp")
                         function(data) {
                             console.log(data.data)
                             alert("Form has been saved, and any Observations extracted and saved")
+                            $scope.selectPatient()  //to read the new data
                         }, function(err) {
                             alert(angular.toJson(err.data))
                         }
@@ -202,7 +213,12 @@ angular.module("formsApp")
                         if (data.data && data.data.entry) {
                             data.data.entry.forEach(function (entry){
                                 let QR = entry.resource
-                                $scope.existingQR.push({QR:QR,display:QR.questionnaire})
+
+                                if (QR.questionnaire) {
+                                    let ar = QR.questionnaire.split('/')
+                                    $scope.existingQR.push({QR:QR,Q:QR.questionnaire,display:ar[ar.length -1]})
+                                }
+
                             })
                         }
                     }
@@ -212,12 +228,42 @@ angular.module("formsApp")
                 getObservationsForPatient($scope.input.selectedPatient.resource.id)
             }
 
+            $scope.updateQuery = function(){
+                getObservationsForPatient($scope.input.selectedPatient.resource.id)
+            }
+
+            $scope.selectObservationGroup = function(group) {
+                delete $scope.input.selectedObs
+                $scope.observationGroup = group
+            }
+
             let getObservationsForPatient = function(patId){
-                let url = "/ds/fhir/Observation?patient="+patId
+                let url = "/ds/fhir/Observation?patient="+patId + "&_count=50"
 
                 $http.get(url).then(
                     function (data) {
                         $scope.bundleObservations = data.data
+
+                        //create observation hash by code
+                        $scope.hashObservations = {}
+                        if ($scope.bundleObservations.entry) {
+                            $scope.bundleObservations.entry.forEach(function (entry) {
+                                let obs = entry.resource
+                                let code,display
+                                if (obs.code && obs.code.coding && obs.code.coding.length > 0) {
+                                    code = obs.code.coding[0].system + "#" + obs.code.coding[0].code
+                                    display = obs.code.coding[0].display
+                                }
+                                if (code) {
+                                    $scope.hashObservations[code] = $scope.hashObservations[code] || {display:display,resources:[]}
+                                    $scope.hashObservations[code].resources.push(obs)
+                                }
+
+                            })
+                            console.log($scope.hashObservations)
+                        }
+
+
                     }
                 )
             }

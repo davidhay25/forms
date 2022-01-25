@@ -1,0 +1,139 @@
+
+<div>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <h3 ng-show="editType == 'edit'" class="modal-title">Edit Item</h3>
+                <h3 ng-show="editType == 'new'" class="modal-title">New Item</h3>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <uib-tabset>
+            <uib-tab heading="Question details">
+                <table class="table">
+                    <tr>
+                        <td>LinkId</td>
+                        <td><input type="text"
+                                   placeholder="A unique (in this Q) identifier for the item"
+                                   ng-model="newItem.linkId" class="form-control"/> </td>
+
+                    </tr>
+                    <tr>
+                        <td>Text</td>
+                        <td><input type="text"
+                                   placeholder="Text to display to the user"
+                                   ng-model="newItem.text" class="form-control"/> </td>
+
+                    </tr>
+
+
+
+                    <tr>
+                        <td>Type</td>
+                        <td>
+                            <select class="form-control" ng-model="newItem.type"
+                                    ng-options = "itemType for itemType in input.itemTypes"></select>
+                        </td>
+
+                    </tr>
+
+                    <tr ng-show = "newItem.type == 'quantity'">
+                        <td>Units</td>
+                        <td>
+                            <input class="form-control" type="text" ng-model="newItem.tmp.units"
+                                   placeholder="Units (using UCUM)"/>
+                            <em>Add link to UCUM or a lookup</em>
+                        </td>
+
+                    </tr>
+
+                    <tr ng-show = "newItem.type == 'choice' || newItem.type == 'open-choice'">
+                        <td>ValueSet</td>
+                        <td>
+                            <input class="form-control" type="text" ng-model="newItem.answerValueSet"
+                                   placeholder="ValueSet url"/>
+                            <!--
+                            <select class="form-control" ng-model="newItem.answerValueSet"
+                                    ng-options = "vs.display for vs in input.vsList"></select>
+
+                            -->
+                            <em class="pull-right">ToDo: allow select off server</em>
+                        </td>
+                    </tr>
+
+                    <tr ng-hide = "newItem.type == 'display' ">
+                        <td>Code</td>
+                        <td>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input class="form-control" type="text" ng-model="newItem.tmp.codeCode"
+                                           placeholder="Code"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-control" ng-model="newItem.tmp.codeSystem"
+                                            ng-options = "system.display for system in input.codeSystems"></select>
+                                </div>
+                                <div class="col-md-4">
+                                    <input class="form-control" type="text" ng-model="newItem.tmp.codeDisplay"
+                                           placeholder="Display"/>
+                                </div>
+                            </div>
+
+
+                            <div><em>If a code is supplied, the item will be extracted as an Observation</em></div>
+                        </td>
+                    </tr>
+
+
+                </table>
+
+
+            </uib-tab>
+            <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >
+                <uib-tab-heading>Options <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
+                <table class="table table-bordered table-condensed">
+                    <tr ng-repeat = "option in newItem.answerOption">
+                        <td>{{option.valueCoding.code}}</td>
+                        <td>{{option.valueCoding.system}}</td>
+                        <td>{{option.valueCoding.display}}</td>
+                        <td>X</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="form-control" placeholder="Code" ng-model="newAnswerCode"/> </td>
+                        <td><input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/> </td>
+                        <td><input type="text" class="form-control" placeholder="Display" ng-model="newAnswerDisplay"/> </td>
+                        <td>+</td>
+                    </tr>
+                </table>
+
+            </uib-tab>
+        </uib-tabset>
+
+
+</div>
+
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <button class="btn btn-success pull-right"
+                        ng-click="save()">
+                    <div ng-show="editType == 'edit'">Save changes</div>
+                    <div ng-show="editType == 'new'">Add new item</div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

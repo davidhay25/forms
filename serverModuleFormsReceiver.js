@@ -1,5 +1,5 @@
 //Forms receiver module. Receives a QR and processes it
-
+//hapi server in ~/hapi-forms on dev machine
 const axios = require('axios').default;
 let serverRoot
 
@@ -126,6 +126,7 @@ function performObservationExtraction(Q,QR) {
     })
 
 
+    //go through the QR and generate a hash or response items keyed by linkId
     function parseQR(hashQR,item) {
         if (item.item) {
             item.item.forEach(function(child){
@@ -136,19 +137,34 @@ function performObservationExtraction(Q,QR) {
             //It's assumed that there is only an item if it has a value
             hashQR[item.linkId] = item
 
-
         }
     }
-    parseQR(hashQR,QR.item[0])
 
-    //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts
+    QR.item.forEach(function(topLevel){
+        //parseQ(hashQ,Q.item[0])
+        parseQR(hashQR,topLevel)
+    })
+
+    //parseQR(hashQR,QR.item[0])
+
+    //the provenance resource for this action
+    let provenance = {resourceType:"Provenance",recorded:new Date().toISOString(), target:[],entity:[]}
+
+    //set the entity to the QR. The id should be present - add a fullUrl to the bundle
+    provenance.entity.push({role:"source",what:{reference:"/QuestionnaireResponse/" + QR.id}})
+
+    //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
+    //console.log('QR',hashQR)
     Object.keys(hashQ).forEach(function (key){
         let QItem = hashQ[key]  //the Q item that this QR item is an answer to
         //is there a QR item with a matching linkId?
+        //console.log(key)
         if (hashQR[key]) {
             // yes there is. Create an observation for each answer.
             let QRItem = hashQR[key]    //the item from the QR
+            //console.log("qri",key,QRItem)
             //console.log('a',QRItem,QItem)
+            //console.log(QRItem.answer)
             QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
                 //theAnswer is a single answer value...
                 let observation = {resourceType:'Observation'}

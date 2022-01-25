@@ -8,7 +8,10 @@ angular.module("formsApp")
         return {
 
 
-
+            getObsExtension : function() {
+                //used by the dashboard...
+                return extUrlObsExtract
+            },
             findExtension : function(item,url) {
                 //return an array with all matching extensions
                 let ar = []
@@ -54,7 +57,7 @@ angular.module("formsApp")
                 function parseQ(node,item) {
                     if (item.item) {
 
-                        let parentNode = {linkId:item.linkId,item:[]}
+                        let parentNode = {linkId:item.linkId,item:[],text:item.text}
                         node.item.push(parentNode)
 
                         item.item.forEach(function(child){
@@ -65,7 +68,7 @@ angular.module("formsApp")
                     } else {
                         //is there a value:
                         let value = form[item.linkId]
-                        let itemToAdd = {linkId : item.linkId,answer:[]}
+                        let itemToAdd = {linkId : item.linkId,answer:[],text:item.text}
 
                         if (value) {
                             switch (item.type) {
@@ -214,13 +217,12 @@ angular.module("formsApp")
                 let formDef = angular.copy(treeData)
                 formDef.splice(0,1)      //remove the root
 
-
-
-
 /* not sure whether to do this here, or by the QCreator when the Q is created / updated... */
-                // Add a flag so can show
+
+                // Add a flag so can show extractables
                 formDef.forEach(function (def) {
-                    let ar = that.findExtension(def.data, extUrlObsExtract)
+                    let ar = that.findExtension(def.data.item, extUrlObsExtract)
+                    //console.log(ar.length)
                     if (ar.length > 0 && ar[0].valueBoolean == true) {
                         def.meta = {obsExtract:true}
                     }
@@ -237,17 +239,77 @@ angular.module("formsApp")
 
 
                 deferred.resolve(formDef)
-
                 return deferred.promise
 
 
             },
 
+            makeQItemsFromTree : function(treedata) {
+                //make a set of Q items from the tree. 2 levels only. todo make recursive
+                //console.log(treedata)
+
+
+                //create an array of root nodes
+                let arItems = []    //the Q has an array of items - not a single element...
+                let parentItem = {}
+                treedata.forEach(function (node){
+
+                    if (node.parent == '#') {
+                        //ignore the root
+                    } else if (node.parent == 'root') {
+                        //this is a node off the root - ie a top level item
+                        parentItem = node.data.item
+                        parentItem.item = []
+
+                        parentItem.type = 'group'  //force the type
+
+                        arItems.push(parentItem)
+                    } else {
+                        //this is a child off the top level. Here is where any recursion would go if > 2 levels
+                        //note that recursion is on tree structure
+                        let leafItem = node.data.item
+                        delete leafItem.item    //just in case - shouldn't be here at 2 levels....
+
+                        parentItem.item.push(leafItem)
+                    }
+                })
+                //console.log(arItems)
+                return arItems
+
+
+                //when recursing, get the structure from the tree - not the items.items
+
+                /*
+                //now, process each top level item iteratively
+                arItems.forEach(function (topItem){
+                    topItem
+                    arItems.push(topItem)
+
+                })
+
+                function processBranch(ar,item) {
+
+                    if (item.item) {
+                        //this is a parent
+                        item.item.forEach(function (child){
+                            processBranch(ar,child)
+                        })
+
+                    } else {
+                        //this is a leaf - add the item to the array
+                        ar.push(item)
+                    }
+
+                }
+*/
+            },
+
             makeTreeFromQ : function (Q) {
+                //specifically 2 levels. Not recursive
                 let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                 let treeData = []
                 let hash = {}
-                let root = {id:'root',text:'Root',parent:'#',state:{},data:{}}
+                let root = {id:'root',text:'Root',parent:'#',state:{},data:{level:'root'}}
                 treeData.push(root)
 
                 Q.item.forEach(function(parentItem){
@@ -255,10 +317,13 @@ angular.module("formsApp")
                     let item = {id: parentItem.linkId,state:{},data:{}}
                     item.text = parentItem.text;
                     item.parent = "root";
-                    item.data = {type:parentItem.type,text:parentItem.text};
-                    item.data.mult = makeMult(parentItem) //mult
+                    item.data = {item:parentItem,level:'parent'}
+                    //item.meta = {level:'parent'}
+                    //item.data = {type:parentItem.type,text:parentItem.text};
+
+                    //item.data.mult = makeMult(parentItem) //mult
                     item.answerValueSet = parentItem.answerValueSet
-                    item.data.description = getDescription(parentItem)
+                    // why do I need this?item.data.description = getDescription(parentItem)
 
                     hash[item.id] = item.data;
                     treeData.push(item)
@@ -268,7 +333,8 @@ angular.module("formsApp")
                             let item = {id: child.linkId,state:{},data:{}}
                             item.text = child.text;
                             item.parent = parentItem.linkId;
-                            item.data = child
+                            item.data = {item:child,level:'child'} //child
+                            //item.meta = {level:'child'}
                             /*
                             item.data = {type:child.type,text:child.text};
                             item.data.answerOption = child.answerOption
