@@ -17,14 +17,12 @@ angular.module("formsApp")
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
-
             $localStorage.formsVS = $localStorage.formsVS || []
             if ($localStorage.formsVS.length == 0) {
-                console.log('read')
+
                 $localStorage.formsVS.push({display:"Yes, No, Don't know",description:"Standard VS to replace boolean",url:"http://hl7.org/fhir/ValueSet/yesnodontknow"})
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
-
 
             $scope.expandAll = function() {
                 expandAll()
@@ -44,8 +42,6 @@ angular.module("formsApp")
 
             $scope.input.vsList = $localStorage.formsVS
 
-
-
             if (!  $scope.input.vsList)  {
 
                 $scope.input.vsList = []      //populate from List of VS from forms server
@@ -56,33 +52,47 @@ angular.module("formsApp")
             }
 
 
-
+            //create a new Q
             $scope.newQ = function() {
-                //need to collect the Q metadata (name, url, description etc.) ? a modal
-                alert("To be developed")
+                $scope.editQ()
+            }
+
+            $scope.editQ = function(Q) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editQ.html',
+                    backdrop: 'static',
+                    controller: 'editQCtrl',
+                    resolve: {
+                        Q: function () {
+                            return Q
+                        }
+                    }
+                }).result.then(
+                    function (Q) {
+                        if (Q) {
+                            //if a Q is passed back, it is a new one
+
+                            $scope.drawQ(Q)
+                        }
+                    }
+                )
+
             }
 
             $scope.addVS = function(){
                 alert("To be developed")
             }
 
-            $scope.updateItemDEP = function(node) {
-
-                let inx = findPositionInTree(node)
-                let element = $scope.treeData[inx]
-                element.text = node.data.item.text
-                element.data.item.text = node.data.item.text
 
 
-                drawTree()
-            }
-
-            //udate the seelctedQ on the forms manager server
+            //update the selctedQ on the forms manager server
             $scope.updateQ = function() {
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
                         alert("Q updated on the Forms Manager")
+                        $scope.input.dirty = false;
                     }, function(err) {
                         alert(angular.toJson(err.data))
                     }
@@ -92,7 +102,7 @@ angular.module("formsApp")
             let updateAfterEdit = function(){
                 let items = formsSvc.makeQItemsFromTree($scope.treeData)
                 $scope.selectedQ.item = items;
-                $scope.selectQ($scope.selectedQ)
+                $scope.drawQ($scope.selectedQ)
             }
 
             $scope.moveUp = function(node) {
@@ -107,7 +117,7 @@ angular.module("formsApp")
                             $scope.treeData.splice(inx+1,1)
                             $scope.treeIdToSelect = node.id
                             updateAfterEdit()
-                            $scope.dirty = true
+                            $scope.input.dirty = true
                         } else {
                             alert("Already at the top of the section")
                         }
@@ -134,7 +144,7 @@ angular.module("formsApp")
 
                             $scope.treeIdToSelect = node.id
                             updateAfterEdit()
-                            $scope.dirty = true
+                            $scope.input.dirty = true
 
                         } else {
                             alert("Already at the bottom of the section")
@@ -186,7 +196,7 @@ angular.module("formsApp")
 
                 let items = formsSvc.makeQItemsFromTree($scope.treeData)
                 $scope.selectedQ.item = items;
-                $scope.selectQ($scope.selectedQ)
+                $scope.drawQ($scope.selectedQ)
             }
 
 
@@ -226,7 +236,7 @@ angular.module("formsApp")
 
                         makeFormDef()
                         drawTree()
-                        $scope.dirty = true
+                        $scope.input.dirty = true
                         //node.data.item = item
                     })
             }
@@ -267,75 +277,58 @@ angular.module("formsApp")
                     }).result.then(
                         function (item) {
                             //return the item to insert into the tree...
-console.log(item)
 
-/*
-                    //If a code has been entered, set the coding and the extension
-                    if (item.tmp.codeCode) {
-                        let code = {code:item.tmp.codeCode,system:item.tmp.codeSystem.url,display:item.tmp.codeDisplay}
-                        item.code = [code]
-                        delete item.tmp
-
-                        //add the extension for observation extraction
-                        item.extension = []
-                        item.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
-                    }
-
-*/
-                    //create the new treeview node
-                    let newNode = {id: item.linkId,state:{},data:{}}      //the treeview node
-                    newNode.text = item.text;    //text to display in the tree
-                    newNode.data = {item:item}
+                            //create the new treeview node
+                            let newNode = {id: item.linkId,state:{},data:{}}      //the treeview node
+                            newNode.text = item.text;    //text to display in the tree
+                            newNode.data = {item:item}
 
 
-                    //the level is where the node sits relative to the parent
-                    switch (insertType) {
-                        case 'section' :
-                            //a new section. Add to the end with the parent as 'root'
-                            newNode.parent = 'root'
-                            newNode.data.level = 'parent'
-                            $scope.treeData.splice($scope.treeData.length+1,0,newNode)
-                            break
-                        case 'element' :
-                            //the selected node is a child of the parent node
-                            if (node.parent == 'root') {        //ie the parent is a section
-                                //this is a child element
-                                newNode.parent = node.id
-                                newNode.data.level = 'child'
+                            //the level is where the node sits relative to the parent
+                            switch (insertType) {
+                                case 'section' :
+                                    //a new section. Add to the end with the parent as 'root'
+                                    newNode.parent = 'root'
+                                    newNode.data.level = 'parent'
+                                    $scope.treeData.splice($scope.treeData.length+1,0,newNode)
+                                    break
+                                case 'element' :
+                                    //the selected node is a child of the parent node
+                                    if (node.parent == 'root') {        //ie the parent is a section
+                                        //this is a child element
+                                        newNode.parent = node.id
+                                        newNode.data.level = 'child'
 
-                                //ensure that the parent is set appropriately
-                                //todo - this only works if only parents are off the root
-                                node.data.item.type = 'group'   //it must be a group
-                                node.data.level = 'parent'      //? need to check for root?
+                                        //ensure that the parent is set appropriately
+                                        //todo - this only works if only parents are off the root
+                                        node.data.item.type = 'group'   //it must be a group
+                                        node.data.level = 'parent'      //? need to check for root?
 
-                                $scope.treeData.splice(parentPosition+1,0,newNode)
-                            } else {
-                                //this is a leaf off a section
-                                newNode.parent = node.parent
-                                newNode.data.level = 'child'
+                                        $scope.treeData.splice(parentPosition+1,0,newNode)
+                                    } else {
+                                        //this is a leaf off a section
+                                        newNode.parent = node.parent
+                                        newNode.data.level = 'child'
 
-                                //ensure that the parent is set appropriately
-                                node.data.item.type = 'group'   //it must be a group
-                                node.data.level = 'parent'
-                                $scope.treeData.splice(parentPosition+1,0,newNode)
+                                        //ensure that the parent is set appropriately
+                                        node.data.item.type = 'group'   //it must be a group
+                                        node.data.level = 'parent'
+                                        $scope.treeData.splice(parentPosition+1,0,newNode)
+
+                                    }
+                                    //newNode.parent = node.id
+                                    //newNode.data.level = 'child'
+                                    break
 
                             }
-                            //newNode.parent = node.id
-                            //newNode.data.level = 'child'
-                            break
 
-                    }
+                            $scope.treeIdToSelect = newNode.id
 
-                    $scope.treeIdToSelect = newNode.id
+                            let items = formsSvc.makeQItemsFromTree($scope.treeData)
+                            $scope.selectedQ.item = items;
 
-
-                    //update the Q items
-
-
-                    let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                    $scope.selectedQ.item = items;
-                    $scope.selectQ($scope.selectedQ)    //sets up tree & draws it
-                    $scope.dirty = true
+                            $scope.drawQ($scope.selectedQ)    //sets up tree & draws it
+                            $scope.input.dirty = true
 
                             makeFormDef()
 
@@ -358,95 +351,6 @@ console.log(item)
 
             //save new item (insert it into the treeData). Later, will convert the tree data to a Q
             //and update. Note that update is only for the items in the Q - leave the others
-            //todo - set up for new Q
-            $scope.saveItemDEP = function(node) {
-                let parentItem = node.data.item
-                let parentPosition = findPositionInTree(node)
-                if (parentPosition > -1) {
-                    //regardless of child / sibling we insert the node directly after the parent. ..
-
-                    //set the code (if entered)
-                    let newItem = $scope.newItem;   //the item to be inserted
-                    if (newItem.tmp.codeCode) {
-                        let code = {code:$scope.newItem.tmp.codeCode,system:newItem.tmp.codeSystem.url,display:newItem.tmp.codeDisplay}
-                        newItem.code = [code]
-                        delete newItem.tmp
-
-                        //add the extension for observation extraction
-                        newItem.extension = []
-                        newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
-                    }
-
-
-
-                    //insertType is 'section' (add to the root) or 'element' (add within a section)
-                    //if an element, then if the parent is off the root it's a child, otherwise it's a sibling
-
-                    let insertType = newItem.insertType
-                    delete newItem.insertType
-
-                    let newNode = {id: newItem.linkId,state:{},data:{}}      //the treeview node
-
-                    newNode.text = newItem.text;    //text to display in the tree
-                    newNode.data = {item:newItem}
-
-
-                    //the level is where the node sits relative to the parent
-                    switch (insertType) {
-                        case 'section' :
-                            //a new section. Add to the end with the parent as 'root'
-                            newNode.parent = 'root'
-                            newNode.data.level = 'parent'
-                            $scope.treeData.splice($scope.treeData.length+1,0,newNode)
-                            break
-                        case 'element' :
-                            //the selected node is a child of the parent node
-                            if (node.parent == 'root') {        //ie the parent is a section
-                                //this is a child element
-                                newNode.parent = node.id
-                                newNode.data.level = 'child'
-
-                                //ensure that the parent is set appropriately
-                                node.data.item.type = 'group'   //it must be a group
-                                node.data.level = 'parent'      //? need to check for root?
-
-                                $scope.treeData.splice(parentPosition+1,0,newNode)
-                            } else {
-                                //this is a leaf off a section
-                                newNode.parent = node.parent
-                                newNode.data.level = 'child'
-
-                                //ensure that the parent is set appropriately
-                                node.data.item.type = 'group'   //it must be a group
-                                node.data.level = 'parent'
-                                $scope.treeData.splice(parentPosition+1,0,newNode)
-
-                            }
-                            //newNode.parent = node.id
-                            //newNode.data.level = 'child'
-                            break
-
-                        }
-
-                    $scope.treeIdToSelect = newNode.id
-
-
-                    //update the Q items
-
-
-                    let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                    $scope.selectedQ.item = items;
-                    $scope.selectQ($scope.selectedQ)    //sets up tree &
-
-
-
-                }
-
-
-
-
-                }
-
 
             //-----------  tree utility functions
 
@@ -553,18 +457,55 @@ console.log(item)
                 delete $scope.selectedVsItem
             }
 
+            //when called from Q list
             $scope.selectQ = function(Q) {
+                if ($scope.input.dirty) {
+                    if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
+                        $scope.drawQ(Q,true)
+                        $scope.treeIdToSelect = "root"
+                        $scope.input.dirty = false
+                    }
+                } else {
+                    $scope.drawQ(Q,true)
+                    $scope.treeIdToSelect = "root"
+                }
+
+            }
+
+            //perfroms a 'redraw' of the Q - called frequently
+            $scope.drawQ = function(Q,resetToSection) {
+                //save the current state of node expansion
+                let hashState = {}
+                if ($scope.treeData) {
+                    $scope.treeData.forEach(function (node){
+                        hashState[node.id] = node.state.opened
+
+                    })
+                }
+
+
                 clearWorkArea()
                 $scope.selectedQ = Q
                 $scope.QAudit = formsSvc.auditQ(Q)      //the audit report
                 let vo = formsSvc.makeTreeFromQ(Q)
-                $scope.treeData = vo.treeData
-                $scope.hashItem = vo.hash
+                $scope.treeData = vo.treeData       //for drawing the tree
+                // - not currently used? $scope.hashItem = vo.hash
                 //expandAll()
-                $scope.showSection()
+                //$scope.treeIdToSelect = "root"
+                if (resetToSection) {
+                    $scope.showSection()
+                } else {
+                    //restore the opened state
+                    $scope.treeData.forEach(function (node){
+
+                        node.state.opened = hashState[node.id]
+
+                    })
+                }
+
                 drawTree()
                 makeFormDef()
-                $scope.dirty = false
+              //  $scope.input.dirty = false
             }
 
             let drawTree = function() {

@@ -1,0 +1,80 @@
+
+<div>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <h3 ng-show="editType == 'edit'" class="modal-title">Edit Q</h3>
+                <h3 ng-show="editType == 'new'" class="modal-title">New Q</h3>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+                <table class="table">
+
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text"
+                                   placeholder="Name (no spaces)"
+                                   ng-change="updateUrl(Q.name)"
+                                   ng-model="Q.name" class="form-control"/> </td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td>Title</td>
+                        <td><input type="text"
+                                   placeholder="Brief description"
+                                   ng-model="Q.title" class="form-control"/> </td>
+
+                    </tr>
+
+
+
+                    <tr>
+                        <td>Description</td>
+                        <td>
+                            <textarea ng-model="Q.description" placeholder="Long description" class="form-control">
+
+                            </textarea>
+                        </td>
+
+                    </tr>
+
+
+
+                </table>
+
+
+
+
+
+</div>
+
+    <div class="modal-header">
+
+        <div class="row">
+
+            <div class="col-md-6 col-sm-6">
+                <strong>{{Q.url}}</strong>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <button class="btn btn-success pull-right"
+                        ng-click="save()">
+                    <div ng-show="editType == 'edit'">Save changes</div>
+                    <div ng-show="editType == 'new'">Add new item</div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

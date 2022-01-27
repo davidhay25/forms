@@ -52,6 +52,7 @@
     <script src="js/dashboardCtrl.js"></script>
     <script src="js/formsService.js"></script>
     <script src="js/editItemCtrl.js"></script>
+    <script src="js/editQCtrl.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
 
@@ -127,7 +128,7 @@
                            New Q
                        </button>
 
-                       <div ng-show="treeData && dirty">
+                       <div ng-show="treeData && input.dirty">
                            <button class="btn btn-link"
                                    ng-click="updateQ()">
                                Update Q
@@ -139,7 +140,8 @@
                    </div>
                    <div class="col-md-10">
                        <uib-tabset ng-show="treeData">
-                           <uib-tab heading="Tree">
+
+                           <uib-tab heading="Q Items tree">
 
 
                                <div class="row">
@@ -155,45 +157,6 @@
                                        <uib-tabset>
 
                                            <uib-tab heading="Details">
-                                               <!--
-                                               <pre>{{selectedNode.data.level | json}}</pre>
-
-
-
--->
-
-                                               <h4>Questionnaire Metadata</h4>
-                                               <div class="row">
-                                                   <div class="col-md-2">
-                                                       Id
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
-                                                   </div>
-                                               </div>
-
-                                               <div class="row">
-                                                   <div class="col-md-2">
-                                                       Url
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
-                                                   </div>
-                                               </div>
-
-                                               <div class="row">
-                                                   <div class="col-md-2">
-                                                       Title
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <textarea disabled = 'disabled' class="form-control" ng-model="selectedQ.title">
-
-                                                       </textarea>
-
-                                                   </div>
-                                               </div>
-
-                                               <hr/>
 
                                                <div ng-show = "selectedNode">
                                                <H4>Element: {{selectedNode.data.item.text}}</H4>
@@ -298,82 +261,13 @@
                                                        </div>
                                                    </div>
                                                </div>
-
-                                               </div>
-
-                                               <!-- UI to add item-->
-                                               <!--
-                                               <div ng-show="newItem">
-                                                   <table class="table">
-                                                       <tr>
-                                                           <td>LinkId</td>
-                                                           <td><input type="text"
-                                                                      placeholder="A unique (in this Q) identifier for the item"
-                                                                      ng-model="newItem.linkId" class="form-control"/> </td>
-
-                                                       </tr>
-                                                       <tr>
-                                                           <td>Text</td>
-                                                           <td><input type="text"
-                                                                      placeholder="Text to display to the user"
-                                                                      ng-model="newItem.text" class="form-control"/> </td>
-
-                                                       </tr>
-                                                       <tr>
-                                                           <td>Type</td>
-                                                           <td>
-                                                               <select class="form-control" ng-model="newItem.type"
-                                                                       ng-options = "itemType for itemType in input.itemTypes"></select>
-                                                           </td>
-
-                                                       </tr>
-
-                                                       <tr ng-show = "newItem.type == 'choice' || newItem.type == 'open-choice'">
-                                                           <td>ValueSet</td>
-                                                           <td>
-                                                               <select class="form-control" ng-model="newItem.answerValueSet"
-                                                                       ng-options = "vs.display for vs in input.vsList"></select>
-                                                           </td>
-                                                       </tr>
-
-                                                       <tr>
-                                                           <td>Code</td>
-                                                           <td>
-
-                                                               <div class="row">
-                                                                   <div class="col-md-4">
-                                                                       <input class="form-control" type="text" ng-model="newItem.tmp.codeCode"
-                                                                              placeholder="Code"/>
-                                                                   </div>
-                                                                   <div class="col-md-4">
-                                                                       <select class="form-control" ng-model="newItem.tmp.codeSystem"
-                                                                               ng-options = "system.display for system in input.codeSystems"></select>
-                                                                   </div>
-                                                                   <div class="col-md-4">
-                                                                       <input class="form-control" type="text" ng-model="newItem.tmp.codeDisplay"
-                                                                              placeholder="Display"/>
-                                                                   </div>
-                                                               </div>
-
-
-
-
-                                                               <div><em>If a code is supplied, the item will be extracted as an Observation</em></div>
-                                                           </td>
-                                                       </tr>
-
-
-                                                   </table>
-
-                                                   <button class="btn btn-danger"
-                                                           ng-click="saveItem(selectedNode)">
-                                                       Add item
-                                                   </button>
-
+                                                   <!--
+                                                <hr/>
+                                               <pre>{{selectedNode.data.item | json}}</pre>
+-->
                                                </div>
 
 
-                                               -->
                                            </uib-tab>
 
                                            <uib-tab heading="Json">
@@ -391,7 +285,56 @@
 
 
                            </uib-tab>
-                           <uib-tab heading="Preview">
+
+                           <uib-tab heading="Q metadata">
+                               <br/>
+                               <div class="row">
+                                   <div class="col-md-2">
+                                       Id
+                                   </div>
+                                   <div class="col-md-9">
+                                       <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                                   </div>
+                               </div>
+
+                               <div class="row">
+                                   <div class="col-md-2">
+                                       Url
+                                   </div>
+                                   <div class="col-md-9">
+                                       <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+                                   </div>
+                               </div>
+
+                               <div class="row">
+                                   <div class="col-md-2">
+                                       Title
+                                   </div>
+                                   <div class="col-md-9">
+                                       <textarea class="form-control" ng-model="selectedQ.title"
+                                        ng-change="input.dirty = true">
+
+                                       </textarea>
+
+                                   </div>
+                               </div>
+
+                               <div class="row">
+                                   <div class="col-md-2">
+                                       Description
+                                   </div>
+                                   <div class="col-md-9">
+                                       <textarea class="form-control" ng-model="selectedQ.description"
+                                                 ng-change="input.dirty = true">
+
+                                       </textarea>
+
+                                   </div>
+                               </div>
+
+                           </uib-tab>
+
+                           <uib-tab heading="Form preview">
 
                                <div class="myScroll">
                                    <ng-include src = "'includes/renderFormPage.html'"></ng-include>
@@ -432,7 +375,6 @@
 
 
                            </uib-tab>
-
 
                            <uib-tab heading="Report">
                                <br/>

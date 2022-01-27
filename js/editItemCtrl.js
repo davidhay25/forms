@@ -19,11 +19,34 @@ angular.module("formsApp")
                         $scope.newItem.tmp.codeSystem = cs
                     }
                 })
+            }
+
+            $scope.removeAnswerOption = function(inx){
+                $scope.newItem.answerOption.splice(inx)
+            }
+
+            $scope.addAnswerOption = function(code,system,display){
+                if ($scope.newItem.valueSet) {
+                    alert("You can't have both a ValueSet and list of options.")
+                    return
+                }
+
+                $scope.newItem.answerOption = $scope.newItem.answerOption || []
+                let opt = {valueCoding:{}}
+                opt.valueCoding.code = code
+
+                opt.valueCoding.system = system
+                opt.valueCoding.display = display
+
+                //let the selected system remain
+                delete $scope.input.newAnswerCode
+                delete $scope.input.newAnswerDisplay
+
+                $scope.newItem.answerOption.push(opt)
 
             }
 
             $scope.save = function() {
-
 
                 if ( $scope.newItem.tmp && $scope.newItem.tmp.units) {
                     let unitsExtension = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit" //defined in the core spec

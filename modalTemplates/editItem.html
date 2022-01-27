@@ -19,6 +19,8 @@
     </div>
     <div class="modal-body">
 
+
+
         <uib-tabset>
             <uib-tab heading="Question details">
                 <table class="table">
@@ -106,15 +108,32 @@
                 <table class="table table-bordered table-condensed">
                     <tr ng-repeat = "option in newItem.answerOption">
                         <td>{{option.valueCoding.code}}</td>
-                        <td>{{option.valueCoding.system}}</td>
+                        <td>
+                            {{option.valueCoding.system}}
+                        </td>
                         <td>{{option.valueCoding.display}}</td>
-                        <td>X</td>
+                        <td>
+                            <i class=" clickable glyphicon glyphicon-remove"
+                               ng-click = "removeAnswerOption($index)"></i>
+                        </td>
                     </tr>
                     <tr>
-                        <td><input type="text" class="form-control" placeholder="Code" ng-model="newAnswerCode"/> </td>
-                        <td><input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/> </td>
-                        <td><input type="text" class="form-control" placeholder="Display" ng-model="newAnswerDisplay"/> </td>
-                        <td>+</td>
+                        <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
+                        <td>
+
+                            <select class="form-control" ng-model="input.newAnswerSystem"
+                                    ng-options = "system.display for system in input.codeSystems"></select>
+                            <!--
+                            <input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/>
+                        -->
+                        </td>
+                        <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
+                        <td>
+                            <i ng-show="input.newAnswerCode"
+                               class="clickable glyphicon glyphicon-plus-sign"
+                               ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
+
+
                     </tr>
                 </table>
 
