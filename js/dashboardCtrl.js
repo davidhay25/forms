@@ -105,6 +105,12 @@ angular.module("formsApp")
                 $scope.drawQ($scope.selectedQ)
             }
 
+
+            let sectionHash = {}
+            let makeSectionHash = function(treeData){
+
+            }
+
             $scope.moveUp = function(node) {
                 if (node.data.level == 'child') {
                     //if previous node in the tree has the same parent, then can swap with it
@@ -126,6 +132,7 @@ angular.module("formsApp")
                     //create an array of sections
                     //if not at top then can swap
                     //swapping means moving a set of items - can get that from the array of sections
+                    console.log($scope.treeData)
                     alert("Section movement not yet enabled")
                 }
 

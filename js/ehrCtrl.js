@@ -114,6 +114,8 @@ angular.module("formsApp")
                 //$scope.treeData = vo.treeData
                 $scope.hashItem = vo.hash       //all items in teh form hashed by id
 
+                $scope.selectedSection = Q.item[0]  //show first tab in tab view
+
 
                 //$scope.formDef = vo.treeData
                 formsSvc.makeFormDefinition(vo.treeData).then(
@@ -122,14 +124,24 @@ angular.module("formsApp")
                     }
                 )
 
-                //$scope.formDef = vo.treeData
+                //generate tabbed model (for tab form view)
+                //let arSection = []
 
 
-                $scope.makeQR()
+
+
+
+                $scope.makeQR()     //create initial QR
 
 
                 drawTree(vo.treeData)
               // makeFormDef()
+            }
+
+            //when a top level item is selected in the tabbed interface
+            $scope.selectSection = function(section) {
+                $scope.selectedSection = section
+
             }
 
             //---------------------------------------------------------------------------------
@@ -142,16 +154,33 @@ angular.module("formsApp")
                     $scope.form,$scope.hashItem,$scope.selectedPatient,
                     $scope.selectedPractitioner.resource)
                 console.log($scope.QR)
+                $scope.selectedQR = $scope.QR   //for rendering
             }
 
 
             //an existing QR is selected
             $scope.selectQR = function(QR) {
-                $scope.selectedQR = QR
+                $scope.selectedQR = QR      //todo ?replace with .QR
+                //$scope.QR = QR  // as needed by render
 
-                //set the data for the form
-                $scope.formDef
-                $scope.form
+
+                /* - do I even need the Q for a display???
+                //retrieve the Q from the forms manager
+
+                let qry = "/fm/fhir/Questionnaire?url=" + QR.questionnaire
+                $http.get(qry).then(
+                    function(data) {
+                        if (data.data.entry && data.data.entry.length > 0) {
+                            //todo check for > 1
+                            $scope.Q = data.data.entry[0].resource
+
+                        }
+                    }
+                )
+
+                */
+
+
 
 
                 let url = "/fr/testextract"
@@ -306,7 +335,7 @@ angular.module("formsApp")
                     data.data.entry.forEach(function (entry){
                         let display = entry.resource.name[0].text
                         $scope.allPatients.push({display:display,resource:entry.resource})
-                        $scope.input.selectedPatient = $scope.allPatients[0]
+                        $scope.input.selectedPatient = $scope.allPatients[1]
 
                     })
                     $scope.selectPatient()

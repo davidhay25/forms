@@ -1,0 +1,91 @@
+<div>
+    <!-- Render a printable / viewable version of the form
+    needs $scope.Q & $scope.QR set
+    -->
+    <style>
+        .section {
+            border: 1px solid gainsboro;
+            padding : 3px;
+            margin: 4px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            background-color: cornsilk;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="banner">Pathology request form</div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="section">Demographics</div>
+
+        </div>
+        <div class="col-md-9">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+
+
+        </div>
+        <div class="col-md-9">
+
+            <div>{{selectedPatient.name[0] | HumanName}}</div>
+            <div>{{selectedPatient | NHI}}</div>
+            <div>{{selectedPatient.gender}} {{selectedPatient.birthDate}}</div>
+
+        </div>
+    </div>
+
+
+    <div ng-repeat="section in selectedQR.item">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="section">{{section.text}}</div>
+
+            </div>
+            <div class="col-md-9">
+
+
+            </div>
+        </div>
+
+        <div ng-repeat="item in section.item">
+            <div class="row">
+                <div class="col-md-3">
+
+                    <div style="padding-left: 10px">{{item.text}}</div>
+
+                </div>
+                <div class="col-md-9">
+                    <div ng-repeat="answer in item.answer">
+                        <div ng-show="answer.valueDecimal">
+                            {{answer.valueDecimal}}
+                        </div>
+
+                        <div ng-show="answer.valueString">
+                            {{answer.valueString}}
+                        </div>
+
+                        <div ng-show="answer.valueCoding">
+                            {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
+                        </div>
+
+
+                    </div>
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

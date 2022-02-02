@@ -3,6 +3,13 @@
 const axios = require('axios').default;
 let serverRoot
 
+function createUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 function setup(app,sr) {
     serverRoot = sr
     //routes that are intended to be 'public' routes - ie that matches what the IG requires
@@ -15,9 +22,15 @@ function setup(app,sr) {
             let resources = await extractResources(QR)
             let arObservations = resources.obs     //An array of created observations
 
+
+
             //construct transaction bundle
             let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
             bundle.entry.push(createEntry(QR))
+
+            //add the ServiceRequest
+            bundle.entry.push(createServiceRequest(QR))
+
             arObservations.forEach(function (observation){
                 bundle.entry.push(createEntry(observation))
             })
@@ -55,6 +68,8 @@ function setup(app,sr) {
     app.post('/fr/testextract',async function(req,res){
         try {
             let resources = await extractResources(req.body)
+            resources.obs.push(createServiceRequest(req.body,resources.obs))
+
             //console.log('y',resources)
             res.json(resources)
         } catch (ex) {
@@ -95,7 +110,7 @@ async function extractResources(QR) {
 function performObservationExtraction(Q,QR) {
     const extractObsUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
     const unitsUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
-    arObservations = []     //the extracted observations
+    let arObservations = []     //the extracted observations
 
     //iterate over the Q to create a hash (by linkId) of items with the Observation extraction set
     let hashQ = {}      //hash of items that have the Observation extract extension set
@@ -168,6 +183,7 @@ function performObservationExtraction(Q,QR) {
             QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
                 //theAnswer is a single answer value...
                 let observation = {resourceType:'Observation'}
+                observation.id = createUUID()   //will be ignored by fhir server
                 observation.text = {status:'generated'}
                 let text = ""
                 observation.status = "final"
@@ -234,6 +250,25 @@ function performObservationExtraction(Q,QR) {
     return {'obs':arObservations,QHash:hashQ,QRHash:hashQR};
 
     //return {resourceType:"Observation"}
+}
+
+//create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
+function createServiceRequest(QR,arExtractedResources) {
+    let sr = {resourceType:"ServiceRequest"}
+
+    sr.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Pathology request form</div>",status:"additional"}
+    sr.status = "active"
+    sr.intent = "order"
+    sr.subject = QR.subject;
+    sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
+    sr.supportingInfo = []
+    sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
+    if (arExtractedResources) {
+        arExtractedResources.forEach(function (resource){
+            sr.supportingInfo.push({reference: resource.resourceType +  "/"+resource.id})
+        })
+    }
+    return sr
 }
 
 //find all extensions in this item with the given url. Return an array of extensions...

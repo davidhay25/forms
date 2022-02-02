@@ -7,6 +7,17 @@ angular.module("formsApp")
 
         return {
 
+            makeParentHash : function(treeData) {
+                //create a hash showing where each section is in the tree
+                let hashParent = {}
+                treeData.forEach(function (item,inx){
+                    if (item.parent == 'root') {
+                        //this is a parent
+                        //hashParent[item.id] =
+                    }
+                })
+            },
+
             auditQ : function(Q) {
                 //generate audit report for Q
                 let audit = {'missingvs': [],nocode:[]}
@@ -153,7 +164,7 @@ angular.module("formsApp")
                     }
 
 
-                    console.log(childrenOfNode.item[0])
+                   // console.log(childrenOfNode.item[0])
 
                    //topNode.push(childrenOfNode.item[0])    //otherwise too deeply nested
                     //console.log(childrenOfNode)
@@ -302,31 +313,7 @@ angular.module("formsApp")
                 return arItems
 
 
-                //when recursing, get the structure from the tree - not the items.items
 
-                /*
-                //now, process each top level item iteratively
-                arItems.forEach(function (topItem){
-                    topItem
-                    arItems.push(topItem)
-
-                })
-
-                function processBranch(ar,item) {
-
-                    if (item.item) {
-                        //this is a parent
-                        item.item.forEach(function (child){
-                            processBranch(ar,child)
-                        })
-
-                    } else {
-                        //this is a leaf - add the item to the array
-                        ar.push(item)
-                    }
-
-                }
-*/
             },
 
             makeTreeFromQ : function (Q) {

@@ -22,7 +22,7 @@ function setup(app,serverRoot) {
         //res.json()
     })
 
-    //return all the questionnaires
+    //return all the questionnaires - or search by url
     app.get('/fm/fhir/Questionnaire',function(req,res){
         let url = serverRoot + "Questionnaire"
 
@@ -40,6 +40,9 @@ function setup(app,serverRoot) {
                 res.status(response.status).send(err)
             })
     })
+
+
+
 }
 
 module.exports = {

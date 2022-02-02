@@ -52,7 +52,7 @@
     <script src="js/ehrCtrl.js"></script>
     <script src="js/formsService.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
-
+    <script src="js/filters.js"></script>
 
     <style>
         #graph {
@@ -116,7 +116,7 @@
             <br/>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="list-group lis" style="cursor:pointer;">
+                    <div class="list-group" style="cursor:pointer;">
                         <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
                              ng-click="selectQ(Q)"
                              ng-repeat="Q in allQ">
@@ -127,7 +127,17 @@
                 <div class="col-md-9">
                     <br/>
                     <uib-tabset ng-show="selectedQ">
-                        <uib-tab heading="Form">
+                        <uib-tab heading="Tabbed Form">
+                            <div class="row">
+                                <div class="col-md-12" >
+                                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                                </div>
+                            </div>
+
+                            <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
+                        </uib-tab>
+
+                        <uib-tab heading="Plain Form">
 
                             <div class="row">
                                 <div class="col-md-12" >
@@ -135,12 +145,18 @@
                                 </div>
                             </div>
 
-
                             <ng-include src = "'includes/renderFormPage.html'"></ng-include>
 
+                        </uib-tab>
 
+                        <uib-tab heading="View as printout">
+                            <em>A view of the form as it might be rendered for printing of display</em>
+
+                            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
 
                         </uib-tab>
+
+
                         <uib-tab heading="QR">
                             <uib-tabset>
                                 <uib-tab heading="Json">
@@ -230,15 +246,25 @@
             <div class="row">
                 <div class="col-md-2">
                     <div class="list-group">
-                        <div ng-class="{'list-group-item':true}"
+                        <div ng-class="{'list-group-item':true,'listItemSelected':QRItem.QR.id == selectedQR.id}"
                              ng-click="selectQR(QRItem.QR)"
+                             style="cursor: pointer"
                              ng-repeat="QRItem in existingQR">
                             {{QRItem.display}}
+                            <div>{{QRItem.QR.authored | prettyDate}} <span class="pull-right">{{QRItem.QR.authored | age}}</span> </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-10">
                     <uib-tabset>
+                        <uib-tab heading="Form">
+                            Use the 'populate' function to generate a form view of the data.
+                            or use the 'new form rendering' plus the data from the QR (setting $scope.form)
+
+                            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+
+                        </uib-tab>
+
                         <uib-tab heading="Json">
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>
@@ -285,13 +311,7 @@
                             <em>Uses test extract operation - not query</em>
                             <pre>{{resourcesFromExistingQR | json}}</pre>
                         </uib-tab>
-                        <uib-tab heading="Form">
-                            Use the 'populate' function to generate a form view of the data.
-                            or use the 'new form rendering' plus the data from the QR (setting $scope.form)
 
-
-
-                        </uib-tab>
                     </uib-tabset>
 
 
