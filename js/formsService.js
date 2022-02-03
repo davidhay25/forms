@@ -5,7 +5,72 @@ angular.module("formsApp")
         extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 
+        canShareServer = "http://canshare/fhir/"
+
         return {
+
+
+            makeDRList : function(bundle) {
+                //construct an array of DR's with associated Observations
+                let hashResource = {}   //all resources other than DR hashed by {type}/{id}
+                let arDR = []           //array of DRs - content = {DR,obs[]}
+                if (bundle.entry) {
+                    bundle.entry.forEach(function (entry) {
+                        let resource = entry.resource
+                        if (resource.resourceType == 'DiagnosticReport') {
+                            arDR.push({resource: resource, obs: []})
+                        } else {
+                            hashResource[resource.resourceType + "/" + resource.id] = resource
+                        }
+                    })
+
+                    //go through the DR and add the resources referenced from the .result element to it
+                    arDR.forEach(function (item) {
+                        item.resource.result.forEach(function (ref) {
+                            item.obs.push(hashResource[ref.reference])
+                        })
+                    })
+
+                    return arDR     //{resource: obs[]: }
+                }
+            },
+
+            createPOSTEntry : function(resource) {
+                //create an entry element to insert into a bundle for a POST
+                let that = this;
+                let entry = {}
+                if (resource.id) {
+                    entry.fullUrl = canShareServer + resource.resourceType + "/" + resource.id
+                } else {
+                    resource.id = that.createUUID()
+                    entry.fullUrl = "urn:uuid:" + resource.id
+                }
+                entry.resource = resource
+                entry.request = {method:'POST',url:resource.resourceType}
+                return entry
+            },
+
+            createPUTEntry : function(resource) {
+                //create an entry element to insert into a bundle for a PUT
+                let that = this;
+                let entry = {}
+                if (resource.id) {
+                    entry.fullUrl = canShareServer +  resource.resourceType + "/" + resource.id
+                    entry.resource = resource
+                    entry.request = {method:'PUT',url:resource.resourceType + "/" + resource.id}
+                    return entry
+                } else {
+                    throw "The resource must have an id for PUT operations"
+                }
+
+            },
+
+            createUUID : function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            })
+        },
 
             makeParentHash : function(treeData) {
                 //create a hash showing where each section is in the tree

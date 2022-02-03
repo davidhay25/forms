@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>PathLab</title>
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+    <script src="js/libs/angular-sanitize.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <style>
+        .myScroll {
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+        .obsExtract {
+            background-color: #ebcccc;
+        }
+
+
+    </style>
+
+    <script>
+        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("formsApp").constant("moment", moment);
+        angular.module("formsApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+        }]);
+
+    </script>
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <script src="js/pathlabCtrl.js"></script>
+    <script src="js/formsService.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/filters.js"></script>
+
+    <script src="directive/displayFormDir.js"></script>
+
+    <style>
+        #graph {
+            width: 100%;
+            height: 550px;
+            border: 1px solid lightgray;
+        }
+    </style>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="formsApp" ng-controller="pathlabCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5 col-sm-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Pathlab interface
+                        </a>
+                    </span>
+            </div>
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+                    {{selectedPractitioner.display}}
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+                <div class="navbar-text">
+                    <select class="form-control" ng-model = "input.selectedPatient"
+                            ng-change="selectPatient()"
+                            ng-options = "item.display for item in allPatients"></select>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-3">
+            <h4>Active Service Requests</h4>
+            <div class="list-group">
+                <div class="list-group-item"
+                     ng-click="selectSR(sr)"
+                     ng-repeat="sr in allSR" style="cursor: pointer">
+                    {{sr.id}}
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-9">
+
+            <uib-tabset ng-show="selectedQR">
+                <uib-tab heading="Request Form">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!--
+                            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+-->
+                            <displayform patient="selectedPatient" qr="selectedQR"></displayform>
+
+
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Submit report</h4>
+
+                            <textarea class="form-control" ng-model="input.report"></textarea>
+                            <br/>
+
+                            <checkbox ng-model="input.closeSR"></checkbox> Close Service Request
+
+                            <button ng-show = "input.report"  class="btn btn-primary" ng-click="submitReport()">Submit report</button>
+
+                            <br/> <br/>
+
+                            <em>This will create a DiagnosticReport and an Observation with the text above.
+                                <br/> <br/>
+                            These resources, along with the ServiceRequest that is being fulfilled will be sent
+                            to the custom operation that will save them in the database and update the ServiceRequest
+                            to indicate that it is complete.
+                                <br/> <br/>
+
+                                Any number of Observations (linked from the DiagnosticReport)
+                            can be included in the bundle.</em>
+                        </div>
+                    </div>
+
+
+
+                </uib-tab>
+                <uib-tab heading="SR Json">
+                    <pre>{{selectedSR | json}}</pre>
+
+                </uib-tab>
+                <uib-tab heading="QR Json">
+                    <pre>{{selectedQR | json}}</pre>
+
+                </uib-tab>
+            </uib-tabset>
+
+
+
+
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>

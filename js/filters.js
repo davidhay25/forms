@@ -2,7 +2,7 @@ angular.module("formsApp")
 
     .filter('HumanName',function(){
         return function (hn) {
-            if (hn.text) {
+            if (hn && hn.text) {
                 return hn.text
             }
            // if ()
@@ -56,7 +56,7 @@ angular.module("formsApp")
         .filter('prettyDate',function(){
             return function(da){
                 if (da) {
-                    return moment(da).format('Do MMM  hh:mm a')
+                    return moment(da).format('MMM D hh:mm a')
                 }
 
             }

@@ -54,6 +54,8 @@
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 
+    <script src="directive/displayFormDir.js"></script>
+
     <style>
         #graph {
             width: 100%;
@@ -185,11 +187,16 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="list-group">
-                                                <div ng-class="{'list-group-item':true}"
+                                                <div ng-class="{'list-group-item':true,listItemSelected:selectedResource.id == item.resource.id}"
                                                      ng-click = "selectResource(item)"
+                                                     style="cursor: pointer"
                                                     ng-repeat = "item in extractedResources">
 
-                                                    <span class="pull-right badge">{{item.OO.issue.length}}</span>
+                                                    <span class="pull-right">
+                                                        <i ng-show = "item.valid" style="color: green" class="glyphicon glyphicon-thumbs-up"></i>
+                                                        <i ng-hide = "item.valid" style="color: red" class="glyphicon glyphicon-thumbs-down"></i>
+                                                    </span>
+
                                                     {{item.resource.resourceType}}
 
                                                 </div>
@@ -203,6 +210,9 @@
                                                 <uib-tab heading="Validation result">
                                                     <pre>{{selectedResourceValidation | json}}</pre>
 
+                                                </uib-tab>
+                                                <uib-tab heading="Graph">
+                                                    <em>Todo: add graph of all resources (incl. Patient, Practitioner)</em>
                                                 </uib-tab>
                                             </uib-tabset>
 
@@ -257,11 +267,78 @@
                 </div>
                 <div class="col-md-10">
                     <uib-tabset>
+                        <!--
                         <uib-tab heading="Form">
-                            Use the 'populate' function to generate a form view of the data.
-                            or use the 'new form rendering' plus the data from the QR (setting $scope.form)
+
 
                             <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+
+                        </uib-tab>
+                        -->
+
+                        <uib-tab heading="Form">
+                            <displayform patient="selectedPatient" qr="selectedQR"></displayform>
+
+                        </uib-tab>
+
+
+                        <uib-tab ng-show="allSR.length > 0">
+                            <uib-tab-heading>Workflow <span class="badge">{{selectedSR.length}}</span></uib-tab-heading>
+
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="list-group">
+                                        <div class="list-group-item"
+                                             ng-click = "selectSR(sr)"
+                                             style="cursor: pointer"
+                                             ng-repeat="sr in allSR ">
+                                            {{sr.id}}
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <uib-tabset>
+                                        <uib-tab heading = "ServiceRequest Json">
+                                            <pre>{{selectedSR | json}}</pre>
+                                        </uib-tab>
+
+                                        <uib-tab heading = "DiagnosticReports">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="list-group">
+                                                        <div class="list-group-item"
+                                                             ng-click = "selectSRDR(srdr)"
+                                                             style="cursor: pointer"
+                                                             ng-repeat="srdr in SRDRs ">
+                                                            {{srdr.resource.id}}
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div ng-repeat="obs in selectedSRDR.obs">
+                                                        <pre>{{obs | json}}</pre>
+                                                    </div>
+
+
+
+                                                </div>
+
+
+                                            </div>
+
+                                        </uib-tab>
+
+
+
+
+                                    </uib-tabset>
+
+                                </div>
+
+                            </div>
 
                         </uib-tab>
 
@@ -302,9 +379,6 @@
 
 
                                 </div>
-
-
-
                         </uib-tab>
 
                         <uib-tab heading="Extracted resources">
@@ -370,8 +444,25 @@
         </uib-tab>
         <uib-tab heading = "Clinical Perspective">
 
+            <div class="row" ng-repeat="dr in allDR">
+                <div class="col-md-6">
+                    {{dr.resource.id}}
 
-            continuous page list of episodes problems, meds, allergies. Can see at a glance. Clincial dashboard
+                    <div ng-repeat="obs in dr.obs">
+                        {{obs.valueString}}
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+
+
+
+                </div>
+            </div>
+
+
+            <pre>{{allDR | json}}</pre>
+
 
         </uib-tab>
     </uib-tabset>

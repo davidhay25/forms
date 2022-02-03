@@ -39,15 +39,15 @@
         </div>
         <div class="col-md-9">
 
-            <div>{{selectedPatient.name[0] | HumanName}}</div>
-            <div>{{selectedPatient | NHI}}</div>
-            <div>{{selectedPatient.gender}} {{selectedPatient.birthDate}}</div>
+            <div>{{patient.name[0] | HumanName}}</div>
+            <div>{{patient | NHI}}</div>
+            <div>{{patient.gender}} {{patient.birthDate}}</div>
 
         </div>
     </div>
+    {{dQR}}
 
-
-    <div ng-repeat="section in selectedQR.item">
+    <div ng-repeat="section in qr.item">
         <div class="row">
             <div class="col-md-3">
                 <div class="section">{{section.text}}</div>

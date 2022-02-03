@@ -29,7 +29,8 @@ function setup(app,sr) {
             bundle.entry.push(createEntry(QR))
 
             //add the ServiceRequest
-            bundle.entry.push(createServiceRequest(QR))
+
+            bundle.entry.push(createEntry(createServiceRequest(QR)))
 
             arObservations.forEach(function (observation){
                 bundle.entry.push(createEntry(observation))
@@ -163,10 +164,18 @@ function performObservationExtraction(Q,QR) {
     //parseQR(hashQR,QR.item[0])
 
     //the provenance resource for this action
-    let provenance = {resourceType:"Provenance",recorded:new Date().toISOString(), target:[],entity:[]}
+    let provenance = {resourceType:"Provenance"}
+    provenance.id = createUUID()   //will be ignored by fhir server
+    provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
+    provenance.recorded = new Date().toISOString()
+    provenance.entity = []
+    provenance.agent = []
 
     //set the entity to the QR. The id should be present - add a fullUrl to the bundle
     provenance.entity.push({role:"source",what:{reference:"/QuestionnaireResponse/" + QR.id}})
+
+    //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
+    provenance.agent.push({who:QR.author})
 
     //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
     //console.log('QR',hashQR)
@@ -226,25 +235,24 @@ function performObservationExtraction(Q,QR) {
                     observation.valueString = theAnswer.valueString
                     text += theAnswer.valueString
                 }
-/*
-                if (theAnswer.answerQuantity) {
-                    observation.valueQuantity = theAnswer.answerQuantity
-                }
-*/
+
                 if (theAnswer.valueCoding) {
                     observation.valueCodeableConcept = {coding:[theAnswer.valueCoding]}
                     text += theAnswer.valueCoding.code + " (" + theAnswer.valueCoding.system + ")"
                 }
 
-                observation.text.div="<div xmlns='http://www.w3.org/1999/xhtml'> + text + </div>"
+                observation.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>" + text + "</div>"
 
                 arObservations.push(observation)
+                provenance.target = provenance.target || []
+                provenance.target.push({reference: "Observation/"+ observation.id})
 
             })
         }
     })
 
 
+    //todo temp - need to fix issue with references... - QR may need uuid, and bundle needs fullUrl arObservations.push(provenance)
 
     //console.log('hash',hashQ)
     return {'obs':arObservations,QHash:hashQ,QRHash:hashQR};
@@ -255,7 +263,7 @@ function performObservationExtraction(Q,QR) {
 //create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
 function createServiceRequest(QR,arExtractedResources) {
     let sr = {resourceType:"ServiceRequest"}
-
+    sr.id = createUUID()   //will be ignored by fhir server
     sr.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Pathology request form</div>",status:"additional"}
     sr.status = "active"
     sr.intent = "order"
