@@ -48,9 +48,7 @@ Description: "Questionnaire for Lung Cancer histology request"
 
 //-----  clinical information
 
-* item[+].linkId = "test"
-* item[=].text = "test question at top level"
-* item[=].type = #text
+
 
 * item[+].linkId = "clinicalinfo"
 * item[=].text = "Clinical Information"

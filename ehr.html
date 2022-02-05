@@ -342,6 +342,12 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="Provenance">
+                            <em>This is the Provenance resource that was generated when this
+                            form was saved. There should only be one at the moment.</em>
+                            <pre>{{selectedProvenance | json}}</pre>
+                        </uib-tab>
+
                         <uib-tab heading="Json">
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>

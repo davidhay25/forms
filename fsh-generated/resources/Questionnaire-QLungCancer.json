@@ -7,11 +7,6 @@
   "title": "A form to capture data to accompany a histology request for lung cancer",
   "item": [
     {
-      "linkId": "test",
-      "text": "test question at top level",
-      "type": "text"
-    },
-    {
       "linkId": "clinicalinfo",
       "text": "Clinical Information",
       "type": "group",

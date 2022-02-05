@@ -36,27 +36,32 @@ function setup(app,sr) {
                 bundle.entry.push(createEntry(observation))
             })
 
+            console.log(JSON.stringify(bundle,null,2))
+
             axios.post('http://localhost:9099/baseR4/', bundle)
                 .then(function (response) {
                     //console.log(response);
                     res.status(response.status).json(response.data)
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                     res.status(error.response.status).json(error.response.data)
 
-
-
                 });
-
-
 
         } catch (ex) {
             res.status(500).json(ex.message)
         }
 
         function createEntry(resource) {
+            //assume that these are all POST with uuid as id...
             let entry = {}
+            //entry.fullUrl = "http://clinfhir.com/fhir/" + resource.resourceType
+            //entry.fullUrl += "/urn:uuid:" + resource.id
+
+            //entry.fullUrl = "http://clinfhir.com/fhir/urn:uuid:" + resource.id
+            entry.fullUrl = "urn:uuid:" + resource.id
+
             entry.resource = resource
             entry.request = {method:'POST',url:resource.resourceType}
             return entry
@@ -115,7 +120,9 @@ function performObservationExtraction(Q,QR) {
 
     //iterate over the Q to create a hash (by linkId) of items with the Observation extraction set
     let hashQ = {}      //hash of items that have the Observation extract extension set
-    let hashQR = {}     //hash of items in QR qith an answer
+    let hashQR = {}     //hash of items in QR with an answer
+
+    //QR.id = createUUID()    //needed so provenance works
 
     function parseQ(hashQ,item) {
         if (item.item) {
@@ -137,7 +144,6 @@ function performObservationExtraction(Q,QR) {
         }
     }
     Q.item.forEach(function(topLevel){
-        //parseQ(hashQ,Q.item[0])
         parseQ(hashQ,topLevel)
     })
 
@@ -157,7 +163,6 @@ function performObservationExtraction(Q,QR) {
     }
 
     QR.item.forEach(function(topLevel){
-        //parseQ(hashQ,Q.item[0])
         parseQR(hashQR,topLevel)
     })
 
@@ -171,8 +176,9 @@ function performObservationExtraction(Q,QR) {
     provenance.entity = []
     provenance.agent = []
 
-    //set the entity to the QR. The id should be present - add a fullUrl to the bundle
-    provenance.entity.push({role:"source",what:{reference:"/QuestionnaireResponse/" + QR.id}})
+
+
+    provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
 
     //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
     provenance.agent.push({who:QR.author})
@@ -210,8 +216,8 @@ function performObservationExtraction(Q,QR) {
                 }
 
                 observation.code = oCode
-                observation.derivedFrom = [{reference:"QuestionnaireResponse/" + QR.id}]
 
+                observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
                 //console.log(theAnswer)
                 //todo - the dtatypes for Observation and Questionnaire aren't the same!
                 if (theAnswer.valueDecimal) {
@@ -245,7 +251,8 @@ function performObservationExtraction(Q,QR) {
 
                 arObservations.push(observation)
                 provenance.target = provenance.target || []
-                provenance.target.push({reference: "Observation/"+ observation.id})
+
+                provenance.target.push({reference: "urn:uuid:"+ observation.id})
 
             })
         }
@@ -253,6 +260,8 @@ function performObservationExtraction(Q,QR) {
 
 
     //todo temp - need to fix issue with references... - QR may need uuid, and bundle needs fullUrl arObservations.push(provenance)
+
+    arObservations.push(provenance)
 
     //console.log('hash',hashQ)
     return {'obs':arObservations,QHash:hashQ,QRHash:hashQR};

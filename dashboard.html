@@ -19,6 +19,7 @@
     <script src="js/libs/angular-sanitize.js"></script>
     <script src="js/libs/jstree.min.js"></script>
 
+
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
     <style>
@@ -54,7 +55,7 @@
     <script src="js/editItemCtrl.js"></script>
     <script src="js/editQCtrl.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
-
+    <script src="js/filters.js"></script>
 
     <style>
         #graph {
@@ -110,7 +111,7 @@
     </nav>
 
     <uib-tabset>
-            <uib-tab heading="Questionnaire resources">
+        <uib-tab heading="Questionnaire resources">
                 <br/>
                <div class="row">
                    <div class="col-md-2">
@@ -428,7 +429,33 @@
                </div>
 
             </uib-tab>
-            <uib-tab heading="Terminology">
+
+        <uib-tab heading="Provenance">
+            <div/>
+            <div class="row">
+                <div class="col-md-3">
+                    <uib-tabset>
+                        <uib-tab heading="All Provenance">
+                            <div class="list-group">
+                                <div ng-class="{'list-group-item':true}"
+                                     ng-click="selectProvenance(prov)"
+                                     ng-repeat="prov in allProvenance">
+                                    {{prov.id}}
+                                    <div>{{prov.recorded | prettyDate}} <span class="pull-right">{{prov.recorded| age}}</span> </div>
+                                </div>
+                            </div>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+                </div>
+                <div class="col-md-6">
+                    <pre>{{selectedProvenance | json}}</pre>
+                </div>
+            </div>
+        </uib-tab>
+
+        <uib-tab heading="Terminology">
 
                 <div class="row">
                     <div class="col-md-2">
@@ -489,7 +516,7 @@
 
 
             </uib-tab>
-            <uib-tab ng-show="false" heading="External services">
+        <uib-tab ng-show="false" heading="External services">
                 <br/>
                 <uib-tabset>
                     <uib-tab heading="NHI"></uib-tab>
