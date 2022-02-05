@@ -55,7 +55,7 @@
     <script src="js/filters.js"></script>
 
     <script src="directive/displayFormDir.js"></script>
-
+    <script src="directive/displayProvenanceDir.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -345,7 +345,12 @@
                         <uib-tab heading="Provenance">
                             <em>This is the Provenance resource that was generated when this
                             form was saved. There should only be one at the moment.</em>
-                            <pre>{{selectedProvenance | json}}</pre>
+
+                            <displayprovenance provenance="selectedProvenance"
+                                               targets = "selectedProvenanceTargets"></displayprovenance>
+
+
+
                         </uib-tab>
 
                         <uib-tab heading="Json">
