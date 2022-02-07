@@ -8,7 +8,12 @@
             <pre>{{provenance | json}}</pre>
         </div>
         <div class="col-md-6">
-            <pre>{{targets | json}}</pre>
+            <div ng-repeat="target in targets">
+                <div><strong>{{target.resourceType}} {{target.id}}</strong></div>
+                <pre>{{target | json}}</pre>
+            </div>
+
+
         </div>
     </div>
 

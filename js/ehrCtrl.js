@@ -87,6 +87,9 @@ angular.module("formsApp")
                         function(data) {
                             console.log(data)
                             $scope.extractedResources = []
+
+
+
                             data.data.obs.forEach(function (resource){
                                 let url = validationServer + resource.resourceType + "/$validate"
                                 $http.post(url,resource).then(
@@ -100,6 +103,12 @@ angular.module("formsApp")
                                 )
 
                             })
+
+                            //add other resources so they're visible in the display
+
+                            $scope.extractedResources.push({resource:$scope.QR,OO:{},valid:true})
+                            $scope.extractedResources.push({resource:$scope.input.selectedPatient.resource,OO:{},valid:true})
+                            $scope.extractedResources.push({resource:$scope.selectedPractitioner.resource,OO:{},valid:true})
 
                         }, function(err) {
                             console.log(err)

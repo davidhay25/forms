@@ -33,9 +33,12 @@ angular.module("formsApp")
                     function(newProv,old) {
                         if (newProv) {
                             console.log('watch called with provenanceid '+ newProv.id)
+
+                            //todo - wait a sec than check targets. get if null
                         }
 
                     }
+
                 );
 
 

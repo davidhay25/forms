@@ -19,24 +19,21 @@ function setup(app,sr) {
 
         let QR = req.body
         try {
-            let resources = await extractResources(QR)
-            let arObservations = resources.obs     //An array of created observations
+            let result = await extractResources(QR)
+            let arResources = result.obs     //An array of created observations todo - and others, rename
 
-
+            //need to add other resources to provenance
+            //let provenance = resources.provenance
 
             //construct transaction bundle
             let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
             bundle.entry.push(createEntry(QR))
 
-            //add the ServiceRequest
-
-            bundle.entry.push(createEntry(createServiceRequest(QR)))
-
-            arObservations.forEach(function (observation){
+            arResources.forEach(function (observation){
                 bundle.entry.push(createEntry(observation))
             })
 
-            console.log(JSON.stringify(bundle,null,2))
+            //console.log(JSON.stringify(bundle,null,2))
 
             axios.post('http://localhost:9099/baseR4/', bundle)
                 .then(function (response) {
@@ -56,10 +53,6 @@ function setup(app,sr) {
         function createEntry(resource) {
             //assume that these are all POST with uuid as id...
             let entry = {}
-            //entry.fullUrl = "http://clinfhir.com/fhir/" + resource.resourceType
-            //entry.fullUrl += "/urn:uuid:" + resource.id
-
-            //entry.fullUrl = "http://clinfhir.com/fhir/urn:uuid:" + resource.id
             entry.fullUrl = "urn:uuid:" + resource.id
 
             entry.resource = resource
@@ -74,15 +67,14 @@ function setup(app,sr) {
     app.post('/fr/testextract',async function(req,res){
         try {
             let resources = await extractResources(req.body)
-            resources.obs.push(createServiceRequest(req.body,resources.obs))
 
-            //console.log('y',resources)
             res.json(resources)
         } catch (ex) {
             res.status(500).json(ex.message)
         }
     })
 }
+
 
 
 //extract resources from QR
@@ -95,15 +87,29 @@ async function extractResources(QR) {
     if (! qUrl) {
         return makeOO("No questionnaire element in the QR")
     }
-    let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
 
+    //retrieve the Q
+    let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
     let response = await axios.get(url)
     let bundle = response.data
 
     if (bundle.entry && bundle.entry.length == 1) {
-        let Q = bundle.entry[0].resource
-        //perform processing
+        let Q = bundle.entry[0].resource    //todo - assume only 1
+
+        //retrieve Observations
         let resources = performObservationExtraction(Q,QR)
+
+        // now create other resources
+        let provenance = resources.provenance
+
+        //the service request - always added ATM
+        let sr =  createServiceRequest(QR)      //todo refactor names of vo returned
+        provenance.target.push({reference: "urn:uuid:"+ sr.id})
+        resources.obs.push(sr)          //not really all obs...
+        //resources.others = []       //all resources
+
+
+
         return resources
 
 
@@ -113,7 +119,10 @@ async function extractResources(QR) {
 
 }
 
+
 function performObservationExtraction(Q,QR) {
+    const extractDefinitionUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+
     const extractObsUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
     const unitsUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
     let arObservations = []     //the extracted observations
@@ -121,11 +130,24 @@ function performObservationExtraction(Q,QR) {
     //iterate over the Q to create a hash (by linkId) of items with the Observation extraction set
     let hashQ = {}      //hash of items that have the Observation extract extension set
     let hashQR = {}     //hash of items in QR with an answer
+    let hashQDefinition = {}    //hash of items that have the definition extraction set. {item: resourceType:}
 
     //QR.id = createUUID()    //needed so provenance works
 
+    //recursive algorithm to create hash of items that are Observation extraction
     function parseQ(hashQ,item) {
         if (item.item) {
+            //still need to check for definition based extraction...
+            //we're assuming that the extension is on the parent - child items use 'definition' with the resource elements
+
+            //look for definition extractions
+            let ar1 = findExtension(item,extractDefinitionUrl)
+            //console.log(item.linkId,item.extension,ar1.length)
+            if (ar1.length > 0) {
+                let resourceType = ar1[0].valueCode
+                hashQDefinition[item.linkId] = {item:item,resourceType:resourceType}
+            }
+
             item.item.forEach(function(child){
                 parseQ(hashQ,child)
             })
@@ -141,8 +163,10 @@ function performObservationExtraction(Q,QR) {
                     hashQ[item.linkId] = item
                 }
             }
+
         }
     }
+
     Q.item.forEach(function(topLevel){
         parseQ(hashQ,topLevel)
     })
@@ -176,15 +200,12 @@ function performObservationExtraction(Q,QR) {
     provenance.entity = []
     provenance.agent = []
 
-
-
     provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
 
     //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
     provenance.agent.push({who:QR.author})
 
     //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
-    //console.log('QR',hashQR)
     Object.keys(hashQ).forEach(function (key){
         let QItem = hashQ[key]  //the Q item that this QR item is an answer to
         //is there a QR item with a matching linkId?
@@ -192,13 +213,11 @@ function performObservationExtraction(Q,QR) {
         if (hashQR[key]) {
             // yes there is. Create an observation for each answer.
             let QRItem = hashQR[key]    //the item from the QR
-            //console.log("qri",key,QRItem)
-            //console.log('a',QRItem,QItem)
-            //console.log(QRItem.answer)
+
             QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
                 //theAnswer is a single answer value...
                 let observation = {resourceType:'Observation'}
-                observation.id = createUUID()   //will be ignored by fhir server
+                observation.id = createUUID()
                 observation.text = {status:'generated'}
                 let text = ""
                 observation.status = "final"
@@ -223,7 +242,6 @@ function performObservationExtraction(Q,QR) {
                 if (theAnswer.valueDecimal) {
                     //if a decimal, then look for the unit extension to create a Quantity
                     let ar = findExtension(QItem,unitsUrl)
-                    //console.log(ar)
                     if (ar.length > 0) {
                         let coding = ar[0].valueCoding
                         //Can create a Quantity. should only be 1 really...
@@ -233,9 +251,7 @@ function performObservationExtraction(Q,QR) {
                     } else {
                         //not sure what to do if there's no extension. Is that a QA that should be applied to the Q? ie that decimal must have the extension?
                     }
-
                 }
-
 
                 if (theAnswer.valueString) {
                     observation.valueString = theAnswer.valueString
@@ -259,14 +275,58 @@ function performObservationExtraction(Q,QR) {
     })
 
 
-    //todo temp - need to fix issue with references... - QR may need uuid, and bundle needs fullUrl arObservations.push(provenance)
+
+    //now go through and pull out any items that use definition based
+    Object.keys(hashQDefinition).forEach(function (key){
+        let vo = hashQDefinition[key]   //{item: resourceType:}
+        let resourceType = vo.resourceType
+        let item = vo.item
+
+        if (item.item){     //assume that any contents of the resource are child elements
+            let resource = {resourceType:resourceType}
+            resource.id = createUUID()
+            resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Specimen from Pathology request form</div>",status:"additional"}
+            resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
+            let canBeAdded = false      //only add if there is at least one child element entry
+
+            item.item.forEach(function (child){
+                if (child.definition) {
+                    let QRItem = hashQR[child.linkId]
+                    if (QRItem && QRItem.answer) {
+                        //there is an answer
+                        canBeAdded = true
+                        //assume this is a fhirpath expression - 2 level only - eg specimen.type
+                        //todo - need a better algorithm here. For now, assume that any value is a top level element....
+                        let ar = child.definition.split('.')
+                        let elementName = ar[1]
+
+                        //todo - support all the answer types that could be used...
+                        //todo - think about multiple answers...
+                        if (QRItem.answer[0].valueCoding) {
+                            //assume a codeableconcept
+                            resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
+                        }
+
+                    }
+
+
+
+                }
+            })
+            if (canBeAdded) {
+                arObservations.push(resource)
+                provenance.target = provenance.target || []
+                provenance.target.push({reference: "urn:uuid:"+ resource.id})
+            }
+
+        }
+
+    })
 
     arObservations.push(provenance)
 
-    //console.log('hash',hashQ)
-    return {'obs':arObservations,QHash:hashQ,QRHash:hashQR};
+    return {'obs':arObservations,provenance:provenance,QHash:hashQ,QRHash:hashQR};
 
-    //return {resourceType:"Observation"}
 }
 
 //create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
