@@ -55,7 +55,7 @@
     <script src="js/filters.js"></script>
 
     <script src="directive/displayFormDir.js"></script>
-
+    <script src="directive/displayProvenanceDir.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -211,15 +211,18 @@
                                                     <pre>{{selectedResourceValidation | json}}</pre>
 
                                                 </uib-tab>
-                                                <uib-tab heading="Graph">
-                                                    <em>Todo: add graph of all resources (incl. Patient, Practitioner)</em>
-                                                </uib-tab>
+
                                             </uib-tabset>
 
 
                                         </div>
                                     </div>
                                 </uib-tab>
+
+                                <uib-tab heading="Graph">
+                                    <em>Todo: add graph of all resources (incl. Patient, Practitioner)</em>
+                                </uib-tab>
+                                
                                 <uib-tab heading="Json">
                                     <pre>{{extractedResources | json}}</pre>
                                 </uib-tab>
@@ -342,10 +345,22 @@
 
                         </uib-tab>
 
-                        <uib-tab heading="Json">
+                        <uib-tab heading="Provenance">
+                            <em>This is the Provenance resource that was generated when this
+                            form was saved. There should only be one at the moment.</em>
+
+                            <displayprovenance provenance="selectedProvenance"
+                                               targets = "selectedProvenanceTargets"></displayprovenance>
+
+
+
+                        </uib-tab>
+
+                        <uib-tab heading="QR Json">
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>
-                        <uib-tab heading="Report">
+
+                        <uib-tab ng-show = "false" heading="Report">
 
                             <div ng-repeat = "topItem in selectedQR.item">
 
@@ -381,7 +396,7 @@
                                 </div>
                         </uib-tab>
 
-                        <uib-tab heading="Extracted resources">
+                        <uib-tab ng-show = "false" heading="Extracted resources">
                             <em>Uses test extract operation - not query</em>
                             <pre>{{resourcesFromExistingQR | json}}</pre>
                         </uib-tab>

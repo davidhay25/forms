@@ -24,6 +24,34 @@ angular.module("formsApp")
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
 
+
+
+            // --------- provenance stuff
+
+            $http.get("/ds/fhir/Provenance").then(
+                function(data){
+                    $scope.allProvenance = []
+                    if (data.data.entry) {
+                        data.data.entry.forEach(function (entry){
+                            $scope.allProvenance.push(entry.resource)
+                        })
+                    }
+
+
+
+                    console.log($scope.allProvenance)
+
+                }, function(err) {
+
+                }
+            )
+
+            $scope.selectProvenance = function(prov) {
+                $scope.selectedProvenance = prov
+            }
+            //----------
+
+
             $scope.expandAll = function() {
                 expandAll()
                 drawTree()
@@ -50,6 +78,9 @@ angular.module("formsApp")
                 $scope.input.vsList.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
 
             }
+
+
+            //retrieve the Provenance resources
 
 
             //create a new Q

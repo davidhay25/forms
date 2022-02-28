@@ -7,11 +7,6 @@
   "title": "A form to capture data to accompany a histology request for lung cancer",
   "item": [
     {
-      "linkId": "test",
-      "text": "test question at top level",
-      "type": "text"
-    },
-    {
       "linkId": "clinicalinfo",
       "text": "Clinical Information",
       "type": "group",
@@ -250,7 +245,20 @@
       "linkId": "specimen",
       "text": "Specimen Information",
       "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueCode": "Specimen"
+        }
+      ],
       "item": [
+        {
+          "linkId": "specType",
+          "text": "Type of specimen",
+          "type": "choice",
+          "answerValueSet": "http://terminology.hl7.org/ValueSet/v2-0487",
+          "definition": "Specimen.type"
+        },
         {
           "linkId": "specLabel",
           "text": "Specimen Label",

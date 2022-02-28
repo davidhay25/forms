@@ -137,10 +137,11 @@ angular.module("formsApp")
                 //hash is items from the Q keyed by linkId
                 //form is the data enterd keyed by linkId
                 //todo - make recursive...
+                let qrId = this.createUUID()
                 let err = false
                 console.log(form)
                 console.log(hash)
-                let QR = {resourceType:'QuestionnaireResponse',id:"qr-" + new Date().getTime(),status:'in-progress'}
+                let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
                 QR.text = {status:'generated'}
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url

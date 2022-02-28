@@ -48,9 +48,7 @@ Description: "Questionnaire for Lung Cancer histology request"
 
 //-----  clinical information
 
-* item[+].linkId = "test"
-* item[=].text = "test question at top level"
-* item[=].type = #text
+
 
 * item[+].linkId = "clinicalinfo"
 * item[=].text = "Clinical Information"
@@ -148,6 +146,15 @@ Description: "Questionnaire for Lung Cancer histology request"
 * item[+].linkId = "specimen"
 * item[=].text = "Specimen Information"
 * item[=].type = #group
+* item[=].extension[+].url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+* item[=].extension[=].valueCode = #Specimen
+
+
+* item[=].item[+].linkId = "specType"
+* item[=].item[=].text = "Type of specimen"
+* item[=].item[=].type = #choice
+* item[=].item[=].answerValueSet = "http://terminology.hl7.org/ValueSet/v2-0487"
+* item[=].item[=].definition = "Specimen.type"
 
 * item[=].item[+].linkId = "specLabel"
 * item[=].item[=].text = "Specimen Label"
