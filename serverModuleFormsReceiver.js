@@ -52,7 +52,7 @@ function setup(app,sr) {
         function createEntry(resource) {
             //assume that these are all POST with uuid as id...
             let entry = {}
-
+            entry.fullUrl = "urn:uuid:" + resource.id
             entry.resource = resource
             entry.request = {method:'POST',url:resource.resourceType}
             return entry
@@ -102,6 +102,8 @@ async function extractResources(QR) {
 
         //the service request - always added ATM
         let sr =  createServiceRequest(QR)      //todo refactor names of vo returned
+        provenance.target = provenance.target || []
+
         provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...
         //resources.others = []       //all resources
@@ -235,6 +237,7 @@ function performObservationExtraction(Q,QR) {
                 observation.code = oCode
 
                 observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
+
                 //console.log(theAnswer)
                 //todo - the dtatypes for Observation and Questionnaire aren't the same!
                 if (theAnswer.valueDecimal) {
@@ -337,10 +340,13 @@ function createServiceRequest(QR,arExtractedResources) {
     sr.subject = QR.subject;
     sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
     sr.supportingInfo = []
-    sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
+    //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
+    sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
+
     if (arExtractedResources) {
         arExtractedResources.forEach(function (resource){
-            sr.supportingInfo.push({reference: resource.resourceType +  "/"+resource.id})
+            //sr.supportingInfo.push({reference: resource.resourceType +  "/"+resource.id})
+            sr.supportingInfo.push({reference: "urn:uuid:"+resource.id})
         })
     }
     return sr

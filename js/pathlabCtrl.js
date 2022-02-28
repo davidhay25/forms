@@ -8,7 +8,7 @@ angular.module("formsApp")
 
             //retrieve all active ServiceRequests - todo add filter for type
 
-            $http.get("/ds/fhir/ServiceRequest?status=active").then(
+            $http.get("/ds/fhir/ServiceRequest?status=active&_count=50").then(
                 function (data) {
                     $scope.allSR = [];
                     if (data.data.entry) {
@@ -96,6 +96,7 @@ angular.module("formsApp")
 
                                     console.log(data.data)
                                 }, function(err) {
+                                    alert(angular.toJson(err))
                                     console.log(err)
                                 }
                             )

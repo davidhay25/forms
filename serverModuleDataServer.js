@@ -12,8 +12,6 @@ function setup(app,serverRoot) {
     //create an update bundle:
     //PUT SR, POST DR & Obs
 
-
-
     app.get('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
 
@@ -23,7 +21,7 @@ function setup(app,serverRoot) {
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
-                console.log(err)
+                //console.log(err)
                 res.status(err.response.status).send(err.response.data)
             })
     })
@@ -49,7 +47,7 @@ function setup(app,serverRoot) {
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
-                console.log(err)
+                //console.log(err)
                 res.status(err.response.status).send(err.response.data)
             })
     })
@@ -69,7 +67,7 @@ function setup(app,serverRoot) {
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
-                console.log(err)
+                //console.log(err)
                 res.status(err.response.status).send(err.response.data)
             })
 
