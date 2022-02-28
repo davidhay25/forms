@@ -34,12 +34,6 @@ function setup(app,sr) {
                 bundle.entry.push(createEntry(observation))
             })
 
-<<<<<<< HEAD
-            //console.log(JSON.stringify(bundle))
-=======
-            //console.log(JSON.stringify(bundle,null,2))
-
->>>>>>> 188458bca58f2759aebdf8289c0dd074a883a5c5
             axios.post('http://localhost:9099/baseR4/', bundle)
                 .then(function (response) {
                     //console.log(response);
@@ -58,12 +52,7 @@ function setup(app,sr) {
         function createEntry(resource) {
             //assume that these are all POST with uuid as id...
             let entry = {}
-<<<<<<< HEAD
-            //entry.fullUrl = "urn:uuid:" + resource.id;       //assume the id is a uuid
-=======
-            entry.fullUrl = "urn:uuid:" + resource.id
 
->>>>>>> 188458bca58f2759aebdf8289c0dd074a883a5c5
             entry.resource = resource
             entry.request = {method:'POST',url:resource.resourceType}
             return entry
