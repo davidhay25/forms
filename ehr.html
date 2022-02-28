@@ -444,7 +444,7 @@
         </uib-tab>
         <uib-tab heading = "Clinical Perspective">
 
-            <div class="row" ng-repeat="dr in allDR">
+            <div class="row" ng-repeat="dr in allDR" ng-click="select(dr)">
                 <div class="col-md-6">
                     {{dr.resource.id}}
 
@@ -455,7 +455,7 @@
                 </div>
                 <div class="col-md-6">
 
-
+                    <displayform patient="selectedPatient" qr="selectedQR"></displayform>
 
                 </div>
             </div>

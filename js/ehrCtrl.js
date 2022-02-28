@@ -294,10 +294,6 @@ angular.module("formsApp")
                     )
                 }
 
-
-
-
-
             }
 
             //when a patient is selected - load the QR from the data server
@@ -306,6 +302,7 @@ angular.module("formsApp")
                 $scope.existingQR = []
                 console.log($scope.input.selectedPatient)
                 $scope.selectedPatient = $scope.input.selectedPatient.resource;
+
                 //get all the QR for this patient from the data server
                 let url = "/ds/fhir/QuestionnaireResponse?patient="+$scope.input.selectedPatient.resource.id
                 $http.get(url).then(

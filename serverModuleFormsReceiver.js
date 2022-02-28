@@ -18,6 +18,7 @@ function setup(app,sr) {
     app.post('/fr/fhir/receiveQR',async function(req,res){
 
         let QR = req.body
+        QR.id = createUUID();
         try {
             let resources = await extractResources(QR)
             let arObservations = resources.obs     //An array of created observations
@@ -36,6 +37,7 @@ function setup(app,sr) {
                 bundle.entry.push(createEntry(observation))
             })
 
+            //console.log(JSON.stringify(bundle))
             axios.post('http://localhost:9099/baseR4/', bundle)
                 .then(function (response) {
                     //console.log(response);
@@ -44,8 +46,6 @@ function setup(app,sr) {
                 .catch(function (error) {
                     console.log(error);
                     res.status(error.response.status).json(error.response.data)
-
-
 
                 });
 
@@ -57,6 +57,7 @@ function setup(app,sr) {
 
         function createEntry(resource) {
             let entry = {}
+            //entry.fullUrl = "urn:uuid:" + resource.id;       //assume the id is a uuid
             entry.resource = resource
             entry.request = {method:'POST',url:resource.resourceType}
             return entry
