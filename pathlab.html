@@ -116,9 +116,10 @@
         <div class="col-md-3">
             <h4>Active Service Requests</h4>
             <div class="list-group">
-                <div class="list-group-item"
+                <div ng-class="{'list-group-item':true,'listItemSelected':sr.id == selectedSR.id}"
                      ng-click="selectSR(sr)"
                      ng-repeat="sr in allSR" style="cursor: pointer">
+                    <div>{{sr.subject.display}}</div>
                     {{sr.id}}
                 </div>
             </div>

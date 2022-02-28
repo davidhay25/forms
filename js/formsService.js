@@ -7,6 +7,23 @@ angular.module("formsApp")
 
         canShareServer = "http://canshare/fhir/"
 
+        function getHN(hn) {
+            let name = "Unknown name"
+            if (hn) {
+                name = hn.text
+                if (! name) {
+                    if (hn.given) {
+                        hn.given.forEach(function (n){
+                            name += n + " "
+                        })
+                    }
+                    name += hn.family
+                }
+            }
+
+            return name
+        }
+
         return {
 
 
@@ -146,8 +163,20 @@ angular.module("formsApp")
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url
                 QR.authored = new Date().toISOString()
-                QR.subject = {reference:"Patient/"+patient.id}
-                QR.author = {reference:"Practitioner/"+practitioner.id}
+
+                let patientName = ""
+                if (patient.name) {
+                    patientName = getHN(patient.name[0])
+                }
+
+                QR.subject = {reference:"Patient/"+patient.id,display:patientName}
+
+                let practitionerName = ""
+                if (practitioner.name) {
+                    practitionerName = getHN(practitioner.name[0])
+                }
+
+                QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
                 QR.item = []
 
 

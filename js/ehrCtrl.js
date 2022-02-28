@@ -300,9 +300,6 @@ angular.module("formsApp")
                                 }
                             })
 
-
-
-
                         }
 
                     }, function (err) {

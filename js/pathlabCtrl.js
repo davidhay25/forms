@@ -8,17 +8,20 @@ angular.module("formsApp")
 
             //retrieve all active ServiceRequests - todo add filter for type
 
-            $http.get("/ds/fhir/ServiceRequest?status=active&_count=50").then(
-                function (data) {
-                    $scope.allSR = [];
-                    if (data.data.entry) {
-                        data.data.entry.forEach(function (entry){
-                            $scope.allSR.push(entry.resource)
-                        })
-                    }
+            function getActiveSR() {
+                $http.get("/ds/fhir/ServiceRequest?status=active&_count=50").then(
+                    function (data) {
+                        $scope.allSR = [];
+                        if (data.data.entry) {
+                            data.data.entry.forEach(function (entry){
+                                $scope.allSR.push(entry.resource)
+                            })
+                        }
 
-                }
-            )
+                    }
+                )
+            }
+            getActiveSR()
 
             //Have the client create an update transaction
             //todo do we want this to go through a custom operation instead? What would be the reason...
@@ -51,6 +54,9 @@ angular.module("formsApp")
                 $http.post("/ds/fhir",bundle).then(
                     function (data) {
                         console.log(data)
+                        delete $scope.selectedQR
+                        delete $scope.selectedSR
+                        getActiveSR()
                     },function (err) {
                         console.log(err)
                     }
@@ -61,7 +67,9 @@ angular.module("formsApp")
             }
 
             $scope.selectSR = function(SR) {
+                delete $scope.selectedQR
                 $scope.selectedSR = SR
+                $scope.input.closeSR = true
 
                 //locate the QR from the SR
                 if (SR.supportingInfo) {

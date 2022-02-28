@@ -338,6 +338,7 @@ function createServiceRequest(QR,arExtractedResources) {
     sr.status = "active"
     sr.intent = "order"
     sr.subject = QR.subject;
+    sr.requester = QR.author
     sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
     sr.supportingInfo = []
     //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
