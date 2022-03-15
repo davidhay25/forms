@@ -15,7 +15,7 @@
                      ng-repeat="section in selectedQ.item">
                     {{section.text}}
                     <span class="pull-right badge">
-                        {{section.item.length}}
+                         {{completedAnswersInSection(section)}} / {{section.item.length}}
                     </span>
 
                 </div>

@@ -2,6 +2,16 @@ angular.module("formsApp")
 
     .service('formsSvc', function($q,$http,$filter,moment) {
 
+        //mdmReferral = {text:"xxx"}
+
+        let globals
+        $http.get("globals.json").then(
+            function(data) {
+                console.log(data.data)
+                globals = data.data
+            }
+        )
+
         extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 
@@ -12,6 +22,7 @@ angular.module("formsApp")
             if (hn) {
                 name = hn.text
                 if (! name) {
+                    name = ""
                     if (hn.given) {
                         hn.given.forEach(function (n){
                             name += n + " "
@@ -56,12 +67,16 @@ angular.module("formsApp")
                 //create an entry element to insert into a bundle for a POST
                 let that = this;
                 let entry = {}
-                if (resource.id) {
-                    entry.fullUrl = canShareServer + resource.resourceType + "/" + resource.id
-                } else {
-                    resource.id = that.createUUID()
-                    entry.fullUrl = "urn:uuid:" + resource.id
+
+                let resourceType = "urn:uuid:"      //default to a uuid
+
+                if (resource.id && resource.id.split('-') < 4) {
+                    //if there are 4 or more '-' we assume this is a uuid
+                    resourceType =  resource.resourceType
                 }
+
+                entry.fullUrl = resourceType + resource.id
+
                 entry.resource = resource
                 entry.request = {method:'POST',url:resource.resourceType}
                 return entry

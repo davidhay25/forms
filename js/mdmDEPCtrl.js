@@ -1,14 +1,17 @@
-//Dashboard controller
+
 
 angular.module("formsApp")
-    .controller('ehrCtrl',
-        function ($scope,$http,formsSvc,actnowSvc) {
+    .controller('mdmCtrl',
+        function ($scope,$http,formsSvc) {
 
             $scope.input = {}
             $scope.form = {}
 
             let validationServer = "http://localhost:9099/baseR4/"
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
+
+            $scope.allRegimens = [{disply:"Lung Cancer regimen"}]
+
 
             // ------------ this code is almost the same as that in the dashboard. ? move to a service
 
@@ -22,35 +25,8 @@ angular.module("formsApp")
                 }
             )
 
-            //count the number of completed answers in each section - used by tabbed form...
-            $scope.completedAnswersInSection = function(section) {
-                console.log(section)
-                let cnt = 0
-                section.item.forEach(function (item){
-                    if ($scope.form[item.linkId]) {
-                        cnt ++
-                    }
-                })
 
-                return cnt
 
-            }
-
-            $scope.selectDR = function (dr) {
-                $scope.selectedDR = dr
-            }
-
-            $scope.selectCP = function(cp) {
-                $scope.selectedCP = cp
-            }
-            //construct a simplified logical model of a regimen to ease UI
-            $scope.getRegimenSummary = function (cp){
-                $scope.regimenLM = actnowSvc.makeRegimenLM(cp,$scope.hashAllCarePlans)
-            }
-
-            $scope.recordAdministration = function(act) {
-                alert("Will allow the administration times to be recorded")
-            }
 
             //===============  functions for form ===================
 
@@ -184,9 +160,6 @@ angular.module("formsApp")
 
             //---------------------------------------------------------------------------------
 
-            $scope.selectSR = function(SR) {
-                $scope.selectedSRForList = SR
-            }
 
             //select a single DR that has a reference to the SR
             $scope.selectSRDR = function(srdr) {
@@ -194,7 +167,7 @@ angular.module("formsApp")
             }
 
             // a ServiceRequest is selected in the workflow tab...
-            $scope.selectSRforQR = function(sr) {
+            $scope.selectSR = function(sr) {
                 $scope.selectedSR = sr
                 delete $scope.SRDRs     //the DR's that have a reference to this SR
                 delete $scope.selectedSRDR
@@ -206,7 +179,28 @@ angular.module("formsApp")
                     function(data) {
                         let bundle = data.data
                         console.log(bundle)
+                        /*
+                        let hashResource = {}   //all resources other than DR hashed by {type}/{id}
+                        let arDR = []           //array of DRs - content = {DR,obs[]}
+                        if (bundle.entry) {
+                            bundle.entry.forEach(function (entry) {
+                                let resource = entry.resource
+                                if (resource.resourceType == 'DiagnosticReport') {
+                                    arDR.push({resource:resource,obs:[]})
+                                } else {
+                                    hashResource[resource.resourceType + "/" + resource.id] = resource
+                                }
+                            })
 
+                            //go through the DR and add the resources referenced from the .result element to it
+                            arDR.forEach(function (item) {
+                                item.resource.result.forEach(function (ref) {
+                                    item.obs.push(hashResource[ref.reference])
+                                })
+                            })
+
+                            console.log(arDR)
+                            */
                             $scope.SRDRs = formsSvc.makeDRList(bundle)
 
 
@@ -242,7 +236,7 @@ angular.module("formsApp")
                 //todo a custom search is probably a good idea
 
 
-                $scope.SRforQR = []    //all the SR associated with this QR
+                $scope.allSR = []    //all the SR associated with this QR
                 let qry = "/ds/fhir/ServiceRequest?patient=" + $scope.selectedPatient.id
                 $http.get(qry).then(
                     function(data) {
@@ -256,7 +250,7 @@ angular.module("formsApp")
                                     sr.supportingInfo.forEach(function (si){
                                         if (si.reference == 'QuestionnaireResponse/'+ QR.id) {
                                             //yes! this SR refers to the QR
-                                            $scope.SRforQR.push(sr)
+                                            $scope.allSR.push(sr)
                                         }
                                     })
                                 }
@@ -264,7 +258,7 @@ angular.module("formsApp")
 
 
                         }
-                        console.log($scope.SRforQR)
+                        console.log($scope.allSR)
                     }, function(err) {
                         console.log(err)
                     }
@@ -374,14 +368,10 @@ angular.module("formsApp")
                 )
 
                 //get all the DR - DiagnosticReports
-
-
                 let qry = "/ds/fhir/DiagnosticReport?patient="+$scope.selectedPatient.id+"&_include=DiagnosticReport:result"
                 $http.get(qry).then(
                     function(data) {
-
                         $scope.allDR = formsSvc.makeDRList(data.data)
-                        //console.log($scope.allDR)
                     }, function(err) {
                         console.log(err)
                     }
@@ -391,37 +381,26 @@ angular.module("formsApp")
                 getObservationsForPatient($scope.input.selectedPatient.resource.id)
 
                 //get all the act-now data (assumes the careplan supporting-info search parameter has been applied to the server
-                //todo - create follow paging routine
-                //todo - ?include MedicationAdmin as well
-
-                //server script does paging
                 let qryActnow = "/ds/fhir/CarePlan?patient=" +$scope.input.selectedPatient.resource.id
                 qryActnow += "&_include=CarePlan:condition"
                 qryActnow += "&_include=CarePlan:supporting-info"
                 qryActnow += "&_include:iterate=Observation:has-member"     //eg the TNM codes
                 qryActnow += "&_revinclude=Observation:based-on"
-                qryActnow += "&_revinclude=MedicationAdministration:ma-based-on"
-                //qryActnow += "&_count=50"
+                qryActnow += "&_count=50"
 
                 $http.get(qryActnow).then(
                     function(data) {
 
-                        $scope.allCarePlans = []
-                        $scope.hashAllCarePlans = {}      //hash by resource id
+                        $scope.actnow = []
+                        $scope.hashActnow = {}      //hash by resource id
                         if (data.data.entry) {
-                            //convert to list and hash of resources
+                            //convert to list of resources
                             data.data.entry.forEach(function (entry){
-                                if (entry.resource.resourceType == 'CarePlan') {
-                                    $scope.allCarePlans.push(entry.resource)
-                                }
-
-                                $scope.hashAllCarePlans[entry.resource.resourceType + "/" + entry.resource.id] = entry.resource
+                                $scope.actnow.push(entry.resource)
+                                $scope.hashActnow[entry.resource.resourceType + "/" + entry.resource.id] = entry.resource
                             })
                         }
-                        console.log($scope.allCarePlans)
-
-
-
+                        console.log($scope.actnow)
 
                     }, function(err) {
                         console.log(err)
@@ -429,28 +408,9 @@ angular.module("formsApp")
                 )
 
 
-                //All service Requests
-                let qrySR = "/ds/fhir/ServiceRequest?patient=" +$scope.input.selectedPatient.resource.id
-                $scope.allSR = []
-                //qryActnow += "&_include=CarePlan:condition"
-                //qryActnow += "&_include=CarePlan:supporting-info"
-                //qryActnow += "&_include:iterate=Observation:has-member"     //eg the TNM codes
-                //qryActnow += "&_revinclude=Observation:based-on"
-                //qryActnow += "&_revinclude=MedicationAdministration:ma-based-on"
-                $http.get(qrySR).then(
-                    function(data) {
-                        if (data.data.entry) {
-                            //convert to list and hash of resources
-                            data.data.entry.forEach(function (entry){
-                                $scope.allSR.push(entry.resource)
+               // canshare.clinfhir.com:9099/baseR4/CarePlan?patient=an-patient&_include=CarePlan:supporting-info&_revinclude=Observation:based-on
 
-                            })
-                        }
 
-                       // $scope.allSR = data.data
-                    }, function(err) {
-
-                    })
 
             }
 
@@ -464,7 +424,7 @@ angular.module("formsApp")
             }
 
             let getObservationsForPatient = function(patId){
-                let url = "/ds/fhir/Observation?patient="+patId //+ "&_count=50"
+                let url = "/ds/fhir/Observation?patient="+patId + "&_count=50"
 
                 $http.get(url).then(
                     function (data) {
@@ -532,7 +492,7 @@ angular.module("formsApp")
                     data.data.entry.forEach(function (entry){
                         let display = entry.resource.name[0].text
                         $scope.allPatients.push({display:display,resource:entry.resource})
-                        $scope.input.selectedPatient = $scope.allPatients[0]
+                        $scope.input.selectedPatient = $scope.allPatients[3]
 
                     })
                     $scope.selectPatient()
@@ -549,11 +509,7 @@ angular.module("formsApp")
 
                     $scope.allPractitioners = [];
                     data.data.entry.forEach(function (entry){
-                        let display = "No Name"
-                        if (entry.resource.name) {
-                            display = entry.resource.name[0].text
-                        }
-
+                        let display = entry.resource.name[0].text
                         $scope.allPractitioners.push({display:display,resource:entry.resource})
 
                         //$scope.selectPractitioner()

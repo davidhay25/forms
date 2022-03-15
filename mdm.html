@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>PathLab</title>
+    <title>MDM meeting</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
@@ -49,7 +49,7 @@
     </script>
     <script src="js/libs/ngStorage.min.js"></script>
 
-    <script src="js/pathlabCtrl.js"></script>
+    <script src="js/mdmCtrl.js"></script>
     <script src="js/formsService.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
@@ -68,7 +68,7 @@
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-    <div ng-app="formsApp" ng-controller="pathlabCtrl" class="container-fluid">
+    <div ng-app="formsApp" ng-controller="mdmCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -76,14 +76,14 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Canshare: Referrals for Histology examination
+                            Canshare: Referrals for MDM meeting
                         </a>
                     </span>
             </div>
 
+
             <div class="col-md-2 col-sm-2">
                 <div class="navbar-text">
-                    {{selectedPractitioner.display}}
 
 
                 </div>
@@ -102,10 +102,9 @@
             </div>
 
             <div class="col-md-3 col-sm-3">
+
                 <div class="navbar-text">
-                    <select class="form-control" ng-model = "input.selectedPatient"
-                            ng-change="selectPatient()"
-                            ng-options = "item.display for item in allPatients"></select>
+
                 </div>
 
             </div>
@@ -123,14 +122,14 @@
                     {{sr.id}}
                 </div>
             </div>
-            <em>These are all ServiceRequests that have a category of 'lab request' and a status of 'active'. The query could be refined
+            <em>These are all ServiceRequests to the MDM meeting that have a status = 'active'. The query could be refined
             if the ServiceRequest was directed to a specific lab when the initial request was made..</em>
 
         </div>
         <div class="col-md-9">
 
             <uib-tabset ng-show="selectedQR">
-                <uib-tab heading="Request Form">
+                <uib-tab heading="Request Form and action">
                     <div class="row">
                         <div class="col-md-8">
                             <!--
@@ -138,9 +137,16 @@
 -->
                             <displayform patient="selectedPatient" qr="selectedQR"></displayform>
 
+                            <div class="rounded-box">Pathologist report</div>
+                            <div>
+                                Todo - add pathologist report
+                            </div>
+                            <div><em>DiagnosticReport / Observation</em></div>
 
                         </div>
                         <div class="col-md-4">
+                            <h4>MDM outcome</h4>
+                            <!--
                             <h4>Submit report</h4>
 
                             <textarea class="form-control" ng-model="input.report"></textarea>
@@ -150,28 +156,63 @@
 
                             <button ng-show = "input.report"  class="btn btn-primary" ng-click="submitReport()">Submit report</button>
 
-                            <br/> <br/>
-<!--
-                            <checkbox ng-model="input.referMDM"></checkbox> Refer to MDM
-
-                            <br/> <br/>
                             -->
+                            <br/> <br/>
 
-                            <em>This will create a DiagnosticReport and an Observation with the text above.
-                                <br/> <br/>
-                            These resources, along with the ServiceRequest that is being fulfilled will be sent
-                            to the custom operation that will save them in the database and update the ServiceRequest
-                            to indicate that it is complete.
-                                <br/> <br/>
+                            <div>Primary diagnosis</div>
+                            <input type="text" class="form-control"
+                                   ng-model="input.dx"
+                                   placeholder="Have lookup for diagnosis"/>
 
-                                Any number of Observations (linked from the DiagnosticReport)
-                            can be included in the bundle.</em>
+                            <div>Regimen to apply</div>
+                            <select class="form-control" ng-model="input.regimen"
+                                    ng-options="item.display for item in allRegimens"></select>
+
+                            <br/> <br/>
+                            <div>
+                                <button class="btn btn-primary pull-right"
+                                        ng-show = "input.regimen && input.dx"
+                                        ng-click="applyRegimen(input.regimen,input.dx)">Apply regimen</button>
+                            </div>
+                            <br/> <br/>
+                            <em>Selecting a regimen will create a number of resources.
+                                <ul>
+                                    <li>A Condition resource that represents the cancer being treated</li>
+                                    <li>A 'top level' CarePlan to track care delivered for this condition </li>
+                                    <li>A 'regimen level' CarePlan to track medication cycles against the regimen </li>
+                                </ul>
+
+                                <br/> <br/>
+                            </em>
                         </div>
                     </div>
 
 
 
                 </uib-tab>
+                <uib-tab heading="Pathology Report">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h4>Report</h4>
+                            {{pathReport.display}}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Diagnostic Report</strong>
+                            <pre>{{pathReport.dr | json}}</pre>
+
+
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Observation</strong>
+                            <pre>{{pathReport.observation | json}}</pre>
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading = "Top level CarePlan">
+                    <pre>{{selectedCarePlan | json}}</pre>
+                </uib-tab>
+
                 <uib-tab heading="SR Json">
                     <pre>{{selectedSR | json}}</pre>
 

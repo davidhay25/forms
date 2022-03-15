@@ -3,6 +3,10 @@
 const axios = require('axios').default;
 let serverRoot
 
+let globals = require("./globals.json")
+//console.log(globals.hello)
+
+
 function createUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -92,21 +96,41 @@ async function extractResources(QR) {
     let bundle = response.data
 
     if (bundle.entry && bundle.entry.length == 1) {
+        //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
 
-        //retrieve Observations
+        //retrieve Observations (and potentially other resources)
         let resources = performObservationExtraction(Q,QR)
 
-        // now create other resources
+        // now create other resources (and track with provenance). The provenance was created and populated during resource extraction
         let provenance = resources.provenance
 
-        //the service request - always added ATM
-        let sr =  createServiceRequest(QR)      //todo refactor names of vo returned
-        provenance.target = provenance.target || []
+        //create 'disease level' CP
+        let cp = createCarePlan(QR)
+        provenance.target.push({reference: "urn:uuid:"+ cp.id})
+        resources.obs.push(cp)
 
+        //the service request for a path request - always added ATM
+        //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
+
+        let sr =  createServiceRequest(QR,globals.labrefer,cp,"Path request")      //todo refactor names of vo returned
+        //provenance.target = provenance.target || []
         provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...
         //resources.others = []       //all resources
+
+
+        //generate MDM referral (servicerequest) if requested by QR
+        if (resources.QRHash['mdmreferral']) {
+            //the service request for a path request - always added ATM
+            //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
+            //let category = globals.labrefer
+
+            let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral")      //todo refactor names of vo returned
+            //provenance.target = provenance.target || []
+            provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
+            resources.obs.push(srMDM)          //not really all obs...
+        }
 
 
 
@@ -114,10 +138,11 @@ async function extractResources(QR) {
 
 
     } else {
-        return makeOO("There needs to be a single Q with the url:" )
+        return makeOO("There needs to be a single Q with the url: " + qUrl )
     }
 
 }
+
 
 
 function performObservationExtraction(Q,QR) {
@@ -199,6 +224,7 @@ function performObservationExtraction(Q,QR) {
     provenance.recorded = new Date().toISOString()
     provenance.entity = []
     provenance.agent = []
+    provenance.target = []
 
     provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
 
@@ -267,7 +293,7 @@ function performObservationExtraction(Q,QR) {
                 observation.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>" + text + "</div>"
 
                 arObservations.push(observation)
-                provenance.target = provenance.target || []
+                //provenance.target = provenance.target || []
 
                 provenance.target.push({reference: "urn:uuid:"+ observation.id})
 
@@ -331,26 +357,56 @@ function performObservationExtraction(Q,QR) {
 }
 
 //create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
-function createServiceRequest(QR,arExtractedResources) {
+function createServiceRequest(QR,category,carePlan,description,arExtractedResources) {
     let sr = {resourceType:"ServiceRequest"}
     sr.id = createUUID()   //will be ignored by fhir server
-    sr.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Pathology request form</div>",status:"additional"}
+    sr.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>"+description+"</div>",status:"additional"}
     sr.status = "active"
     sr.intent = "order"
+    sr.authoredOn = new Date().toISOString()
     sr.subject = QR.subject;
     sr.requester = QR.author
-    sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
+    sr.category = [category]
+    //sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
     sr.supportingInfo = []
     //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
     sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
 
+    //if there's a careplan (and there should be) then add the SR as an activity, and a reference from SR -> CP
+    if (carePlan) {
+        carePlan.activity = carePlan.activity || []
+        let activity = {}
+        activity.reference = {reference : "urn:uuid:"+ sr.id}
+        carePlan.activity =  carePlan.activity || []
+        carePlan.activity.push(activity)
+        //a reference from SR back to the CP
+        sr.basedOn = {reference : "urn:uuid:"+ carePlan.id}
+    }
+/*
+    //?? not actually using this ATM
     if (arExtractedResources) {
         arExtractedResources.forEach(function (resource){
             //sr.supportingInfo.push({reference: resource.resourceType +  "/"+resource.id})
             sr.supportingInfo.push({reference: "urn:uuid:"+resource.id})
         })
     }
+*/
     return sr
+}
+
+function createCarePlan(QR) {
+    //what about the Condition it addresses?
+    let cpTreat = {resourceType: "CarePlan", id: createUUID()}
+    cpTreat.status = "active"
+    cpTreat.intent = "plan"
+    cpTreat.period = {start:"2022-01-01",end:"2023-01-01"}
+    cpTreat.category = globals.treatmentCPCategory // {text: "Treatment level plan"}
+    cpTreat.title = "The top level plan describing treatment for this condition"
+    cpTreat.subject = QR.subject
+    cpTreat.supportingInfo = []
+    cpTreat.supportingInfo.push({reference: "urn:uuid:"+QR.id})
+
+    return cpTreat
 }
 
 //find all extensions in this item with the given url. Return an array of extensions...

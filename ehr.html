@@ -56,6 +56,7 @@
 
     <script src="directive/displayFormDir.js"></script>
     <script src="directive/displayProvenanceDir.js"></script>
+    <script src="js/actnowSvc.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -76,9 +77,11 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            CanShare sample EHR
+                            CanShare: Create Path request and view patient data
+                            <!-- <div><em>Surgeon and MDM meeting</em></div> -->
                         </a>
                     </span>
+
             </div>
 
             <div class="col-md-2 col-sm-2">
@@ -255,7 +258,8 @@
             </div>
 
         </uib-tab>
-        <uib-tab heading="Existing Forms">
+        <uib-tab>
+            <uib-tab-heading>Existing Forms <span ng-show="existingQR.length > 0" class="badge">{{existingQR.length}}</span> </uib-tab-heading>
             <div class="row">
                 <div class="col-md-2">
                     <div class="list-group">
@@ -265,11 +269,12 @@
                              ng-repeat="QRItem in existingQR">
                             {{QRItem.display}}
                             <div>{{QRItem.QR.authored | prettyDate}} <span class="pull-right">{{QRItem.QR.authored | age}}</span> </div>
+                            <div>QR Id: {{QRItem.QR.id}}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-10">
-                    <uib-tabset>
+                    <uib-tabset ng-show="selectedQR">
                         <!--
                         <uib-tab heading="Form">
 
@@ -285,7 +290,7 @@
                         </uib-tab>
 
 
-                        <uib-tab ng-show="allSR.length > 0">
+                        <uib-tab ng-show="SRforQR.length > 0">
                             <uib-tab-heading>Workflow <span class="badge">{{selectedSR.length}}</span></uib-tab-heading>
 
 
@@ -293,9 +298,9 @@
                                 <div class="col-md-3">
                                     <div class="list-group">
                                         <div class="list-group-item"
-                                             ng-click = "selectSR(sr)"
+                                             ng-click = "selectSRforQR(sr)"
                                              style="cursor: pointer"
-                                             ng-repeat="sr in allSR ">
+                                             ng-repeat="sr in SRforQR ">
                                             {{sr.id}}
 
                                         </div>
@@ -410,7 +415,229 @@
 
 
         </uib-tab>
-        <uib-tab heading="Query resources">
+
+        <uib-tab>
+            <uib-tab-heading>Pathology reports <span ng-show="allDR.length > 0" class="badge">{{allDR.length}}</span></uib-tab-heading>
+            <br/>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <table class="table table-condensed">
+                        <tr><th>Date</th><th>Report</th></tr>
+                        <tr ng-repeat = "dr in allDR" ng-click="selectDR(dr)" style="cursor: pointer">
+                            <td width = "25%">
+                                {{dr.resource.effectiveDateTime | date :  "MMM d yyyy"}}
+                            </td>
+                            <td>
+                                {{dr.obs[0].valueString}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <pre>{{selectedDR.resource | json}}</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <pre>{{selectedDR.obs | json}}</pre>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+<!--
+            <uib-tabset>
+                <br/>
+                <uib-tab heading="List">
+                    <table class="table table-condensed">
+                        <tr><th>Date</th><th>Report</th></tr>
+                        <tr ng-repeat = "dr in allDR" ng-click="selectDR(dr)">
+                            <td width = "15%">
+                                {{dr.resource.effectiveDateTime | date :  "MMM d yyyy"}}
+                            </td>
+
+                            <td>
+                                {{dr.obs[0].valueString}}
+                            </td>
+
+                        </tr>
+                    </table>
+                </uib-tab>
+
+                <uib-tab heading="Json">
+                    <div class="row"  ng-repeat = "dr in allDR">
+                        <div class="col-md-6">
+                            <pre>{{dr.resource | json}}</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <pre>{{dr.obs | json}}</pre>
+                        </div>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+
+-->
+
+
+        </uib-tab>
+        <uib-tab ng-show="false" heading="Medication administrations">
+            table of CP hierarchy to left, administrations in right
+            ? separate cols for regimen & Cycle
+            ? dropdown to select top level CP
+            possibly other CP details
+        </uib-tab>
+
+        <uib-tab heading="CarePlans" >
+            <uib-tab-heading>
+                CarePlans <span class="badge">{{allCarePlans.length}}</span>
+            </uib-tab-heading>
+            <br/>
+
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table-condensed table table-bordered">
+                                <tr><th>Id</th><th>Title</th><th>Status</th><th>Category</th></tr>
+                                <tr ng-repeat="cp in allCarePlans" ng-click="selectCP(cp)" style="cursor: pointer">
+                                    <td>{{cp.id}}</td>
+                                    <td>{{cp.title}}</td>
+                                    <td>{{cp.status}}</td>
+                                    <td>
+                                        <div ng-repeat="c in cp.category">
+                                            <div ng-repeat="coding in c.coding">
+                                                {{coding.code}} ({{coding.system}})
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <pre>{{selectedCP | json}}</pre>
+                        </div>
+                    </div>
+
+
+
+        </uib-tab>
+        <uib-tab heading = "Regimens">
+
+
+            <div class="row">
+                <div class="col-md-3">
+
+                    <div class="list-group">
+                        <div class="list-group-item"
+                             ng-repeat = "(k,resource)  in allCarePlans"
+                             style="cursor:pointer"
+                             ng-click="getRegimenSummary(resource)"
+                             ng-show="resource.resourceType == 'CarePlan' && resource.category[0].coding[0].code=='regimenCP'" >
+
+                            <div class="list-group-item" >
+                                {{resource.title}}
+                                <div><em>{{resource.id}}</em></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <em>The ability to construct the model assumes that the bundle is conformant to
+                        the IG. This can be validated.</em>
+                </div>
+                <div class="col-md-9">
+                    <uib-tabset>
+                        <uib-tab heading = "Display">
+
+
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Cycle</th><th>Administered medications</th><th>Cycle outcomes</th></tr>
+                                <tr ng-repeat="cycle in regimenLM.cycles">
+                                    <td>
+                                        {{cycle.model.title}} ({{cycle.model.status}})
+                                        <div>Period: {{cycle.model.period.start}} -> {{cycle.model.period.end}}</div>
+                                        <div>Cycle Number: {{cycle.model.cycleNumber}}</div>
+                                        <div ng-show="cycle.model.activities.length > 0">
+                                            <strong>Activities</strong>
+                                            <ul>
+                                                <li ng-repeat="act in cycle.model.activities">
+                                                    {{act.display}}
+                                                    <span  class="clickable pull-right" ng-show="act.product"
+                                                           ng-click="recordAdministration(act)">
+                                                                Record admin
+                                                            </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div ng-repeat="med in cycle.model.medications">
+
+                                            {{med.period.start | date : "MMM d yyyy"}}
+                                            {{med.period.start | date : "hh:mm a"}} - {{med.period.end | date : "hh:mm a"}}     {{med.drugName}} {{med.dosage}}
+
+                                        </div>
+                                    </td>
+                                    <td>
+
+                                    </td>
+
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+                        <uib-tab heading = "Medication timeline view">
+                            *** need to figure out creating a CarePlan from PlanDefinition
+                            ? from the cycle Plan
+                            based on information from the regimen plan definition create a timeline of when
+                            meds are to be administered. Include given and planned.
+                        </uib-tab>
+                        <uib-tab heading = "Summary Json">
+                            <pre>{{regimenLM | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+                </div>
+            </div>
+
+
+        </uib-tab>
+
+
+        <uib-tab>
+            <uib-tab-heading>Service Requests <span ng-show="allSR.length > 0" class="badge">{{allSR.length}}</span> </uib-tab-heading>
+                <br/>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-condensed">
+                            <tr ><th>SR Id</th><th>Date</th><th>Category</th><th>Status</th></tr>
+                            <tr style="cursor: pointer" ng-repeat="row in allSR" ng-click="selectSR(row)">
+                                <td>{{row.id}}</td>
+                                <td>{{row.authoredOn | prettyDate}}</td>
+                                <td>{{row.category[0].text}}</td>
+                                <td>{{row.status}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <pre>{{selectedSRForList | json}}</pre>
+                    </div>
+                </div>
+
+        </uib-tab>
+
+
+        <uib-tab heading="Query resources" ng-show="true">
             <div class="row">
                 <div class="col-md-12">
                     <button class="btn-link btn pull-right" ng-click="updateQuery()">Refresh</button>
@@ -457,7 +684,9 @@
 
 
         </uib-tab>
-        <uib-tab heading = "Clinical Perspective">
+
+
+        <uib-tab heading = "Clinical Perspective" ng-show="false">
 
             <div class="row" ng-repeat="dr in allDR" ng-click="select(dr)">
                 <div class="col-md-6">
