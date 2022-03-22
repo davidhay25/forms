@@ -137,11 +137,7 @@
 -->
                             <displayform patient="selectedPatient" qr="selectedQR"></displayform>
 
-                            <div class="rounded-box">Pathologist report</div>
-                            <div>
-                                Todo - add pathologist report
-                            </div>
-                            <div><em>DiagnosticReport / Observation</em></div>
+
 
                         </div>
                         <div class="col-md-4">
@@ -191,7 +187,8 @@
 
                 </uib-tab>
                 <uib-tab heading="Pathology Report">
-                    <div class="row">
+
+                    <div class="row" ng-show = "pathReport.dr">
                         <div class="col-md-4">
                             <h4>Report</h4>
                             {{pathReport.display}}
@@ -209,7 +206,7 @@
                     </div>
                 </uib-tab>
 
-                <uib-tab heading = "Top level CarePlan">
+                <uib-tab heading = "Top level/Disease CarePlan">
                     <pre>{{selectedCarePlan | json}}</pre>
                 </uib-tab>
 

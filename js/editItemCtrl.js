@@ -1,13 +1,19 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
-        function ($scope,formsSvc,item,itemTypes,editType,codeSystems) {
+        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType) {
+
+            //editType id 'new' or 'edit'
+            //insertType is 'section' or 'item'
 
             //todo get units if extension present
             $scope.editType = editType
+            $scope.insertType = insertType
             $scope.input = {}
             $scope.input.itemTypes = itemTypes
             $scope.input.codeSystems = codeSystems
             $scope.newItem = item
+
+
 
             //set the code controls
             if ($scope.newItem.code && $scope.newItem.code.length > 0) {

@@ -85,10 +85,31 @@
                             {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
                         </div>
 
-
                     </div>
+{{item.item}}
+                    <div ng-show = "item.item">
+                        <div ng-repeat="childItem in item.item">
+                            <div ng-repeat="childAnswer in childItem">
+                                <div ng-show="childAnswer.valueDecimal">
+                                    {{answer.valueDecimal}}
+                                </div>
 
+                                <div ng-show="childAnswer.valueString">
+                                    {{answer.valueString}}
+                                </div>
 
+                                <div ng-show="childAnswer.valueBoolean">
+
+                                    {{answer.valueBoolean ? "Yes" : "No"}}
+                                </div>
+
+                                <div ng-show="childAnswer.valueCoding">
+                                    {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
 
 
                 </div>

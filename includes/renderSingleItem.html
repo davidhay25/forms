@@ -1,0 +1,118 @@
+
+<!-- Renter a single item. Used in the new tabbed double column interface-->
+
+<div>
+
+
+    <div ng-show="showConditional(cell)">
+        <div ng-hide="cell.item.type == 'display'">
+            <strong>{{cell.item.text}}</strong>
+            <span ng-show="cell.item.type == 'reference'">
+
+            <i class="btn btn-link glyphicon glyphicon-search clickable"
+               ng-click="selectResourceFromService(cell.item)"></i>
+        </span>
+        </div>
+
+
+        <div ng-switch="cell.item.type">
+
+            <div ng-switch-when="group">
+
+            </div>
+
+            <div ng-switch-when="display">
+                <em>{{cell.item.text}}</em>
+
+            </div>
+
+            <div ng-switch-when="reference">
+                <!-- references are selected from a dialog-->
+                {{form[cell.item.linkId].display}}
+
+            </div>
+
+            <div ng-switch-when="text">
+                <textarea ng-model="form[cell.item.linkId]" class="form-control"
+                      ng-blur="makeQR(cell.item.linkId)"></textarea>
+            </div>
+
+            <div ng-switch-when="boolean">
+                <checkbox ng-model="form[cell.item.linkId]"  ng-blur="makeQR(cell.item.linkId)"></checkbox>
+            </div>
+
+
+            <div ng-switch-when="choice">
+
+                <div ng-show = "cell.item.answerOption">
+
+                    <div ng-show="cell.displayHint == 'radio-button'">
+
+                        <span ng-repeat="option in cell.item.answerOption">
+
+                            <input type="radio" value="{{option}}"
+                                   ng-change="makeQR(cell.item.linkId)"
+                                   ng-model="form[cell.item.linkId]"/>
+
+                            {{option.valueCoding.display}}
+                    </span>
+
+                    </div>
+
+                    <div ng-hide="cell.displayHint == 'radio-button'">
+
+
+                        <select class="form-control" ng-model="form[cell.item.linkId]"
+                                ng-change="makeQR(cell.item.linkId)"
+                                ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
+
+                        </select>
+                    </div>
+
+
+                </div>
+
+
+            <div ng-show = "cell.item.answerValueSet">
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" class = "form-control" ng-model="form[cell.item.linkId]"
+                               placeholder="Auto lookup after 3 characters"
+                               typeahead-min-length="3"
+                               typeahead-wait-ms="1000"
+                               typeahead-on-select="selectConcept($item, $model, $label)"
+                               uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,cell.item.answerValueSet)"/>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-link" ng-click=""></button>
+                    </div>
+                </div>
+
+                <!-- todo - is this better as a 'click to select'-->
+
+
+
+                <div ng-hide = "cell.item.answerValueSet || cell.item.answerOption">
+                    This question is a choice, but there is no ValueSet or answerOption
+                </div>
+
+
+            </div>
+
+
+
+            </div>
+
+
+
+            <div ng-switch-default>
+                <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                       ng-model="form[cell.item.linkId]" class="form-control"/>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

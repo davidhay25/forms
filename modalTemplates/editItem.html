@@ -23,6 +23,7 @@
 
         <uib-tabset>
             <uib-tab heading="Question details">
+                <br/>
                 <table class="table">
                     <tr>
                         <td>LinkId</td>
@@ -41,14 +42,15 @@
 
 
 
-                    <tr>
+                    <tr ng-hide = "insertType == 'section'">
                         <td>Type</td>
                         <td>
                             <select class="form-control" ng-model="newItem.type"
                                     ng-options = "itemType for itemType in input.itemTypes"></select>
                         </td>
-
                     </tr>
+
+
 
                     <tr ng-show = "newItem.type == 'quantity'">
                         <td>Units</td>
@@ -105,6 +107,7 @@
             </uib-tab>
             <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >
                 <uib-tab-heading>Options <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
+                <br/>
                 <table class="table table-bordered table-condensed">
                     <tr ng-repeat = "option in newItem.answerOption">
                         <td>{{option.valueCoding.code}}</td>
@@ -137,6 +140,10 @@
                     </tr>
                 </table>
 
+            </uib-tab>
+            <uib-tab ng-show = "editType == 'new'" heading = "Library">
+                <br/>
+                TBD  - allow selection from the library of items
             </uib-tab>
         </uib-tabset>
 

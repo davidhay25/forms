@@ -7,10 +7,9 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.allRegimens = [{display:"Lung Cancer regimen",url:"http://canshare.com/lungCancerPlan"}]
 
-
             $http.get("./globals.json").then(
                 function(data) {
-                    console.log(data)
+                    //console.log(data)
                     $scope.globals = data.data
                     getActiveSR()
                 }
@@ -45,7 +44,7 @@ angular.module("formsApp")
 
                             })
                         }
-                        console.log($scope.allSR)
+                        //console.log($scope.allSR)
                     }
                 )
             }
@@ -54,11 +53,7 @@ angular.module("formsApp")
 
             $scope.applyRegimen = function(regimen,dx) {
 
-
-
                 if (confirm("Are you sure you wish to apply this carePlan")) {
-
-
                     let bundle = {resourceType: "Bundle", type: "transaction", entry: []}
 
                     //mark the SR as completed
@@ -74,47 +69,23 @@ angular.module("formsApp")
                     bundle.entry.push(formsSvc.createPOSTEntry(condition))
 
                     //add the condition to the careplan, and add the CP to the bundle for update
-                    $scope.selectedCarePlan.addresses = $scope.selectedCarePlan.addresses || []
-                    $scope.selectedCarePlan.addresses.push({reference: "urn:uuid:" + condition.id})
-                    bundle.entry.push(formsSvc.createPUTEntry($scope.selectedCarePlan))
-
-/*
-
-                    //the top level careplan (created when the pathrequest was submitted) id referenced from the SR
-                    //note there is a question around when the top level CP should be created
-
-                    let topLevelPlanRef
-                    if ($scope.selectedSR.basedOn) {
-                        //for now
-                        $scope.selectedSR.basedOn.forEach(function (bo){
-                            if (bo.reference && bo.reference.indexOf('CarePlan') > -1) {
-                                //topLevelPlan =
-                            }
-                        })
+                    if ($scope.selectedCarePlan) {
+                        $scope.selectedCarePlan.addresses = $scope.selectedCarePlan.addresses || []
+                        $scope.selectedCarePlan.addresses.push({reference: "urn:uuid:" + condition.id})
+                        bundle.entry.push(formsSvc.createPUTEntry($scope.selectedCarePlan))
                     }
-*/
 
-/*
-                    //create the top level ?treatment CarePlan
-                    let cpTreat = {resourceType: "CarePlan", id: formsSvc.createUUID()}
-                    cpTreat.status = "active"
-                    cpTreat.intent = "plan"
-                    cpTreat.period = {start:"2022-01-01",end:"2023-01-01"}
-                    cpTreat.category = $scope.globals.treatmentCPCategory // {text: "Treatment level plan"}
-                    cpTreat.title = "The top level plan describing treatment for this condition"
-                    cpTreat.subject = $scope.selectedSR.subject
-                    cpTreat.addresses = [{reference: "urn:uuid:" + condition.id}]
-                    bundle.entry.push(formsSvc.createPOSTEntry(cpTreat))
-*/
 
-                    //create the regimen CarePlan. dummy data for ow - would come from the regimens service
+                    //create the regimen CarePlan. dummy data for now - would come from the regimens service
                     let cpRegimen = {resourceType: "CarePlan", id: formsSvc.createUUID()}
                     cpRegimen.status = "active"
                     cpRegimen.intent = "plan"
                     cpRegimen.period = {start:"2022-01-01",end:"2022-06-01"}
                     cpRegimen.category = $scope.globals.regimenCPCategory //{text: "Treatment level plan"}
-                    cpRegimen.partOf = {reference: "CarePlan/" + $scope.selectedCarePlan.id}  //as the CP is not being created in this bundle, the real type is used
-                    cpRegimen.title = "CarePlan representing regimen"
+                    if ($scope.selectedCarePlan) {
+                        cpRegimen.partOf = {reference: "CarePlan/" + $scope.selectedCarePlan.id}  //as the CP is not being created in this bundle, the real type is used
+                    }
+                        cpRegimen.title = regimen.display //"CarePlan representing regimen"
                     cpRegimen.subject = $scope.selectedSR.subject
                     bundle.entry.push(formsSvc.createPOSTEntry(cpRegimen))
 
@@ -132,7 +103,7 @@ angular.module("formsApp")
                     cpCycle.subject = $scope.selectedSR.subject
                     bundle.entry.push(formsSvc.createPOSTEntry(cpCycle))
 
-                    console.log(bundle)
+                    //console.log(bundle)
 
                     //return
 
@@ -158,6 +129,10 @@ angular.module("formsApp")
             //when a service request is selected
             $scope.selectSR = function(SR) {
                 delete $scope.selectedQR
+                delete $scope.selectedCarePlan
+                delete $scope.selectedPatient
+                delete $scope.pathReport
+
                 $scope.selectedSR = SR
                 $scope.input.closeSR = true
 
@@ -237,7 +212,7 @@ angular.module("formsApp")
                         qry += "&_include=DiagnosticReport:result"
                         $http.get(qry).then(
                             function(data) {
-                                console.log(data.data)
+                                //console.log(data.data)
                                 //should be a single DR & Observation
                                 if (data.data.entry) {
                                     data.data.entry.forEach(function (entry){

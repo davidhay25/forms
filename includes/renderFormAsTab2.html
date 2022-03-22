@@ -1,0 +1,79 @@
+
+
+<div class="row">
+    <div class="col-md-3">
+        Sections
+        <div class="list-group">
+            <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
+                 ng-click = "selectSection(section)"
+                 style="cursor: pointer"
+                 ng-repeat="section in formTemplate">
+
+                {{section.text}}
+                <!-- temp
+                <span class="pull-right badge">
+                         {{completedAnswersInSection(section)}} / {{section.item.length}}
+                    </span>
+-->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <!--
+        <div class="row">
+            <div class="col-md-4">
+                Left Pane
+            </div>
+            <div class="col-md-4">
+                Right pane
+            </div>
+            <div class="col-md-4">
+                Notes
+            </div>
+        </div>
+
+        -->
+
+        <div ng-repeat="row in selectedSection.rows">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div ng-repeat="cell in row.left">
+                        <div style="margin-bottom: 8px">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                    <div ng-repeat="cell in row.right">
+                        <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div ng-repeat="cell in row.left">
+                        <div ng-show = "cell.extractObservation">
+                            "{{cell.item.text}}" extracted as Observation
+                        </div>
+                        <div ng-hide = "cell.item.code || cell.item.type == 'display'">
+                            "{{cell.item.text}}" has no code
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+<!--
+        <pre>{{selectedSection | json}}</pre>
+        -->
+
+    </div>
+</div>

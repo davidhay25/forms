@@ -21,36 +21,45 @@ function setup(app,sr) {
     //Receive a QR resource. Process and save.
     app.post('/fr/fhir/receiveQR',async function(req,res){
 
-        let QR = req.body
-        QR.id = createUUID();
-        try {
-            let result = await extractResources(QR)
-            let arResources = result.obs     //An array of created observations todo - and others, rename
 
-            //need to add other resources to provenance
-            //let provenance = resources.provenance
 
-            //construct transaction bundle
-            let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
-            bundle.entry.push(createEntry(QR))
+        //let QR = req.body
 
-            arResources.forEach(function (observation){
-                bundle.entry.push(createEntry(observation))
-            })
+        let QR = extractQRFromBundle(req.body)
+        //console.log(QR)
+        if (QR) {
+            QR.id = createUUID();
+            try {
+                let result = await extractResources(QR)
+                let arResources = result.obs     //An array of created observations todo - and others, rename
 
-            axios.post('http://localhost:9099/baseR4/', bundle)
-                .then(function (response) {
-                    //console.log(response);
-                    res.status(response.status).json(response.data)
+                //need to add other resources to provenance
+                //let provenance = resources.provenance
+
+                //construct transaction bundle
+                let bundle = {resourceType: "Bundle", type: 'transaction', entry: []}
+                bundle.entry.push(createEntry(QR))
+
+                arResources.forEach(function (observation) {
+                    bundle.entry.push(createEntry(observation))
                 })
-                .catch(function (error) {
-                    //console.log(error);
-                    res.status(error.response.status).json(error.response.data)
 
-                });
+                axios.post('http://localhost:9099/baseR4/', bundle)
+                    .then(function (response) {
+                        //console.log(response);
+                        res.status(response.status).json(response.data)
+                    })
+                    .catch(function (error) {
+                        //console.log(error);
+                        res.status(error.response.status).json(error.response.data)
 
-        } catch (ex) {
-            res.status(500).json(ex.message)
+                    });
+
+            } catch (ex) {
+                res.status(500).json(ex.message)
+            }
+        } else {
+            res.status(400).json({msg:"Bundle does not contain a QR resource"})
         }
 
         function createEntry(resource) {
@@ -65,24 +74,50 @@ function setup(app,sr) {
     })
 
 
-    //peform the extraction from an FSH. Used for testing and display in the EHR
+    //perform the extraction from an FSH. Used for testing and display in the EHR module
+
     app.post('/fr/testextract',async function(req,res){
         try {
-            let resources = await extractResources(req.body)
+            let QR = extractQRFromBundle(req.body)
+            //console.log(QR)
+            if (QR) {
+                let resources = await extractResources(QR)
+                res.json(resources)
+            } else {
+                res.status(400).json({msg:"Bundle does not contain a QR resource"})
+            }
 
-            res.json(resources)
         } catch (ex) {
             res.status(500).json(ex.message)
         }
     })
 }
 
+//get the QR from the bundle.
+function extractQRFromBundle(bundle) {
+    let QR;
+    //console.log(bundle)
+    if (bundle && bundle.entry) {
+        bundle.entry.forEach(function (entry){
+            let resource = entry.resource
+            if (resource && resource.resourceType == 'QuestionnaireResponse'){
+                QR = resource
+            }
+        })
+    }
+    return QR
+
+}
 
 
 //extract resources from QR
 // http://build.fhir.org/ig/HL7/sdc/extraction.html
 //https://medium.com/software-development-turkey/using-async-await-with-axios-edf8a0fed4b1
 async function extractResources(QR) {
+
+
+
+
 
     //get the Questionnaire. for now, get it derectly from the hapi server...
     let qUrl = QR.questionnaire
@@ -256,12 +291,14 @@ function performObservationExtraction(Q,QR) {
                 if (QItem.code) {
                     QItem.code.forEach(function (coding){
                         oCode.coding.push(coding)
-                        text += oCode.display + " "
+                        if (oCode.display) {
+                            text += oCode.display + ": "
+                        }
+
                     })
                 }
 
                 observation.code = oCode
-
                 observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
 
                 //console.log(theAnswer)
@@ -380,7 +417,7 @@ function createServiceRequest(QR,category,carePlan,description,arExtractedResour
         carePlan.activity =  carePlan.activity || []
         carePlan.activity.push(activity)
         //a reference from SR back to the CP
-        sr.basedOn = {reference : "urn:uuid:"+ carePlan.id}
+        sr.basedOn = [{reference : "urn:uuid:"+ carePlan.id}]
     }
 /*
     //?? not actually using this ATM
@@ -400,7 +437,7 @@ function createCarePlan(QR) {
     cpTreat.status = "active"
     cpTreat.intent = "plan"
     cpTreat.period = {start:"2022-01-01",end:"2023-01-01"}
-    cpTreat.category = globals.treatmentCPCategory // {text: "Treatment level plan"}
+    cpTreat.category = [globals.treatmentCPCategory] // {text: "Treatment level plan"}
     cpTreat.title = "The top level plan describing treatment for this condition"
     cpTreat.subject = QR.subject
     cpTreat.supportingInfo = []

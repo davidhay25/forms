@@ -7,10 +7,9 @@ angular.module("formsApp")
             $scope.QVS = []
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','decimal','integer','date','dateTime','choice','open-choice','display']
+            $scope.input.itemTypes = ['string','quantity','text','decimal','integer','date','dateTime','choice','open-choice','display','group']
 
             $scope.input.codeSystems = []
-
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
@@ -24,6 +23,29 @@ angular.module("formsApp")
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
 
+
+            //---- tabbed forms support
+
+            $scope.form = {}
+            //when a top level item is selected in the tabbed interface
+            $scope.selectSection = function(section) {
+                $scope.selectedSection = section
+
+            }
+
+            //count the number of completed answers in each section - used by tabbed form...
+            $scope.completedAnswersInSection = function(section) {
+                console.log(section)
+                let cnt = 0
+                section.item.forEach(function (item){
+                    if ($scope.form[item.linkId]) {
+                        cnt ++
+                    }
+                })
+
+                return cnt
+
+            }
 
 
             // --------- provenance stuff
@@ -55,8 +77,9 @@ angular.module("formsApp")
             $scope.expandAll = function() {
                 expandAll()
                 drawTree()
-
             }
+
+            //collapse to section level
             $scope.showSection = function() {
                 $scope.treeData.forEach(function (item) {
                     item.state.opened = true
@@ -85,7 +108,31 @@ angular.module("formsApp")
 
             //create a new Q
             $scope.newQ = function() {
-                $scope.editQ()
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editQ.html',
+                    backdrop: 'static',
+                    controller: 'editQCtrl',
+                    resolve: {
+                        Q: function () {
+                            return null
+                        }
+                    }
+                }).result.then(
+                    function (Q) {
+                        if (Q) {
+                            //if a Q is passed back, it is a new one
+console.log(Q)
+                            Q.id = "cf-" + new Date().getTime()
+                            Q.resourceType = "Questionnaire"
+                            $scope.selectedQ = Q
+                            $scope.updateQ(function(){
+                                $scope.allQ.push(Q)
+                                $scope.drawQ(Q)
+                            })
+
+                        }
+                    }
+                )
             }
 
             $scope.editQ = function(Q) {
@@ -102,7 +149,6 @@ angular.module("formsApp")
                 }).result.then(
                     function (Q) {
                         if (Q) {
-                            //if a Q is passed back, it is a new one
 
                             $scope.drawQ(Q)
                         }
@@ -118,11 +164,14 @@ angular.module("formsApp")
 
 
             //update the selctedQ on the forms manager server
-            $scope.updateQ = function() {
+            $scope.updateQ = function(cb) {
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
                         alert("Q updated on the Forms Manager")
+                        if (cb) {
+                            cb()
+                        }
                         $scope.input.dirty = false;
                     }, function(err) {
                         alert(angular.toJson(err.data))
@@ -241,6 +290,7 @@ angular.module("formsApp")
             //edit an existing item
             $scope.editItem = function(node) {
                 let item = node.data.item
+                console.log(node.data.level)    //child or parent
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editItem.html',
                     backdrop: 'static',
@@ -257,6 +307,14 @@ angular.module("formsApp")
                         },
                         codeSystems: function() {
                             return $scope.input.codeSystems
+                        }, insertType : function() {
+                            if (node.data.level == 'parent') {
+                                return 'section'
+                            } else {
+                                return 'item'
+                            }
+
+
                         }
                     }
                 }).result.then(
@@ -281,7 +339,7 @@ angular.module("formsApp")
             //set up to add new item
 
             $scope.addItem = function(node,insertType) {
-                //insertType is 'child' or 'sibling'
+                //insertType is 'section' or 'element'
 
                 let newItem = {}
                 newItem.tmp = {codeSystem: $scope.input.codeSystems[0] } //default to snomed
@@ -310,6 +368,9 @@ angular.module("formsApp")
                             },
                             codeSystems: function() {
                                 return $scope.input.codeSystems
+                            },
+                            insertType : function() {
+                                return insertType
                             }
                         }
                     }).result.then(
@@ -504,6 +565,10 @@ angular.module("formsApp")
                         $scope.input.dirty = false
                     }
                 } else {
+
+
+
+
                     $scope.drawQ(Q,true)
                     $scope.treeIdToSelect = "root"
                 }
@@ -623,12 +688,12 @@ angular.module("formsApp")
                 let url = "/fm/fhir/Questionnaire"
                 $http.get(url).then(
                     function (data) {
-
                         $scope.allQ = [];
                         data.data.entry.forEach(function (entry){
-                            $scope.allQ.push(entry.resource)
-                        })
 
+                            $scope.allQ.push(entry.resource)
+
+                        })
                     }
                 )
             }

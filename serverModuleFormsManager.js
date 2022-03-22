@@ -13,8 +13,8 @@ function setup(app,serverRoot) {
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
-                console.log(err)
-                res.status(response.status).send(err)
+                console.log(err.response.data)
+                res.status(400).send(err.response.data)
             })
 
         //console.log(Q)

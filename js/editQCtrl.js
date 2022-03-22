@@ -2,7 +2,7 @@ angular.module("formsApp")
     .controller('editQCtrl',
         function ($scope,formsSvc,Q) {
 
-            let QBase = "http://clinfhir.com/fhir/Questionnaire/"
+            let QBase = "http://canshare.com/fhir/Questionnaire/" //just for the url
 
             if (Q) {
                 $scope.Q = angular.copy(Q)  //needs to be a clone so can cancel edits
@@ -13,7 +13,6 @@ angular.module("formsApp")
             }
 
             //$scope.input = {}
-
 
             $scope.updateUrl = function (name) {
                 $scope.Q.url = QBase + name

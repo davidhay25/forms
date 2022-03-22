@@ -22,26 +22,70 @@ angular.module("formsApp")
                 }
             )
 
-            //count the number of completed answers in each section - used by tabbed form...
-            $scope.completedAnswersInSection = function(section) {
-                console.log(section)
-                let cnt = 0
-                section.item.forEach(function (item){
-                    if ($scope.form[item.linkId]) {
-                        cnt ++
-                    }
-                })
 
-                return cnt
 
-            }
-
+            //when a DiagnosticReport is selected in the Path reports tab
             $scope.selectDR = function (dr) {
                 $scope.selectedDR = dr
             }
 
+            //when a CarePlan is selected in the CP tab
             $scope.selectCP = function(cp) {
                 $scope.selectedCP = cp
+
+                delete $scope.input.selectedIncommingResource
+                //select the incoming resources
+                //http://localhost:9099/baseR4/CarePlan?_id=regimenPlan1&_revinclude=Observation:*
+                //let qry = "/ds/fhir/DiagnosticReport?based-on="+sr.id+"&_include=DiagnosticReport:result"
+                $scope.hashIncomming = {}
+                $scope.incommingCount = 0
+
+                let types = ['Observation','ServiceRequest','DiagnosticReport','CarePlan']
+                types.forEach(function(type){
+                    getResources(cp.id,type,function(ar){
+                        $scope.hashIncomming[type] = ar
+                        $scope.incommingCount += ar.length
+                        console.log($scope.hashIncomming)
+                    })
+
+                })
+                    /*
+                getResources(cp.id,'Observation',function(ar){
+                    hashIncomming['Observation'] = ar
+                    console.log(hashIncomming)
+                })
+
+                getResources(cp.id,'ServiceRequest',function(ar){
+                    hashIncomming['ServiceRequest'] = ar
+                    console.log(hashIncomming)
+                })
+*/
+                function getResources(cpId,type,cb) {
+
+                    let qry = `/ds/fhir/CarePlan?_id=${cpId}&_revinclude=${type}:*`
+                    console.log(qry)
+                    $http.get(qry).then(
+                        function(data) {
+                            let ar = []
+                            if (data.data && data.data.entry) {
+
+                                data.data.entry.forEach(function (entry){
+                                    if (entry.resource.id !== cpId){
+                                        ar.push(entry.resource)
+                                    }
+                                })
+                            }
+                            cb(ar)
+                        },
+                        function(err){
+
+                        }
+                    )
+//console.log(qry)
+                   // let qry = `/ds/fhir/`+type+"?__revinclude=DiagnosticReport:result"
+                }
+
+
             }
             //construct a simplified logical model of a regimen to ease UI
             $scope.getRegimenSummary = function (cp){
@@ -53,7 +97,7 @@ angular.module("formsApp")
             }
 
             //===============  functions for form ===================
-
+            //todo move all this stuff to a separate controller for the renderer
             //used by type-ahead for ValueSet based selection
             $scope.getConcepts = function(val,url) {
 
@@ -93,6 +137,18 @@ angular.module("formsApp")
                 $scope.makeQR()
             }
 
+            //code to show (or not) a conditional group
+            $scope.showConditionalGroupDEP = function(item) {
+                console.log(item)
+                if (item.length > 0) {
+                    //we're assuming that there is only a single item of type group
+                    let group = item[0]
+                    if (group.enableWhen && group.enableWhen.length > 0) {
+                        let conditional = group.enableWhen[0]       //only looking at the first one for now
+                    }
+                }
+            }
+
             //============================
 
 
@@ -112,7 +168,10 @@ angular.module("formsApp")
                 //let validationServer = "http://localhost:9099/baseR4/"
                 if ($scope.QR) {
                     let url = "/fr/testextract"
-                    $http.post(url,$scope.QR).then(
+
+                    let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+                    bundle.entry.push({resource:$scope.QR})
+                    $http.post(url,bundle).then(
                         function(data) {
                             console.log(data)
                             $scope.extractedResources = []
@@ -140,6 +199,7 @@ angular.module("formsApp")
                             $scope.extractedResources.push({resource:$scope.selectedPractitioner.resource,OO:{},valid:true})
 
                         }, function(err) {
+                            alert(angular.toJson(err.data))
                             console.log(err)
                         }
                     )
@@ -148,11 +208,15 @@ angular.module("formsApp")
 
             $scope.selectQ = function(Q) {
                 $scope.selectedQ = Q
+
+                $scope.formTemplate = formsSvc.makeFormTemplate(Q)
+
+
                 let vo = formsSvc.makeTreeFromQ(Q)
+
                 //$scope.treeData = vo.treeData
                 $scope.hashItem = vo.hash       //all items in teh form hashed by id
-
-                $scope.selectedSection = Q.item[0]  //show first tab in tab view
+                //$scope.selectedSection = Q.item[0]  //show first tab in tab view
 
 
                 //$scope.formDef = vo.treeData
@@ -166,9 +230,6 @@ angular.module("formsApp")
                 //let arSection = []
 
 
-
-
-
                 $scope.makeQR()     //create initial QR
 
 
@@ -177,7 +238,7 @@ angular.module("formsApp")
             }
 
             //when a top level item is selected in the tabbed interface
-            $scope.selectSection = function(section) {
+            $scope.selectSectionEDP = function(section) {
                 $scope.selectedSection = section
 
             }
@@ -226,6 +287,12 @@ angular.module("formsApp")
                     $scope.selectedPractitioner.resource)
                 console.log($scope.QR)
                 $scope.selectedQR = $scope.QR   //for rendering
+/*
+                //generate the OML
+                $scope.OML = formsSvc.makeORM($scope.selectedQ,
+                    $scope.form,$scope.hashItem,$scope.selectedPatient,
+                    $scope.selectedPractitioner.resource)
+*/
             }
 
 
@@ -331,8 +398,11 @@ angular.module("formsApp")
                 //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
 
                 if (confirm("Are you sure you're ready to submit this form")){
+                    let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+                    bundle.entry.push({resource:$scope.QR})
+
                     let url = "/fr/fhir/receiveQR"
-                    $http.post(url,$scope.QR).then(
+                    $http.post(url,bundle).then(
                         function(data) {
                             console.log(data.data)
                             alert("Form has been saved, and any Observations extracted and saved")
@@ -391,8 +461,6 @@ angular.module("formsApp")
                 getObservationsForPatient($scope.input.selectedPatient.resource.id)
 
                 //get all the act-now data (assumes the careplan supporting-info search parameter has been applied to the server
-                //todo - create follow paging routine
-                //todo - ?include MedicationAdmin as well
 
                 //server script does paging
                 let qryActnow = "/ds/fhir/CarePlan?patient=" +$scope.input.selectedPatient.resource.id
@@ -401,6 +469,7 @@ angular.module("formsApp")
                 qryActnow += "&_include:iterate=Observation:has-member"     //eg the TNM codes
                 qryActnow += "&_revinclude=Observation:based-on"
                 qryActnow += "&_revinclude=MedicationAdministration:ma-based-on"
+                qryActnow += "&_sort=_id"
                 //qryActnow += "&_count=50"
 
                 $http.get(qryActnow).then(
@@ -414,7 +483,7 @@ angular.module("formsApp")
                                 if (entry.resource.resourceType == 'CarePlan') {
                                     $scope.allCarePlans.push(entry.resource)
                                 }
-
+                                //used to create act-now LM - ?needs better name
                                 $scope.hashAllCarePlans[entry.resource.resourceType + "/" + entry.resource.id] = entry.resource
                             })
                         }
@@ -495,7 +564,7 @@ angular.module("formsApp")
             }
 
             let drawTree = function(treeData){
-
+console.log(treeData)
                 expandAll(treeData)
                 //deSelectExcept()
                 $('#QTree').jstree('destroy');

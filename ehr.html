@@ -57,6 +57,7 @@
     <script src="directive/displayFormDir.js"></script>
     <script src="directive/displayProvenanceDir.js"></script>
     <script src="js/actnowSvc.js"></script>
+    <script src="js/formRenderCtrl.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -119,30 +120,67 @@
 
         <uib-tab heading="New form">
             <br/>
+
             <div class="row">
-                <div class="col-md-3">
-                    <div class="list-group" style="cursor:pointer;">
-                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                             ng-click="selectQ(Q)"
-                             ng-repeat="Q in allQ">
-                            {{Q.name}}
-                        </div>
-                    </div>
+                <div class="col-md-1">
+                    Form
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-2">
+                    <select class="form-control" ng-model="input.Qcontrol"
+                            ng-options = "Q.name for Q in allQ"
+                            ng-change = "selectQ(input.Qcontrol)">
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                </div>
+            </div>
+
+            <br/>
+
+
+            <div class="row">
+                <!--
+               <div class="col-md-2">
+
+                   <div class="list-group" style="cursor:pointer;">
+                       <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                            ng-click="selectQ(Q)"
+                            ng-repeat="Q in allQ">
+                           {{Q.name}}
+                       </div>
+                   </div>
+
+               </div>
+                -->
+                <div class="col-md-12">
                     <br/>
                     <uib-tabset ng-show="selectedQ">
-                        <uib-tab heading="Tabbed Form">
-                            <div class="row">
-                                <div class="col-md-12" >
-                                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
-                                </div>
-                            </div>
 
-                            <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
+
+
+                        <uib-tab heading = "Tabbed Form">
+                            <div ng-controller="formsCtrl">
+                                <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                            </div>
                         </uib-tab>
 
-                        <uib-tab heading="Plain Form">
+                        <uib-tab ng-show = "false" heading = "template">
+                            <pre>{{formTemplate | json}}</pre>
+                        </uib-tab>
+
+
+                        <uib-tab ng-show = "false" heading="Tabbed Form">
+
+                            <div ng-controller="formsCtrl">
+                                <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
+                            </div>
+
+
+
+                        </uib-tab>
+
+                        <uib-tab ng-show = "false" heading="Plain Form">
 
                             <div class="row">
                                 <div class="col-md-12" >
@@ -180,8 +218,10 @@
 
                             </uib-tabset>
 
+                        </uib-tab>
 
-
+                        <uib-tab ng-show="false" heading="HL7 v2 message">
+                            <pre>{{OML}}</pre>
                         </uib-tab>
                         <uib-tab heading="Test resource extraction">
                             <button class="btn btn-link" ng-click=testExtraction()>Extract from QR</button>
@@ -497,32 +537,60 @@
             </uib-tab-heading>
             <br/>
 
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table-condensed table table-bordered">
-                                <tr><th>Id</th><th>Title</th><th>Status</th><th>Category</th></tr>
-                                <tr ng-repeat="cp in allCarePlans" ng-click="selectCP(cp)" style="cursor: pointer">
-                                    <td>{{cp.id}}</td>
-                                    <td>{{cp.title}}</td>
-                                    <td>{{cp.status}}</td>
-                                    <td>
-                                        <div ng-repeat="c in cp.category">
-                                            <div ng-repeat="coding in c.coding">
-                                                {{coding.code}} ({{coding.system}})
-                                            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table-condensed table table-bordered">
+                        <tr><th>Id</th><th>Title</th><th>Status</th><th>Category</th></tr>
+                        <tr ng-repeat="cp in allCarePlans" ng-click="selectCP(cp)" style="cursor: pointer">
+                            <td>{{cp.id}}</td>
+                            <td>{{cp.title}}</td>
+                            <td>{{cp.status}}</td>
+                            <td>
+                                <div ng-repeat="c in cp.category">
+                                    <div ng-repeat="coding in c.coding">
+                                        {{coding.code}} ({{coding.system}})
+                                    </div>
 
-                                        </div>
-                                    </td>
+                                </div>
+                            </td>
 
 
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <uib-tabset>
+                        <uib-tab heading="CarePlan">
                             <pre>{{selectedCP | json}}</pre>
-                        </div>
-                    </div>
+                        </uib-tab>
+                        <uib-tab >
+                            <uib-tab-heading>
+                                Incoming references <span class="badge">{{incommingCount}}</span>
+                            </uib-tab-heading>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div ng-repeat="(k,v) in hashIncomming">
+                                        <strong>{{k}}</strong>
+                                        <div class="list-group">
+                                            <div class="list-group-item" ng-repeat="resource in v"
+
+                                                ng-click="input.selectedIncommingResource = resource">
+                                                {{resource.id}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <pre>{{input.selectedIncommingResource | json}}</pre>
+                                </div>
+                            </div>
+
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+            </div>
 
 
 

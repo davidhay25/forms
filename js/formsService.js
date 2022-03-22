@@ -12,6 +12,9 @@ angular.module("formsApp")
             }
         )
 
+        //HPIRoot = "http://localhost:9099/baseR4/"
+        HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
+
         extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 
@@ -37,6 +40,154 @@ angular.module("formsApp")
 
         return {
 
+            makeFormTemplate : function(Q) {
+                let that = this;
+
+                //create a template suitable for rendering in 2 columns
+                //is a collection of sections. Each section contains an array of rows,
+                // each row is an array with 2 elements (left / right) and the cell has an array of items
+
+                let template = []
+
+                Q.item.forEach(function (sectionItem) {
+                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[]}
+                    template.push(section)
+                    //now look at the items below the section level.
+
+                    if (sectionItem.item) {
+                        sectionItem.item.forEach(function (item) {
+                            if (item.type == 'group') {
+                                //groups has a specific structure ATM
+                                //the first item goes in col 1
+                                //other items go in col 2 - and will often have conditionals on them
+                                let row = {}    //will have 2 entries - left and right
+
+                                if (item.item) {    //these are the child items
+                                    item.item.forEach(function (child,inx) {
+                                        //ignore any item entries on the child - we don't go any deeper atm
+                                        if (inx == 0) {
+                                            //this is the first item in the group - it goes in the left
+                                            let cell = {item:child}      //to allow for ither elements like control type...
+                                            setDecoration(cell,child)        //sets thinks like control type
+                                            row.left = [cell]
+                                        } else {
+                                            //this is a subsequent item - it will go in the right col
+                                            let cell = {item:child}
+                                            setDecoration(cell,child)
+                                            row.right = row.right || []
+                                            row.right.push(cell)
+                                        }
+                                    })
+
+                                    section.rows.push(row)
+
+                                }
+
+                            } else {
+                                //if the item isn't a group, then add it to column 1.
+                                let row = {}   //will have a single entry - left
+                                let cell = {item:item}      //to allow for ither elements like control type...
+                                setDecoration(cell,item)
+                                row.left = [cell]             //make it an arra to match the group
+                                section.rows.push(row)
+
+                            }
+
+                        })
+                    }
+
+                })
+
+                //console.log(template)
+                //console.log(angular.toJson(template,null,2))
+                return template
+
+                //looks for specific instructions from the Q about an item - eg render as radio
+                function setDecoration(cell,item) {
+
+                    //look for item control
+                    let extControlType = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+                    let ar = that.findExtension(item,extControlType)
+                    if (ar.length > 0) {
+                        let ext = ar[0].valueCodeableConcept
+                        if (ext && ext.coding.length > 0) {
+                            let controlHint = ext.coding[0].code
+                            cell.displayHint = controlHint
+
+                        }
+                    }
+                    //look for observation extraction
+                    let extExtractObs = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+                    let arObs = that.findExtension(item,extExtractObs)
+                    if (arObs.length > 0) {
+                        if (arObs[0].valueBoolean) {
+
+                            cell.extractObservation = true
+                        }
+
+                    }
+
+                }
+
+
+            },
+            //determine whether the condition on an item is true...
+            checkConditional : function(item,formData) {
+                if (item.enableWhen && item.enableWhen.length > 0) {
+                    let conditional = item.enableWhen[0]       //only looking at the first one for now
+                    //console.log(conditional)
+                    let formValue = formData[conditional.question]  //the value from the form to be compared
+                    //console.log(referenceValue)
+                    if (formValue) {
+                        switch(conditional.operator) {
+                            case '=' :
+                                //todo - check for different datatypes...
+                                //right now, we're assuming that Codings are being used...
+
+                               // if (source) {
+                                    //when a radio is used as the input, the value is a string rather than an object
+                                    if (typeof formValue === 'string' || formValue instanceof String) {
+                                        formValue = JSON.parse(formValue)
+                                    }
+                             //   }
+
+                                return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
+                                break
+                        }
+                    }
+                } else {
+                    return true
+                }
+
+                function checkEqualCoding(source,target) {
+                    //source is from the form, target is the  Q
+
+
+
+
+                    if (source && target) {
+                        if (source.system) {
+                            if ((source.system == target.system) && (source.code == target.code)) {
+                                return true
+                            }
+                        } else {
+                            if (source.code == target.code) {
+                                return true
+                            }
+                        }
+                    }
+
+
+                }
+            },
+
+            getHN : function (hn){
+                return getHN(hn)
+            },
+
+            getHPIRoot : function () {
+                return HPIRoot
+            },
 
             makeDRList : function(bundle) {
                 //construct an array of DR's with associated Observations
@@ -149,7 +300,7 @@ angular.module("formsApp")
                 //return an array with all matching extensions
                 let ar = []
                 //console.log(item)
-                if (item.extension) {
+                if (item && item.extension) {
                     for (var i=0; i <  item.extension.length; i++){
                         let ext = item.extension[i]
                         if (ext.url == url) {
@@ -164,7 +315,215 @@ angular.module("formsApp")
         //make the treeData from the Q
 
 
-            makeQR : function(Q,form,hash,patient,practitioner) {
+            makeQR :  function(Q,form,hash,patient,practitioner) {
+                let that = this
+
+                //make the QuestionnaireResponse from the form data
+                //hash is items from the Q keyed by linkId
+                //form is the data enterd keyed by linkId
+                //todo - make recursive...
+                let qrId = this.createUUID()
+                let err = false
+                console.log(form)
+                console.log(hash)
+                let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
+                QR.text = {status:'generated'}
+                QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
+                QR.questionnaire = Q.url
+                QR.authored = new Date().toISOString()
+
+                let patientName = ""
+                if (patient.name) {
+                    patientName = getHN(patient.name[0])
+                }
+
+                QR.subject = {reference:"Patient/"+patient.id,display:patientName}
+
+                let practitionerName = ""
+                if (practitioner.name) {
+                    practitionerName = getHN(practitioner.name[0])
+                }
+
+                QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
+                QR.item = []
+
+                //the top level items - sections - directly off the Q root...
+                Q.item.forEach(function (section) {
+                        let parentItem = null
+
+                        section.item.forEach(function (child) {
+                            //items off the section. they will either be data elements, or groups
+
+                            let key = child.linkId  //the key for this Q item
+                            let value = form[key]
+
+                            let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
+
+                            if (value) {        //is there a value for this item. Won't be if this is a group...
+                                console.log("adding",key,value)
+
+                                if (! parentItem) {
+                                    parentItem = {linkId : section.linkId,text:section.text,item: []}
+                                    QR.item.push(parentItem)
+                                }
+
+                                let result = getValue(child,value)
+                                itemToAdd.answer.push(result)
+
+                                parentItem.item = parentItem.item || []
+                                parentItem.item.push(itemToAdd)
+                            }
+
+
+
+                            //Are there any grandchildren? If so, they will be conditional items...
+                            //the immediate child is of type group, with the actual data items as grandchildren below that
+                            if (child.item) {
+                                //so this will be the groups - with child items ?todo check?. Each item at this level is a group
+                                //the first is the 'main' item that goes in the left pane,
+                                // others are in the right pane. May have conditionals (but do we care here? )
+                                //but all are at the some level in the QR - on an item off the parent
+                                //with the conditional statements on it, and child items (great granschild) below that
+                                let gcRootItem     //the item in the QR that any conditional values get added
+                                child.item.forEach(function (gcItem) {      //gc is grandChild...
+                                    //is there data for this iyem
+                                    //todo - not checking whether the item has conditions - should we?
+                                    let gcValue = form[gcItem.linkId]
+                                    if (gcValue) {
+                                        console.log(gcValue)
+
+                                        //the parent (off the section) may not have been created yet
+                                        if (! parentItem) {
+                                            parentItem = {linkId : section.linkId,text:section.text,item: []}
+                                            QR.item.push(parentItem)
+                                        }
+
+
+                                        if (! gcRootItem) {
+                                            //the root hasn't been created
+                                            gcRootItem = {linkId:child.linkId,text:child.text,item:[]}
+
+                                            parentItem.item = parentItem.item || []
+                                            parentItem.item.push(gcRootItem)
+                                        }
+
+
+                                        let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text,answer:[]}
+
+                                        let result = getValue(gcItem,gcValue)
+
+                                        gcItemToInsert.answer.push(result)
+
+                                        gcRootItem.item.push(gcItemToInsert)
+
+
+                                        //
+                                    }
+
+
+
+                                    //is the conditional met?
+                                    if (false && that.checkConditional(conditionalItem,form)) {
+                                        //yes! Not check all the items off this item for data
+                                        if (conditionalItem.item) {
+                                            let ggcRootItem     //the item in the QR that any conditional values get added
+                                            conditionalItem.item.forEach(function (ggcItem) {
+                                                //ggc = great grand child!
+
+                                                let ggcValue = form[ggcItem.linkId]
+                                                if (ggcValue) {
+                                                    //if there's a value, then ensure that the QR structure is complete
+                                                    let ggcAnswer = getValue(ggcItem,ggcValue)
+
+                                                    if (! ggcRootItem) {
+                                                        //the root hasn't been created
+                                                        ggcRootItem = {linkId:conditionalItem.linkId,text:conditionalItem.text,item:[]}
+                                                        itemToAdd.item = itemToAdd.item || []
+                                                        itemToAdd.item.push(ggcRootItem)
+                                                    }
+                                                    let ggcItemToInsert = {linkId:ggcItem.linkId,text:ggcItem.text,answer:[]}
+                                                    ggcItemToInsert.answer.push(ggcAnswer)
+                                                    ggcRootItem.item.push(ggcItemToInsert)
+
+                                                }
+
+                                            })
+                                        }
+
+
+
+                                    }
+
+
+
+                                })
+                            }
+
+
+
+                        })
+                })
+
+                return QR
+
+                function getValue(item,value) {
+                    let result;
+                    switch (item.type) {
+                        case "choice":
+                            console.log(value)
+
+                            //when a radio is used as the input, the value is a string rather than an object
+                            if (typeof value === 'string' || value instanceof String) {
+                                value = JSON.parse(value)
+                            }
+
+
+                            if (value.valueCoding) {
+                                //itemToAdd.answer.push(value)    //will be a coding
+                                result = value
+                            } else {
+                                result = {valueCoding : value}
+                                //itemToAdd.answer.push({valueCoding : value})
+                            }
+                            //itemToAdd.answer.push({valueCoding : value})    //will be a coding
+                            //itemToAdd.answer.push(value)    //will be a coding
+                            break;
+                        case "decimal" :
+                            let v = parseFloat(value)
+                            if (v) {
+                                result = {valueDecimal : v }
+                                //itemToAdd.answer.push({valueDecimal : v })
+                            } else {
+                                alert("Item: " + item.text + " must be a number")
+                            }
+
+                            break;
+                        case "boolean":
+                            result = {valueBoolean : value}
+                            //itemToAdd.answer.push({valueBoolean : value})    //will be a coding
+                            break;
+
+                        case "reference" :
+                            result = {valueReference : value}
+                            //itemToAdd.answer.push({valueReference : value})
+                            break
+
+                        default :
+                            result = {valueString : value}
+                            //itemToAdd.answer.push({valueString : value})
+                    }
+
+                    return result
+                    //node.item = node.item || []
+                    //node.item.push({answer: answer})
+                    //node.item.push(itemToAdd)
+
+
+                }
+
+            },
+
+            makeQROld : function(Q,form,hash,patient,practitioner) {
                 //make the QuestionnaireResponse from the form data
                 //hash is items from the Q keyed by linkId
                 //form is the data enterd keyed by linkId
@@ -200,15 +559,22 @@ angular.module("formsApp")
                 //node is the structure that is being constructed. It has an item[] property
                 //As this routine is called
                 //item is the item from the Q that is being parsed...
-                function parseQ(node,item) {
+
+                function parseQ(node,item,level) {
                     if (item.item) {
+
 
                         let parentNode = {linkId:item.linkId,item:[],text:item.text}
                         node.item.push(parentNode)
 
                         item.item.forEach(function(child){
+                            if (level == 0) {
+                                level++
+                                parseQ(parentNode,child,level)
+                            }
 
-                            parseQ(parentNode,child)
+
+
                         })
 
                     } else {
@@ -241,6 +607,10 @@ angular.module("formsApp")
                                     itemToAdd.answer.push({valueBoolean : value})    //will be a coding
                                     break;
 
+                                case "reference" :
+                                    itemToAdd.answer.push({valueReference : value})
+                                    break
+
                                 default :
                                     itemToAdd.answer.push({valueString : value})
                             }
@@ -257,7 +627,7 @@ angular.module("formsApp")
                 //add them independently to the QR
                 Q.item.forEach(function (topLevelItem){
                     let childrenOfNode = {item:[]}
-                    parseQ(childrenOfNode,topLevelItem)
+                    parseQ(childrenOfNode,topLevelItem,0)
 
                     let branchToAdd = childrenOfNode.item[0]
                     if (branchToAdd) {

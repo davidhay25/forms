@@ -1,5 +1,13 @@
 <div>
 
+    <style>
+        .heading {
+            background-color: #e4e9f0;
+            text-align: center;
+            padding: 8px;
+        }
+    </style>
+
     <!-- Create an HTML rendering of as a tabbed form
     uses Q directly (unlike the full page rendering)
     $scope.selectedQ must exist...
@@ -23,156 +31,147 @@
         </div>
 
         <div class="col-md-9">
+
+            <div class="row">
+                <div class="col-md-4 heading">
+                    <span class="header">Primary question</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="header">Conditional questions</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="header">Notes</span>
+                </div>
+            </div>
+
             <div ng-repeat="item in selectedSection.item">
 
+
+
                 <div class="row">
-                    <div class="col-md-4">
-
+                    <!--
+                    <div class="col-md-3">
                         {{item.text}}
-
                     </div>
+-->
+                    <div class="col-md-8">
 
-                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- the left (main) pane-->
+                                <strong>{{item.text}}</strong>
+                                    <span ng-show="item.type == 'reference'">
 
-                        <div ng-switch="item.type">
+                                        <i class="btn btn-link glyphicon glyphicon-search clickable"
+                                           ng-click="selectResourceFromService(item)"></i>
+                                    </span>
+                                <div ng-switch="item.type">
 
-                            <div ng-switch-when="group">
+                                    <div ng-switch-when="group">
 
-                            </div>
+                                    </div>
 
-                            <div ng-switch-when="text">
+                                    <div ng-switch-when="reference">
+                                        <!-- references are selected from a dialog-->
+                                        {{form[item.linkId].display}}
+                                    </div>
 
+                                    <div ng-switch-when="text">
                                 <textarea ng-model="form[item.linkId]" class="form-control"
                                           ng-blur="makeQR(item.linkId)"></textarea>
-                            </div>
+                                    </div>
 
-                            <div ng-switch-when="boolean">
-
-                                <checkbox ng-model="form[item.linkId]"  ng-blur="makeQR(item.linkId)"></checkbox>
-                            </div>
-
-
-                            <div ng-switch-when="choice">
+                                    <div ng-switch-when="boolean">
+                                        <checkbox ng-model="form[item.linkId]"  ng-blur="makeQR(item.linkId)"></checkbox>
+                                    </div>
 
 
-                                <div ng-show = "item.answerOption">
-                                    <select class="form-control" ng-model="form[item.linkId]"
-                                            ng-change="makeQR(item.linkId)"
-                                            ng-options = "concept.valueCoding.display for concept in item.answerOption">
+                                    <div ng-switch-when="choice">
+                                        <div ng-show = "item.answerOption">
+                                            <select class="form-control" ng-model="form[item.linkId]"
+                                                    ng-change="makeQR(item.linkId)"
+                                                    ng-options = "concept.valueCoding.display for concept in item.answerOption">
 
-                                    </select>
+                                            </select>
+                                        </div>
+
+                                        <div ng-show = "item.answerValueSet">
+
+                                            <input type="text" class = "form-control" ng-model="form[item.linkId]"
+                                                   placeholder="Minimum 3 characters"
+                                                   typeahead-min-length="3"
+                                                   typeahead-wait-ms="1000"
+                                                   typeahead-on-select="selectConcept($item, $model, $label)"
+                                                   uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,item.answerValueSet)"/>
+
+                                        </div>
+
+                                        <div ng-hide = "item.answerValueSet || item.answerOption">
+                                            This question is a choice, but there is no ValueSet or answerOption
+                                        </div>
+
+
+                                    </div>
+                                    <div ng-switch-default>
+                                        <input type="text"  ng-blur="makeQR(item.linkId)"
+                                               ng-model="form[item.linkId]" class="form-control"/>
+                                    </div>
+
                                 </div>
 
-                                <div ng-show = "item.answerValueSet">
+                            </div>
+                            <div class="col-md-6">
+                                <!-- the right (conditional display) pane  -->
 
-                                    <input type="text" class = "form-control" ng-model="form[item.linkId]"
-                                           placeholder="Minimum 3 characters"
-                                           typeahead-min-length="3"
-                                           typeahead-wait-ms="1000"
-                                           typeahead-on-select="selectConcept($item, $model, $label)"
-                                           uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,item.answerValueSet)"/>
+                                <div ng-repeat="conditionalGroup in item.item">
 
+
+                                <div ng-show = "conditionalGroup && showConditionalGroup(conditionalGroup)">
+
+                                    <div ng-repeat="child in conditionalGroup.item">
+
+                                        <strong>{{child.text}}</strong>
+                                        <div ng-switch="child.type">
+                                            <div ng-switch-default>
+
+                                                <input type="text"  ng-blur="makeQR(child.linkId)"
+                                                       ng-model="form[child.linkId]" class="form-control"/>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
 
-                                <div ng-hide = "item.answerValueSet || item.answerOption">
-                                    This question is a choice, but there is no ValueSet or answerOption
-                                </div>
-
-
-                            </div>
-                            <div ng-switch-default>
-                                <input type="text"  ng-blur="makeQR(item.linkId)"
-                                       ng-model="form[item.linkId]" class="form-control"/>
                             </div>
 
+                            </div>
                         </div>
+
+
+
                     <br/>
                 </div>
 
+                    <div class="col-md-4">
+                        <div ng-repeat="code in item.code">
+                            Code: {{code.code}} ({{code.system}})
+                        </div>
+
+
+                        <div ng-show="observationExtract(item)">
+                            Extracted as Observation
+                        </div>
+
+                    </div>
 
 
             </div>
 
         </div>
-    </div>
-    </div>
 
-
-<!--
-
-    <div ng-repeat="item in formDef">
-        <div class="row">
-            <div class="col-md-4">
-
-                <div ng-show="item.data.item.type == 'group'">
-                    <strong>{{item.text}}</strong>
-                </div>
-
-
-                <div ng-hide="item.data.item.type == 'group'">
-                    <div  ng-class="{obsExtract:item.meta.obsExtract}" style="padding-left: 8px">{{item.text}}</div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div ng-switch="item.data.item.type">
-
-                    <div ng-switch-when="group">
-
-                    </div>
-
-                    <div ng-switch-when="text">
-
-                        <textarea ng-model="form[item.id]" class="form-control"
-                                  ng-blur="makeQR(item.id)"></textarea>
-                    </div>
-
-                    <div ng-switch-when="boolean">
-
-                        <checkbox ng-model="form[item.id]"  ng-blur="makeQR(item.id)"></checkbox>
-                    </div>
-
-
-                    <div ng-switch-when="choice">
-
-
-                        <div ng-show = "item.data.item.answerOption">
-                            <select class="form-control" ng-model="form[item.id]"
-                                    ng-change="makeQR(item.id)"
-                                    ng-options = "concept.valueCoding.display for concept in item.data.item.answerOption">
-
-                            </select>
-                        </div>
-
-                        <div ng-show = "item.data.item.answerValueSet">
-
-                            <input type="text" class = "form-control" ng-model="form[item.id]"
-                                   placeholder="Minimum 3 characters"
-                                   typeahead-min-length="3"
-                                   typeahead-wait-ms="1000"
-                                   typeahead-on-select="selectConcept($item, $model, $label)"
-                                   uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,item.data.item.answerValueSet)"/>
-
-
-                        </div>
-
-
-
-
-                    </div>
-                    <div ng-switch-default>
-                        <input type="text"  ng-blur="makeQR(item.id)"
-                               ng-model="form[item.id]" class="form-control"/>
-                    </div>
-
-                </div>
-                <br/>
-            </div>
-
-            <div class="col-md-2">
-
-            </div>
-        </div>
     </div>
 
-    -->
+    </div>
+
+
 </div>

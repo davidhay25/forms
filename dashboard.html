@@ -338,8 +338,14 @@
                            <uib-tab heading="Form preview">
 
                                <div class="myScroll">
+                                   <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
+                                   <!--
                                    <ng-include src = "'includes/renderFormPage.html'"></ng-include>
+                                   -->
                                </div>
+<!--
+                               <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+-->
 
                            </uib-tab>
 
@@ -434,30 +440,38 @@
             <em>Query for supported resources - ? or link to Server Query - yes!</em>
         </uib-tab>
 
+
+
         <uib-tab heading="Provenance">
-            <div/>
-            <div class="row">
-                <div class="col-md-3">
-                    <uib-tabset>
-                        <uib-tab heading="All Provenance">
-                            <div class="list-group">
-                                <div ng-class="{'list-group-item':true}"
-                                     ng-click="selectProvenance(prov)"
-                                     ng-repeat="prov in allProvenance">
-                                    {{prov.id}}
-                                    <div>{{prov.recorded | prettyDate}} <span class="pull-right">{{prov.recorded| age}}</span> </div>
-                                </div>
-                            </div>
-                        </uib-tab>
-                    </uib-tabset>
+            <br/>
 
 
-                </div>
-                <div class="col-md-6">
-                    <pre>{{selectedProvenance | json}}</pre>
-                </div>
-            </div>
-        </uib-tab>
+           <div class="row">
+               <div class="col-md-3">
+                   <uib-tabset>
+                       <uib-tab heading="All Provenance">
+                           <div class="list-group">
+                               <div ng-class="{'list-group-item':true}"
+                                    ng-click="selectProvenance(prov)"
+                                    ng-repeat="prov in allProvenance">
+                                   {{prov.id}}
+                                   <div>{{prov.recorded | prettyDate}}
+                                       <span class="pull-right">{{prov.recorded| age}}</span> </div>
+                               </div>
+                           </div>
+                       </uib-tab>
+                   </uib-tabset>
+
+
+               </div>
+               <div class="col-md-6">
+                   <pre>{{selectedProvenance | json}}</pre>
+               </div>
+           </div>
+
+       </uib-tab>
+
+
 
         <uib-tab heading="Terminology">
 
@@ -520,6 +534,19 @@
 
 
             </uib-tab>
+        <uib-tab heading="Q item library">
+            <br/>
+            <ul>
+                <li>A collection of Q items that can be directly added to a new Q </li>
+                <li>eg individual iteme (diagnosis lookup with valueset / codes set</li>
+                <li>complete sections - eg TNM items</li>
+                <li>? store as single 'reference' Q and the Q builder can select</li>
+            </ul>
+
+
+        </uib-tab>
+
+
         <uib-tab ng-show="false" heading="External services">
                 <br/>
                 <uib-tabset>

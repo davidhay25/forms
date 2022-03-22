@@ -70,9 +70,10 @@
             </div>
             <div class="col-md-6 col-sm-6">
                 <button class="btn btn-success pull-right"
+                        ng-show="Q.name"
                         ng-click="save()">
                     <div ng-show="editType == 'edit'">Save changes</div>
-                    <div ng-show="editType == 'new'">Add new item</div>
+                    <div ng-show="editType == 'new'">Add new Questionnaire</div>
                 </button>
             </div>
         </div>
