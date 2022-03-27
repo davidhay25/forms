@@ -163,7 +163,12 @@
                                            <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
                                            <button class="btn btn-link" ng-click="showSection()">Show sections</button>
                                        </div>
-                                       <div id="designTree"></div>
+                                       <div class="clearfix"></div>
+                                       <div class="myScroll">
+                                           <div id="designTree"></div>
+                                       </div>
+
+
                                    </div>
                                    <div class="col-md-7">
 
@@ -172,13 +177,23 @@
                                            <uib-tab heading="Details">
 
                                                <div ng-show = "selectedNode">
+                                                   <div ng-show="selectedNode.data.item.repeats">
+                                                       <div class="alert alert-danger pull-right">
+                                                           <strong>Element can repeat</strong>
+                                                       </div>
+
+                                                   </div>
+
                                                <H4>Element: {{selectedNode.data.item.text}}</H4>
+
+
 
                                                <div class="row">
                                                    <div class="col-md-3">
                                                        Type
                                                    </div>
                                                    <div class="col-md-9">
+
                                                        {{selectedNode.data.item.type}}
                                                    </div>
                                                </div>
@@ -211,6 +226,45 @@
                                                        {{selectedNode.data.item.answerOption.length}} options in Q
                                                    </div>
                                                </div>
+
+                                               <div class="row" ng-show="selectedNode.data.item.enableWhen">
+                                                   <div class="col-md-3">
+                                                       Conditionals
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <div ng-repeat="ew in selectedNode.data.item.enableWhen">
+                                                           {{ew.question}} = {{ew.answerCoding.code}}
+                                                       </div>
+                                                   </div>
+                                               </div>
+
+                                               <div class="row" ng-show="selectedNode.data.meta.usageNotes">
+                                                   <div class="col-md-3">
+                                                       Usage Notes
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.meta.usageNotes}}
+                                                   </div>
+                                               </div>
+
+                                               <div class="row" ng-show="selectedNode.data.meta.extraction.notes">
+                                                   <div class="col-md-3">
+                                                       Extraction Notes
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.meta.extraction.notes}}
+                                                   </div>
+                                               </div>
+
+                                               <div class="row" ng-show="selectedNode.data.meta.sourceStandard">
+                                                   <div class="col-md-3">
+                                                       Source standard
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.meta.sourceStandard}}
+                                                   </div>
+                                               </div>
+
 
                                                <hr/>
                                                <div class="row">

@@ -13,7 +13,7 @@
                 <div class="col-md-2">
                     <strong>linkId</strong>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <strong>Text</strong>
                 </div>
                 <div class="col-md-1">
@@ -26,8 +26,8 @@
                     <strong>Code</strong>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Conditional / Notes</strong>
+                <div class="col-md-4">
+                    <strong>Conditional / Notes / Source</strong>
                 </div>
 
             </div>
@@ -40,12 +40,12 @@
                         <div ng-show = "child.type == 'single'">
                             <div class="row bottom-border" >
                                 <div class="col-md-2">
-                                    <div class="clickable" ng-click="editItemFromReport(child.item)">
+                                    <div class="clickable" ng-click="editItemFromReport(child)">
                                         {{child.item.linkId}}
                                     </div>
 
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     {{child.item.text}}
                                 </div>
                                 <div class="col-md-1">
@@ -67,12 +67,13 @@
                                 </div>
 
 
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div ng-repeat="ew in child.item.enableWhen">
                                         C: {{ew.question}} = {{ew.answerCoding.code}}
                                     </div>
 
                                     <div>{{child.meta.usageNotes}}</div>
+                                    <div ng-show = "child.meta.sourceStandard">S: {{child.meta.sourceStandard}}</div>
                                 </div>
 
                             </div>
@@ -85,11 +86,11 @@
                             <div ng-repeat = "grandchild in child.children">
                                 <div class="row bottom-border">
                                     <div class="col-md-2">
-                                        <div class="clickable" ng-click="editItemFromReport(grandchild.item)">
+                                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
                                             {{grandchild.item.linkId}}
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         {{grandchild.item.text}}
                                     </div>
                                     <div class="col-md-1">
@@ -107,12 +108,14 @@
 
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
+                                        <div>{{grandchild.meta.usageNotes}}</div>
                                         <div ng-repeat="ew in grandchild.item.enableWhen">
                                             C: {{ew.question}} = {{ew.answerCoding.code}}
                                         </div>
+                                        <div ng-show = "grandchild.meta.sourceStandard">S: {{grandchild.meta.sourceStandard}}</div>
 
-                                        <div>{{grandchild.meta.usageNotes}}</div>
+
                                     </div>
                                 </div>
 
@@ -133,12 +136,12 @@
 
         </uib-tab>
         <uib-tab heading = "Coded items">
-
+            <br/>
             <table class="table table-bordered table-condensed">
                 <tr><th>linkId</th><th>Text</th><th>Type</th><th>Options</th><th>Details</th></tr>
                 <tr ng-repeat="coded in report.coded">
                     <td>
-                        <div class="clickable" ng-click="editItemFromReport(grandchild.item)">
+                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
                             {{coded.item.linkId}}
                         </div>
 
@@ -172,12 +175,12 @@
 
         </uib-tab>
         <uib-tab heading = "Conditionals by item">
-
+            <br/>
             <table class="table table-bordered table-condensed">
                 <tr><th>linkId of conditional item</th><th>Text</th><th>Type</th><th>Dependency</th></tr>
                 <tr ng-repeat="conditional in report.conditional">
                     <td>
-                        <div class="clickable" ng-click="editItemFromReport(conditional.item)">
+                        <div class="clickable" ng-click="editItemFromReport(conditional)">
                             {{conditional.item.linkId}}
                         </div>
 
@@ -186,7 +189,7 @@
                     <td>{{conditional.item.type}}</td>
                     <td>
                         <div ng-repeat="ew in conditional.item.enableWhen">
-                            <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question].item)">
+                            <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question])">
                                 {{ew.question}}
                             </span> = {{ew.answerCoding.code}}
 
@@ -206,7 +209,7 @@
                 <tr><th>Source Item</th><th>
                     <div class="row">
                         <div class="col-md-4">
-                            Items dependant on this one
+                            Items dependant on the source
                         </div>
                         <div class="col-md-4">
                             Conditional value
@@ -218,7 +221,7 @@
                 <tr ng-repeat = "(k,v) in hashAllItems"
                     ng-show="v.dependencies.length > 0">
                     <td>
-                        <span class="clickable" ng-click="editItemFromReport(hashAllItems[k].item)">
+                        <span class="clickable" ng-click="editItemFromReport(hashAllItems[k])">
                               {{k}}
                         </span>
 
@@ -227,7 +230,7 @@
                         <div ng-repeat="entry in v.dependencies">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <span class="clickable" ng-click="editItemFromReport(entry.item)">
+                                    <span class="clickable" ng-click="editItemFromReport(entry)">
                                     {{entry.item.linkId}} ( {{entry.item.text}})
                                 </span>
                                 </div>
@@ -305,7 +308,7 @@
                         <div ng-show = "child.type == 'single'">
                             <div class="row bottom-border">
                                 <div class="col-md-2">
-                                    <div class="clickable" ng-click="editItemFromReport(child.item)">
+                                    <div class="clickable" ng-click="editItemFromReport(child)">
                                         {{child.item.linkId}}
                                     </div>
 
@@ -323,10 +326,6 @@
                                     <div>{{child.meta.usageNotes}}</div>
                                 </div>
 
-
-
-
-
                             </div>
 
 
@@ -337,7 +336,7 @@
                             <div ng-repeat = "grandchild in child.children">
                                 <div class="row bottom-border">
                                     <div class="col-md-2">
-                                        <div class="clickable" ng-click="editItemFromReport(grandchild.item)">
+                                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
                                             {{grandchild.item.linkId}}
                                         </div>
                                     </div>
@@ -378,6 +377,53 @@
         </uib-tab>
 
         <uib-tab heading = "Textual">
+        </uib-tab>
+
+        <uib-tab heading = "Terminology">
+            <br/>
+            <table class="table table-bordered table-condensed">
+                <tr><th>linkId</th><th>
+                    <div class="row">
+                        <div class="col-md-3">
+                            Code
+                        </div>
+                        <div class="col-md-6">
+                            System
+                        </div>
+                        <div class="col-md-3">
+                            Display
+                        </div>
+                    </div>
+
+
+                </th></tr>
+                <tr ng-repeat="coded in report.coded">
+                    <td>
+                        <div>{{coded.item.text}}</div>
+                        <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
+                            LinkId: {{coded.item.linkId}}
+
+                        </div>
+
+                    </td>
+                    <td>
+                        <div ng-repeat = "option in coded.item.answerOption">
+                            <div class="row bottom-border">
+                                <div class="col-md-3">
+                                    {{option.valueCoding.code}}
+                                </div>
+                                <div class="col-md-6">
+                                    {{option.valueCoding.system}}
+                                </div>
+                                <div class="col-md-3">
+                                    {{option.valueCoding.display}}
+                                </div>
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </uib-tab>
 
     </uib-tabset>

@@ -7,7 +7,7 @@ angular.module("formsApp")
         let globals
         $http.get("globals.json").then(
             function(data) {
-                console.log(data.data)
+               // console.log(data.data)
                 globals = data.data
             }
         )
@@ -18,8 +18,11 @@ angular.module("formsApp")
         extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
         extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
+
         extExtractNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-extractNotes"
         extUsageNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-usageNotes"
+        extSourceStandard = "http://canshare.com/fhir/StructureDefinition/questionnaire-sourceStandard"
+
         canShareServer = "http://canshare/fhir/"
 
         function getHN(hn) {
@@ -79,6 +82,12 @@ angular.module("formsApp")
                     })
 
 
+                }
+
+                //and source standard
+                let ar4 = this.findExtension(item,extSourceStandard)
+                if (ar4.length > 0) {
+                    meta.sourceStandard = ar4[0].valueString
                 }
 
                 return meta
@@ -252,7 +261,7 @@ angular.module("formsApp")
                 let template = []
 
                 Q.item.forEach(function (sectionItem) {
-                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[]}
+                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                     template.push(section)
                     //now look at the items below the section level.
 
@@ -526,8 +535,8 @@ angular.module("formsApp")
                 //todo - make recursive...
                 let qrId = this.createUUID()
                 let err = false
-                console.log(form)
-                console.log(hash)
+               // console.log(form)
+                //console.log(hash)
                 let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
                 QR.text = {status:'generated'}
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
@@ -562,7 +571,7 @@ angular.module("formsApp")
                             let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
 
                             if (value) {        //is there a value for this item. Won't be if this is a group...
-                                console.log("adding",key,value)
+                               // console.log("adding",key,value)
 
                                 if (! parentItem) {
                                     parentItem = {linkId : section.linkId,text:section.text,item: []}
@@ -592,7 +601,7 @@ angular.module("formsApp")
                                     //todo - not checking whether the item has conditions - should we?
                                     let gcValue = form[gcItem.linkId]
                                     if (gcValue) {
-                                        console.log(gcValue)
+                                       // console.log(gcValue)
 
                                         //the parent (off the section) may not have been created yet
                                         if (! parentItem) {
@@ -672,7 +681,7 @@ angular.module("formsApp")
                     let result;
                     switch (item.type) {
                         case "choice":
-                            console.log(value)
+                            //console.log(value)
 
                             //when a radio is used as the input, the value is a string rather than an object
                             if (typeof value === 'string' || value instanceof String) {
@@ -732,8 +741,8 @@ angular.module("formsApp")
                 //todo - make recursive...
                 let qrId = this.createUUID()
                 let err = false
-                console.log(form)
-                console.log(hash)
+                //console.log(form)
+                //console.log(hash)
                 let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
                 QR.text = {status:'generated'}
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
@@ -787,7 +796,7 @@ angular.module("formsApp")
                         if (value) {
                             switch (item.type) {
                                 case "choice":
-                                    console.log(value)
+                                   // console.log(value)
                                     if (value.valueCoding) {
                                         itemToAdd.answer.push(value)    //will be a coding
                                     } else {
@@ -854,7 +863,7 @@ angular.module("formsApp")
 
 
                 QR.item = topNode
-                console.log(topNode.item)
+                //console.log(topNode.item)
                // console.log(QR)
 
 
@@ -999,7 +1008,8 @@ angular.module("formsApp")
             },
 
             makeTreeFromQ : function (Q) {
-                //specifically 2 levels. Not recursive
+                //specifically 3 levels. Not recursive
+                let that = this
                 let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                 let treeData = []
                 let hash = {}
@@ -1007,13 +1017,13 @@ angular.module("formsApp")
                 treeData.push(root)
 
                 Q.item.forEach(function(parentItem){
-
+                    //each top level item is a section
                     let item = {id: parentItem.linkId,state:{},data:{}}
                     item.text = parentItem.text;
                     item.parent = "root";
-                    item.data = {item:parentItem,level:'parent'}
-                    //item.meta = {level:'parent'}
-                    //item.data = {type:parentItem.type,text:parentItem.text};
+                    let meta = that.getMetaInfoForItem(parentItem)
+                    item.data = {item:parentItem,level:'parent',meta:meta}
+
 
                     //item.data.mult = makeMult(parentItem) //mult
                     item.answerValueSet = parentItem.answerValueSet
@@ -1022,12 +1032,14 @@ angular.module("formsApp")
                     hash[item.id] = item.data;
                     treeData.push(item)
 
+                    //second later - ie each section
                     if (parentItem.item) {
                         parentItem.item.forEach(function (child) {
                             let item = {id: child.linkId,state:{},data:{}}
                             item.text = child.text;
                             item.parent = parentItem.linkId;
-                            item.data = {item:child,level:'child'} //child
+                            let meta = that.getMetaInfoForItem(child)
+                            item.data = {item:child,level:'child',meta:meta} //child
                             //item.meta = {level:'child'}
                             /*
                             item.data = {type:child.type,text:child.text};
@@ -1037,6 +1049,29 @@ angular.module("formsApp")
                             */
                             hash[item.id] = item.data;
                             treeData.push(item)
+
+                            //third level - the contents of a section element...
+                            if (child.item) {
+                                child.item.forEach(function (grandchild) {
+                                    let item = {id: grandchild.linkId, state: {}, data: {}}
+                                    item.text = grandchild.text;
+                                    item.parent = child.linkId;
+                                    let meta = that.getMetaInfoForItem(grandchild)
+                                    item.data = {item: grandchild, level: 'child', meta:meta} //child
+                                    //item.meta = {level:'child'}
+                                    /*
+                                    item.data = {type:child.type,text:child.text};
+                                    item.data.answerOption = child.answerOption
+                                    item.data.mult = makeMult(child) //mult
+                                    item.data.description = getDescription(child)
+                                    */
+                                    hash[grandchild.id] = grandchild.data;
+                                    treeData.push(item)
+                                })
+                            }
+
+
+
                         })
 
                     }
@@ -1061,7 +1096,7 @@ angular.module("formsApp")
                     return v
                 }
 
-                function makeMult(item) {
+                function makeMultDEP(item) {
                     let mult = ""
                     if (item.required) {
                         mult = "1.."

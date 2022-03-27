@@ -286,12 +286,15 @@ angular.module("formsApp")
                 $scope.drawQ($scope.selectedQ)
             }
 
-            $scope.editItemFromReport = function (item) {
+            $scope.editItemFromReport = function (entry) {
+                console.log(entry)
+                let item = entry.item
                 let node = {data:{}}
                 node.data.item = item
                 node.data.level = "item"
                 $scope.editItem(node)
             }
+
 
             //edit an existing item
             $scope.editItem = function(node) {
@@ -313,14 +316,13 @@ angular.module("formsApp")
                         },
                         codeSystems: function() {
                             return $scope.input.codeSystems
-                        }, insertType : function() {
+                        },
+                        insertType : function() {
                             if (node.data.level == 'parent') {
                                 return 'section'
                             } else {
                                 return 'item'
                             }
-
-
                         }
                     }
                 }).result.then(

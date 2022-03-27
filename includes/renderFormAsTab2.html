@@ -10,6 +10,11 @@
                  ng-repeat="section in formTemplate">
 
                 {{section.text}}
+
+
+                <span class = "badge pull-right" ng-show="section.item.repeats"> Mult</span>
+
+
                 <!-- temp
                 <span class="pull-right badge">
                          {{completedAnswersInSection(section)}} / {{section.item.length}}
