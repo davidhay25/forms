@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('ehrCtrl',
-        function ($scope,$http,formsSvc,actnowSvc) {
+        function ($scope,$http,formsSvc,actnowSvc,$window) {
 
             $scope.input = {}
             $scope.form = {}
@@ -19,6 +19,30 @@ angular.module("formsApp")
                     data.data.entry.forEach(function (entry){
                         $scope.allQ.push(entry.resource)
                     })
+
+                    //once we have all the Q, see if a Q name was passed in the call.
+                    //if it was, then hide all of the components except for the new form one
+
+                    let search = $window.location.search;
+                    if (search) {
+                        let QName = search.substr(1)
+
+                        let ar = $scope.allQ.filter(q => q.name == QName)
+                        if (ar.length > 0) {
+                            //assume only 1
+                            $scope.reviewMode = true    //will hide most of the tabs...
+                            $scope.selectQ(ar[0])
+                        } else {
+                            console.log("There was no Questionnaire with the name " + QName)
+                        }
+                        //console.log(ar)
+
+                        //console.log(QName)
+
+                       // $scope.selectQ
+
+
+                    }
                 }
             )
 

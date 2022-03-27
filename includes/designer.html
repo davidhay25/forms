@@ -1,0 +1,222 @@
+<div>
+
+    <uib-tabset>
+        <uib-tab heading="Library items (edit)">
+
+
+
+            <div class="row">
+                <div class="col-md-3">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-link pull-right" ng-click="newDdItem()">New item</button>
+                        </div>
+                    </div>
+
+
+                    <div class="list-group">
+                        <div  ng-class="{'list-group-item':true,'listItemSelected':ddItem.id == selectedddItem.id}"
+                             ng-click="selectddItem(ddItem)"
+                              style="cursor: pointer"
+                             ng-repeat="ddItem in library">
+                            {{ddItem.name}}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-9">
+                    <button ng-show="input.ddItemDirty" class="btn btn-danger pull-right" ng-click="saveDdItem()">Save changes</button>
+
+                    <!--
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button ng-show="input.dirty" class="btn btn-danger pull-right" ng-click="save()">Save changes</button>
+                        </div>
+                    </div>
+                    -->
+                    <uib-tabset>
+                        <uib-tab heading="Details">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" ng-change="input.dirty = true"
+                                               class="form-control" ng-model="selectedddItem.name">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Code</label>
+                                        <input type="text" ng-change="input.dirty = true"
+                                               class="form-control" ng-model="selectedddItem.sctId"/>
+                                        <div><em>The SNOMED sctId for this item</em></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Description</label>
+                                    <textarea ng-change="input.dirty = true" class="form-control"
+                                              ng-model="selectedddItem.description"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>DataType</label>
+
+
+                                <div ng-repeat="option in hisoDT">
+
+                                    <input type="radio" value="{{option}}"
+                                       ng-change="input.dirty = true"
+                                       ng-model="selectedddItem.hisoDt"/>
+
+                                        {{option}}
+                                </div>
+
+
+
+
+                                </div>
+                            </div>
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedddItem | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+
+            </div>
+        </uib-tab>
+        <uib-tab heading="Library items table">
+            <table class="table table-bordered table-condensed table-striped">
+                <tr ng-repeat="item in library">
+                    <td>{{item.name}}</td>
+                    <td>{{item.description}}</td>
+                    <td>{{item.hisoDt}}</td>
+                    <td>{{item.sctId}}</td>
+
+
+                </tr>
+            </table>
+
+        </uib-tab>
+        <uib-tab heading="Collections">
+            <div class="row">
+                <div class="col-md-3">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-link pull-right" ng-click="newCollection()">New collection</button>
+                        </div>
+                    </div>
+
+                    <div class="list-group">
+                        <div  ng-class="{'list-group-item':true,'listItemSelected':ddItem.id == selectedddItem.id}"
+                              ng-click="selectCollection(collection)"
+                              style="cursor: pointer"
+                              ng-repeat="collection in collections">
+                            {{collection.id}}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-9">
+                    <button ng-show="input.collectionDirty"
+                            class="btn btn-danger pull-right" ng-click="saveCollection()">Save changes</button>
+
+                    <uib-tabset>
+                        <uib-tab heading="Item selection">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Current items</strong>
+                                    <div class="list-group">
+                                        <div class="list-group-item" ng-repeat="vo in selectedCollection.items">
+                                            <div class="clickable pull-right" ng-click="removeItemFromCollection($index)">Remove</div>
+                                            {{vo.item.name}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Library items</strong>
+                                    <div class="list-group">
+                                        <div class="list-group-item" ng-repeat="item in possibleItems">
+                                            <div class="clickable pull-right" ng-click="addItemToCollection(item)">Add</div>
+                                            {{item.name}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </uib-tab>
+                        <uib-tab heading="Item customization">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>Items</strong>
+                                    <div class="list-group">
+                                        <div class="list-group-item" ng-repeat="vo in selectedCollection.items">
+                                            <div class="clickable pull-right" ng-click="removeItemFromCollection($index)">Remove</div>
+                                            {{vo.item.name}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-9">
+                                </div>
+                            </div>
+
+                        </uib-tab>
+
+                        <uib-tab heading="Form">
+                            <button class="btn btn-link" ng-click="refreshForm()">Refresh</button>
+
+                            <pre>{{Q | json}}</pre>
+
+                            <div ng-controller="formsCtrl">
+                                <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                            </div>
+                        </uib-tab>
+
+                    </uib-tabset>
+
+
+
+                </div>
+            </div>
+
+        </uib-tab>
+    </uib-tabset>
+
+
+
+
+    <!--
+    status
+    code  snomedTerm
+    Category
+    Sub-category
+    field name
+    definition
+    sourceStandards
+    hisoDT
+    hisoClass
+    fhirDT
+    size
+    layout
+    dataDomain
+    valueset
+    obligation
+    cardinality
+    verificationRules
+
+    -->
+
+
+</div>

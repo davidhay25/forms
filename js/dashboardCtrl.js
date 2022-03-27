@@ -7,7 +7,7 @@ angular.module("formsApp")
             $scope.QVS = []
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','decimal','integer','date','dateTime','choice','open-choice','display','group']
+            $scope.input.itemTypes = ['string','quantity','text','decimal','integer','date','dateTime','choice','open-choice','display','group','reference']
 
             $scope.input.codeSystems = []
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
@@ -35,7 +35,7 @@ angular.module("formsApp")
 
             //count the number of completed answers in each section - used by tabbed form...
             $scope.completedAnswersInSection = function(section) {
-                console.log(section)
+               // console.log(section)
                 let cnt = 0
                 section.item.forEach(function (item){
                     if ($scope.form[item.linkId]) {
@@ -61,7 +61,7 @@ angular.module("formsApp")
 
 
 
-                    console.log($scope.allProvenance)
+                    //console.log($scope.allProvenance)
 
                 }, function(err) {
 
@@ -121,7 +121,7 @@ angular.module("formsApp")
                     function (Q) {
                         if (Q) {
                             //if a Q is passed back, it is a new one
-console.log(Q)
+//console.log(Q)
                             Q.id = "cf-" + new Date().getTime()
                             Q.resourceType = "Questionnaire"
                             $scope.selectedQ = Q
@@ -212,7 +212,7 @@ console.log(Q)
                     //create an array of sections
                     //if not at top then can swap
                     //swapping means moving a set of items - can get that from the array of sections
-                    console.log($scope.treeData)
+                    //console.log($scope.treeData)
                     alert("Section movement not yet enabled")
                 }
 
@@ -286,11 +286,17 @@ console.log(Q)
                 $scope.drawQ($scope.selectedQ)
             }
 
+            $scope.editItemFromReport = function (item) {
+                let node = {data:{}}
+                node.data.item = item
+                node.data.level = "item"
+                $scope.editItem(node)
+            }
 
             //edit an existing item
             $scope.editItem = function(node) {
                 let item = node.data.item
-                console.log(node.data.level)    //child or parent
+                //console.log(node.data.level)    //child or parent
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editItem.html',
                     backdrop: 'static',
@@ -320,19 +326,25 @@ console.log(Q)
                 }).result.then(
                     function (updatedItem) {
                         let inx = findPositionInTree(node)
+                        if (inx >= 0) {
+                            let element = $scope.treeData[inx]
 
-                        let element = $scope.treeData[inx]
-                        element.text = updatedItem.text
-                        element.data.item = updatedItem
+                            element.text = updatedItem.text
+                            element.data.item = updatedItem
 
-                        let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                        $scope.selectedQ.item = items;
+                            let items = formsSvc.makeQItemsFromTree($scope.treeData)
+                            $scope.selectedQ.item = items;
 
-                        $scope.treeIdToSelect = node.id
+                            $scope.treeIdToSelect = node.id
 
-                        makeFormDef()
-                        drawTree()
-                        $scope.input.dirty = true
+                            makeFormDef()
+                            drawTree()
+                            $scope.input.dirty = true
+                        } else {
+                            //if -1, the element was not found
+                            console.log('Unable to find item in tree')
+                        }
+
                         //node.data.item = item
                     })
             }
@@ -567,6 +579,15 @@ console.log(Q)
                 } else {
 
 
+                    //for the summary tab...
+                    let vo = formsSvc.generateQReport(Q)
+                    $scope.report = vo.report
+                    $scope.hashAllItems = vo.hashAllItems
+
+                   // console.log($scope.report)
+
+                    //the template for the forms preview
+                    $scope.formTemplate = formsSvc.makeFormTemplate(Q)
 
 
                     $scope.drawQ(Q,true)

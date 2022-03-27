@@ -17,7 +17,9 @@ angular.module("formsApp")
 
         extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
-
+        extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
+        extExtractNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-extractNotes"
+        extUsageNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-usageNotes"
         canShareServer = "http://canshare/fhir/"
 
         function getHN(hn) {
@@ -40,6 +42,206 @@ angular.module("formsApp")
 
         return {
 
+            getMetaInfoForItem : function(item) {
+                //populate meta info - like resource extraction
+                let meta = {}
+
+                //update the Observationextract
+                let ar = this.findExtension(item,extUrlObsExtract)
+                if (ar.length > 0 ) {
+                    if (ar[0].valueBoolean) {
+                        meta.extraction = meta.extraction || {}
+                        meta.extraction.extractObservation = true
+                    }
+                }
+
+                //now look for any extraction notes
+                let ar1 = this.findExtension(item,extExtractNotes)
+                if (ar1.length > 0) {
+                    meta.extraction = meta.extraction || {}
+                    meta.extraction.notes = ar1[0].valueString
+                }
+
+                //and usage notes
+                let ar2 = this.findExtension(item,extUsageNotes)
+                if (ar2.length > 0) {
+                    meta.extraction = meta.extraction || {}
+                    meta.usageNotes = ar2[0].valueString
+                }
+
+                //and reference types
+                let ar3 = this.findExtension(item,extResourceReference)
+
+                if (ar3.length > 0) {
+                    meta.referenceTypes = meta.referenceTypes || []
+                    ar3.forEach(function (ext) {
+                        meta.referenceTypes.push(ext.valueCode)
+                    })
+
+
+                }
+
+                return meta
+            },
+
+            generateQReport : function(Q) {
+                //generate report for Q
+
+                let that = this;
+                let hashAllItems = {}
+                let report = {section:[],coded:[],conditional:[],reference:[]}
+                let issues = []     //issues found during report generation
+
+                Q.item.forEach(function(item){
+                    //items off the root are the top level sections. They have children that are either single questions
+                    //or groups of questions. A group has only a single level of questions
+                    let section = {item:item,children:[]}
+                    report.section.push(section)
+
+                    if (item.item) {        //should always have children
+                        item.item.forEach(function (child){
+
+                            updateSpecificArrays(report,child)
+
+
+                            if (child.type == 'group') {
+                                //this is a group of questions - commonly used for conditionals.
+                                //when displayed in the UI, the first item is in the left pane, the others in the right
+                                //most commonly, the first item (in the left pane) is the key question, the others
+                                //being conditional on the value of that item. ie the answer to the first question will
+                                //determine what is shown on the right...
+                                let group = {type:'group',item:child,children:[],meta:{}}
+                                section.children.push(group)
+                                //step through the children of the group..
+                                child.item.forEach(function (grandChild) {
+
+                                    updateSpecificArrays(report,grandChild)
+
+                                    let entry = {item:grandChild,meta:{}}
+                                    populateMeta(entry)
+
+                                    group.children.push(entry)
+                                })
+
+
+                            } else {
+                                //this is a single question with no grandchildren.
+
+                                let entry = {type:'single',item:child,meta:{}}
+                                populateMeta(entry)
+                                section.children.push(entry)
+
+                                if (child.item) {
+                                    //there shouldn't be any child items todo ?issue
+                                }
+                            }
+
+                        })
+                    }
+                })
+
+                return {report:report,hashAllItems:hashAllItems}
+
+                function populateMeta(entry) {
+                    //populate meta info - like resource extraction
+                    //todo - refactor to use getMeta
+                   // let meta = that.getMetaInfoForItem(entry.item)
+                    entry.meta = that.getMetaInfoForItem(entry.item)
+//return
+                    /*
+                    //update the Observationextract
+                    let ar = that.findExtension(entry.item,extUrlObsExtract)
+                    if (ar.length > 0 ) {
+                        if (ar[0].valueBoolean) {
+                            entry.meta.extraction = entry.meta.extraction || {}
+                            entry.meta.extraction.extractObservation = true
+
+                        }
+                    }
+
+                    //now look for any extraction notes
+                    let ar1 = that.findExtension(entry.item,extExtractNotes)
+                    if (ar1.length > 0) {
+                        entry.meta.extraction = entry.meta.extraction || {}
+                        entry.meta.extraction.notes = ar1[0].valueString
+                    }
+
+                    */
+
+
+                }
+
+                function updateSpecificArrays(report,child) {
+                    //update the coded & reference
+                    if (hashAllItems[child.linkId]) {
+                        alert("There are multiple items with the linkId: " + child.linkId)
+                        return
+                    }
+                    hashAllItems[child.linkId] = {item:child,dependencies:[]}
+
+                    //update specific summary arrays - coded & reference
+                    switch (child.type) {
+                        case 'choice' :
+                        case 'open-choice':
+                            let entry = {item:child,options:{}}
+                            report.coded.push(entry)
+                            //break out any answerOptions by system
+
+
+                            if (child.answerOption) {
+                                child.answerOption.forEach(function (vc) {
+                                    let system = vc.valueCoding.system || 'Unknown'
+                                    entry.options[system] = entry.options[system] || []
+                                    entry.options[system].push(vc.valueCoding)
+
+
+                                    
+                                })
+                            }
+                            //console.log('code')
+                            break
+                        case 'reference' :
+                            let refEntry = {item:child,resourceTypes:[]}
+
+                            let ar = that.findExtension(child,extResourceReference)
+                            if (ar.length > 0) {
+                                ar.forEach(function (ext) {
+                                    refEntry.resourceTypes.push(ext.valueCode)
+                                })
+                            }
+
+                            //todo - get the reference types from the extension
+                            report.reference.push(refEntry)
+                            break;
+                    }
+
+
+
+
+
+
+                    //update the conditional
+                    if (child.enableWhen) {
+                        report.conditional.push({item:child})
+
+                        //update the 'parent' hash
+                        child.enableWhen.forEach(function (ew) {
+                            if (hashAllItems[ew.question]) {
+                                hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
+                            } else {
+                                alert('error: missing linkId of conditional target' + ew.question)
+                               // console.log('error: missing linkId' + ew.question)
+                            }
+                        })
+
+
+
+                    }
+
+                }
+
+
+            },
             makeFormTemplate : function(Q) {
                 let that = this;
 

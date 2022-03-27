@@ -24,7 +24,7 @@
         <uib-tabset>
             <uib-tab heading="Question details">
                 <br/>
-                <table class="table">
+                <table class="table table-condensed">
                     <tr>
                         <td>LinkId</td>
                         <td><input type="text"
@@ -40,13 +40,35 @@
 
                     </tr>
 
+                    <tr>
+                        <td>Flags</td>
+                        <td>
+                            <checkbox ng-model="newItem.repeats"></checkbox> Repeats
+                        </td>
+
+                    </tr>
+
 
 
                     <tr ng-hide = "insertType == 'section'">
                         <td>Type</td>
                         <td>
-                            <select class="form-control" ng-model="newItem.type"
-                                    ng-options = "itemType for itemType in input.itemTypes"></select>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <select class="form-control" ng-model="newItem.type"
+                                            ng-options = "itemType for itemType in input.itemTypes"></select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div ng-show="newItem.type == 'reference'">
+
+                                        <div ng-repeat = "ref in meta.referenceTypes">
+                                            {{ref}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </td>
                     </tr>
 
@@ -66,13 +88,8 @@
                         <td>ValueSet</td>
                         <td>
                             <input class="form-control" type="text" ng-model="newItem.answerValueSet"
-                                   placeholder="ValueSet url"/>
-                            <!--
-                            <select class="form-control" ng-model="newItem.answerValueSet"
-                                    ng-options = "vs.display for vs in input.vsList"></select>
+                                   placeholder="ValueSet url ToDo: allow select off server"/>
 
-                            -->
-                            <em class="pull-right">ToDo: allow select off server</em>
                         </td>
                     </tr>
 
@@ -95,8 +112,33 @@
                                 </div>
                             </div>
 
-
+<!--
                             <div><em>If a code is supplied, the item will be extracted as an Observation</em></div>
+                            -->
+                        </td>
+                    </tr>
+
+                    <tr ng-show = "newItem.enableWhen">
+                        <td>Conditional</td>
+                        <td>
+                            <div ng-repeat = "ew in newItem.enableWhen">
+                                Conditional on value of <em>{{ew.question}}</em>. Details in conditional tab.
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    <tr ng-show = "meta.extraction">
+                        <td>Resource extraction</td>
+                        <td>
+                            <div ng-show="meta.extraction.extractObservation">
+                                Will be extracted as an Observation
+                            </div>
+                            <div ng-show="meta.extraction.notes">
+                                <p>
+                                    {{meta.extraction.notes}}
+                                </p>
+                            </div>
                         </td>
                     </tr>
 
@@ -105,10 +147,25 @@
 
 
             </uib-tab>
+
+            <uib-tab heading = "Notes">
+                <br/>
+                <strong>Usage Notes</strong>
+                <textarea class="form-control" ng-model="meta.usageNotes">
+
+                </textarea>
+
+                <strong>Resource extraction Notes</strong>
+                <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
+
+
+            </uib-tab>
+
             <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >
                 <uib-tab-heading>Options <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
                 <table class="table table-bordered table-condensed">
+                    <tr><th>Code</th><th>System</th><th>Display</th></tr>
                     <tr ng-repeat = "option in newItem.answerOption">
                         <td>{{option.valueCoding.code}}</td>
                         <td>
@@ -141,10 +198,21 @@
                 </table>
 
             </uib-tab>
-            <uib-tab ng-show = "editType == 'new'" heading = "Library">
+
+            <uib-tab ng-show = "newItem.enableWhen" heading = "Conditionals">
+                <pre>{{newItem.enableWhen | json}}</pre>
+
+            </uib-tab>
+
+            <uib-tab ng-show = "false || editType == 'edit'" heading = "Library">
                 <br/>
                 TBD  - allow selection from the library of items
             </uib-tab>
+            <uib-tab ng-show = "newItem.type" heading = "Json">
+                <br/>
+                <pre>{{newItem | json}}</pre>
+            </uib-tab>
+
         </uib-tabset>
 
 

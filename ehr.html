@@ -116,22 +116,43 @@
         </div>
     </nav>
 
-    <uib-tabset>
+    <div ng-show="reviewMode">
+        <div class="row">
+            <div class="col-md-9">
+                <div ng-controller="formsCtrl">
+                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                </div>
+            </div>
+            <div class="col-md-3">
+            </div>
+        </div>
+
+    </div>
+
+    <uib-tabset ng-hide="reviewMode">
 
         <uib-tab heading="New form">
             <br/>
 
             <div class="row">
                 <div class="col-md-1">
-                    Form
+                    <div ng-hide="reviewMode">
+                        Form
+                    </div>
+
                 </div>
+
                 <div class="col-md-2">
-                    <select class="form-control" ng-model="input.Qcontrol"
-                            ng-options = "Q.name for Q in allQ"
-                            ng-change = "selectQ(input.Qcontrol)">
-                    </select>
+                    <div ng-hide="reviewMode">
+                        <select class="form-control" ng-model="input.Qcontrol"
+                                ng-options = "Q.name for Q in allQ"
+                                ng-change = "selectQ(input.Qcontrol)">
+                        </select>
+                    </div>
+
                 </div>
-                <div class="col-md-2">
+
+                <div class="col-md-9">
                     <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
                 </div>
             </div>
@@ -175,7 +196,6 @@
                             <div ng-controller="formsCtrl">
                                 <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
                             </div>
-
 
 
                         </uib-tab>
@@ -298,7 +318,7 @@
             </div>
 
         </uib-tab>
-        <uib-tab>
+        <uib-tab ng-hide="reviewMode">
             <uib-tab-heading>Existing Forms <span ng-show="existingQR.length > 0" class="badge">{{existingQR.length}}</span> </uib-tab-heading>
             <div class="row">
                 <div class="col-md-2">
@@ -456,7 +476,7 @@
 
         </uib-tab>
 
-        <uib-tab>
+        <uib-tab ng-hide="reviewMode">
             <uib-tab-heading>Pathology reports <span ng-show="allDR.length > 0" class="badge">{{allDR.length}}</span></uib-tab-heading>
             <br/>
 
@@ -531,7 +551,7 @@
             possibly other CP details
         </uib-tab>
 
-        <uib-tab heading="CarePlans" >
+        <uib-tab ng-hide="reviewMode" heading="CarePlans" >
             <uib-tab-heading>
                 CarePlans <span class="badge">{{allCarePlans.length}}</span>
             </uib-tab-heading>
@@ -595,7 +615,7 @@
 
 
         </uib-tab>
-        <uib-tab heading = "Regimens">
+        <uib-tab ng-hide="reviewMode" heading = "Regimens">
 
 
             <div class="row">
@@ -681,7 +701,7 @@
         </uib-tab>
 
 
-        <uib-tab>
+        <uib-tab ng-hide="reviewMode">
             <uib-tab-heading>Service Requests <span ng-show="allSR.length > 0" class="badge">{{allSR.length}}</span> </uib-tab-heading>
                 <br/>
 
@@ -705,7 +725,7 @@
         </uib-tab>
 
 
-        <uib-tab heading="Query resources" ng-show="true">
+        <uib-tab heading="Query resources" ng-show="false">
             <div class="row">
                 <div class="col-md-12">
                     <button class="btn-link btn pull-right" ng-click="updateQuery()">Refresh</button>

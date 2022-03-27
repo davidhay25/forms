@@ -124,8 +124,17 @@ angular.module("formsApp")
 
                             console.log(resource)
                             //this is actually the scope from the parent...
-                            $scope.form[item.linkId] =
-                                {reference:resourceType + "/" + resource.id,display:formsSvc.getHN(resource.name[0])}
+
+                            if (resource.resourceType == "Practitioner") {
+                                $scope.form[item.linkId] =
+                                    {reference:resourceType + "/" + resource.id,display:formsSvc.getHN(resource.name[0])}
+                            } else {
+                                //Organization
+                                $scope.form[item.linkId] =
+                                    {reference:resourceType + "/" + resource.id,display:resource.name}
+                            }
+
+
 
                                 //also the parent scope
                             $scope.makeQR(item.linkId)

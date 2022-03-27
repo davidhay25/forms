@@ -13,6 +13,12 @@ angular.module("formsApp")
             $scope.input.codeSystems = codeSystems
             $scope.newItem = item
 
+            if (item) {
+                //in particular gets the extensions into a easier format
+                $scope.meta = formsSvc.getMetaInfoForItem(item)
+            }
+
+
 
 
             //set the code controls
@@ -69,7 +75,15 @@ angular.module("formsApp")
 
 
                 if ($scope.newItem.tmp && $scope.newItem.tmp.codeCode) {
-                    let code = {code:$scope.newItem.tmp.codeCode,system:$scope.newItem.tmp.codeSystem.url,display:$scope.newItem.tmp.codeDisplay}
+                    let code = {code:$scope.newItem.tmp.codeCode,
+                        //system:$scope.newItem.tmp.codeSystem.url,
+                        display:$scope.newItem.tmp.codeDisplay}
+
+                        if ($scope.newItem.tmp.codeSystem) {
+                            code.system = $scope.newItem.tmp.codeSystem.url
+                        }
+
+
                     $scope.newItem.code = [code]
                     //delete item.tmp
 
