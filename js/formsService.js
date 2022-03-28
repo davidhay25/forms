@@ -68,7 +68,7 @@ angular.module("formsApp")
                 //and usage notes
                 let ar2 = this.findExtension(item,extUsageNotes)
                 if (ar2.length > 0) {
-                    meta.extraction = meta.extraction || {}
+                    //meta.extraction = meta.extraction || {}
                     meta.usageNotes = ar2[0].valueString
                 }
 
@@ -80,8 +80,6 @@ angular.module("formsApp")
                     ar3.forEach(function (ext) {
                         meta.referenceTypes.push(ext.valueCode)
                     })
-
-
                 }
 
                 //and source standard
@@ -104,13 +102,16 @@ angular.module("formsApp")
                 Q.item.forEach(function(item){
                     //items off the root are the top level sections. They have children that are either single questions
                     //or groups of questions. A group has only a single level of questions
-                    let section = {item:item,children:[]}
+
+                    let section = {item:item,children:[],meta:{}}
+                    populateMeta(section)
+
                     report.section.push(section)
 
                     if (item.item) {        //should always have children
                         item.item.forEach(function (child){
 
-                            updateSpecificArrays(report,child)
+                            updateSpecificArrays(item,report,child)
 
 
                             if (child.type == 'group') {
@@ -124,7 +125,7 @@ angular.module("formsApp")
                                 //step through the children of the group..
                                 child.item.forEach(function (grandChild) {
 
-                                    updateSpecificArrays(report,grandChild)
+                                    updateSpecificArrays(item,report,grandChild)
 
                                     let entry = {item:grandChild,meta:{}}
                                     populateMeta(entry)
@@ -180,7 +181,7 @@ angular.module("formsApp")
 
                 }
 
-                function updateSpecificArrays(report,child) {
+                function updateSpecificArrays(sectionItem,report,child) {
                     //update the coded & reference
                     if (hashAllItems[child.linkId]) {
                         alert("There are multiple items with the linkId: " + child.linkId)
@@ -192,7 +193,7 @@ angular.module("formsApp")
                     switch (child.type) {
                         case 'choice' :
                         case 'open-choice':
-                            let entry = {item:child,options:{}}
+                            let entry = {section:sectionItem,item:child,options:{}}
                             report.coded.push(entry)
                             //break out any answerOptions by system
 

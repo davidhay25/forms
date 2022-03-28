@@ -23,18 +23,35 @@
                     <strong>Repeats</strong>
                 </div>
                 <div class="col-md-1">
-                    <strong>Code</strong>
+                  <!--  <strong>Code</strong>-->
                 </div>
 
                 <div class="col-md-4">
-                    <strong>Conditional / Notes / Source</strong>
+                    <strong>Conditional / Usage notes / Source</strong>
                 </div>
 
             </div>
 
             <div class="myScroll">
                 <div ng-repeat="section in report.section">
-                    <h4>{{section.item.text}}</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>{{section.item.text}}</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <div ng-show="section.item.repeats">
+                                Yes
+                            </div>
+                        </div>
+                        <div class="col-nd-4">
+                            <div ng-repeat="ew in section.item.enableWhen">
+                                C: {{ew.question}} = {{ew.answerCoding.code}}
+                            </div>
+
+                            <div>{{child.meta.usageNotes}}</div>
+                            <div ng-show = "section.meta.sourceStandard">S: {{child.meta.sourceStandard}}</div>
+                        </div>
+                    </div>
 
                     <div ng-repeat = "child in section.children">
                         <div ng-show = "child.type == 'single'">
@@ -59,10 +76,12 @@
                                 </div>
 
                                 <div class="col-md-1">
+                                    <!--
                                     <div ng-repeat="code in child.item.code">
                                         {{code.code}}
-                                        <!-- todo - popover for system <div>{{code.system}}</div>-->
+
                                     </div>
+                                    -->
 
                                 </div>
 
@@ -101,10 +120,12 @@
                                     </div>
 
                                     <div class="col-md-1">
+                                        <!--
                                         <div ng-repeat="code in child.item.code">
                                             {{code.code}}
-                                            <!-- todo - popover for system <div>{{code.system}}</div>-->
+
                                         </div>
+                                        -->
 
                                     </div>
 
@@ -138,14 +159,16 @@
         <uib-tab heading = "Coded items">
             <br/>
             <table class="table table-bordered table-condensed">
-                <tr><th>linkId</th><th>Text</th><th>Type</th><th>Options</th><th>Details</th></tr>
+                <tr><th>Section</th><th>Item linkId</th><th>Text</th><th>Type</th><th>Options</th><th>Details</th></tr>
                 <tr ng-repeat="coded in report.coded">
+                    <td>{{coded.section.text}}</td>
                     <td>
                         <div class="clickable" ng-click="editItemFromReport(grandchild)">
                             {{coded.item.linkId}}
                         </div>
 
                     </td>
+
                     <td>{{coded.item.text}}</td>
                     <td>{{coded.item.type}}</td>
 
@@ -289,10 +312,13 @@
                 <div class="col-md-2">
                     <strong>linkId</strong>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <strong>Text</strong>
                 </div>
                 <div class="col-md-2">
+                  <strong>Code</strong>
+                </div>
+                <div class="col-md-1">
                     <strong>Observation extraction</strong>
                 </div>
                 <div class="col-md-4">
@@ -302,7 +328,27 @@
 
             <div class="myScroll">
                 <div ng-repeat="section in report.section">
-                    <h4>{{section.item.text}}</h4>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>{{section.item.text}}</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <div ng-show="section.item.repeats">
+                                Yes
+                            </div>
+                        </div>
+                        <div class="col-nd-4">
+                            <div ng-repeat="ew in section.item.enableWhen">
+                                C: {{ew.question}} = {{ew.answerCoding.code}}
+                            </div>
+
+
+                            <div>{{section.meta.extraction.notes}}</div>
+
+
+                        </div>
+                    </div>
 
                     <div ng-repeat = "child in section.children">
                         <div ng-show = "child.type == 'single'">
@@ -313,17 +359,25 @@
                                     </div>
 
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     {{child.item.text}}
                                 </div>
                                 <div class="col-md-2">
+
+                                    <div ng-repeat="code in child.item.code">
+                                        {{code.code}}
+                                        <!-- todo - popover for system <div>{{code.system}}</div>-->
+                                    </div>
+
+                                </div>
+                                <div class="col-md-1">
                                     <div ng-show="child.meta.extraction.extractObservation">
                                         Yes
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     {{child.meta.extraction.notes}}
-                                    <div>{{child.meta.usageNotes}}</div>
+
                                 </div>
 
                             </div>
@@ -340,10 +394,18 @@
                                             {{grandchild.item.linkId}}
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         {{grandchild.item.text}}
                                     </div>
                                     <div class="col-md-2">
+
+                                        <div ng-repeat="code in grandchild.item.code">
+                                            {{code.code}}
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-1">
                                         <div ng-show="grandchild.meta.extraction.extractObservation">
                                             Yes
                                         </div>
@@ -351,7 +413,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         {{grandchild.meta.extraction.notes}}
-                                        <div>{{grandchild.meta.usageNotes}}</div>
+
                                     </div>
                                 </div>
                             </div>
@@ -382,23 +444,23 @@
         <uib-tab heading = "Terminology">
             <br/>
             <table class="table table-bordered table-condensed">
-                <tr><th>linkId</th><th>
+                <tr><th width="20%">linkId</th><th>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             Code
                         </div>
                         <div class="col-md-6">
                             System
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             Display
                         </div>
                     </div>
 
 
                 </th></tr>
-                <tr ng-repeat="coded in report.coded">
-                    <td>
+                <tr  ng-repeat="coded in report.coded">
+                    <td width="20%">
                         <div>{{coded.item.text}}</div>
                         <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
                             LinkId: {{coded.item.linkId}}
@@ -409,13 +471,13 @@
                     <td>
                         <div ng-repeat = "option in coded.item.answerOption">
                             <div class="row bottom-border">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     {{option.valueCoding.code}}
                                 </div>
                                 <div class="col-md-6">
                                     {{option.valueCoding.system}}
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     {{option.valueCoding.display}}
                                 </div>
                             </div>
