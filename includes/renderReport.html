@@ -16,17 +16,18 @@
                 <div class="col-md-3">
                     <strong>Text</strong>
                 </div>
+                <div class="col-md-2">
+                    <strong>Q code</strong>
+                </div>
                 <div class="col-md-1">
                     <strong>Type</strong>
                 </div>
                 <div class="col-md-1">
                     <strong>Repeats</strong>
                 </div>
-                <div class="col-md-1">
-                  <!--  <strong>Code</strong>-->
-                </div>
 
-                <div class="col-md-4">
+
+                <div class="col-md-3">
                     <strong>Conditional / Usage notes / Source</strong>
                 </div>
 
@@ -65,6 +66,15 @@
                                 <div class="col-md-3">
                                     {{child.item.text}}
                                 </div>
+                                <div class="col-md-2">
+
+                                    <div ng-repeat="code in child.item.code">
+                                        {{code.code}}
+
+                                    </div>
+
+
+                                </div>
                                 <div class="col-md-1">
                                     {{child.item.type}}
                                 </div>
@@ -75,18 +85,10 @@
 
                                 </div>
 
-                                <div class="col-md-1">
-                                    <!--
-                                    <div ng-repeat="code in child.item.code">
-                                        {{code.code}}
-
-                                    </div>
-                                    -->
-
-                                </div>
 
 
-                                <div class="col-md-4">
+
+                                <div class="col-md-3">
                                     <div ng-repeat="ew in child.item.enableWhen">
                                         C: {{ew.question}} = {{ew.answerCoding.code}}
                                     </div>
@@ -112,6 +114,15 @@
                                     <div class="col-md-3">
                                         {{grandchild.item.text}}
                                     </div>
+                                    <div class="col-md-2">
+
+                                        <div ng-repeat="code in grandchild.item.code">
+                                            {{code.code}}
+
+                                        </div>
+
+
+                                    </div>
                                     <div class="col-md-1">
                                         {{grandchild.item.type}}
                                     </div>
@@ -119,17 +130,9 @@
                                         {{grandchild.item.repeats}}
                                     </div>
 
-                                    <div class="col-md-1">
-                                        <!--
-                                        <div ng-repeat="code in child.item.code">
-                                            {{code.code}}
 
-                                        </div>
-                                        -->
 
-                                    </div>
-
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div>{{grandchild.meta.usageNotes}}</div>
                                         <div ng-repeat="ew in grandchild.item.enableWhen">
                                             C: {{ew.question}} = {{ew.answerCoding.code}}
@@ -444,7 +447,10 @@
         <uib-tab heading = "Terminology">
             <br/>
             <table class="table table-bordered table-condensed">
-                <tr><th width="20%">linkId</th><th>
+                <tr>
+                    <th width="20%">
+                        linkId</th>
+                    <th>
                     <div class="row">
                         <div class="col-md-2">
                             Code
@@ -456,17 +462,15 @@
                             Display
                         </div>
                     </div>
-
-
-                </th></tr>
+                </th>
+                </tr>
                 <tr  ng-repeat="coded in report.coded">
                     <td width="20%">
                         <div>{{coded.item.text}}</div>
                         <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
                             LinkId: {{coded.item.linkId}}
-
                         </div>
-
+                        <div>Q Code: {{coded.item.code[0].code}}</div>
                     </td>
                     <td>
                         <div ng-repeat = "option in coded.item.answerOption">
