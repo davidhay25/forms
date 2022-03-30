@@ -78,8 +78,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            CanShare: Create Path request and view patient data
-                            <!-- <div><em>Surgeon and MDM meeting</em></div> -->
+                            {{input.appTitle}}
                         </a>
                     </span>
 
@@ -117,14 +116,52 @@
     </nav>
 
     <div ng-show="reviewMode">
-        <div class="row">
-            <div class="col-md-9">
-                <div ng-controller="formsCtrl">
-                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+
+        <div>
+
+
+            <div class="row" >
+                <div class="col-md-4">
+                    {{selectedQ.title}}
+                </div>
+
+
+                <div class="col-md-2">
+                    <!--
+                    <button class="btn btn-primary pull-right" ng-click="prepop()">Pre-populate</button>
+                    -->
+                </div>
+
+                <div class="col-md-5">
+                    <div ng-hide="input.reviewPreview" class="clickable pull-right" ng-click="input.reviewPreview = true">Preview form</div>
+                    <div ng-show="input.reviewPreview" class="clickable pull-right" ng-click="input.reviewPreview = false">Edit form</div>
+                </div>
+
+                <div class="col-md-1">
+                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
                 </div>
             </div>
-            <div class="col-md-3">
+        </div>
+        <hr/>
+
+        <div ng-hide="input.reviewPreview">
+            <div class="row">
+
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-11">
+                    <div ng-controller="formsCtrl">
+                        <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                    </div>
+                </div>
+
             </div>
+        </div>
+
+        <div ng-show="input.reviewPreview">
+            <em>A view of the form as it might be rendered for printing of display</em>
+
+            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
         </div>
 
     </div>

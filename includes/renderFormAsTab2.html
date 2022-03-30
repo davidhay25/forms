@@ -30,7 +30,7 @@
         <div ng-repeat="row in selectedSection.rows">
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div ng-repeat="cell in row.left">
                         <div style="margin-bottom: 8px">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
@@ -39,35 +39,38 @@
                     </div>
 
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div ng-repeat="cell in row.right">
                         <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                     </div>
 
                 </div>
 
-                <div class="col-md-4">
-<!--
-                    <div ng-repeat="cell in row.left">
-                        <div ng-show = "cell.extractObservation">
-                            "{{cell.item.text}}" extracted as Observation
-                        </div>
-                        <div ng-hide = "cell.item.code || cell.item.type == 'display'">
-                            "{{cell.item.text}}" has no code
-                        </div>
-                    </div>
-
-                    -->
 
 
-                </div>
+                <!--
+                                <div class="col-md-4">
 
+                                    <div ng-repeat="cell in row.left">
+                                        <div ng-show = "cell.extractObservation">
+                                            "{{cell.item.text}}" extracted as Observation
+                                        </div>
+                                        <div ng-hide = "cell.item.code || cell.item.type == 'display'">
+                                            "{{cell.item.text}}" has no code
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+                   -->
             </div>
 
+            <hr style="margin: 2px"/>
+
         </div>
-<!--
-        <pre>{{selectedSection | json}}</pre>
-        -->
+
 
     </div>
 </div>

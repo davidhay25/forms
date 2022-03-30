@@ -59,6 +59,7 @@
     <script src="js/designerCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
     <script src="js/formRenderCtrl.js"></script>
+    <script src="js/formReviewsCtrl.js"></script>
 
     <style>
         #graph {
@@ -177,16 +178,34 @@
                                            <uib-tab heading="Details">
 
                                                <div ng-show = "selectedNode">
-                                                   <div ng-show="selectedNode.data.item.repeats">
-                                                       <div class="alert alert-danger pull-right">
-                                                           <strong>Element can repeat</strong>
-                                                       </div>
 
+
+
+
+                                                   <div class="row">
+                                                       <div class="col-md-9">
+                                                           <H4>Element: {{selectedNode.data.item.text}}</H4>
+                                                       </div>
+                                                       <div class="col-md-3">
+                                                           <div ng-show="selectedNode.data.item.repeats">
+                                                               <div class="alert alert-danger pull-right">
+                                                                   <strong>Element can repeat</strong>
+                                                               </div>
+
+                                                           </div>
+                                                       </div>
                                                    </div>
 
-                                               <H4>Element: {{selectedNode.data.item.text}}</H4>
 
+                                                   <div class="row">
+                                                       <div class="col-md-3">
+                                                           LinkId
+                                                       </div>
+                                                       <div class="col-md-9">
 
+                                                           {{selectedNode.data.item.linkId}}
+                                                       </div>
+                                                   </div>
 
                                                <div class="row">
                                                    <div class="col-md-3">
@@ -511,11 +530,19 @@
 
         </uib-tab>
 
+
+
+        <uib-tab heading="Form reviews">
+            <br/>
+            <div ng-controller="formReviewsCtrl">
+                <ng-include src = "'includes/formReviews.html'"></ng-include>
+            </div>
+
+        </uib-tab>
+
         <uib-tab heading="Query server">
             <em>Query for supported resources - ? or link to Server Query - yes!</em>
         </uib-tab>
-
-
 
         <uib-tab heading="Provenance">
             <br/>
@@ -545,7 +572,6 @@
            </div>
 
        </uib-tab>
-
 
 
         <uib-tab heading="Terminology">

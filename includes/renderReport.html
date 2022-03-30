@@ -36,15 +36,15 @@
             <div class="myScroll">
                 <div ng-repeat="section in report.section">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <h4>{{section.item.text}}</h4>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <div ng-show="section.item.repeats">
                                 Yes
                             </div>
                         </div>
-                        <div class="col-nd-4">
+                        <div class="col-md-3">
                             <div ng-repeat="ew in section.item.enableWhen">
                                 C: {{ew.question}} = {{ew.answerCoding.code}}
                             </div>
@@ -159,6 +159,188 @@
 
 
         </uib-tab>
+
+        <uib-tab heading = "Terminology">
+            <br/>
+            <table class="table table-bordered table-condensed">
+                <tr>
+                    <th width="20%">
+                        linkId</th>
+                    <th>
+                        <div class="row">
+                            <div class="col-md-2">
+                                Code
+                            </div>
+                            <div class="col-md-6">
+                                System
+                            </div>
+                            <div class="col-md-4">
+                                Display
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+                <tr  ng-repeat="coded in report.coded">
+                    <td width="20%">
+                        <div>{{coded.item.text}}</div>
+                        <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
+                            LinkId: {{coded.item.linkId}}
+                        </div>
+                        <div ng-show="coded.item.code">Q Code: {{coded.item.code[0].code}}</div>
+                    </td>
+                    <td>
+                        <div ng-repeat = "option in coded.item.answerOption">
+                            <div class="row bottom-border">
+                                <div class="col-md-2">
+                                    {{option.valueCoding.code}}
+                                </div>
+                                <div class="col-md-6">
+                                    {{option.valueCoding.system}}
+                                </div>
+                                <div class="col-md-4">
+                                    {{option.valueCoding.display}}
+                                </div>
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </uib-tab>
+
+
+        <uib-tab heading = "Resource extraction">
+
+            <div class="row">
+                <div class="col-md-2">
+                    <strong>linkId</strong>
+                </div>
+                <div class="col-md-3">
+                    <strong>Text</strong>
+                </div>
+                <div class="col-md-2">
+                    <strong>Q Code</strong>
+                </div>
+                <div class="col-md-1">
+                    <strong>Observation extraction</strong>
+                </div>
+                <div class="col-md-4">
+                    <strong>Notes - Extraction & Usage</strong>
+                </div>
+            </div>
+
+            <div class="myScroll">
+                <div ng-repeat="section in report.section">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>{{section.item.text}}</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <div ng-show="section.item.repeats">
+                                Yes
+                            </div>
+                        </div>
+                        <div class="col-nd-4">
+                            <div ng-repeat="ew in section.item.enableWhen">
+                                C: {{ew.question}} = {{ew.answerCoding.code}}
+                            </div>
+
+
+                            <div>{{section.meta.extraction.notes}}</div>
+
+
+                        </div>
+                    </div>
+
+                    <div ng-repeat = "child in section.children">
+                        <div ng-show = "child.type == 'single'">
+                            <div class="row bottom-border">
+                                <div class="col-md-2">
+                                    <div class="clickable" ng-click="editItemFromReport(child)">
+                                        {{child.item.linkId}}
+                                    </div>
+
+                                </div>
+                                <div class="col-md-3">
+                                    {{child.item.text}}
+                                </div>
+                                <div class="col-md-2">
+
+                                    <div ng-repeat="code in child.item.code">
+                                        {{code.code}}
+                                        <!-- todo - popover for system <div>{{code.system}}</div>-->
+                                    </div>
+
+                                </div>
+                                <div class="col-md-1">
+                                    <div ng-show="child.meta.extraction.extractObservation">
+                                        Yes
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    {{child.meta.extraction.notes}}
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                        <div ng-show = "child.type == 'group'">
+
+                            <div ng-repeat = "grandchild in child.children">
+                                <div class="row bottom-border">
+                                    <div class="col-md-2">
+                                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
+                                            {{grandchild.item.linkId}}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{grandchild.item.text}}
+                                    </div>
+                                    <div class="col-md-2">
+
+                                        <div ng-repeat="code in grandchild.item.code">
+                                            {{code.code}}
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div ng-show="grandchild.meta.extraction.extractObservation">
+                                            Yes
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{grandchild.meta.extraction.notes}}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--
+            <div ng-repeat="section in report.section">
+                <h4>{{section.item.text}}</h4>
+
+                <div ng-repeat = "child in section.children" ng-show="child.meta.extraction">
+
+                    {{child.meta}}
+
+
+                </div>
+            </div>
+            -->
+
+        </uib-tab>
+
         <uib-tab heading = "Coded items">
             <br/>
             <table class="table table-bordered table-condensed">
@@ -309,188 +491,9 @@
 
 
 
-        <uib-tab heading = "Resource extraction">
-
-            <div class="row">
-                <div class="col-md-2">
-                    <strong>linkId</strong>
-                </div>
-                <div class="col-md-3">
-                    <strong>Text</strong>
-                </div>
-                <div class="col-md-2">
-                  <strong>Code</strong>
-                </div>
-                <div class="col-md-1">
-                    <strong>Observation extraction</strong>
-                </div>
-                <div class="col-md-4">
-                    <strong>Notes - Extraction & Usage</strong>
-                </div>
-            </div>
-
-            <div class="myScroll">
-                <div ng-repeat="section in report.section">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>{{section.item.text}}</h4>
-                        </div>
-                        <div class="col-md-2">
-                            <div ng-show="section.item.repeats">
-                                Yes
-                            </div>
-                        </div>
-                        <div class="col-nd-4">
-                            <div ng-repeat="ew in section.item.enableWhen">
-                                C: {{ew.question}} = {{ew.answerCoding.code}}
-                            </div>
-
-
-                            <div>{{section.meta.extraction.notes}}</div>
-
-
-                        </div>
-                    </div>
-
-                    <div ng-repeat = "child in section.children">
-                        <div ng-show = "child.type == 'single'">
-                            <div class="row bottom-border">
-                                <div class="col-md-2">
-                                    <div class="clickable" ng-click="editItemFromReport(child)">
-                                        {{child.item.linkId}}
-                                    </div>
-
-                                </div>
-                                <div class="col-md-3">
-                                    {{child.item.text}}
-                                </div>
-                                <div class="col-md-2">
-
-                                    <div ng-repeat="code in child.item.code">
-                                        {{code.code}}
-                                        <!-- todo - popover for system <div>{{code.system}}</div>-->
-                                    </div>
-
-                                </div>
-                                <div class="col-md-1">
-                                    <div ng-show="child.meta.extraction.extractObservation">
-                                        Yes
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    {{child.meta.extraction.notes}}
-
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-                        <div ng-show = "child.type == 'group'">
-
-                            <div ng-repeat = "grandchild in child.children">
-                                <div class="row bottom-border">
-                                    <div class="col-md-2">
-                                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
-                                            {{grandchild.item.linkId}}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        {{grandchild.item.text}}
-                                    </div>
-                                    <div class="col-md-2">
-
-                                        <div ng-repeat="code in grandchild.item.code">
-                                            {{code.code}}
-
-                                        </div>
-
-                                    </div>
-                                    <div class="col-md-1">
-                                        <div ng-show="grandchild.meta.extraction.extractObservation">
-                                            Yes
-                                        </div>
-
-                                    </div>
-                                    <div class="col-md-4">
-                                        {{grandchild.meta.extraction.notes}}
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!--
-            <div ng-repeat="section in report.section">
-                <h4>{{section.item.text}}</h4>
-
-                <div ng-repeat = "child in section.children" ng-show="child.meta.extraction">
-
-                    {{child.meta}}
-
-
-                </div>
-            </div>
-            -->
-
-        </uib-tab>
-
         <uib-tab heading = "Textual">
         </uib-tab>
 
-        <uib-tab heading = "Terminology">
-            <br/>
-            <table class="table table-bordered table-condensed">
-                <tr>
-                    <th width="20%">
-                        linkId</th>
-                    <th>
-                    <div class="row">
-                        <div class="col-md-2">
-                            Code
-                        </div>
-                        <div class="col-md-6">
-                            System
-                        </div>
-                        <div class="col-md-4">
-                            Display
-                        </div>
-                    </div>
-                </th>
-                </tr>
-                <tr  ng-repeat="coded in report.coded">
-                    <td width="20%">
-                        <div>{{coded.item.text}}</div>
-                        <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
-                            LinkId: {{coded.item.linkId}}
-                        </div>
-                        <div>Q Code: {{coded.item.code[0].code}}</div>
-                    </td>
-                    <td>
-                        <div ng-repeat = "option in coded.item.answerOption">
-                            <div class="row bottom-border">
-                                <div class="col-md-2">
-                                    {{option.valueCoding.code}}
-                                </div>
-                                <div class="col-md-6">
-                                    {{option.valueCoding.system}}
-                                </div>
-                                <div class="col-md-4">
-                                    {{option.valueCoding.display}}
-                                </div>
-                            </div>
-
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </uib-tab>
 
     </uib-tabset>
 

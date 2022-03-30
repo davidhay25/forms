@@ -7,6 +7,8 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.form = {}
 
+            $scope.input.appTitle = "CanShare: Create Path request and view patient data"
+
             let validationServer = "http://localhost:9099/baseR4/"
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
@@ -29,19 +31,16 @@ angular.module("formsApp")
 
                         let ar = $scope.allQ.filter(q => q.name == QName)
                         if (ar.length > 0) {
+                            $scope.input.appTitle = "Review form design"
                             //assume only 1
                             $scope.reviewMode = true    //will hide most of the tabs...
                             $scope.selectQ(ar[0])
+
+
+
                         } else {
                             console.log("There was no Questionnaire with the name " + QName)
                         }
-                        //console.log(ar)
-
-                        //console.log(QName)
-
-                       // $scope.selectQ
-
-
                     }
                 }
             )
@@ -306,17 +305,16 @@ angular.module("formsApp")
             //invoked whenever an item in the generated form changes...
             $scope.makeQR = function() {
                 delete $scope.qrValidationResult
-                $scope.QR = formsSvc.makeQR($scope.selectedQ,
-                    $scope.form,$scope.hashItem,$scope.selectedPatient,
-                    $scope.selectedPractitioner.resource)
+                if ($scope.selectedPatient && $scope.selectedPractitioner) {
+                    $scope.QR = formsSvc.makeQR($scope.selectedQ,
+                        $scope.form,$scope.hashItem,$scope.selectedPatient,
+                        $scope.selectedPractitioner.resource)
+                }
+
+
                 console.log($scope.QR)
                 $scope.selectedQR = $scope.QR   //for rendering
-/*
-                //generate the OML
-                $scope.OML = formsSvc.makeORM($scope.selectedQ,
-                    $scope.form,$scope.hashItem,$scope.selectedPatient,
-                    $scope.selectedPractitioner.resource)
-*/
+
             }
 
 

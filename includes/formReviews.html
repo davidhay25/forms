@@ -1,0 +1,54 @@
+<div>
+
+
+    <div class="row">
+        <div class="col-md-2">
+            <strong>Questionnaires</strong>
+            <div class="list-group">
+                <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
+                     style="cursor: pointer"
+                     ng-click="selectQReviews(Q)"
+                     ng-repeat="Q in allQ">
+                    {{Q.name}}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <strong>Reviews</strong>
+            <div class="list-group">
+                <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
+                     style="cursor: pointer"
+                     ng-click="selectReview(review)"
+                     ng-repeat="review in reviewQRs">
+                    {{review.QR.author.display}}
+                    <div><em>{{review.QR.authored | date}}</em></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <strong>Comments</strong>
+            <div ng-repeat="r in selectedReview.reviews">
+
+                <div><strong>{{r.text}}</strong></div>
+                <div>{{r.answer[0].valueString}}</div>
+                <br/>
+
+            </div>
+
+        </div>
+        <div class="col-md-5">
+            <div ng-show = "selectedQR">
+                <br/>
+                <strong>Form</strong>
+                <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>

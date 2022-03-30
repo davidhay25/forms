@@ -66,6 +66,7 @@
                     <div style="padding-left: 10px">{{item.text}}</div>
 
                 </div>
+
                 <div class="col-md-9">
                     <div ng-repeat="answer in item.answer">
                         <div ng-show="answer.valueDecimal">
@@ -84,28 +85,49 @@
                         <div ng-show="answer.valueCoding">
                             {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
                         </div>
+                        <div ng-show="answer.valueReference">
+                            {{answer.valueReference.display}}
+                        </div>
 
                     </div>
-{{item.item}}
+
+
+
                     <div ng-show = "item.item">
                         <div ng-repeat="childItem in item.item">
+                            <!--ci {{childItem}}-->
                             <div ng-repeat="childAnswer in childItem">
-                                <div ng-show="childAnswer.valueDecimal">
-                                    {{answer.valueDecimal}}
+                                <!--ca {{childAnswer}}-->
+                                <div ng-repeat="entry in childAnswer">
+
+                                    <div ng-show="entry.valueDecimal">
+                                        {{entry.valueDecimal}}
+                                    </div>
+
+                                    <div ng-show="entry.valueString">
+                                        {{entry.valueString}}
+                                    </div>
+
+                                    <div ng-show="entry.valueBoolean">
+
+                                        {{entry.valueBoolean ? "Yes" : "No"}}
+                                    </div>
+
+                                    <div ng-show="entry.valueCoding">
+                                        {{entry.valueCoding.display}}
+                                        <!--
+                                        ({{entry.valueCoding.code}}  {{entry.valueCoding.system}})
+                                        {{entry}}-->
+                                    </div>
+
+                                    <div ng-show="entry.valueReference">
+                                        {{entry.valueReference.display}}
+                                    </div>
                                 </div>
 
-                                <div ng-show="childAnswer.valueString">
-                                    {{answer.valueString}}
-                                </div>
 
-                                <div ng-show="childAnswer.valueBoolean">
 
-                                    {{answer.valueBoolean ? "Yes" : "No"}}
-                                </div>
 
-                                <div ng-show="childAnswer.valueCoding">
-                                    {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
-                                </div>
                             </div>
 
                         </div>

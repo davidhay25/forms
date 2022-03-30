@@ -45,6 +45,21 @@ angular.module("formsApp")
 
         return {
 
+            getQRforQ : function(url) {
+                let deferred = $q.defer()
+                //get all the QR's for a given Q
+                let qry = "/ds/fhir/QuestionnaireResponse?questionnaire=" + url
+                $http.get(qry).then(function(data){
+                    console.log(data)
+                    deferred.resolve(data.data)
+
+                },
+                    function(err){
+                    deferred.reject()
+                })
+                return deferred.promise
+            },
+
             getMetaInfoForItem : function(item) {
                 //populate meta info - like resource extraction
                 let meta = {}
@@ -268,6 +283,7 @@ angular.module("formsApp")
 
                     if (sectionItem.item) {
                         sectionItem.item.forEach(function (item) {
+                            let meta = that.getMetaInfoForItem(item)
                             if (item.type == 'group') {
                                 //groups has a specific structure ATM
                                 //the first item goes in col 1
@@ -279,7 +295,7 @@ angular.module("formsApp")
                                         //ignore any item entries on the child - we don't go any deeper atm
                                         if (inx == 0) {
                                             //this is the first item in the group - it goes in the left
-                                            let cell = {item:child}      //to allow for ither elements like control type...
+                                            let cell = {item:child,meta:meta}      //to allow for ither elements like control type...
                                             setDecoration(cell,child)        //sets thinks like control type
                                             row.left = [cell]
                                         } else {
@@ -298,7 +314,7 @@ angular.module("formsApp")
                             } else {
                                 //if the item isn't a group, then add it to column 1.
                                 let row = {}   //will have a single entry - left
-                                let cell = {item:item}      //to allow for ither elements like control type...
+                                let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                 setDecoration(cell,item)
                                 row.left = [cell]             //make it an arra to match the group
                                 section.rows.push(row)
