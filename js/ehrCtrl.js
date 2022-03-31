@@ -45,6 +45,16 @@ angular.module("formsApp")
                 }
             )
 
+            $scope.prepop = function () {
+
+                //let patient = {resourceType:"Patient","birthDate":"1990-01-01"}
+
+                formsSvc.prepopForm($scope.hashItem,$scope.form,$scope.input.selectedPatient.resource)
+
+                $scope.makeQR()
+
+            }
+
 
 
             //when a DiagnosticReport is selected in the Path reports tab

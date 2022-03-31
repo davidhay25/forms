@@ -22,7 +22,9 @@
 
     <div class="banner">Pathology request form</div>
 
-    <div class="row">
+    <!-- Assume that the for itself has demographics entries
+
+    <div class="row" ng-show="selectedPatient">
         <div class="col-md-3">
             <div class="section">Demographics</div>
 
@@ -32,7 +34,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" ng-show="selectedPatient">
         <div class="col-md-3">
 
 
@@ -43,9 +45,10 @@
             <div>{{selectedPatient | NHI}}</div>
             <div>{{selectedPatient.gender}} {{selectedPatient.birthDate}}</div>
 
+
         </div>
     </div>
-
+-->
 
     <div ng-repeat="section in selectedQR.item">
         <div class="row">
@@ -83,7 +86,7 @@
                         </div>
 
                         <div ng-show="answer.valueCoding">
-                            {{answer.valueCoding.display}} ({{answer.valueCoding.code}}  {{answer.valueCoding.system}})
+                            {{answer.valueCoding.display}} <!--({{answer.valueCoding.code}}  {{answer.valueCoding.system}}) -->
                         </div>
                         <div ng-show="answer.valueReference">
                             {{answer.valueReference.display}}

@@ -19,9 +19,13 @@ angular.module("formsApp")
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
         extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
 
+        //todo fsh doesn't underatnd expression extension...
+        extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
+
         extExtractNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-extractNotes"
         extUsageNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-usageNotes"
         extSourceStandard = "http://canshare.com/fhir/StructureDefinition/questionnaire-sourceStandard"
+        //extRow = "http://canshare.com/fhir/StructureDefinition/questionnaire-row"
 
         canShareServer = "http://canshare/fhir/"
 
@@ -44,6 +48,78 @@ angular.module("formsApp")
         }
 
         return {
+
+            prepopForm : function(hashItems,hashData,resource){
+                //perform pre-population - highly limited!!!
+                //only for string/date values off the root ATM
+                let that = this
+                Object.keys(hashItems).forEach(function (key) {
+                    let entry = hashItems[key]
+                    if (entry) {
+                        let ar = that.findExtension(entry.item,extPrepop)
+                        if (ar.length > 0 ) {
+                            if (ar[0].valueString) {
+
+                                console.log(ar[0].valueString)
+
+                                let linkId = entry.item.linkId
+
+                                //only support specific pre-pop
+                                switch (ar[0].valueString) {
+                                    case "%patient.family" :
+                                        if (resource.name) {
+                                            hashData[linkId] = resource.name[0].family
+                                        }
+                                        break
+                                    case "%patient.given" :
+                                        if (resource.name) {
+                                            hashData[linkId] = resource.name[0].given[0]
+                                        }
+                                        break
+                                    case "%patient.identifier" :
+                                        if (resource.identifier) {
+                                            hashData[linkId] = resource.identifier[0].value
+                                        }
+                                        break
+                                    case "%patient.birthDate" :
+                                        if (resource.birthDate) {
+                                            hashData[linkId] = resource.birthDate
+                                        }
+                                        break
+                                    case "%patient.gender" :
+                                        if (resource.gender) {
+                                            hashData[linkId] = resource.gender
+                                        }
+                                        break
+
+                                }
+
+
+/*
+
+                                //for now assume that pre-pop is off the root... - eg %patient.birthDate
+                                let ar1 = ar[0].valueString.split('.')
+                                let path = ar1[1]
+                                let dataToInsert = resource[path]
+                                if (dataToInsert) {
+                                    if (Array.isArray(dataToInsert)) {
+                                        hashData[linkId] = dataToInsert[0]
+                                    } else {
+                                        hashData[linkId] = dataToInsert
+                                    }
+                                }
+
+                                */
+
+                            }
+                        }
+                    }
+
+
+
+
+                })
+            },
 
             getQRforQ : function(url) {
                 let deferred = $q.defer()
@@ -102,6 +178,9 @@ angular.module("formsApp")
                 if (ar4.length > 0) {
                     meta.sourceStandard = ar4[0].valueString
                 }
+
+                //display row - left or right
+
 
                 return meta
             },
@@ -316,7 +395,9 @@ angular.module("formsApp")
                                 let row = {}   //will have a single entry - left
                                 let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                 setDecoration(cell,item)
-                                row.left = [cell]             //make it an arra to match the group
+                                row.left = [cell]             //make it an array to match the group
+
+
                                 section.rows.push(row)
 
                             }

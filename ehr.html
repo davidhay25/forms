@@ -110,6 +110,11 @@
                             ng-change="selectPatient()"
                             ng-options = "item.display for item in allPatients"></select>
                 </div>
+                <div ng-show="reviewMode">
+                    <div class="navbar-text">
+                    <button class="btn btn-primary pull-right" ng-click="prepop()">Pre-populate</button>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -127,9 +132,9 @@
 
 
                 <div class="col-md-2">
-                    <!--
-                    <button class="btn btn-primary pull-right" ng-click="prepop()">Pre-populate</button>
-                    -->
+
+
+
                 </div>
 
                 <div class="col-md-5">
@@ -147,13 +152,16 @@
         <div ng-hide="input.reviewPreview">
             <div class="row">
 
+
                 <div class="col-md-1">
                 </div>
-                <div class="col-md-11">
+                <div class="col-md-8">
                     <div ng-controller="formsCtrl">
                         <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                     </div>
                 </div>
+
+
 
             </div>
         </div>
