@@ -244,6 +244,8 @@ angular.module("formsApp")
 
                 $scope.formTemplate = formsSvc.makeFormTemplate(Q)
 
+                console.log($scope.formTemplate)
+
 
                 let vo = formsSvc.makeTreeFromQ(Q)
 

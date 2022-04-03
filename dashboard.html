@@ -153,6 +153,9 @@
 
                    </div>
                    <div class="col-md-10">
+
+                       <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
+
                        <uib-tabset ng-show="treeData">
 
                            <uib-tab heading="Q Items tree">
@@ -284,6 +287,15 @@
                                                    </div>
                                                </div>
 
+                                               <div class="row" ng-show="selectedNode.data.item.type == 'group'">
+                                                   <div class="col-md-3">
+                                                       Column count
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       {{selectedNode.data.meta.column}}
+                                                   </div>
+                                               </div>
+
 
                                                <hr/>
                                                <div class="row">
@@ -377,6 +389,8 @@
                                <ng-include src = "'includes/renderReport.html'"></ng-include>
                                <br/>
                            </uib-tab>
+
+
 
                            <uib-tab heading="Q metadata">
                                <br/>
@@ -515,7 +529,7 @@
                               </table>
                            </uib-tab>
 
-                           <uib-tab ng-show = false heading="FSH">
+                           <uib-tab  heading="FSH">
                                >>todo use gofsh to convert to FSH
                            </uib-tab>
 

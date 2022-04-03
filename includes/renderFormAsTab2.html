@@ -29,24 +29,84 @@
 
         <div ng-repeat="row in selectedSection.rows">
 
+            <strong>{{row.text}}</strong>
+
+
             <div class="row">
-                <div class="col-md-6">
-                    <div ng-repeat="cell in row.left">
-                        <div style="margin-bottom: 8px">
+
+
+
+                <!-- 2 columns -->
+                <div ng-show = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+                    <div class="col-md-6">
+                        <div ng-repeat="cell in row.col1">
+                            <div style="margin-bottom: 8px">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div ng-repeat="cell in row.col2">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
-
                     </div>
-
                 </div>
 
-                <div class="col-md-6">
-                    <div ng-repeat="cell in row.right">
-                        <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                <!-- 3 columns -->
+                <div ng-show = "row.meta.columnCount == 3">
+                    <div class="col-md-4">
+                        <div ng-repeat="cell in row.col1">
+                            <div style="margin-bottom: 8px">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
+
+                        </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div ng-repeat="cell in row.col2">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div ng-repeat="cell in row.col3">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- 4 columns -->
+                <div ng-show = "row.meta.columnCount == 4">
+                    <div class="col-md-3">
+                        <div ng-repeat="cell in row.col1">
+                            <div style="margin-bottom: 8px">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div ng-repeat="cell in row.col2">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div ng-repeat="cell in row.col3">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div ng-repeat="cell in row.col4">
+                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                        </div>
+                    </div>
+                </div>
 
 
                 <!--

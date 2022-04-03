@@ -169,10 +169,11 @@ angular.module("formsApp")
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
                         alert("Q updated on the Forms Manager")
+                        $scope.input.dirty = false;
                         if (cb) {
                             cb()
                         }
-                        $scope.input.dirty = false;
+
                     }, function(err) {
                         alert(angular.toJson(err.data))
                     }
@@ -192,18 +193,54 @@ angular.module("formsApp")
             }
 
             $scope.moveUp = function(node) {
+
+                $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
+               // moveItem : function(Q,dirn,linkId) {
+
+                $scope.treeIdToSelect = node.id
+                $scope.drawQ($scope.selectedQ,true)
+                $scope.input.dirty = true;
+/*
+                return
+
                 if (node.data.level == 'child') {
+
+                    let parentItem = node.data.parentItem
+                    let parentItemInx = node.data.parentItemInx
+                    console.log(parentItem,parentItemInx)
+                    if (parentItemInx > 0) {
+                        //can move up
+
+
+
+                        let itemToMove = parentItem.item.splice(parentItem.item,1)
+                        $scope.drawQ($scope.selectedQ,false)
+                    }
+
+                    return
+
                     //if previous node in the tree has the same parent, then can swap with it
                     let inx = findPositionInTree(node)
                     if (inx > 0) {
                         let previous = $scope.treeData[inx-1]
                         if (previous.parent == node.parent) {
-                            //same parent, can swap
-                            $scope.treeData.splice(inx-1,0,node)
-                            $scope.treeData.splice(inx+1,1)
+                            //same parent, can swap\
+
+                            //change the underlying Q and re-render the tree
+                            let parentItem = previous.item  //the set of items that this one is in...
+
+                            //temp$scope.treeData.splice(inx-1,0,node)
+                            //temp$scope.treeData.splice(inx+1,1)
+
                             $scope.treeIdToSelect = node.id
                             updateAfterEdit()
                             $scope.input.dirty = true
+
+                            //re-draw the summary report
+                            let vo = formsSvc.generateQReport($scope.selectedQ)
+                            $scope.report = vo.report
+                            $scope.hashAllItems = vo.hashAllItems
+
                         } else {
                             alert("Already at the top of the section")
                         }
@@ -215,10 +252,21 @@ angular.module("formsApp")
                     //console.log($scope.treeData)
                     alert("Section movement not yet enabled")
                 }
-
+*/
             }
 
             $scope.moveDown = function(node) {
+
+                $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'dn',node.data.item.linkId)
+                // moveItem : function(Q,dirn,linkId) {
+
+                $scope.treeIdToSelect = node.id
+                $scope.drawQ($scope.selectedQ,true)
+                $scope.input.dirty = true;
+                /*
+                //$scope.drawQ($scope.selectedQ,true)
+return
+
                 if (node.data.level == 'child') {
                     //if next node in the tree has the same parent, then can swap with it
                     let inx = findPositionInTree(node)
@@ -233,6 +281,11 @@ angular.module("formsApp")
                             updateAfterEdit()
                             $scope.input.dirty = true
 
+                            //re-draw the summary report
+                            let vo = formsSvc.generateQReport($scope.selectedQ)
+                            $scope.report = vo.report
+                            $scope.hashAllItems = vo.hashAllItems
+
                         } else {
                             alert("Already at the bottom of the section")
                         }
@@ -243,7 +296,7 @@ angular.module("formsApp")
                     //swapping means moving a set of items - can get that from the array of sections
                     alert("Section movement not yet enabled")
                 }
-
+*/
             }
 
             //note that when the Q is build, the structure comes from the tree - not the item.items element.
@@ -292,6 +345,7 @@ angular.module("formsApp")
                 let node = {data:{}}
                 node.data.item = item
                 node.data.level = "item"
+                node.id = entry.item.linkId     //needed to find node in tree...
                 $scope.editItem(node)
             }
 
@@ -326,25 +380,45 @@ angular.module("formsApp")
                         }
                     }
                 }).result.then(
+
                     function (updatedItem) {
-                        let inx = findPositionInTree(node)
+                        //return
+
+                        let inx = findPositionInTree(node)      //based on node.id
                         if (inx >= 0) {
+
                             let element = $scope.treeData[inx]
 
                             element.text = updatedItem.text
                             element.data.item = updatedItem
 
-                            let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                            $scope.selectedQ.item = items;
+                            //also need to update the meta VO
+                             element.data.meta = formsSvc.getMetaInfoForItem(updatedItem)
+
+                            //need to update the item in the Q
+                           // formsSvc.updateQItem($scope.selectedQ,updatedItem)
+
+
+                           let items = formsSvc.makeQItemsFromTree($scope.treeData)
+                          $scope.selectedQ.item = items;
+
+
 
                             $scope.treeIdToSelect = node.id
+
+                            //update the report object  for the summary tab...
+                            //this works because the edit function is updating the Q item reference directly...
+
+                            let vo = formsSvc.generateQReport($scope.selectedQ)
+                            $scope.report = vo.report
+                            $scope.hashAllItems = vo.hashAllItems
 
                             makeFormDef()
                             drawTree()
                             $scope.input.dirty = true
                         } else {
                             //if -1, the element was not found
-                            console.log('Unable to find item in tree')
+                            alert('Unable to find item in tree')
                         }
 
                         //node.data.item = item
@@ -444,6 +518,11 @@ angular.module("formsApp")
                             $scope.input.dirty = true
 
                             makeFormDef()
+
+                            //re-draw the summary report
+                            let vo = formsSvc.generateQReport($scope.selectedQ)
+                            $scope.report = vo.report
+                            $scope.hashAllItems = vo.hashAllItems
 
 
                         })
@@ -585,13 +664,11 @@ angular.module("formsApp")
                     let vo = formsSvc.generateQReport(Q)
                     $scope.report = vo.report
                     $scope.hashAllItems = vo.hashAllItems
-
+                    //let vo1 = formsSvc.generateQReport(Q)
                    // console.log($scope.report)
 
                     //the template for the forms preview
                     $scope.formTemplate = formsSvc.makeFormTemplate(Q)
-
-
                     $scope.drawQ(Q,true)
                     $scope.treeIdToSelect = "root"
                 }

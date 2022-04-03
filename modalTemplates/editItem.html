@@ -10,7 +10,7 @@
             </div>
             <div class="col-md-6 col-sm-6 col-xs-6">
 
-                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+                <button class="btn btn-link pull-right" ng-click="cancel()">Cancel</button>
 
             </div>
 
@@ -59,6 +59,18 @@
                                             ng-options = "itemType for itemType in input.itemTypes"></select>
                                 </div>
                                 <div class="col-sm-6">
+
+                                    <div ng-show="newItem.type == 'group'">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-md-6">
+                                                Column count
+                                            </div>
+                                            <div class="col-sm-3 col-md-3">
+                                                <input type="text" class="form-control" ng-model="meta.columnCount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div ng-show="newItem.type == 'reference'">
 
                                         <div ng-repeat = "ref in meta.referenceTypes">
@@ -162,6 +174,10 @@
                 <textarea class="form-control" ng-model="meta.sourceStandard"> </textarea>
 
 
+            </uib-tab>
+
+            <uib-tab heading = "Dependencies">
+                Items that have a conditional clause (enableWhen) set to this question.
             </uib-tab>
 
             <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >

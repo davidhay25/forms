@@ -11,14 +11,19 @@
                    ng-click="selectResourceFromService(cell.item)"></i>
             </span>
 
-            <strong>{{cell.item.text}}</strong>
-            <span ng-show = "cell.item.repeats"> (Mult.) </span>
-            <span ng-show = "cell.meta.usageNotes">
+            <div ng-hide = "cell.item.type == 'boolean'">
+                <strong>{{cell.item.text}}</strong>
+
+                <span ng-show = "cell.item.repeats"> (Mult.) </span>
+                <span ng-show = "cell.meta.usageNotes">
                 <i class="glyphicon glyphicon-info-sign"
                    uib-popover="{{cell.meta.usageNotes}}"
                    popover-placement="right"
                    popover-trigger="'mouseenter'"/>
             </span>
+            </div>
+
+
 
         </div>
 
@@ -50,7 +55,7 @@
             </div>
 
             <div ng-switch-when="boolean">
-                <checkbox ng-model="form[cell.item.linkId]"  ng-blur="makeQR(cell.item.linkId)"></checkbox>
+                <checkbox ng-model="form[cell.item.linkId]"  ng-blur="makeQR(cell.item.linkId)"></checkbox> {{cell.item.text}}
             </div>
 
 

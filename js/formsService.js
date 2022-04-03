@@ -25,7 +25,8 @@ angular.module("formsApp")
         extExtractNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-extractNotes"
         extUsageNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-usageNotes"
         extSourceStandard = "http://canshare.com/fhir/StructureDefinition/questionnaire-sourceStandard"
-        //extRow = "http://canshare.com/fhir/StructureDefinition/questionnaire-row"
+        extColumn = "http://canshare.com/fhir/StructureDefinition/questionnaire-column"
+        extColumnCount = "http://canshare.com/fhir/StructureDefinition/questionnaire-column-count"
 
         canShareServer = "http://canshare/fhir/"
 
@@ -48,6 +49,173 @@ angular.module("formsApp")
         }
 
         return {
+
+            moveItem : function(Q,dirn,linkId) {
+                for (var sectionIndex =0; sectionIndex < Q.item.length;sectionIndex ++) {
+                    let section = Q.item[sectionIndex]
+                    if (section.linkId == linkId) {
+
+                        if (dirn == 'up' && sectionIndex > -1) {
+                            let ar = Q.item.splice(sectionIndex,1)
+                            Q.item.splice(sectionIndex-1,0,ar[0])
+                        }
+
+                        if (dirn == 'dn' && sectionIndex < Q.item.length) {
+                            let ar = Q.item.splice(sectionIndex,1)
+                            Q.item.splice(sectionIndex+1,0,ar[0])
+                        }
+                        break
+
+                    } else {
+                        //now check the section children
+                        for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
+                            let child = section.item[childIndex]
+                            if (child.linkId == linkId) {
+                                console.log('found',childIndex)
+
+                                if (dirn == 'up' && childIndex > 0) {
+                                    let ar = section.item.splice(childIndex,1)
+                                    section.item.splice(childIndex-1,0,ar[0])
+
+                                }
+                                if (dirn == 'dn' && childIndex < section.item.length) {
+                                    let ar = section.item.splice(childIndex,1)
+                                    section.item.splice(childIndex+1,0,ar[0])
+
+                                }
+                                break
+                            } else {
+                                //grandchildren
+                                if (child.item) {
+                                    for (var grandchildIndex = 0; grandchildIndex < child.item.length;grandchildIndex ++) {
+                                    let grandchild = child.item[grandchildIndex]
+                                    if (grandchild.linkId == linkId) {
+                                        if (dirn == 'up' && grandchildIndex > 0) {
+                                            let ar = child.item.splice(grandchildIndex,1)
+                                            child.item.splice(grandchildIndex-1,0,ar[0])
+
+                                        }
+                                        if (dirn == 'dn' && grandchildIndex < section.item.length) {
+                                            let ar = child.item.splice(grandchildIndex,1)
+                                            child.item.splice(grandchildIndex+1,0,ar[0])
+
+                                        }
+                                        break
+                                    }
+
+
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+
+                }
+                return Q
+
+
+            },
+            moveItemX : function(Q,dirn,linkId) {
+                //move an item in the direction
+                //locate in Q based on linkId. Then check the item[] collection it is in and see if can move
+                //https://javascript.plainenglish.io/a-nice-way-to-iterate-over-collections-in-javascript-254b6f5d9907
+                for (const [sectionIndex, section] of Q.item.entries()) {
+                    //check for a move at the section level
+                    if (section.linkId == linkId) {
+
+                        if (dirn == 'up' && sectionIndex > -1) {
+                            let ar = Q.item.splice(sectionIndex,1)
+                            Q.item.splice(sectionIndex-1,0,ar[0])
+                        }
+
+                        if (dirn == 'dn' && sectionIndex < Q.item.length) {
+                            let ar = Q.item.splice(sectionIndex,1)
+                            Q.item.splice(sectionIndex+1,0,ar[0])
+                        }
+
+                    }
+
+                    for (const [childIndex,child] of section.item.entries()) {
+                        //check for a move at the section child level
+                        if (child.linkId == linkId) {
+                            console.log('found',childIndex)
+
+                            if (dirn == 'up' && childIndex > 0) {
+                                let ar = section.item.splice(childIndex,1)
+                                section.item.splice(childIndex-1,0,ar[0])
+                            }
+                            if (dirn == 'dn' && childIndex < section.item.length) {
+                                let ar = section.item.splice(childIndex,1)
+                                section.item.splice(childIndex+1,0,ar[0])
+                                break
+                            }
+
+                        }
+
+                        console.log(child.linkId)
+                        if (child.item) {
+                            console.log('checking gc')
+                            for (const [grandChildIndex, grandChild] of child.item.entries()) {
+                                //check for a move at the grandchile level
+                                if (grandChild.linkId == linkId) {
+                                    console.log('found',grandChildIndex)
+                                    if (grandChildIndex > 0) {
+                                        let ar = child.item.splice(grandChildIndex,1)
+                                        child.item.splice(grandChildIndex-1,0,ar[0])
+                                        console.log('delete')
+                                        //break
+                                    }
+
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+                return Q
+
+
+            },
+
+            updateQItemDEP : function(Q,updatedItem) {
+                //update a single item in the Q
+
+
+                function parseBranch(item,update) {
+
+                    if (item.linkId == update.linkId) {
+                        item = update
+                    } else {
+                        if (item.item) {
+                            //has child elements - will be section or group
+                            item.item.forEach(function (child) {
+                                parseBranch(child,update)
+                            })
+                        } else {
+
+                        }
+                    }
+                }
+                Q.item.forEach(function (section) {
+                    parseBranch(section,updatedItem)
+                })
+
+/*
+                Q.item.forEach(function (section) {
+                    if (section.linkId == updatedItem.linkId) {
+                        section = updatedItem
+                    } else {
+
+                    }
+
+                })
+*/
+
+            },
 
             prepopForm : function(hashItems,hashData,resource){
                 //perform pre-population - highly limited!!!
@@ -136,8 +304,70 @@ angular.module("formsApp")
                 return deferred.promise
             },
 
+            updateMetaInfoForItem (item,meta) {
+                //the opposite of getMetaInfoForItem() - update an item (extensions) based on the meta VO
+                //assumption that and given extension only appears once...
+
+                //Extract Observation extension...
+                /*
+                if (meta.extraction && meta.extraction.extractObservation) {
+                    let ext = {url:extUrlObsExtract,valueBoolean:true}
+
+                    addExtension(item,ext)
+                } else {
+                    removeExtension(item,extUrlObsExtract)
+                }
+                */
+                if (meta.extraction) {
+                    updateExtension(item,extUrlObsExtract,"Boolean",meta.extraction.extractObservation)
+
+                    updateExtension(item,extExtractNotes,"String",meta.extraction.notes)
+
+                }
+
+                //usage notes
+                updateExtension(item,extUsageNotes,"String",meta.usageNotes)
+
+                //source standard
+                updateExtension(item,extSourceStandard,"String",meta.sourceStandard)
+
+                //display columns
+                updateExtension(item,extColumn,"Integer",meta.columnCount)
+
+                //reference types
+/* todo - need to allow multiple extensions of same url...
+                meta.referenceTypes = meta.referenceTypes || []
+                ar3.forEach(function (ext) {
+                    meta.referenceTypes.push(ext.valueCode)
+                })
+*/
+                function updateExtension(item,url,type,value) {
+                    //update an extension. Remove the existing one/s then add if not empty
+                    removeExtension(item,url)       //clear out existing ones
+                    if (value) {
+                        item.extension = item.extension || []
+                        let ext = {url:url}
+                        ext['value'+type] = value
+                        item.extension.push(ext)
+                    }
+                }
+
+                function removeExtension(item,url) {
+                    //remove all extensions with this url...
+                    if (item.extension) {
+                        let ar = []
+                        item.extension.forEach(function (ext) {
+                            if (ext.url !== url) {
+                                ar.push(ext)
+                            }
+                        })
+                        item.extension = ar
+                    }
+                }
+
+            },
             getMetaInfoForItem : function(item) {
-                //populate meta info - like resource extraction
+                //populate meta info - like resource extraction. Basically pull all extensions into a VO
                 let meta = {}
 
                 //update the Observationextract
@@ -179,7 +409,21 @@ angular.module("formsApp")
                     meta.sourceStandard = ar4[0].valueString
                 }
 
-                //display row - left or right
+                //display col - column number, 1 based
+                let ar5 = this.findExtension(item,extColumn)
+                if (ar5.length > 0) {
+                    meta.column = ar5[0].valueInteger
+                }
+
+                //column count
+                meta.columnCount = 2       //default column count
+
+                let ar6 = this.findExtension(item,extColumnCount)
+                if (ar6.length > 0) {
+                    meta.columnCount = ar6[0].valueInteger
+                    console.log(ar6[0].valueInteger)
+                }
+
 
 
                 return meta
@@ -188,24 +432,26 @@ angular.module("formsApp")
             generateQReport : function(Q) {
                 //generate report for Q
 
+                let clone = angular.copy(Q)
+
                 let that = this;
                 let hashAllItems = {}
                 let report = {section:[],coded:[],conditional:[],reference:[]}
                 let issues = []     //issues found during report generation
 
-                Q.item.forEach(function(item){
+                clone.item.forEach(function(sectionItem){
                     //items off the root are the top level sections. They have children that are either single questions
-                    //or groups of questions. A group has only a single level of questions
+                    //or groups of questions. A group has only a single level of child questions
 
-                    let section = {item:item,children:[],meta:{}}
+                    let section = {item:sectionItem,children:[],meta:{}}
                     populateMeta(section)
 
                     report.section.push(section)
 
-                    if (item.item) {        //should always have children
-                        item.item.forEach(function (child){
+                    if (sectionItem.item) {        //should always have children
+                        sectionItem.item.forEach(function (child){
 
-                            updateSpecificArrays(item,report,child)
+                            updateSpecificArrays(sectionItem,report,child)
 
 
                             if (child.type == 'group') {
@@ -216,11 +462,15 @@ angular.module("formsApp")
                                 //determine what is shown on the right...
                                 let group = {type:'group',item:child,children:[],meta:{}}
                                 section.children.push(group)
+
+                                //set the column count
+                                populateMeta(group)
+
                                 //step through the children of the group..
                                 child.item.forEach(function (grandChild) {
 
-                                    updateSpecificArrays(item,report,grandChild)
-
+                                    updateSpecificArrays(sectionItem,report,grandChild)
+                                    // function updateSpecificArrays(sectionItem,report,child)
                                     let entry = {item:grandChild,meta:{}}
                                     populateMeta(entry)
 
@@ -248,37 +498,15 @@ angular.module("formsApp")
 
                 function populateMeta(entry) {
                     //populate meta info - like resource extraction
-                    //todo - refactor to use getMeta
-                   // let meta = that.getMetaInfoForItem(entry.item)
                     entry.meta = that.getMetaInfoForItem(entry.item)
-//return
-                    /*
-                    //update the Observationextract
-                    let ar = that.findExtension(entry.item,extUrlObsExtract)
-                    if (ar.length > 0 ) {
-                        if (ar[0].valueBoolean) {
-                            entry.meta.extraction = entry.meta.extraction || {}
-                            entry.meta.extraction.extractObservation = true
-
-                        }
-                    }
-
-                    //now look for any extraction notes
-                    let ar1 = that.findExtension(entry.item,extExtractNotes)
-                    if (ar1.length > 0) {
-                        entry.meta.extraction = entry.meta.extraction || {}
-                        entry.meta.extraction.notes = ar1[0].valueString
-                    }
-
-                    */
 
 
                 }
-
+// function updateSpecificArrays(sectionItem,report,child)
                 function updateSpecificArrays(sectionItem,report,child) {
                     //update the coded & reference
                     if (hashAllItems[child.linkId]) {
-                        alert("There are multiple items with the linkId: " + child.linkId)
+                        console.log("There are multiple items with the linkId: " + child.linkId)
                         return
                     }
                     hashAllItems[child.linkId] = {item:child,dependencies:[]}
@@ -356,33 +584,49 @@ angular.module("formsApp")
                 let template = []
 
                 Q.item.forEach(function (sectionItem) {
-                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
+                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem,meta:{}}
+                    section.meta = that.getMetaInfoForItem(sectionItem)
                     template.push(section)
+
                     //now look at the items below the section level.
 
                     if (sectionItem.item) {
                         sectionItem.item.forEach(function (item) {
                             let meta = that.getMetaInfoForItem(item)
+
                             if (item.type == 'group') {
                                 //groups has a specific structure ATM
                                 //the first item goes in col 1
                                 //other items go in col 2 - and will often have conditionals on them
+
                                 let row = {}    //will have 2 entries - left and right
+                                row.item = item
+                                row.meta = meta
 
                                 if (item.item) {    //these are the child items
                                     item.item.forEach(function (child,inx) {
+                                        let childMeta = that.getMetaInfoForItem(child)
                                         //ignore any item entries on the child - we don't go any deeper atm
+
                                         if (inx == 0) {
                                             //this is the first item in the group - it goes in the left
-                                            let cell = {item:child,meta:meta}      //to allow for ither elements like control type...
-                                            setDecoration(cell,child)        //sets thinks like control type
-                                            row.left = [cell]
+                                            let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
+                                            setDecoration(cell,child)        //sets things like control type
+                                            //row.left = [cell]
+                                            row['col1'] = [cell]
                                         } else {
-                                            //this is a subsequent item - it will go in the right col
+                                            //this is a subsequent item - it will go in the right col by default
+                                            //let side = "right"
+                                            let side = 'col2'
+                                            if (childMeta.column ) {
+                                                side = 'col' + childMeta.column
+                                            }
+
+
                                             let cell = {item:child}
                                             setDecoration(cell,child)
-                                            row.right = row.right || []
-                                            row.right.push(cell)
+                                            row[side] = row[side] || []
+                                            row[side].push(cell)
                                         }
                                     })
 
@@ -395,8 +639,8 @@ angular.module("formsApp")
                                 let row = {}   //will have a single entry - left
                                 let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                 setDecoration(cell,item)
-                                row.left = [cell]             //make it an array to match the group
-
+                                //row.left = [cell]             //make it an array to match the group
+                                row['col1'] = [cell]
 
                                 section.rows.push(row)
 
@@ -1070,32 +1314,36 @@ angular.module("formsApp")
             },
 
             makeQItemsFromTree : function(treedata) {
-                //make a set of Q items from the tree. 2 levels only. todo make recursive
+                //make a set of Q items from the tree. 3 levels only. todo make recursive
                 //console.log(treedata)
 
 
                 //create an array of root nodes
                 let arItems = []    //the Q has an array of items - not a single element...
-                let parentItem = {}
+                let sectionItem = {}
                 treedata.forEach(function (node){
 
                     if (node.parent == '#') {
                         //ignore the root
                     } else if (node.parent == 'root') {
-                        //this is a node off the root - ie a top level item
-                        parentItem = node.data.item
-                        parentItem.item = []
+                        //this is a node off the root - ie a top level item (section
+                        sectionItem = node.data.item
+                        sectionItem.item = []
 
-                        parentItem.type = 'group'  //force the type
+                        //sectionItem.type = 'group'  //force the type
 
-                        arItems.push(parentItem)
+                        arItems.push(sectionItem)
                     } else {
-                        //this is a child off the top level. Here is where any recursion would go if > 2 levels
-                        //note that recursion is on tree structure
-                        let leafItem = node.data.item
-                        delete leafItem.item    //just in case - shouldn't be here at 2 levels....
+                        //this is a child off the top level/section.
 
-                        parentItem.item.push(leafItem)
+                        let leafItem = node.data.item
+                        sectionItem.item.push(leafItem)
+                        if (leafItem.item) {
+                            //this'll be a group with items...
+                            leafItem.item.forEach(function () {
+
+                            })
+                        }
                     }
                 })
                 //console.log(arItems)
@@ -1114,30 +1362,30 @@ angular.module("formsApp")
                 let root = {id:'root',text:'Root',parent:'#',state:{},data:{level:'root'}}
                 treeData.push(root)
 
-                Q.item.forEach(function(parentItem){
+                Q.item.forEach(function(sectionItem){
                     //each top level item is a section
-                    let item = {id: parentItem.linkId,state:{},data:{}}
-                    item.text = parentItem.text;
+                    let item = {id: sectionItem.linkId,state:{},data:{}}
+                    item.text = sectionItem.text + " " + treeData.length;
                     item.parent = "root";
-                    let meta = that.getMetaInfoForItem(parentItem)
-                    item.data = {item:parentItem,level:'parent',meta:meta}
+                    let meta = that.getMetaInfoForItem(sectionItem)
+                    item.data = {item:sectionItem,level:'parent',meta:meta}
 
 
                     //item.data.mult = makeMult(parentItem) //mult
-                    item.answerValueSet = parentItem.answerValueSet
+                    item.answerValueSet = sectionItem.answerValueSet
                     // why do I need this?item.data.description = getDescription(parentItem)
 
                     hash[item.id] = item.data;
                     treeData.push(item)
 
-                    //second later - ie each section
-                    if (parentItem.item) {
-                        parentItem.item.forEach(function (child) {
+                    //second layer - ie each section
+                    if (sectionItem.item) {
+                        sectionItem.item.forEach(function (child,childInx) {
                             let item = {id: child.linkId,state:{},data:{}}
-                            item.text = child.text;
-                            item.parent = parentItem.linkId;
+                            item.text = child.text + " " + treeData.length;
+                            item.parent = sectionItem.linkId;
                             let meta = that.getMetaInfoForItem(child)
-                            item.data = {item:child,level:'child',meta:meta} //child
+                            item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
                             //item.meta = {level:'child'}
                             /*
                             item.data = {type:child.type,text:child.text};
@@ -1152,7 +1400,7 @@ angular.module("formsApp")
                             if (child.item) {
                                 child.item.forEach(function (grandchild) {
                                     let item = {id: grandchild.linkId, state: {}, data: {}}
-                                    item.text = grandchild.text;
+                                    item.text = grandchild.text + " " + treeData.length;
                                     item.parent = child.linkId;
                                     let meta = that.getMetaInfoForItem(grandchild)
                                     item.data = {item: grandchild, level: 'child', meta:meta} //child

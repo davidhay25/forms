@@ -11,15 +11,15 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.itemTypes = itemTypes
             $scope.input.codeSystems = codeSystems
-            $scope.newItem = item
+            //don't use copy() as intending to update item object from Q. todo need to think about cancel...
+            $scope.newItem = item; ///angular.copy(item)             //<<<<<<<<<< new on sunday
+
+            $scope.originalItem = angular.copy(item)    //save the original in case of cancel
 
             if (item) {
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
             }
-
-
-
 
             //set the code controls
             if ($scope.newItem.code && $scope.newItem.code.length > 0) {
@@ -58,8 +58,16 @@ angular.module("formsApp")
 
             }
 
+            $scope.cancel = function() {
+                $scope.$close($scope.originalItem)
+            }
+
             $scope.save = function() {
 
+                //update the extensions in the item based on the meta object
+                formsSvc.updateMetaInfoForItem($scope.newItem,$scope.meta)
+
+                //?? move to ,eat
                 if ( $scope.newItem.tmp && $scope.newItem.tmp.units) {
                     let unitsExtension = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit" //defined in the core spec
                     let coding = {code:$scope.newItem.tmp.units,system:"http://unitsofmeasure.org",display:$scope.newItem.tmp.units}
@@ -87,6 +95,7 @@ angular.module("formsApp")
                     $scope.newItem.code = [code]
                     //delete item.tmp
 
+
                     $scope.newItem.extension = $scope.newItem.extension || []
                     $scope.newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
 
@@ -97,6 +106,8 @@ angular.module("formsApp")
                 }
 
                 delete $scope.newItem.tmp
+
+
 
 
                 $scope.$close($scope.newItem)

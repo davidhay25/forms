@@ -17,9 +17,9 @@
                     <strong>Text</strong>
                 </div>
                 <div class="col-md-2">
-                    <!--
+
                     <strong>Q code</strong>
-                    -->
+
                 </div>
                 <div class="col-md-1">
                     <strong>Type</strong>
@@ -69,12 +69,12 @@
                                     {{child.item.text}}
                                 </div>
                                 <div class="col-md-2">
-<!--
+
                                     <div ng-repeat="code in child.item.code">
                                         {{code.code}}
 
                                     </div>
--->
+
 
                                 </div>
                                 <div class="col-md-1">
@@ -117,12 +117,12 @@
                                         {{grandchild.item.text}}
                                     </div>
                                     <div class="col-md-2">
-<!--
+
                                         <div ng-repeat="code in grandchild.item.code">
                                             {{code.code}}
 
                                         </div>
--->
+
 
                                     </div>
                                     <div class="col-md-1">
@@ -250,7 +250,7 @@
 
 
                             <div>{{section.meta.extraction.notes}}</div>
-
+                            <div>{{section.meta.extraction.usage}}</div>
 
                         </div>
                     </div>
@@ -282,7 +282,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     {{child.meta.extraction.notes}}
-
+                                    {{child.meta.usageNotes}}
                                 </div>
 
                             </div>

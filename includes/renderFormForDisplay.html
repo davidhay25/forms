@@ -101,7 +101,7 @@
                             <!--ci {{childItem}}-->
                             <div ng-repeat="childAnswer in childItem">
                                 <!--ca {{childAnswer}}-->
-                                <div ng-repeat="entry in childAnswer">
+                                <div ng-repeat="entry in childAnswer track by $index">
 
                                     <div ng-show="entry.valueDecimal">
                                         {{entry.valueDecimal}}
