@@ -49,6 +49,44 @@ angular.module("formsApp")
         }
 
         return {
+            loadQByUrl : function(url) {
+                let qry = "/fm/fhir/Questionnaire?url=" + url
+                return $http.get(qry)
+
+            },
+
+            removeItem : function(Q,linkId) {
+                for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+                    let section = Q.item[sectionIndex]
+                    if (section.linkId == linkId) {
+                        //section is being removed
+                        Q.item.splice(sectionIndex,1)
+                        break
+                    } else {
+                        for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
+                            let child = section.item[childIndex]
+                            if (child.linkId == linkId) {
+                                // a child off the section is being removed
+                                section.item.splice(childIndex,1)
+                                break
+                            } else {
+                                if (child.item) {
+                                    for (var grandchildIndex = 0; grandchildIndex < child.item.length; grandchildIndex++) {
+                                        let grandchild = child.item[grandchildIndex]
+                                        if (grandchild.linkId == linkId) {
+                                            //a grandchild is being removed
+                                            child.item.splice(grandchildIndex,1)
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return Q
+
+            },
 
             moveItem : function(Q,dirn,linkId) {
                 for (var sectionIndex =0; sectionIndex < Q.item.length;sectionIndex ++) {
@@ -117,7 +155,7 @@ angular.module("formsApp")
 
 
             },
-            moveItemX : function(Q,dirn,linkId) {
+            moveItemDEP : function(Q,dirn,linkId) {
                 //move an item in the direction
                 //locate in Q based on linkId. Then check the item[] collection it is in and see if can move
                 //https://javascript.plainenglish.io/a-nice-way-to-iterate-over-collections-in-javascript-254b6f5d9907
@@ -1355,6 +1393,7 @@ angular.module("formsApp")
 
             makeTreeFromQ : function (Q) {
                 //specifically 3 levels. Not recursive
+                //levels root, section, child, grandchild
                 let that = this
                 let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                 let treeData = []
@@ -1365,13 +1404,13 @@ angular.module("formsApp")
                 Q.item.forEach(function(sectionItem){
                     //each top level item is a section
                     let item = {id: sectionItem.linkId,state:{},data:{}}
-                    item.text = sectionItem.text + " " + treeData.length;
+                    item.text = sectionItem.text //+ " " + treeData.length;
                     item.parent = "root";
                     let meta = that.getMetaInfoForItem(sectionItem)
-                    item.data = {item:sectionItem,level:'parent',meta:meta}
+                    item.data = {item:sectionItem,level:'section',meta:meta}
 
 
-                    //item.data.mult = makeMult(parentItem) //mult
+
                     item.answerValueSet = sectionItem.answerValueSet
                     // why do I need this?item.data.description = getDescription(parentItem)
 
@@ -1382,17 +1421,11 @@ angular.module("formsApp")
                     if (sectionItem.item) {
                         sectionItem.item.forEach(function (child,childInx) {
                             let item = {id: child.linkId,state:{},data:{}}
-                            item.text = child.text + " " + treeData.length;
+                            item.text = child.text //+ " " + treeData.length;
                             item.parent = sectionItem.linkId;
                             let meta = that.getMetaInfoForItem(child)
                             item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
-                            //item.meta = {level:'child'}
-                            /*
-                            item.data = {type:child.type,text:child.text};
-                            item.data.answerOption = child.answerOption
-                            item.data.mult = makeMult(child) //mult
-                            item.data.description = getDescription(child)
-                            */
+
                             hash[item.id] = item.data;
                             treeData.push(item)
 
@@ -1400,17 +1433,11 @@ angular.module("formsApp")
                             if (child.item) {
                                 child.item.forEach(function (grandchild) {
                                     let item = {id: grandchild.linkId, state: {}, data: {}}
-                                    item.text = grandchild.text + " " + treeData.length;
+                                    item.text = grandchild.text //+ " " + treeData.length;
                                     item.parent = child.linkId;
                                     let meta = that.getMetaInfoForItem(grandchild)
-                                    item.data = {item: grandchild, level: 'child', meta:meta} //child
-                                    //item.meta = {level:'child'}
-                                    /*
-                                    item.data = {type:child.type,text:child.text};
-                                    item.data.answerOption = child.answerOption
-                                    item.data.mult = makeMult(child) //mult
-                                    item.data.description = getDescription(child)
-                                    */
+                                    item.data = {item: grandchild, level: 'grandchild', meta:meta} //child
+
                                     hash[grandchild.id] = grandchild.data;
                                     treeData.push(item)
                                 })

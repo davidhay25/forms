@@ -60,6 +60,7 @@
     <script src="js/designerSvc.js"></script>
     <script src="js/formRenderCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
+    <script src="js/qSvc.js"></script>
 
     <style>
         #graph {
@@ -125,9 +126,9 @@
         </uib-tab>
 -->
         <uib-tab heading="Questionnaire resources">
-                <br/>
-           <div class="row">
-                   <div class="col-md-2">
+            <br/>
+            <div class="row">
+               <div class="col-md-2">
                        <div class="list-group">
                            <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
                                 style="cursor: pointer"
@@ -152,7 +153,7 @@
 
 
                    </div>
-                   <div class="col-md-10">
+               <div class="col-md-10">
 
                        <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
 
@@ -181,9 +182,6 @@
                                            <uib-tab heading="Details">
 
                                                <div ng-show = "selectedNode">
-
-
-
 
                                                    <div class="row">
                                                        <div class="col-md-9">
@@ -292,7 +290,39 @@
                                                        Column count
                                                    </div>
                                                    <div class="col-md-9">
+                                                       {{selectedNode.data.meta.columnCount}}
+                                                   </div>
+                                               </div>
+                                               <div class="row" ng-show="selectedNode.data.meta.column">
+                                                   <div class="col-md-3">
+                                                       Column number
+                                                   </div>
+                                                   <div class="col-md-9">
                                                        {{selectedNode.data.meta.column}}
+                                                   </div>
+                                               </div>
+                                               <div class="row" ng-show="hashAllItems[selectedNode.data.item.linkId].dependencies.length > 0">
+                                                   <div class="col-md-3">
+                                                       Items dependant on this
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <div ng-repeat = "entry in hashAllItems[selectedNode.data.item.linkId].dependencies">
+                                                           <div class="row">
+                                                               <div class="col-md-6">
+                                                                   {{entry.item.linkId}}
+                                                               </div>
+                                                               <div class="col-md-6">
+                                                                   code = {{entry.ew.answerCoding.code}}
+                                                                   <!--
+                                                                   <div ng-repeat="ew in entry.ew">
+                                                                       {{ew}}
+                                                                       {{ew.question}} = {{ew.answerCoding.code}}
+                                                                   </div>
+                                                                   -->
+                                                               </div>
+                                                           </div>
+                                                       </div>
+
                                                    </div>
                                                </div>
 
@@ -315,22 +345,39 @@
                                                            </button>
 
                                                        </div>
-                                                       <div ng-show="selectedNode.data.level == 'parent'">
 
+                                                       <div ng-show="selectedNode.data.level == 'section' ">
                                                            <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'element')">
+                                                                   ng-click="addItem(selectedNode,'child')">
                                                                Add child element item
                                                            </button>
 
                                                        </div>
+
+
                                                        <div ng-show="selectedNode.data.level == 'child'">
                                                            <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'element')">
+                                                                   ng-click="addItem(selectedNode,'child',true)">
                                                                Add sibling element
                                                            </button>
+
+                                                           <button class="btn btn-link"
+                                                                   ng-click="addItem(selectedNode,'grandchild')">
+                                                               Add grandchild element
+                                                           </button>
+
                                                        </div>
 
-                                                   </div>
+                                                       <div ng-show="selectedNode.data.level == 'grandchild'">
+                                                           <button class="btn btn-link"
+                                                                   ng-click="addItem(selectedNode,'grandchild',true)">
+                                                               Add GC sibling element
+                                                           </button>
+
+                                                       </div>
+
+
+                                                       </div>
 
 
                                                    <div class="col-md-2">
@@ -368,8 +415,14 @@
 
                                            </uib-tab>
 
+                                           <uib-tab heading="Meta">
+                                               <pre>{{selectedNode.data.meta | json}}</pre>
+                                               <em>Only for internal use</em>
+                                           </uib-tab>
+
                                            <uib-tab heading="Json">
                                                <pre>{{selectedNode.data.item | json}}</pre>
+                                               <em>Only for internal use</em>
                                            </uib-tab>
 
                                        </uib-tabset>
@@ -540,7 +593,7 @@
                        </uib-tabset>
 
                    </div>
-               </div>
+            </div>
 
         </uib-tab>
 
@@ -548,6 +601,11 @@
 
         <uib-tab heading="Form reviews">
             <br/>
+
+            <div class="banner">
+                Review Url: <strong>canshare.clinfhir.com?{{selectedQ.name}}</strong>
+            </div>
+
             <div ng-controller="formReviewsCtrl">
                 <ng-include src = "'includes/formReviews.html'"></ng-include>
             </div>

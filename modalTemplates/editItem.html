@@ -29,6 +29,7 @@
                         <td>LinkId</td>
                         <td><input type="text"
                                    placeholder="A unique (in this Q) identifier for the item"
+                                   ng-blur="checkUniqueLinkId(newItem.linkId)"
                                    ng-model="newItem.linkId" class="form-control"/> </td>
 
                     </tr>
@@ -50,6 +51,7 @@
 
 
 
+                    <!-- If a section, then the type will be 'group'-->
                     <tr ng-hide = "insertType == 'section'">
                         <td>Type</td>
                         <td>
@@ -176,7 +178,7 @@
 
             </uib-tab>
 
-            <uib-tab heading = "Dependencies">
+            <uib-tab ng-show = "false" heading = "Dependencies">
                 Items that have a conditional clause (enableWhen) set to this question.
             </uib-tab>
 
@@ -218,8 +220,12 @@
 
             </uib-tab>
 
-            <uib-tab ng-show = "newItem.enableWhen" heading = "Conditionals">
+            <uib-tab heading = "Conditionals">
                 <pre>{{newItem.enableWhen | json}}</pre>
+
+
+                <select ng-model="input.ew" class="form-control"
+                        ng-options = "value.item.linkId for (key,value) in hashAllItems"></select>
 
             </uib-tab>
 
@@ -227,7 +233,7 @@
                 <br/>
                 TBD  - allow selection from the library of items
             </uib-tab>
-            <uib-tab ng-show = "newItem.type" heading = "Json">
+            <uib-tab ng-show = "false" heading = "Json">
                 <br/>
                 <pre>{{newItem | json}}</pre>
             </uib-tab>

@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc) {
 
             $scope.QVS = []
 
@@ -13,6 +13,9 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
+            $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review'})
+
+
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
@@ -79,7 +82,7 @@ angular.module("formsApp")
                 drawTree()
             }
 
-            //collapse to section level
+            //collapse to sections
             $scope.showSection = function() {
                 $scope.treeData.forEach(function (item) {
                     item.state.opened = true
@@ -193,114 +196,48 @@ angular.module("formsApp")
             }
 
             $scope.moveUp = function(node) {
+                if (! $scope.editingQ) {
+                    $scope.editingQ = true
+                    $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
+                    // moveItem : function(Q,dirn,linkId) {
 
-                $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
-               // moveItem : function(Q,dirn,linkId) {
-
-                $scope.treeIdToSelect = node.id
-                $scope.drawQ($scope.selectedQ,true)
-                $scope.input.dirty = true;
-/*
-                return
-
-                if (node.data.level == 'child') {
-
-                    let parentItem = node.data.parentItem
-                    let parentItemInx = node.data.parentItemInx
-                    console.log(parentItem,parentItemInx)
-                    if (parentItemInx > 0) {
-                        //can move up
-
-
-
-                        let itemToMove = parentItem.item.splice(parentItem.item,1)
-                        $scope.drawQ($scope.selectedQ,false)
-                    }
-
-                    return
-
-                    //if previous node in the tree has the same parent, then can swap with it
-                    let inx = findPositionInTree(node)
-                    if (inx > 0) {
-                        let previous = $scope.treeData[inx-1]
-                        if (previous.parent == node.parent) {
-                            //same parent, can swap\
-
-                            //change the underlying Q and re-render the tree
-                            let parentItem = previous.item  //the set of items that this one is in...
-
-                            //temp$scope.treeData.splice(inx-1,0,node)
-                            //temp$scope.treeData.splice(inx+1,1)
-
-                            $scope.treeIdToSelect = node.id
-                            updateAfterEdit()
-                            $scope.input.dirty = true
-
-                            //re-draw the summary report
-                            let vo = formsSvc.generateQReport($scope.selectedQ)
-                            $scope.report = vo.report
-                            $scope.hashAllItems = vo.hashAllItems
-
-                        } else {
-                            alert("Already at the top of the section")
-                        }
-                    }
-                } else {
-                    //create an array of sections
-                    //if not at top then can swap
-                    //swapping means moving a set of items - can get that from the array of sections
-                    //console.log($scope.treeData)
-                    alert("Section movement not yet enabled")
+                    $scope.treeIdToSelect = node.id
+                    $scope.drawQ($scope.selectedQ,false)
+                    $scope.input.dirty = true;
+                    $scope.editingQ = false
                 }
-*/
+
             }
 
             $scope.moveDown = function(node) {
+                if (! $scope.editingQ) {
+                    $scope.editingQ = true
+                    $scope.selectedQ = formsSvc.moveItem($scope.selectedQ, 'dn', node.data.item.linkId)
+                    // moveItem : function(Q,dirn,linkId) {
 
-                $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'dn',node.data.item.linkId)
-                // moveItem : function(Q,dirn,linkId) {
-
-                $scope.treeIdToSelect = node.id
-                $scope.drawQ($scope.selectedQ,true)
-                $scope.input.dirty = true;
-                /*
-                //$scope.drawQ($scope.selectedQ,true)
-return
-
-                if (node.data.level == 'child') {
-                    //if next node in the tree has the same parent, then can swap with it
-                    let inx = findPositionInTree(node)
-                    if (inx > 0) {
-                        let next = $scope.treeData[inx+1]
-                        if (next.parent == node.parent) {
-                            //same parent, can swap
-                            $scope.treeData.splice(inx,1)
-                            $scope.treeData.splice(inx+1,0,node)
-
-                            $scope.treeIdToSelect = node.id
-                            updateAfterEdit()
-                            $scope.input.dirty = true
-
-                            //re-draw the summary report
-                            let vo = formsSvc.generateQReport($scope.selectedQ)
-                            $scope.report = vo.report
-                            $scope.hashAllItems = vo.hashAllItems
-
-                        } else {
-                            alert("Already at the bottom of the section")
-                        }
-                    }
-                } else {
-                    //create an array of sections
-                    //if not at top then can swap
-                    //swapping means moving a set of items - can get that from the array of sections
-                    alert("Section movement not yet enabled")
+                    $scope.treeIdToSelect = node.id
+                    $scope.drawQ($scope.selectedQ, false)
+                    $scope.input.dirty = true;
+                    $scope.editingQ = false
                 }
-*/
+
             }
 
             //note that when the Q is build, the structure comes from the tree - not the item.items element.
             $scope.removeElement = function(node) {
+
+                let linkId = node.data.item.linkId
+
+                $scope.selectedQ = formsSvc.removeItem($scope.selectedQ,node.data.item.linkId)
+                // moveItem : function(Q,dirn,linkId) {
+
+                $scope.treeIdToSelect = node.id
+                $scope.drawQ($scope.selectedQ,false)
+                $scope.input.dirty = true;
+
+/*
+                return
+
                 let level = node.data.level
                 if (level == 'child') {
                     //just delete it
@@ -337,6 +274,8 @@ return
                 let items = formsSvc.makeQItemsFromTree($scope.treeData)
                 $scope.selectedQ.item = items;
                 $scope.drawQ($scope.selectedQ)
+
+                */
             }
 
             $scope.editItemFromReport = function (entry) {
@@ -377,6 +316,9 @@ return
                             } else {
                                 return 'item'
                             }
+                        },
+                        hashAllItems : function() {
+                            return $scope.hashAllItems
                         }
                     }
                 }).result.then(
@@ -426,8 +368,20 @@ return
             }
             //set up to add new item
 
-            $scope.addItem = function(node,insertType) {
-                //insertType is 'section' or 'element'
+            $scope.addItem = function(node,insertType,isSibling) {
+                //insertType is 'section' or 'child' or 'grandchild'
+
+
+
+                //levels root, section, child, grandchild
+                let currentLevel = node.data.level      //shouldn't see grandchild here
+
+
+                //insert rules:
+                //If the current node is the root, then a section is added
+                //If the current node is a section (parent == root), then a child is added
+                //If the current node is a child (grandparent == root), then a grandchild is added
+
 
                 let newItem = {}
                 newItem.tmp = {codeSystem: $scope.input.codeSystems[0] } //default to snomed
@@ -459,16 +413,48 @@ return
                             },
                             insertType : function() {
                                 return insertType
+                            },
+                            hashAllItems : function() {
+                                return $scope.hashAllItems
                             }
                         }
                     }).result.then(
                         function (item) {
                             //return the item to insert into the tree...
 
+                            if (currentLevel == 'root') {
+                                //this is a section - directly off the root
+                                $scope.selectedQ.item.push(item)
+
+
+                            } else {
+
+                                //the linkId of the item to add this new item to...
+                                //let parentLinkId = node.data.item.linkId
+                                let parentLinkId = node.id
+                                //if a sibling is being added, the linkId is the linkId of the parent...
+                                if (isSibling) {
+                                    parentLinkId = node.parent
+
+                                }
+
+
+                                //could be a child or grandchild. need to iterate through the Q to find the parent item
+                                $scope.selectedQ = qSvc.addItem($scope.selectedQ,parentLinkId,item)
+                            }
+
+                            //
+
+                            $scope.treeIdToSelect =  item.linkId    //tree id is the linkid...  node.id
+                            $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
+                            $scope.input.dirty = true;
+/*
                             //create the new treeview node
                             let newNode = {id: item.linkId,state:{},data:{}}      //the treeview node
                             newNode.text = item.text;    //text to display in the tree
                             newNode.data = {item:item}
+
+
 
 
                             //the level is where the node sits relative to the parent
@@ -508,16 +494,17 @@ return
                                     break
 
                             }
+*/
 
-                            $scope.treeIdToSelect = newNode.id
+                            // todo - how to find this? - need 'find node with linkId' $scope.treeIdToSelect = newNode.id
 
-                            let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                            $scope.selectedQ.item = items;
+                           // let items = formsSvc.makeQItemsFromTree($scope.treeData)
+                           // $scope.selectedQ.item = items;
 
-                            $scope.drawQ($scope.selectedQ)    //sets up tree & draws it
-                            $scope.input.dirty = true
+                           // $scope.drawQ($scope.selectedQ)    //sets up tree & draws it
+                           // $scope.input.dirty = true
 
-                            makeFormDef()
+                            //makeFormDef()
 
                             //re-draw the summary report
                             let vo = formsSvc.generateQReport($scope.selectedQ)
@@ -677,37 +664,37 @@ return
 
             //perfroms a 'redraw' of the Q - called frequently
             $scope.drawQ = function(Q,resetToSection) {
-                //save the current state of node expansion
+                //save the current state of node expansion from the jstree - not the treedata!!!
                 let hashState = {}
-                if ($scope.treeData) {
-                    $scope.treeData.forEach(function (node){
-                        hashState[node.id] = node.state.opened
-
+                try {
+                    let ar = $('#designTree').jstree('get_state').core.open
+                    ar.forEach(function (id) {
+                        hashState[id] = true
                     })
-                }
 
+                } catch (ex) {
+
+                }
 
                 clearWorkArea()
                 $scope.selectedQ = Q
-                $scope.QAudit = formsSvc.auditQ(Q)      //the audit report
+               // - not doing audit I think... $scope.QAudit = formsSvc.auditQ(Q)      //the audit report
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
-                // - not currently used? $scope.hashItem = vo.hash
-                //expandAll()
-                //$scope.treeIdToSelect = "root"
+
                 if (resetToSection) {
                     $scope.showSection()
                 } else {
                     //restore the opened state
                     $scope.treeData.forEach(function (node){
-
+                        node.state = node.state || {}
                         node.state.opened = hashState[node.id]
-
                     })
                 }
 
                 drawTree()
                 makeFormDef()
+                $scope.formTemplate = formsSvc.makeFormTemplate(Q)
               //  $scope.input.dirty = false
             }
 
@@ -754,6 +741,8 @@ return
                     //ensure the selected node remains so after a redraw...
                   //alert('dbl')
 
+                }).on('change_state.jstree',function(e,data){
+                    console.log(e,data)
                 })
             }
 
@@ -766,6 +755,7 @@ return
 
             //used in the preview
             function makeFormDef() {
+                return  //todo - think this is no longer used...
 
 
                 formsSvc.makeFormDefinition(angular.copy($scope.treeData)).then(
@@ -774,14 +764,7 @@ return
                     }
                 )
 
-
-                //$scope.formDef = angular.copy($scope.treeData)
-                //$scope.formDef.splice(0,1)      //remove the root
-
-
-
             }
-
 
 
             function loadAllQ() {

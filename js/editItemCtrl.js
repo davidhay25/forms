@@ -1,9 +1,23 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
-        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType) {
+        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems) {
+
+
+            //don't use copy() as intending to update item object from Q. todo need to think about cancel...
+            $scope.newItem = item; ///angular.copy(item)             //<<<<<<<<<< new on sunday
 
             //editType id 'new' or 'edit'
-            //insertType is 'section' or 'item'
+            //insertType is 'section' or 'child' or 'grandchild'
+            $scope.hashAllItems = hashAllItems
+
+            let lcHashAllItems = {}
+            Object.keys(hashAllItems).forEach(function(key) {
+                lcHashAllItems[key.toLowerCase()] = true
+            })
+
+            if (insertType == 'section'){
+                $scope.newItem.type = 'group'
+            }
 
             //todo get units if extension present
             $scope.editType = editType
@@ -11,14 +25,28 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.itemTypes = itemTypes
             $scope.input.codeSystems = codeSystems
-            //don't use copy() as intending to update item object from Q. todo need to think about cancel...
-            $scope.newItem = item; ///angular.copy(item)             //<<<<<<<<<< new on sunday
+
 
             $scope.originalItem = angular.copy(item)    //save the original in case of cancel
 
             if (item) {
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
+            }
+
+            $scope.checkUniqueLinkId = function(linkId){
+
+                if (linkId.indexOf(" ") > -1) {
+                    alert("Sorry, no spaces allowed")
+                    return
+                }
+
+                let tmp = linkId.toLowerCase()
+
+                if (lcHashAllItems[tmp]) {
+                    alert("This linkId has been used in this Q. Choose another one. (The check is case insensitive)")
+                    $scope.newItem.linkId = ""
+                }
             }
 
             //set the code controls
@@ -63,6 +91,11 @@ angular.module("formsApp")
             }
 
             $scope.save = function() {
+
+                if (! $scope.newItem.linkId) {
+                    alert("The linkId is mandatory...")
+                    return
+                }
 
                 //update the extensions in the item based on the meta object
                 formsSvc.updateMetaInfoForItem($scope.newItem,$scope.meta)
