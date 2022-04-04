@@ -11,6 +11,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 const url = 'mongodb://localhost:27017';
 
+/* - no longer using mongo...
 const designerModule = require("./serverModuleDesigner.js")
 
 // Database Name
@@ -27,6 +28,7 @@ MongoClient.connect(url, function(err, client) {
     //client.close();
 });
 
+*/
 app.use(bodyParser.json({type:['application/fhir+json','application/json']}))
 
 let serverRoot = "http://localhost:9099/baseR4/"

@@ -198,13 +198,15 @@ angular.module("formsApp")
             $scope.moveUp = function(node) {
                 if (! $scope.editingQ) {
                     $scope.editingQ = true
-                    $scope.selectedQ = formsSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
+                    $scope.selectedQ = qSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
                     // moveItem : function(Q,dirn,linkId) {
 
                     $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ,false)
                     $scope.input.dirty = true;
                     $scope.editingQ = false
+
+                    updateReport()
                 }
 
             }
@@ -212,13 +214,15 @@ angular.module("formsApp")
             $scope.moveDown = function(node) {
                 if (! $scope.editingQ) {
                     $scope.editingQ = true
-                    $scope.selectedQ = formsSvc.moveItem($scope.selectedQ, 'dn', node.data.item.linkId)
+                    $scope.selectedQ = qSvc.moveItem($scope.selectedQ, 'dn', node.data.item.linkId)
                     // moveItem : function(Q,dirn,linkId) {
 
                     $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ, false)
                     $scope.input.dirty = true;
                     $scope.editingQ = false
+
+                    updateReport()
                 }
 
             }
@@ -228,12 +232,18 @@ angular.module("formsApp")
 
                 let linkId = node.data.item.linkId
 
-                $scope.selectedQ = formsSvc.removeItem($scope.selectedQ,node.data.item.linkId)
+                $scope.selectedQ = qSvc.removeItem($scope.selectedQ,node.data.item.linkId)
                 // moveItem : function(Q,dirn,linkId) {
 
                 $scope.treeIdToSelect = node.id
                 $scope.drawQ($scope.selectedQ,false)
                 $scope.input.dirty = true;
+
+                updateReport()
+
+                //let vo = formsSvc.generateQReport($scope.selectedQ)
+                //$scope.report = vo.report
+                //$scope.hashAllItems = vo.hashAllItems
 
 /*
                 return
@@ -311,11 +321,14 @@ angular.module("formsApp")
                             return $scope.input.codeSystems
                         },
                         insertType : function() {
+                            return node.data.level
+                            /*
                             if (node.data.level == 'parent') {
                                 return 'section'
                             } else {
                                 return 'item'
                             }
+                            */
                         },
                         hashAllItems : function() {
                             return $scope.hashAllItems
@@ -324,6 +337,24 @@ angular.module("formsApp")
                 }).result.then(
 
                     function (updatedItem) {
+
+                        qSvc.editItem($scope.selectedQ,updatedItem)
+
+                        $scope.treeIdToSelect = updatedItem.linkId
+                        $scope.drawQ($scope.selectedQ,false)
+                        $scope.input.dirty = true;
+
+
+                        updateReport()
+
+                        //let vo = formsSvc.generateQReport($scope.selectedQ)
+                        //$scope.report = vo.report
+                        //$scope.hashAllItems = vo.hashAllItems
+
+
+                        //return
+
+/*
                         //return
 
                         let inx = findPositionInTree(node)      //based on node.id
@@ -362,7 +393,7 @@ angular.module("formsApp")
                             //if -1, the element was not found
                             alert('Unable to find item in tree')
                         }
-
+*/
                         //node.data.item = item
                     })
             }
@@ -370,6 +401,7 @@ angular.module("formsApp")
 
             $scope.addItem = function(node,insertType,isSibling) {
                 //insertType is 'section' or 'child' or 'grandchild'
+                //tree.id is the linkId
 
 
 
@@ -390,9 +422,9 @@ angular.module("formsApp")
                 newItem.text = 'Test insert'
 
                 //$scope.newItem.insertType = type;
-                let parentItem = node.data.item
-                let parentPosition = findPositionInTree(node)
-                if (parentPosition > -1) {
+              //  let parentItem = node.data.item
+              //  let parentPosition = findPositionInTree(node)
+               // if (parentPosition > -1) {
 
                     $uibModal.open({
                         templateUrl: 'modalTemplates/editItem.html',
@@ -425,8 +457,6 @@ angular.module("formsApp")
                             if (currentLevel == 'root') {
                                 //this is a section - directly off the root
                                 $scope.selectedQ.item.push(item)
-
-
                             } else {
 
                                 //the linkId of the item to add this new item to...
@@ -435,12 +465,15 @@ angular.module("formsApp")
                                 //if a sibling is being added, the linkId is the linkId of the parent...
                                 if (isSibling) {
                                     parentLinkId = node.parent
-
                                 }
-
 
                                 //could be a child or grandchild. need to iterate through the Q to find the parent item
                                 $scope.selectedQ = qSvc.addItem($scope.selectedQ,parentLinkId,item)
+
+                                if (insertType == 'grandchild') {
+                                    //the parent must be of type 'group'
+
+                                }
                             }
 
                             //
@@ -448,6 +481,10 @@ angular.module("formsApp")
                             $scope.treeIdToSelect =  item.linkId    //tree id is the linkid...  node.id
                             $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
                             $scope.input.dirty = true;
+
+                            updateReport()
+
+
 /*
                             //create the new treeview node
                             let newNode = {id: item.linkId,state:{},data:{}}      //the treeview node
@@ -507,13 +544,15 @@ angular.module("formsApp")
                             //makeFormDef()
 
                             //re-draw the summary report
-                            let vo = formsSvc.generateQReport($scope.selectedQ)
-                            $scope.report = vo.report
-                            $scope.hashAllItems = vo.hashAllItems
+                           // let vo = formsSvc.generateQReport($scope.selectedQ)
+                           // $scope.report = vo.report
+                           // console.log(vo.report)
+                            //$scope.hashAllItems = vo.hashAllItems
+
 
 
                         })
-                }
+               // }
 
 /*return
 
@@ -531,7 +570,15 @@ angular.module("formsApp")
             //save new item (insert it into the treeData). Later, will convert the tree data to a Q
             //and update. Note that update is only for the items in the Q - leave the others
 
+            function updateReport() {
+                let vo = formsSvc.generateQReport($scope.selectedQ)
+                $scope.report = vo.report
+                console.log(vo.report)
+                $scope.hashAllItems = vo.hashAllItems
+            }
+
             //-----------  tree utility functions
+
 
 
             //return all the direct child elements of the node

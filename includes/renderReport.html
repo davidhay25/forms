@@ -57,7 +57,9 @@
                     </div>
 
                     <div ng-repeat = "child in section.children">
-                        <div ng-show = "child.type == 'single'">
+
+                        <div ng-show = "true || child.type == 'single'">
+
                             <div class="row bottom-border" >
                                 <div class="col-md-2">
                                     <div class="clickable" ng-click="editItemFromReport(child)">
@@ -104,12 +106,14 @@
 
                         </div>
 
-                        <div ng-show = "child.type == 'group'">
+                        <div ng-show = "true || child.type == 'group'">
 
                             <div ng-repeat = "grandchild in child.children">
                                 <div class="row bottom-border">
                                     <div class="col-md-2">
-                                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
+                                        <div class="clickable"
+                                             style = "padding-left: 8px"
+                                             ng-click="editItemFromReport(grandchild)">
                                             {{grandchild.item.linkId}}
                                         </div>
                                     </div>
