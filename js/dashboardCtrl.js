@@ -38,7 +38,7 @@ angular.module("formsApp")
 
             //count the number of completed answers in each section - used by tabbed form...
             $scope.completedAnswersInSection = function(section) {
-               // console.log(section)
+              
                 let cnt = 0
                 section.item.forEach(function (item){
                     if ($scope.form[item.linkId]) {
@@ -250,16 +250,21 @@ angular.module("formsApp")
             $scope.editItemFromReport = function (entry) {
                 console.log(entry)
                 let item = entry.item
+                let node = findNodeById(item.linkId)
+                /*
                 let node = {data:{}}
                 node.data.item = item
                 node.data.level = "item"
                 node.id = entry.item.linkId     //needed to find node in tree...
+                */
                 $scope.editItem(node)
             }
 
 
             //edit an existing item
             $scope.editItem = function(node) {
+
+               // let parentId = node.parent
 
                 let item = node.data.item
                 //console.log(node.data.level)    //child or parent
@@ -285,6 +290,9 @@ angular.module("formsApp")
                         },
                         hashAllItems : function() {
                             return $scope.hashAllItems
+                        },
+                        parent : function(){
+                            return $scope.hashAllItems[node.parent]
                         }
                     }
                 }).result.then(
@@ -292,7 +300,6 @@ angular.module("formsApp")
                     function (updatedItem) {
                         if (updatedItem) {
                             qSvc.editItem($scope.selectedQ,updatedItem)
-
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.input.dirty = true;
@@ -307,23 +314,9 @@ angular.module("formsApp")
                 //tree.id is the linkId
 
 
-
                 //levels root, section, child, grandchild
                 let currentLevel = node.data.level      //shouldn't see grandchild here
 
-
-                //insert rules:
-                //If the current node is the root, then a section is added
-                //If the current node is a section (parent == root), then a child is added
-                //If the current node is a child (grandparent == root), then a grandchild is added
-
-/*
-                let newItem = {}
-                newItem.tmp = {codeSystem: $scope.input.codeSystems[0] } //default to snomed
-                newItem.linkId = "id-" + new Date().getTime()
-                newItem.type = $scope.input.itemTypes[0]
-                newItem.text = 'Test insert'
-*/
                 $uibModal.open({
                         templateUrl: 'modalTemplates/editItem.html',
                         backdrop: 'static',
@@ -346,6 +339,14 @@ angular.module("formsApp")
                             },
                             hashAllItems : function() {
                                 return $scope.hashAllItems
+                            },
+                            parent : function() {
+                                if (isSibling) {
+                                    return $scope.hashAllItems[node.parent]
+                                } else {
+                                    return $scope.hashAllItems[node.id]
+                                }
+
                             }
                         }
                     }).result.then(

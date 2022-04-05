@@ -1,9 +1,10 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
-        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems) {
+        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems,parent) {
 
 
 
+            $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild'
 

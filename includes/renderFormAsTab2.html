@@ -32,17 +32,12 @@
 
             <strong>{{row.text}}</strong>
 
-
-
-
-
-
             <div class="row">
 
 
 
                 <!-- 2 columns -->
-                <div ng-show = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+                <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
                     <div class="col-md-6">
                         <div ng-repeat="cell in row.col1 track by $index">
                             <div style="margin-bottom: 8px">
@@ -60,7 +55,7 @@
                 </div>
 
                 <!-- 3 columns -->
-                <div ng-show = "row.meta.columnCount == 3">
+                <div ng-if = "row.meta.columnCount == 3">
                     <div class="col-md-4">
                         <div ng-repeat="cell in row.col1  track by $index">
                             <div style="margin-bottom: 8px">
@@ -84,7 +79,7 @@
                 </div>
 
                 <!-- 4 columns -->
-                <div ng-show = "row.meta.columnCount == 4">
+                <div ng-if = "row.meta.columnCount == 4">
                     <div class="col-md-3">
                         <div ng-repeat="cell in row.col1 track by $index">
                             <div style="margin-bottom: 8px">
@@ -112,7 +107,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
 
             <hr style="margin: 2px"/>

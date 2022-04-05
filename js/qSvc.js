@@ -2,7 +2,11 @@ angular.module("formsApp")
     //editing questionnaire
     .service('qSvc', function($q,$http,$filter,moment) {
 
+        //let hashQ
+
         return {
+            //fin
+
             editItem : function(Q,item) {
                 //edit an item
                 let linkId = item.linkId

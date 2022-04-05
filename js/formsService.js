@@ -285,8 +285,10 @@ angular.module("formsApp")
 
                     let section = {item:sectionItem,children:[],meta:{}}
                     populateMeta(section)
+                    hashAllItems[sectionItem.linkId] = {item:sectionItem,dependencies:[]}
 
                     report.section.push(section)
+
 
                     if (sectionItem.item) {        //should always have children
                         sectionItem.item.forEach(function (child){
@@ -310,7 +312,7 @@ angular.module("formsApp")
                                 child.item.forEach(function (grandChild) {
 
                                     updateSpecificArrays(sectionItem,report,grandChild)
-                                    // function updateSpecificArrays(sectionItem,report,child)
+
                                     let entry = {item:grandChild,meta:{}}
                                     populateMeta(entry)
 
@@ -349,6 +351,7 @@ angular.module("formsApp")
                         console.log("There are multiple items with the linkId: " + child.linkId)
                         return
                     }
+
                     hashAllItems[child.linkId] = {item:child,dependencies:[]}
 
                     //update specific summary arrays - coded & reference
@@ -438,7 +441,7 @@ angular.module("formsApp")
                                 let row = {}    //will have multiple columns
                                 //let dirty = true
                                 //row.item = item
-                                //row.meta = meta
+                                row.meta = meta
 
                                 if (item.item) {    //these are the child items
                                     if (meta.columnCount) {
@@ -458,6 +461,7 @@ angular.module("formsApp")
                                                 //add the current row, and move on to the next..
                                                 section.rows.push(row)
                                                 row = {}
+                                                row.meta = meta
                                                 col = 1
                                                 //dirty = false
                                                /// newRow =
@@ -499,10 +503,10 @@ angular.module("formsApp")
                                                 row[side].push(cell)
                                             }
                                         })
-
+                                        section.rows.push(row)   //assume that the whole group fits in a single row...
                                     }
 
-                                    section.rows.push(row)   //assume that the whole group fits in a single row...
+
 
                                 }
 
@@ -524,7 +528,7 @@ angular.module("formsApp")
                     }
 
                 })
-
+console.log(template)
                 return template
 
                 //looks for specific instructions from the Q about an item - eg render as radio
