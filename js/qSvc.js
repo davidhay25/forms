@@ -14,25 +14,30 @@ angular.module("formsApp")
                         Q.item.splice(sectionIndex,1,item)
                         break
                     } else {
-                        for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
-                            let child = section.item[childIndex]
-                            if (child.linkId == linkId) {
-                                // a child off the section is being removed
-                                section.item.splice(childIndex,1,item)
-                                break
-                            } else {
-                                if (child.item) {
-                                    for (var grandchildIndex = 0; grandchildIndex < child.item.length; grandchildIndex++) {
-                                        let grandchild = child.item[grandchildIndex]
-                                        if (grandchild.linkId == linkId) {
-                                            //a grandchild is being removed
-                                            child.item.splice(grandchildIndex,1,item)
-                                            break
+                        if (section.item) {
+                            for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
+                                let child = section.item[childIndex]
+                                if (child.linkId == linkId) {
+                                    // a child off the section is being removed
+                                    section.item.splice(childIndex,1,item)
+                                    break
+                                } else {
+                                    if (child.item) {
+                                        for (var grandchildIndex = 0; grandchildIndex < child.item.length; grandchildIndex++) {
+                                            let grandchild = child.item[grandchildIndex]
+                                            if (grandchild.linkId == linkId) {
+                                                //a grandchild is being removed
+                                                child.item.splice(grandchildIndex,1,item)
+                                                break
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+
+
+
                     }
                 }
                 return Q
@@ -62,20 +67,6 @@ angular.module("formsApp")
                                 child.type = 'group'
                                 break
                             }
-                            /*
-                            else {
-                                if (child.item) {
-                                    for (var grandchildIndex = 0; grandchildIndex < child.item.length; grandchildIndex++) {
-                                        let grandchild = child.item[grandchildIndex]
-                                        if (grandchild.linkId == linkId) {
-                                            //a grandchild is being removed
-                                            child.item.splice(grandchildIndex,1)
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                            */
                         }
                     }
                 }

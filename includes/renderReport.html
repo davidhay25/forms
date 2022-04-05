@@ -189,7 +189,7 @@
                 <tr  ng-repeat="coded in report.coded">
                     <td width="20%">
                         <div>{{coded.item.text}}</div>
-                        <div class="clickable" ng-click="editItemFromReport({item:coded.item})">
+                        <div class="clickable" ng-click="editItemFromReport(coded)">
                             LinkId: {{coded.item.linkId}}
                         </div>
                         <div ng-show="coded.item.code">Q Code: {{coded.item.code[0].code}}</div>
@@ -354,7 +354,7 @@
                 <tr ng-repeat="coded in report.coded">
                     <td>{{coded.section.text}}</td>
                     <td>
-                        <div class="clickable" ng-click="editItemFromReport(grandchild)">
+                        <div class="clickable" ng-click="editItemFromReport(coded)">
                             {{coded.item.linkId}}
                         </div>
 
@@ -476,7 +476,7 @@
                 <tr ng-repeat="reference in report.reference">
                     <td>
 
-                        <div class="clickable" ng-click="editItemFromReport(reference.item)">
+                        <div class="clickable" ng-click="editItemFromReport(reference)">
                             {{reference.item.linkId}}
                         </div>
 

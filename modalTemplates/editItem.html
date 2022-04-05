@@ -27,7 +27,7 @@
                 <table class="table table-condensed">
                     <tr>
                         <td>LinkId</td>
-                        <td><input type="text"
+                        <td><input type="text" ng-disabled = "editType !== 'new'"
                                    placeholder="A unique (in this Q) identifier for the item"
                                    ng-blur="checkUniqueLinkId(newItem.linkId)"
                                    ng-model="newItem.linkId" class="form-control"/> </td>
@@ -52,7 +52,7 @@
 
 
                     <!-- If a section, then the type will be 'group'-->
-                    <tr ng-hide = "insertType == 'section'">
+                    <tr ng-hide = "hideType">
                         <td>Type</td>
                         <td>
                             <div class="row">
@@ -129,6 +129,20 @@
 <!--
                             <div><em>If a code is supplied, the item will be extracted as an Observation</em></div>
                             -->
+                        </td>
+                    </tr>
+
+                    <tr ng-show = "insertType == 'child' && newItem.item.length > 0">
+                        <td>Column count</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-sm-3 col-md-3">
+                                    <input class="form-control" type="text" ng-model="meta.columnCount"
+                                           placeholder="Column count"/>
+                                </div>
+                            </div>
+
+
                         </td>
                     </tr>
 
@@ -221,11 +235,33 @@
             </uib-tab>
 
             <uib-tab heading = "Conditionals">
+
+
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <strong>Source question</strong>
+                        <select ng-model="input.ewQuestion" class="form-control"
+                                ng-change = "ewSelected(input.ewQuestion)"
+                                ng-options = "item.linkId for item in choiceItems"></select>
+                        <em>The question that this one depends on</em>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Value to show this item</strong>
+                        <select ng-model="input.ewAnswer"  class="form-control"
+                                ng-change = ""
+                                ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
+                        <em>The value of the source question that will display this one</em>
+
+                    </div>
+                </div>
+<!--
                 <pre>{{newItem.enableWhen | json}}</pre>
+-->
 
-
-                <select ng-model="input.ew" class="form-control"
-                        ng-options = "value.item.linkId for (key,value) in hashAllItems"></select>
+                <em>Set the question and value that controls if this item is to be displayed.
+                Only questions of type 'choice' with in-line options can be selected.</em>
+                <em>Currently, only a single conditional is supported - this can be relaxed if needed...</em>
 
             </uib-tab>
 
@@ -245,6 +281,7 @@
 
     <div class="modal-header">
 
+        {{editType}} {{insertType}}
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <button class="btn btn-success pull-right"

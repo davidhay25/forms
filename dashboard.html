@@ -56,11 +56,15 @@
     <script src="js/editQCtrl.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
-    <script src="js/designerCtrl.js"></script>
-    <script src="js/designerSvc.js"></script>
+
     <script src="js/formRenderCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
+
+    <!--
+        <script src="js/designerCtrl.js"></script>
+    <script src="js/designerSvc.js"></script>
+    -->
 
     <style>
         #graph {
@@ -253,7 +257,9 @@
                                                    </div>
                                                    <div class="col-md-9">
                                                        <div ng-repeat="ew in selectedNode.data.item.enableWhen">
-                                                           {{ew.question}} = {{ew.answerCoding.code}}
+                                                           <span class="clickable" ng-click="editItemFromLinkId(ew.question)">
+                                                               {{ew.question}} </span>
+                                                           = {{ew.answerCoding.code}}
                                                        </div>
                                                    </div>
                                                </div>
@@ -285,7 +291,7 @@
                                                    </div>
                                                </div>
 
-                                               <div class="row" ng-show="selectedNode.data.item.type == 'group'">
+                                               <div class="row" ng-show="selectedNode.data.meta.columnCount">
                                                    <div class="col-md-3">
                                                        Column count
                                                    </div>
@@ -331,7 +337,7 @@
                                                <div class="row">
 
                                                    <div class="col-md-2">
-                                                       <button class="btn btn-link"
+                                                       <button class="btn btn-link" ng-hide = "selectedNode.id == 'root'"
                                                                ng-click="editItem(selectedNode)">
                                                            Edit
                                                        </button>
@@ -498,14 +504,6 @@
                                <div ng-controller="formsCtrl">
                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                </div>
-                               <!--
-                                                              <div class="myScroll">
-                                                                  <ng-include src = "'includes/renderFormPageAsTab.html'"></ng-include>
-
-                                                              </div>
-
-                                                              <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
-                               -->
 
                            </uib-tab>
 

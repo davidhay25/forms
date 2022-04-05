@@ -170,7 +170,9 @@ angular.module("formsApp")
                 updateExtension(item,extSourceStandard,"String",meta.sourceStandard)
 
                 //display columns
-                updateExtension(item,extColumn,"Integer",meta.columnCount)
+                updateExtension(item,extColumn,"Integer",meta.column)
+
+                updateExtension(item,extColumnCount,"Integer",meta.columnCount)
 
                 //reference types
 /* todo - need to allow multiple extensions of same url...
@@ -254,7 +256,7 @@ angular.module("formsApp")
                 }
 
                 //column count
-                meta.columnCount = 2       //default column count
+               // meta.columnCount = 2       //default column count
 
                 let ar6 = this.findExtension(item,extColumnCount)
                 if (ar6.length > 0) {
@@ -386,10 +388,6 @@ angular.module("formsApp")
                     }
 
 
-
-
-
-
                     //update the conditional
                     if (child.enableWhen) {
                         report.conditional.push({item:child})
@@ -437,48 +435,86 @@ angular.module("formsApp")
                                 //the first item goes in col 1
                                 //other items go in col 2 - and will often have conditionals on them
 
-                                let row = {}    //will have 2 entries - left and right
-                                row.item = item
-                                row.meta = meta
+                                let row = {}    //will have multiple columns
+                                //let dirty = true
+                                //row.item = item
+                                //row.meta = meta
 
                                 if (item.item) {    //these are the child items
-                                    item.item.forEach(function (child,inx) {
-                                        let childMeta = that.getMetaInfoForItem(child)
-                                        //ignore any item entries on the child - we don't go any deeper atm
+                                    if (meta.columnCount) {
+                                        //if there's a column count, then fill rows left -> right
+                                        let col = 1
+                                        item.item.forEach(function (child,inx) {
 
-                                        if (inx == 0) {
-                                            //this is the first item in the group - it goes in the left
-                                            let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
-                                            setDecoration(cell,child)        //sets things like control type
-                                            //row.left = [cell]
-                                            row['col1'] = [cell]
-                                        } else {
-                                            //this is a subsequent item - it will go in the right col by default
-                                            //let side = "right"
-                                            let side = 'col2'
-                                            if (childMeta.column ) {
-                                                side = 'col' + childMeta.column
-                                            }
-
-
+                                            let side = 'col' + col
                                             let cell = {item:child}
                                             setDecoration(cell,child)
                                             row[side] = row[side] || []
                                             row[side].push(cell)
-                                        }
-                                    })
 
-                                    section.rows.push(row)
+                                            //dirty = true
+
+                                            if (col % meta.columnCount == 0) {
+                                                //add the current row, and move on to the next..
+                                                section.rows.push(row)
+                                                row = {}
+                                                col = 1
+                                                //dirty = false
+                                               /// newRow =
+                                            } else {
+                                                col++
+                                            }
+                                        })
+
+                                        if (row.col1) {
+                                            section.rows.push(row)
+                                        }
+
+                                    } else {
+
+                                        //when the columnCount is not present, use the strategy first in left, others in right
+                                        item.item.forEach(function (child,inx) {
+                                            let childMeta = that.getMetaInfoForItem(child)
+                                            //ignore any item entries on the child - we don't go any deeper atm
+
+                                            if (inx == 0) {
+                                                //this is the first item in the group - it goes in the left
+                                                let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
+                                                setDecoration(cell,child)        //sets things like control type
+                                                //row.left = [cell]
+                                                row['col1'] = [cell]
+                                            } else {
+                                                //this is a subsequent item - it will go in the right col by default
+                                                //let side = "right"
+                                                let side = 'col2'
+                                                /* for now, ignore the column number. re-visit when I think more about fill startegies...
+                                                if (childMeta.column ) {
+                                                    side = 'col' + childMeta.column
+                                                }*/
+
+
+                                                let cell = {item:child}
+                                                setDecoration(cell,child)
+                                                row[side] = row[side] || []
+                                                row[side].push(cell)
+                                            }
+                                        })
+
+                                    }
+
+                                    section.rows.push(row)   //assume that the whole group fits in a single row...
 
                                 }
 
                             } else {
                                 //if the item isn't a group, then add it to column 1.
                                 let row = {}   //will have a single entry - left
+                                row.item = item
+                                row.meta = meta
                                 let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                 setDecoration(cell,item)
                                 //row.left = [cell]             //make it an array to match the group
-                                row['col1'] = [cell]
+                                row['col1'] = [cell] //make it an array to match the group
 
                                 section.rows.push(row)
 
@@ -489,8 +525,6 @@ angular.module("formsApp")
 
                 })
 
-                //console.log(template)
-                //console.log(angular.toJson(template,null,2))
                 return template
 
                 //looks for specific instructions from the Q about an item - eg render as radio

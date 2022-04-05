@@ -27,9 +27,14 @@
     <div class="col-md-9">
 
 
-        <div ng-repeat="row in selectedSection.rows">
+
+        <div ng-repeat="row in selectedSection.rows track by $index">
 
             <strong>{{row.text}}</strong>
+
+
+
+
 
 
             <div class="row">
@@ -39,7 +44,7 @@
                 <!-- 2 columns -->
                 <div ng-show = "row.meta.columnCount == 2 || ! row.meta.columnCount">
                     <div class="col-md-6">
-                        <div ng-repeat="cell in row.col1">
+                        <div ng-repeat="cell in row.col1 track by $index">
                             <div style="margin-bottom: 8px">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
@@ -48,7 +53,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div ng-repeat="cell in row.col2">
+                        <div ng-repeat="cell in row.col2 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
@@ -57,7 +62,7 @@
                 <!-- 3 columns -->
                 <div ng-show = "row.meta.columnCount == 3">
                     <div class="col-md-4">
-                        <div ng-repeat="cell in row.col1">
+                        <div ng-repeat="cell in row.col1  track by $index">
                             <div style="margin-bottom: 8px">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
@@ -66,13 +71,13 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div ng-repeat="cell in row.col2">
+                        <div ng-repeat="cell in row.col2 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <div ng-repeat="cell in row.col3">
+                        <div ng-repeat="cell in row.col3 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
@@ -81,7 +86,7 @@
                 <!-- 4 columns -->
                 <div ng-show = "row.meta.columnCount == 4">
                     <div class="col-md-3">
-                        <div ng-repeat="cell in row.col1">
+                        <div ng-repeat="cell in row.col1 track by $index">
                             <div style="margin-bottom: 8px">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
@@ -90,42 +95,24 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div ng-repeat="cell in row.col2">
+                        <div ng-repeat="cell in row.col2 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
 
                     <div class="col-md-3">
-                        <div ng-repeat="cell in row.col3">
+                        <div ng-repeat="cell in row.col3 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
 
                     <div class="col-md-3">
-                        <div ng-repeat="cell in row.col4">
+                        <div ng-repeat="cell in row.col4 track by $index">
                             <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                         </div>
                     </div>
                 </div>
-
-
-                <!--
-                                <div class="col-md-4">
-
-                                    <div ng-repeat="cell in row.left">
-                                        <div ng-show = "cell.extractObservation">
-                                            "{{cell.item.text}}" extracted as Observation
-                                        </div>
-                                        <div ng-hide = "cell.item.code || cell.item.type == 'display'">
-                                            "{{cell.item.text}}" has no code
-                                        </div>
-                                    </div>
-
-
-
-
-                                </div>
-                   -->
+                
             </div>
 
             <hr style="margin: 2px"/>

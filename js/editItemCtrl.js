@@ -3,11 +3,76 @@ angular.module("formsApp")
         function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems) {
 
 
-            //don't use copy() as intending to update item object from Q. todo need to think about cancel...
-            $scope.newItem = item; ///angular.copy(item)             //<<<<<<<<<< new on sunday
 
-            //editType id 'new' or 'edit'
-            //insertType is 'section' or 'child' or 'grandchild'
+            $scope.editType = editType  //editType id 'new' or 'edit'
+            $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild'
+
+            $scope.input = {}
+
+            if (! item) {
+                item = {}
+                item.tmp = {codeSystem: codeSystems[0] } //default to snomed
+                item.linkId = "id-" + new Date().getTime()
+                item.type = itemTypes[0]
+                item.text = 'Test insert'
+                $scope.newItem = item
+            } else {
+                $scope.newItem = angular.copy(item)
+            }
+
+            //construct an array of all the items where the type is choice - for the conditiona; (enable when)
+            $scope.choiceItems = []
+            Object.keys(hashAllItems).forEach(function (key) {
+                let item = hashAllItems[key].item
+                if (item.type == 'choice') {
+                    $scope.choiceItems.push(item)
+                }
+            })
+
+            //needs to be at the top
+            $scope.ewSelected = function(item) {
+                console.log(item)
+                $scope.input.ewQuestionOptions = []
+                item.answerOption.forEach(function (opt) {
+                    $scope.input.ewQuestionOptions.push(opt.valueCoding)
+                })
+            }
+
+            if (item) {
+                //in particular gets the extensions into a easier format
+                $scope.meta = formsSvc.getMetaInfoForItem(item)
+
+                //set the 'enableWhen' - only 1 supported at present...
+                if (item.enableWhen && item.enableWhen.length > 0) {
+                    let ew = item.enableWhen[0]
+                    let linkId = ew.question
+                    let answerCode = ew.answerCoding.code   //the current code value. ignore the system
+                    $scope.choiceItems.forEach(function(choiceItem){
+                        if (choiceItem.linkId == linkId) {
+                            $scope.input.ewQuestion = choiceItem
+
+                            $scope.ewSelected(choiceItem)       //sets the list of values
+
+                            $scope.input.ewQuestionOptions.forEach(function (concept) {
+                                if (concept.code == answerCode) {
+                                    $scope.input.ewAnswer = concept
+                                }
+                            })
+
+                        }
+                    })
+                }
+            }
+
+            if (item.item && item.item.length > 0) {
+                //this has child elements. The type must remain as group.
+                $scope.hideType = true
+            }
+
+
+
+
+
             $scope.hashAllItems = hashAllItems
 
             let lcHashAllItems = {}
@@ -17,22 +82,17 @@ angular.module("formsApp")
 
             if (insertType == 'section'){
                 $scope.newItem.type = 'group'
+                $scope.hideType = true
             }
 
             //todo get units if extension present
-            $scope.editType = editType
-            $scope.insertType = insertType
-            $scope.input = {}
+
             $scope.input.itemTypes = itemTypes
             $scope.input.codeSystems = codeSystems
 
 
-            $scope.originalItem = angular.copy(item)    //save the original in case of cancel
+            //$scope.originalItem = angular.copy(item)    //save the original in case of cancel
 
-            if (item) {
-                //in particular gets the extensions into a easier format
-                $scope.meta = formsSvc.getMetaInfoForItem(item)
-            }
 
             $scope.checkUniqueLinkId = function(linkId){
 
@@ -61,6 +121,9 @@ angular.module("formsApp")
                 })
             }
 
+
+
+
             $scope.removeAnswerOption = function(inx){
                 $scope.newItem.answerOption.splice(inx)
             }
@@ -87,10 +150,22 @@ angular.module("formsApp")
             }
 
             $scope.cancel = function() {
-                $scope.$close($scope.originalItem)
+                //$scope.$close($scope.originalItem)
+                $scope.$close()
             }
 
             $scope.save = function() {
+
+                //todo - check for answerOption when type is not choice...
+
+                console.log($scope.input.ewQuestion)
+                console.log($scope.input.ewAnswer)
+
+                if ($scope.input.ewQuestion && $scope.input.ewAnswer) {
+                    let ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer}
+                    $scope.newItem.enableWhen = [ew]
+
+                }
 
                 if (! $scope.newItem.linkId) {
                     alert("The linkId is mandatory...")
@@ -124,10 +199,8 @@ angular.module("formsApp")
                             code.system = $scope.newItem.tmp.codeSystem.url
                         }
 
-
                     $scope.newItem.code = [code]
                     //delete item.tmp
-
 
                     $scope.newItem.extension = $scope.newItem.extension || []
                     $scope.newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
