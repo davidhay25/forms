@@ -7,9 +7,9 @@ const bodyParser = require('body-parser')
 var express = require('express');
 var app = express();
 
-const MongoClient = require('mongodb').MongoClient;
+//const MongoClient = require('mongodb').MongoClient;
 
-const url = 'mongodb://localhost:27017';
+//const url = 'mongodb://localhost:27017';
 
 /* - no longer using mongo...
 const designerModule = require("./serverModuleDesigner.js")
