@@ -123,27 +123,27 @@
     <div ng-show="reviewMode">
 
         <div>
-
-
             <div class="row" >
                 <div class="col-md-4">
                     {{selectedQ.title}}
                 </div>
 
 
-                <div class="col-md-2">
+                <div class="col-md-4">
 
-
+                    <input type = text ng-model = "input.reviewerName"
+                           placeholder = "Reviewer name"
+                           class="form-control"/>
 
                 </div>
 
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <div ng-hide="input.reviewPreview" class="clickable pull-right" ng-click="input.reviewPreview = true">Preview form</div>
                     <div ng-show="input.reviewPreview" class="clickable pull-right" ng-click="input.reviewPreview = false">Edit form</div>
                 </div>
 
                 <div class="col-md-1">
-                    <button ng-show = "QR" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                    <button ng-show = "QR && input.reviewerName" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
                 </div>
             </div>
         </div>
@@ -390,8 +390,11 @@
                         -->
 
                         <uib-tab heading="Form">
-                            <displayform patient="selectedPatient" qr="selectedQR"></displayform>
 
+                            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                            <!--
+                            <displayform patient="selectedPatient" qr="selectedQR"></displayform>
+-->
                         </uib-tab>
 
 

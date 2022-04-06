@@ -1,52 +1,132 @@
 <div>
 
+    <div class="banner">
+        Review UI Url: <strong>
+        <a target="_blank"
+           ng-href="http://canshare.clinfhir.com/ehr.html?{{selectedReviewQ.name}}">
+            http://canshare.clinfhir.com/ehr.html?{{selectedReviewQ.name}}
+        </a> </strong>
+    </div>
+<!--
+    <div class="row">
+        <div class="col-md-3">
+            <select ng-model="input.selectReviewQ" class="form-control"
+                    ng-options = "Q.name for Q in allQ"
+                    ng-change = "selectQReviews(input.selectReviewQ)"></select>
+        </div>
+    </div>
+
+    <hr/>
+-->
+
 
     <div class="row">
-        <div class="col-md-2">
-            <strong>Questionnaires</strong>
-            <div class="list-group">
-                <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
-                     style="cursor: pointer"
-                     ng-click="selectQReviews(Q)"
-                     ng-repeat="Q in allQ">
-                    {{Q.name}}
-                </div>
-            </div>
-        </div>
+        <!-- maybe remove this when debugging done-->
 
-        <div class="col-md-2">
-            <strong>Reviews</strong>
-            <div class="list-group">
-                <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
-                     style="cursor: pointer"
-                     ng-click="selectReview(review)"
-                     ng-repeat="review in reviewQRs">
-                    {{review.QR.author.display}}
-                    <div><em>{{review.QR.authored | date}}</em></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <strong>Comments</strong>
-            <div ng-repeat="r in selectedReview.reviews">
-
-                <div><strong>{{r.text}}</strong></div>
-                <div>{{r.answer[0].valueString}}</div>
-                <br/>
-
-            </div>
-
-        </div>
         <div class="col-md-5">
-            <div ng-show = "selectedQR">
-                <br/>
-                <strong>Form</strong>
-                <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+            <div class="row">
+
+                <uib-tabset>
+                    <uib-tab heading="Outstanding">
+                        <div class="list-group">
+                            <div ng-class = "{'list-group-item':true,'listItemSelected' : selectedSR.id == entry.resource.id}"
+                                 style="cursor: pointer"
+                                 ng-click = "selectSR(entry.resource)"
+                                 ng-repeat = "entry in serviceRequestsBundle.entry">
+                                {{entry.resource.requester.display}}
+                            </div>
+                        </div>
+
+                    </uib-tab>
+                    <uib-tab heading="By Questionnaire">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Questionnaires</strong>
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
+                                         style="cursor: pointer"
+                                         ng-click="selectQReviews(Q)"
+                                         ng-repeat="Q in allQ">
+                                        {{Q.name}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Reviews</strong>
+                                <div class="myScroll">
+                                    <div class="list-group">
+                                        <div ng-class="{'list-group-item':true,'listItemSelected':review.QR.id == selectedReview.QR.id}"
+                                             style="cursor: pointer"
+                                             ng-click="selectReview(review)"
+                                             ng-repeat="review in reviewQRs">
+                                            {{review.QR.author.display}}
+                                            <div><em>{{review.QR.authored | date}}</em></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </uib-tab>
+                </uib-tabset>
+
 
             </div>
 
         </div>
+
+        <div class="col-md-7">
+            <div class="row">
+
+
+                <div class="col-md-5">
+                <strong>Comments</strong>
+                <div ng-repeat="r in selectedReview.reviews">
+
+                    <div><strong>{{r.text}}</strong></div>
+                    <div>{{r.answer[0].valueString}}</div>
+                    <br/>
+
+                </div>
+
+                <br/>
+                <div class="row" ng-show="selectedSR">
+                    <div class="col-md-12">
+                        <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)" class=" btn btn-primary">Mark as review completed</button>
+                    </div>
+                </div>
+
+            </div>
+
+                <div class="col-md-7">
+                <div ng-show = "selectedQR">
+                    <br/>
+                    <uib-tabset>
+                        <uib-tab heading="Form">
+                            <div class="myScroll">
+                                <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                            </div>
+
+
+                        </uib-tab>
+                        <uib-tab heading="QR Json">
+                            <pre>{{selectedQR | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+                </div>
+
+            </div>
+            </div>
+        </div>
+
+
+
     </div>
 
 

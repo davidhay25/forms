@@ -12,6 +12,22 @@ function setup(app,serverRoot) {
     //create an update bundle:
     //PUT SR, POST DR & Obs
 
+    app.put('/ds/fhir/:type/:id',function(req,res){
+        let url = serverRoot + req.params.type + "/" + req.params.id
+        let resource = req.body
+
+
+        axios.put(url,resource)
+            .then(function (response){
+                //console.log(response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                res.status(err.response.status).send(err.response.data)
+            })
+    })
+
     app.get('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
 

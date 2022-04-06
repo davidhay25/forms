@@ -115,10 +115,6 @@ function extractQRFromBundle(bundle) {
 //https://medium.com/software-development-turkey/using-async-await-with-axios-edf8a0fed4b1
 async function extractResources(QR) {
 
-
-
-
-
     //get the Questionnaire. for now, get it derectly from the hapi server...
     let qUrl = QR.questionnaire
     if (! qUrl) {
@@ -145,10 +141,11 @@ async function extractResources(QR) {
         provenance.target.push({reference: "urn:uuid:"+ cp.id})
         resources.obs.push(cp)
 
-        //the service request for a path request - always added ATM
+        //the service request for a revire request - always added ATM as being used for forms development
+        //could add other SR's as needed - or a task
         //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
 
-        let sr =  createServiceRequest(QR,globals.labrefer,cp,"Path request")      //todo refactor names of vo returned
+        let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request")      //todo refactor names of vo returned
         //provenance.target = provenance.target || []
         provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...

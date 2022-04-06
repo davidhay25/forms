@@ -433,13 +433,19 @@ angular.module("formsApp")
 
                 if (confirm("Are you sure you're ready to submit this form")){
                     let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+
+                    if ($scope.reviewMode) {
+                        let reviewerName = $scope.input.reviewerName || "Unknown reviewer"
+                        $scope.QR.author = {display : reviewerName}
+                    }
+
                     bundle.entry.push({resource:$scope.QR})
 
                     let url = "/fr/fhir/receiveQR"
                     $http.post(url,bundle).then(
                         function(data) {
-                            console.log(data.data)
-                            alert("Form has been saved, and any Observations extracted and saved")
+                            //console.log(data.data)
+                            alert("Form has been saved, and any Observations or other resources extracted and saved")
                             $scope.selectPatient()  //to read the new data
                         }, function(err) {
                             alert(angular.toJson(err.data))
@@ -623,7 +629,6 @@ console.log(treeData)
                 treeData.forEach(function (item) {
                     item.state.opened = true;
                 })
-
             }
 
             //load the patients directly from the data server

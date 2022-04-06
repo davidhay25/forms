@@ -52,91 +52,27 @@
 
     <div ng-repeat="section in selectedQR.item">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="section">{{section.text}}</div>
-
             </div>
-            <div class="col-md-9">
-
-
+            <div class="col-md-8">
             </div>
         </div>
 
+
         <div ng-repeat="item in section.item">
-            <div class="row lineItem">
-                <div class="col-md-3">
 
-                    <div style="padding-left: 10px">{{item.text}}</div>
+            <div ng-repeat="answer in item.answer">
+                <ng-include src = "'includes/renderSingleItemForDisplay.html'"></ng-include>
+            </div>
 
-                </div>
+            <!-- If there is an item element, then this is a group so show the text-->
+            <div ng-show="item.item">{{item.text}}</div>
 
-                <div class="col-md-9">
-                    <div ng-repeat="answer in item.answer">
-                        <div ng-show="answer.valueDecimal">
-                            {{answer.valueDecimal}}
-                        </div>
+            <div ng-repeat = "gc in item.item">
 
-                        <div ng-show="answer.valueString">
-                            {{answer.valueString}}
-                        </div>
-
-                        <div ng-show="answer.valueBoolean">
-
-                            {{answer.valueBoolean ? "Yes" : "No"}}
-                        </div>
-
-                        <div ng-show="answer.valueCoding">
-                            {{answer.valueCoding.display}} <!--({{answer.valueCoding.code}}  {{answer.valueCoding.system}}) -->
-                        </div>
-                        <div ng-show="answer.valueReference">
-                            {{answer.valueReference.display}}
-                        </div>
-
-                    </div>
-
-
-
-                    <div ng-show = "item.item">
-                        <div ng-repeat="childItem in item.item">
-                            <!--ci {{childItem}}-->
-                            <div ng-repeat="childAnswer in childItem">
-                                <!--ca {{childAnswer}}-->
-                                <div ng-repeat="entry in childAnswer track by $index">
-
-                                    <div ng-show="entry.valueDecimal">
-                                        {{entry.valueDecimal}}
-                                    </div>
-
-                                    <div ng-show="entry.valueString">
-                                        {{entry.valueString}}
-                                    </div>
-
-                                    <div ng-show="entry.valueBoolean">
-
-                                        {{entry.valueBoolean ? "Yes" : "No"}}
-                                    </div>
-
-                                    <div ng-show="entry.valueCoding">
-                                        {{entry.valueCoding.display}}
-                                        <!--
-                                        ({{entry.valueCoding.code}}  {{entry.valueCoding.system}})
-                                        {{entry}}-->
-                                    </div>
-
-                                    <div ng-show="entry.valueReference">
-                                        {{entry.valueReference.display}}
-                                    </div>
-                                </div>
-
-
-
-
-                            </div>
-
-                        </div>
-                    </div>
-
-
+                <div ng-repeat="answer in gc.answer">
+                    <ng-include src = "'includes/renderSingleItemForDisplay.html'"></ng-include>
                 </div>
             </div>
 

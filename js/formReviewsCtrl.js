@@ -4,10 +4,100 @@ angular.module("formsApp")
         function ($scope,$http,formsSvc) {
 
 
+
+            //load outstanding SR's
+            function loadActiveSR() {
+                let qry = "/ds/fhir/ServiceRequest?category=reviewRefer&status=active"
+                $http.get(qry).then(
+                    function(data) {
+                        console.log(data)
+                        $scope.serviceRequestsBundle = data.data;
+
+                    }
+                )
+            }
+            loadActiveSR()
+
+            $scope.markSRComplete = function(SR) {
+                SR.status = "completed"
+                let qry = `/ds/fhir/ServiceRequest/${SR.id}`
+                $http.put(qry,SR).then(
+                    function(data) {
+                        loadActiveSR()
+                        delete $scope.selectedSR
+                        delete $scope.selectedQR
+                        delete $scope.selectedReview
+                    }, function(err) {
+                        alert(angular.toJson(err))
+                    }
+                )
+
+            }
+
+            $scope.selectSR = function(sr){
+                $scope.selectedSR = sr
+                //get the QR from the 'supportinginfo in the SR
+
+                if (sr.supportingInfo) {
+                    sr.supportingInfo.forEach(function (si) {
+                        if (si.reference.indexOf('QuestionnaireResponse') > -1) {
+                            //this is the reference to the QR that this SR is for.
+                            let ar = si.reference.split('/')
+                            let QRid = ar[1]
+                            $http.get("/ds/fhir/QuestionnaireResponse/"+QRid).then(
+                                function(data) {
+                                    console.log(data)
+                                    let QR = data.data
+
+                                    //now get the associated Q
+                                    formsSvc.loadQByUrl(QR.questionnaire).then(   //returns a bundle
+                                        function(data) {
+                                            console.log(data)
+                                            if (data.data.entry && data.data.entry.length > 0) {
+                                                let Q = data.data.entry[0].resource
+
+                                                let hashIds = {}
+                                                Q.item.forEach(function (item) {
+                                                    getReviewerLinkId(hashIds,item)
+                                                })
+
+
+                                                let arReviewComments = []
+                                                QR.item.forEach(function (item) {
+                                                    getReviewItems(arReviewComments,hashIds,item)
+
+                                                })
+                                                // if (arReviewComments.length > 0) {
+
+                                                $scope.selectedReview = {QR:QR,reviews:arReviewComments}
+                                                //$scope.reviewQRs.push({QR:QR,reviews:arReviewComments})
+
+                                                $scope.selectedQR = QR
+                                            }
+
+
+
+                                        }
+                                    )
+
+
+
+
+
+                                }, function (err) {
+                                    alert(`The Questionnaire with the id: ${QRid} was not found.`)
+                                }
+                            )
+                        }
+                    })
+                }
+
+            }
+
             let reviewCommentsSystem = "http://canshare.com/cs/review"
 
             $scope.selectReview = function(review) {
-
+                delete $scope.selectedSR
 
                 $scope.selectedReview = review
                 $scope.selectedQR = review.QR       //for the display
@@ -56,8 +146,6 @@ angular.module("formsApp")
                 Q.item.forEach(function (item) {
                     getReviewerLinkId(hashIds,item)
                 })
-
-                //console.log(hashIds)
 
                 formsSvc.getQRforQ(Q.url).then(
                     function(bundleResponses) {

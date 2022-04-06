@@ -410,8 +410,6 @@ angular.module("formsApp")
                     }
 
                 }
-
-
             },
             makeFormTemplate : function(Q) {
                 let that = this;
@@ -528,7 +526,7 @@ angular.module("formsApp")
                     }
 
                 })
-console.log(template)
+
                 return template
 
                 //looks for specific instructions from the Q about an item - eg render as radio
@@ -902,8 +900,13 @@ console.log(template)
                             //console.log(value)
 
                             //when a radio is used as the input, the value is a string rather than an object
+                            //but when pre-popping it is just the text, so trap the error
                             if (typeof value === 'string' || value instanceof String) {
-                                value = JSON.parse(value)
+                                try {
+                                    value = JSON.parse(value)
+                                } catch(ex) {
+                                    console.log("The value was not json")
+                                }
                             }
 
 

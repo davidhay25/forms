@@ -38,7 +38,7 @@ angular.module("formsApp")
 
             //count the number of completed answers in each section - used by tabbed form...
             $scope.completedAnswersInSection = function(section) {
-              
+
                 let cnt = 0
                 section.item.forEach(function (item){
                     if ($scope.form[item.linkId]) {
