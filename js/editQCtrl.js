@@ -1,7 +1,10 @@
 angular.module("formsApp")
     .controller('editQCtrl',
-        function ($scope,$http,formsSvc,Q) {
+        function ($scope,$http,formsSvc,Q,allQ) {
 
+            $scope.allQ = allQ
+            $scope.input = {}
+            $scope.input.section = {}
             let QBase = "http://canshare.com/fhir/Questionnaire/" //just for the url
 
             if (Q) {
@@ -12,12 +15,29 @@ angular.module("formsApp")
                 $scope.Q = {item:[]}
             }
 
-            $scope.input = {}
+            //$scope.input = {}
 
             $scope.updateUrl = function (name) {
                 $scope.Q.url = QBase + name
             }
 
+            $scope.selectExistingQ = function (Q) {
+                $scope.eQ = Q
+            }
+
+            $scope.checkSection = function(linkId,checked) {
+                console.log(linkId,checked)
+
+
+            }
+
+            $scope.showSection = function(linkId){
+                $scope.eQ.item.forEach(function (item) {
+                    if (item.linkId == linkId) {
+                        $scope.selectedSection = item
+                    }
+                })
+            }
 
             $scope.save = function() {
                 if ($scope.editType == "edit") {
@@ -34,6 +54,18 @@ angular.module("formsApp")
                     $scope.$close()        //prob. not necessary to pass the Q back as the instance passed in has been modified
                 } else {
                     //this is a new Q
+
+                    //check for selected sections
+
+                    $scope.eQ.item.forEach(function (section) {
+                        if ($scope.input.section[section.linkId]) {
+                            $scope.Q.item = $scope.Q.item || []
+                            $scope.Q.item.push(section)
+                        }
+                    })
+                    $scope.$close($scope.Q)
+/*
+return
 
                     if ($scope.input.startWithBase) {
 
@@ -56,7 +88,7 @@ angular.module("formsApp")
                     } else {
                         $scope.$close($scope.Q)
                     }
-
+*/
 
                 }
 

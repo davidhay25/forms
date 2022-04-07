@@ -124,9 +124,13 @@ angular.module("formsApp")
                     templateUrl: 'modalTemplates/editQ.html',
                     backdrop: 'static',
                     controller: 'editQCtrl',
+                    //size : 'lg',
                     resolve: {
                         Q: function () {
                             return null
+                        },
+                        allQ : function () {
+                            return $scope.allQ
                         }
                     }
                 }).result.then(

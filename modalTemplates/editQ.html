@@ -18,7 +18,8 @@
 
     </div>
     <div class="modal-body">
-
+        <uib-tabset>
+            <uib-tab heading = "Description">
                 <table class="table">
 
                     <tr>
@@ -61,6 +62,63 @@
 
 
                 </table>
+            </uib-tab>
+            <uib-tab ng-show = "editType == 'new'" heading = "Select from existing Q">
+                <br/>
+                <div class="row">
+                    <div class="col-sm-3">
+                        Existing Q
+                    </div>
+                    <div class="col-sm-9">
+                        <select ng-model="input.libQ" class="form-control"
+                                ng-change = "selectExistingQ(input.libQ)"
+                                ng-options="q.name for q in allQ"></select>
+                    </div>
+                </div>
+                <br/>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="list-group">
+                            <div class="list-group-item"
+                                ng-repeat="item in eQ.item">
+
+                                <checkbox ng-model="input.section[item.linkId]"
+                                    ng-change = "checkSection(item.linkId,input.section[item.linkId])">
+
+                                </checkbox>  {{item.text}}
+
+                                <span>
+                                    <i class="glyphicon glyphicon-info-sign pull-right"
+                                       ng-click = "showSection(item.linkId)" />
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div ng-show="selectedSection" class="banner">{{selectedSection.linkId}}</div>
+                        <div class="list-group">
+                            <div class="list-group-item"
+                                 ng-repeat="item in selectedSection.item">
+                                {{item.text}}
+
+                            </div>
+                        </div>
+
+                        <ul>
+
+                        </ul>
+
+                    </div>
+                </div>
+
+            </uib-tab>
+
+        </uib-tabset>
+
+
 
 
 
