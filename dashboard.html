@@ -60,7 +60,7 @@
     <script src="js/formRenderCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
-
+    <script src="js/dispositionCtrl.js"></script>
     <!--
         <script src="js/designerCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
@@ -133,477 +133,486 @@
     </nav>
 
     <uib-tabset>
-        <!--
-        <uib-tab heading="Designer">
-            <br/>
 
-                <div ng-controller="designerCtrl">
-                    <ng-include src = "'includes/designer.html'"></ng-include>
-                </div>
-        </uib-tab>
--->
+
         <uib-tab heading="Questionnaire resources">
             <br/>
             <div class="row">
-               <div class="col-md-2">
-                       <div class="list-group">
-                           <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                                style="cursor: pointer"
-                                ng-click="selectQ(Q)"
-                                ng-repeat="Q in allQ">
-                               {{Q.name}}
-                           </div>
-                       </div>
+                <div class="col-md-2">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                             style="cursor: pointer"
+                             ng-click="selectQ(Q)"
+                             ng-repeat="Q in allQ">
+                            {{Q.name}}
+                        </div>
+                    </div>
 
-                       <button class="btn btn-link"
-                               ng-click="newQ()">
-                           New Questionnaire
-                       </button>
+                    <button class="btn btn-link"
+                            ng-click="newQ()">
+                        New Questionnaire
+                    </button>
 
-                       <div ng-show="treeData && input.dirty">
-                           <button class="btn btn-link"
-                                   ng-click="updateQ()">
-                               Update Q
-                           </button>
-                       </div>
-
-
-
-                   </div>
-               <div class="col-md-10">
-
-                       <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
-
-                       <uib-tabset ng-show="treeData">
-
-                           <uib-tab heading="Q Items tree">
+                    <div ng-show="treeData && input.dirty">
+                        <button class="btn btn-link"
+                                ng-click="updateQ()">
+                            Update Q
+                        </button>
+                    </div>
 
 
-                               <div class="row">
-                                   <div class="col-md-5">
-                                       <div class="pull-right">
-                                           <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
-                                           <button class="btn btn-link" ng-click="showSection()">Show sections</button>
-                                       </div>
-                                       <div class="clearfix"></div>
-                                       <div class="myScroll">
-                                           <div id="designTree"></div>
-                                       </div>
+
+                </div>
+                <div class="col-md-10">
+
+                    <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
+
+                    <uib-tabset ng-show="treeData">
+
+                        <uib-tab heading="Q Items tree">
 
 
-                                   </div>
-                                   <div class="col-md-7">
-
-                                       <uib-tabset>
-
-                                           <uib-tab heading="Details">
-
-                                               <div ng-show = "selectedNode">
-
-                                                   <div class="row">
-                                                       <div class="col-md-9">
-                                                           <H4>Element: {{selectedNode.data.item.text}}</H4>
-                                                       </div>
-                                                       <div class="col-md-3">
-                                                           <div ng-show="selectedNode.data.item.repeats">
-                                                               <div class="alert alert-danger pull-right">
-                                                                   <strong>Element can repeat</strong>
-                                                               </div>
-
-                                                           </div>
-                                                       </div>
-                                                   </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="pull-right">
+                                        <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
+                                        <button class="btn btn-link" ng-click="showSection()">Show sections</button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="myScroll">
+                                        <div id="designTree"></div>
+                                    </div>
 
 
-                                                   <div class="row">
-                                                       <div class="col-md-3">
-                                                           LinkId
-                                                       </div>
-                                                       <div class="col-md-9">
+                                </div>
+                                <div class="col-md-7">
 
-                                                           {{selectedNode.data.item.linkId}}
-                                                       </div>
-                                                   </div>
+                                    <uib-tabset>
 
-                                               <div class="row">
-                                                   <div class="col-md-3">
-                                                       Type
-                                                   </div>
-                                                   <div class="col-md-9">
+                                        <uib-tab heading="Details">
 
-                                                       {{selectedNode.data.item.type}}
-                                                   </div>
-                                               </div>
-                                               <div class="row">
-                                                   <div class="col-md-3"  ng-show= "selectedNode.data.item.code">
-                                                       Code
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <div ng-repeat = "coding in selectedNode.data.item.code">
-                                                           {{coding.code}}
-                                                           <span style="padding-left: 20px">({{coding.display}})</span>
-                                                           <span style="padding-left: 40px">{{coding.system}}</span>
-                                                       </div>
+                                            <div ng-show = "selectedNode">
 
-                                                   </div>
-                                               </div>
-                                               <div class="row" ng-show="selectedNode.data.item.answerValueSet">
-                                                   <div class="col-md-3">
-                                                       ValueSet
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.item.answerValueSet}}
-                                                   </div>
-                                               </div>
-                                               <div class="row" ng-show="selectedNode.data.item.answerOption">
-                                                   <div class="col-md-3">
-                                                       Coded options
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.item.answerOption.length}} options in Q
-                                                   </div>
-                                               </div>
+                                                <div class="row">
+                                                    <div class="col-md-9">
+                                                        <H4>Element: {{selectedNode.data.item.text}}</H4>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div ng-show="selectedNode.data.item.repeats">
+                                                            <div class="alert alert-danger pull-right">
+                                                                <strong>Element can repeat</strong>
+                                                            </div>
 
-                                               <div class="row" ng-show="selectedNode.data.item.enableWhen">
-                                                   <div class="col-md-3">
-                                                       Conditionals
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <div ng-repeat="ew in selectedNode.data.item.enableWhen">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        LinkId
+                                                    </div>
+                                                    <div class="col-md-9">
+
+                                                        {{selectedNode.data.item.linkId}}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Type
+                                                    </div>
+                                                    <div class="col-md-9">
+
+                                                        {{selectedNode.data.item.type}}
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-3"  ng-show= "selectedNode.data.item.code">
+                                                        Code
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div ng-repeat = "coding in selectedNode.data.item.code">
+                                                            {{coding.code}}
+                                                            <span style="padding-left: 20px">({{coding.display}})</span>
+                                                            <span style="padding-left: 40px">{{coding.system}}</span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-show="selectedNode.data.item.answerValueSet">
+                                                    <div class="col-md-3">
+                                                        ValueSet
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.item.answerValueSet}}
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-show="selectedNode.data.item.answerOption">
+                                                    <div class="col-md-3">
+                                                        Coded options
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.item.answerOption.length}} options in Q
+                                                    </div>
+                                                </div>
+
+                                                <div class="row" ng-show="selectedNode.data.item.enableWhen">
+                                                    <div class="col-md-3">
+                                                        Conditionals
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div ng-repeat="ew in selectedNode.data.item.enableWhen">
                                                            <span class="clickable" ng-click="editItemFromLinkId(ew.question)">
                                                                {{ew.question}} </span>
-                                                           = {{ew.answerCoding.code}}
-                                                       </div>
-                                                   </div>
-                                               </div>
+                                                            = {{ew.answerCoding.code}}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                               <div class="row" ng-show="selectedNode.data.meta.usageNotes">
-                                                   <div class="col-md-3">
-                                                       Usage Notes
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.meta.usageNotes}}
-                                                   </div>
-                                               </div>
+                                                <div class="row" ng-show="selectedNode.data.meta.usageNotes">
+                                                    <div class="col-md-3">
+                                                        Usage Notes
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.usageNotes}}
+                                                    </div>
+                                                </div>
 
-                                               <div class="row" ng-show="selectedNode.data.meta.extraction.notes">
-                                                   <div class="col-md-3">
-                                                       Extraction Notes
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.meta.extraction.notes}}
-                                                   </div>
-                                               </div>
+                                                <div class="row" ng-show="selectedNode.data.meta.extraction.notes">
+                                                    <div class="col-md-3">
+                                                        Extraction Notes
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.extraction.notes}}
+                                                    </div>
+                                                </div>
 
-                                               <div class="row" ng-show="selectedNode.data.meta.sourceStandard">
-                                                   <div class="col-md-3">
-                                                       Source standard
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.meta.sourceStandard}}
-                                                   </div>
-                                               </div>
+                                                <div class="row" ng-show="selectedNode.data.meta.sourceStandard">
+                                                    <div class="col-md-3">
+                                                        Source standard
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.sourceStandard}}
+                                                    </div>
+                                                </div>
 
-                                               <div class="row" ng-show="selectedNode.data.meta.columnCount">
-                                                   <div class="col-md-3">
-                                                       Column count
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.meta.columnCount}}
-                                                   </div>
-                                               </div>
-                                               <div class="row" ng-show="selectedNode.data.meta.column">
-                                                   <div class="col-md-3">
-                                                       Column number
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       {{selectedNode.data.meta.column}}
-                                                   </div>
-                                               </div>
-                                               <div class="row" ng-show="hashAllItems[selectedNode.data.item.linkId].dependencies.length > 0">
-                                                   <div class="col-md-3">
-                                                       Items dependant on this
-                                                   </div>
-                                                   <div class="col-md-9">
-                                                       <div ng-repeat = "entry in hashAllItems[selectedNode.data.item.linkId].dependencies">
-                                                           <div class="row">
-                                                               <div class="col-md-6">
-                                                                   {{entry.item.linkId}}
-                                                               </div>
-                                                               <div class="col-md-6">
-                                                                   code = {{entry.ew.answerCoding.code}}
-                                                                   <!--
-                                                                   <div ng-repeat="ew in entry.ew">
-                                                                       {{ew}}
-                                                                       {{ew.question}} = {{ew.answerCoding.code}}
-                                                                   </div>
-                                                                   -->
-                                                               </div>
-                                                           </div>
-                                                       </div>
+                                                <div class="row" ng-show="selectedNode.data.meta.columnCount">
+                                                    <div class="col-md-3">
+                                                        Column count
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.columnCount}}
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-show="selectedNode.data.meta.column">
+                                                    <div class="col-md-3">
+                                                        Column number
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.column}}
+                                                    </div>
+                                                </div>
+                                                <div class="row" ng-show="hashAllItems[selectedNode.data.item.linkId].dependencies.length > 0">
+                                                    <div class="col-md-3">
+                                                        Items dependant on this
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div ng-repeat = "entry in hashAllItems[selectedNode.data.item.linkId].dependencies">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    {{entry.item.linkId}}
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    code = {{entry.ew.answerCoding.code}}
+                                                                    <!--
+                                                                    <div ng-repeat="ew in entry.ew">
+                                                                        {{ew}}
+                                                                        {{ew.question}} = {{ew.answerCoding.code}}
+                                                                    </div>
+                                                                    -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-                                                   </div>
-                                               </div>
-
-
-                                               <hr/>
-                                               <div class="row">
-
-                                                   <div class="col-md-2">
-                                                       <button class="btn btn-link" ng-hide = "selectedNode.id == 'root'"
-                                                               ng-click="editItem(selectedNode)">
-                                                           Edit
-                                                       </button>
-                                                   </div>
-
-                                                   <div class="col-md-3">
-                                                       <div ng-show="selectedNode.data.level == 'root'">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'section')">
-                                                               Add new section
-                                                           </button>
-
-                                                       </div>
-
-                                                       <div ng-show="selectedNode.data.level == 'section' ">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'child')">
-                                                               Add child element item
-                                                           </button>
-
-                                                       </div>
+                                                    </div>
+                                                </div>
 
 
-                                                       <div ng-show="selectedNode.data.level == 'child'">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'child',true)">
-                                                               Add sibling element
-                                                           </button>
-
-                                                           <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'grandchild')">
-                                                               Add child element
-                                                           </button>
-
-                                                       </div>
-
-                                                       <div ng-show="selectedNode.data.level == 'grandchild'">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="addItem(selectedNode,'grandchild',true)">
-                                                               Add sibling element
-                                                           </button>
-
-                                                       </div>
-
-
-                                                       </div>
-
-
-                                                   <div class="col-md-2">
-                                                       <div ng-show="selectedNode">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="moveUp(selectedNode)">
-                                                               Move up
-                                                           </button>
-                                                       </div>
-                                                   </div>
-                                                   <div class="col-md-2">
-                                                       <div ng-show="selectedNode">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="moveDown(selectedNode)">
-                                                               Move Down
-                                                           </button>
-                                                       </div>
-                                                   </div>
-
-                                                   <div class="col-md-2">
-                                                       <div ng-show="selectedNode">
-                                                           <button class="btn btn-link"
-                                                                   ng-click="removeElement(selectedNode)">
-                                                               Remove element
-                                                           </button>
-                                                       </div>
-                                                   </div>
-                                               </div>
-                                                   <!--
                                                 <hr/>
-                                               <pre>{{selectedNode.data.item | json}}</pre>
+                                                <div class="row">
+
+                                                    <div class="col-md-2">
+                                                        <button class="btn btn-link" ng-hide = "selectedNode.id == 'root'"
+                                                                ng-click="editItem(selectedNode)">
+                                                            Edit
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <div ng-show="selectedNode.data.level == 'root'">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="addItem(selectedNode,'section')">
+                                                                Add new section
+                                                            </button>
+
+                                                        </div>
+
+                                                        <div ng-show="selectedNode.data.level == 'section' ">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="addItem(selectedNode,'child')">
+                                                                Add child element item
+                                                            </button>
+
+                                                        </div>
+
+
+                                                        <div ng-show="selectedNode.data.level == 'child'">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="addItem(selectedNode,'child',true)">
+                                                                Add sibling element
+                                                            </button>
+
+                                                            <button class="btn btn-link"
+                                                                    ng-click="addItem(selectedNode,'grandchild')">
+                                                                Add child element
+                                                            </button>
+
+                                                        </div>
+
+                                                        <div ng-show="selectedNode.data.level == 'grandchild'">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="addItem(selectedNode,'grandchild',true)">
+                                                                Add sibling element
+                                                            </button>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                    <div class="col-md-2">
+                                                        <div ng-show="selectedNode">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="moveUp(selectedNode)">
+                                                                Move up
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div ng-show="selectedNode">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="moveDown(selectedNode)">
+                                                                Move Down
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div ng-show="selectedNode">
+                                                            <button class="btn btn-link"
+                                                                    ng-click="removeElement(selectedNode)">
+                                                                Remove element
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--
+                                             <hr/>
+                                            <pre>{{selectedNode.data.item | json}}</pre>
 -->
-                                               </div>
+                                            </div>
 
 
-                                           </uib-tab>
+                                        </uib-tab>
 
-                                           <uib-tab heading="Meta">
-                                               <pre>{{selectedNode.data.meta | json}}</pre>
-                                               <em>Only for internal use</em>
-                                           </uib-tab>
+                                        <uib-tab heading="Meta">
+                                            <pre>{{selectedNode.data.meta | json}}</pre>
+                                            <em>Only for internal use</em>
+                                        </uib-tab>
 
-                                           <uib-tab heading="Json">
-                                               <pre>{{selectedNode.data.item | json}}</pre>
-                                               <em>Only for internal use</em>
-                                           </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre>{{selectedNode.data.item | json}}</pre>
+                                            <em>Only for internal use</em>
+                                        </uib-tab>
 
-                                       </uib-tabset>
+                                    </uib-tabset>
 
-                                   </div>
-                               </div>
-
-
-
+                                </div>
+                            </div>
 
 
 
-                           </uib-tab>
-
-                           <uib-tab heading="Summary">
-                               <br/>
-                               <ng-include src = "'includes/renderReport.html'"></ng-include>
-                               <br/>
-                           </uib-tab>
 
 
 
-                           <uib-tab heading="Q metadata">
-                               <br/>
-                               <div class="row">
-                                   <div class="col-md-2">
-                                       Id
-                                   </div>
-                                   <div class="col-md-9">
-                                       <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
-                                   </div>
-                               </div>
+                        </uib-tab>
 
-                               <div class="row">
-                                   <div class="col-md-2">
-                                       Url
-                                   </div>
-                                   <div class="col-md-9">
-                                       <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
-                                   </div>
-                               </div>
+                        <uib-tab heading="Summary">
+                            <br/>
+                            <ng-include src = "'includes/renderReport.html'"></ng-include>
+                            <br/>
+                        </uib-tab>
 
-                               <div class="row">
-                                   <div class="col-md-2">
-                                       Title
-                                   </div>
-                                   <div class="col-md-9">
+
+
+                        <uib-tab heading="Q metadata">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Id
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Url
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Title
+                                </div>
+                                <div class="col-md-9">
                                        <textarea class="form-control" ng-model="selectedQ.title"
-                                        ng-change="input.dirty = true">
+                                                 ng-change="input.dirty = true">
 
                                        </textarea>
 
-                                   </div>
-                               </div>
+                                </div>
+                            </div>
 
-                               <div class="row">
-                                   <div class="col-md-2">
-                                       Description
-                                   </div>
-                                   <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Description
+                                </div>
+                                <div class="col-md-9">
                                        <textarea class="form-control" ng-model="selectedQ.description"
                                                  ng-change="input.dirty = true">
 
                                        </textarea>
 
-                                   </div>
-                               </div>
+                                </div>
+                            </div>
 
-                           </uib-tab>
+                        </uib-tab>
 
-                           <uib-tab heading="Form preview">
+                        <uib-tab heading="Form preview">
 
-                               <div ng-controller="formsCtrl">
-                                   <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
-                               </div>
+                            <div ng-controller="formsCtrl">
+                                <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                            </div>
 
-                           </uib-tab>
+                        </uib-tab>
 
-                           <uib-tab ng-show = false heading="Audit">
-                               <br/>
-                               <uib-tabset>
-                                   <uib-tab heading = "No code">
-                                       <br/>
-                                       <em>These items have no code, so will not be extracted as observations.
-                                           This is not necessarily an error, but if you do wish extraction to occur, then
-                                           the code needs to be added.</em>
-                                       <br/> <br/>
-                                       <table class="table">
-                                           <tr ng-repeat="item in QAudit.nocode">
-                                               <td>{{item.parent.text}} > {{item.item.text}} </td>
-                                           </tr>
-                                       </table>
+                        <uib-tab ng-show = false heading="Audit">
+                            <br/>
+                            <uib-tabset>
+                                <uib-tab heading = "No code">
+                                    <br/>
+                                    <em>These items have no code, so will not be extracted as observations.
+                                        This is not necessarily an error, but if you do wish extraction to occur, then
+                                        the code needs to be added.</em>
+                                    <br/> <br/>
+                                    <table class="table">
+                                        <tr ng-repeat="item in QAudit.nocode">
+                                            <td>{{item.parent.text}} > {{item.item.text}} </td>
+                                        </tr>
+                                    </table>
 
-                                       <br/>
-                                   </uib-tab>
-                                   <uib-tab heading = "No Valueset">
-                                       <br/>
-                                       <em>Coded items missing answerValueSet or answerOptions. These are errors that need correction.</em>
-                                       <br/> <br/>
-                                       <table class="table">
-                                           <tr ng-repeat="item in QAudit.missingvs">
-                                               <td>{{item.parent.text}} > {{item.item.text}} </td>
-                                           </tr>
-                                       </table>
-                                       <br/>
-                                   </uib-tab>
-                               </uib-tabset>
+                                    <br/>
+                                </uib-tab>
+                                <uib-tab heading = "No Valueset">
+                                    <br/>
+                                    <em>Coded items missing answerValueSet or answerOptions. These are errors that need correction.</em>
+                                    <br/> <br/>
+                                    <table class="table">
+                                        <tr ng-repeat="item in QAudit.missingvs">
+                                            <td>{{item.parent.text}} > {{item.item.text}} </td>
+                                        </tr>
+                                    </table>
+                                    <br/>
+                                </uib-tab>
+                            </uib-tabset>
 
-                           </uib-tab>
+                        </uib-tab>
 
-                           <uib-tab ng-show = false heading="Report">
-                               <br/>
+                        <uib-tab ng-show = false heading="Report">
+                            <br/>
 
-                              <table class="table-bordered table table-condensed">
-                                  <tr><th>Text</th><th>Type</th><th>Flags</th><th>Code</th><th>Coded info</th></tr>
-                                  <tr ng-repeat="row in treeData">
+                            <table class="table-bordered table table-condensed">
+                                <tr><th>Text</th><th>Type</th><th>Flags</th><th>Code</th><th>Coded info</th></tr>
+                                <tr ng-repeat="row in treeData">
 
-                                      <td>
-                                          <div ng-show = "row.parent == 'root'">
-                                              <strong>{{row.data.item.text}}</strong>
-                                          </div>
-                                          <div ng-hide = "row.parent == 'root'">
-                                              {{row.data.item.text}}
-                                          </div>
+                                    <td>
+                                        <div ng-show = "row.parent == 'root'">
+                                            <strong>{{row.data.item.text}}</strong>
+                                        </div>
+                                        <div ng-hide = "row.parent == 'root'">
+                                            {{row.data.item.text}}
+                                        </div>
 
 
-                                      </td>
-                                      <td>{{row.data.item.type}}</td>
-                                      <td>
-                                          <div ng-show = "row.data.item.required == true">
-                                              Req.
-                                          </div>
-                                      </td>
+                                    </td>
+                                    <td>{{row.data.item.type}}</td>
+                                    <td>
+                                        <div ng-show = "row.data.item.required == true">
+                                            Req.
+                                        </div>
+                                    </td>
 
-                                      <td>{{row.data.item.code[0].code}} {{row.data.item.code[0].system}}</td>
+                                    <td>{{row.data.item.code[0].code}} {{row.data.item.code[0].system}}</td>
 
-                                      <td>
-                                          {{row.data.item.answerValueSet}}
-                                          <div ng-repeat="option in row.data.item.answerOption">
-                                              {{option.valueCoding.code}} &nbsp; &nbsp; ({{option.valueCoding.display}})
-                                              <span class="pull-right">{{option.valueCoding.system}}</span>
-                                          </div>
+                                    <td>
+                                        {{row.data.item.answerValueSet}}
+                                        <div ng-repeat="option in row.data.item.answerOption">
+                                            {{option.valueCoding.code}} &nbsp; &nbsp; ({{option.valueCoding.display}})
+                                            <span class="pull-right">{{option.valueCoding.system}}</span>
+                                        </div>
 
-                                      </td>
+                                    </td>
 
-                                  </tr>
-                              </table>
-                           </uib-tab>
+                                </tr>
+                            </table>
+                        </uib-tab>
 
-                           <uib-tab  heading="FSH">
-                               >>todo use gofsh to convert to FSH
-                           </uib-tab>
+                        <uib-tab ng-show = false heading="FSH">
+                            >>todo use gofsh to convert to FSH
+                        </uib-tab>
 
-                           <uib-tab heading="Json">
-                               <pre>{{selectedQ | json}}</pre>
-                           </uib-tab>
-                       </uib-tabset>
+                        <uib-tab heading = "Review Url">
+                            <br/>
 
-                   </div>
+                                <div >
+                                    Review UI Url: <strong>
+                                    <a target="_blank"
+                                       ng-href="ehr.html?{{selectedQ.name}}">
+                                        http://canshare.clinfhir.com/ehr.html?{{selectedQ.name}}
+                                    </a> </strong>
+                                </div>
+
+
+                        </uib-tab>
+
+                        <uib-tab heading="Json">
+                            <pre>{{selectedQ | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
             </div>
 
         </uib-tab>
+
+
 
         <uib-tab heading="Form reviews">
             <br/>
@@ -616,11 +625,12 @@
 
         </uib-tab>
 
-        <uib-tab heading="Query server">
+
+        <uib-tab ng-show="false" heading="Query server">
             <em>Query for supported resources - ? or link to Server Query - yes!</em>
         </uib-tab>
 
-        <uib-tab heading="Provenance">
+        <uib-tab ng-show="false" heading="Provenance">
             <br/>
 
 
@@ -649,8 +659,43 @@
 
        </uib-tab>
 
+        <uib-tab heading="Form review dispositions">
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                             style="cursor: pointer"
+                             ng-click="loadDispositionsForQ(Q)"
+                             ng-repeat="Q in allQ">
+                            {{Q.name}}
+                        </div>
+                    </div>
 
-        <uib-tab heading="Terminology">
+                </div>
+                <div class="col-md-10">
+                    <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
+                        <tr><th>Reviewer</th><th>Date</th><th>Type</th><th>Comment</th><th>Disposition date</th><th>Disposition</th><th>Note</th></tr>
+                        <tr ng-repeat = "item in dispositionsForQ">
+                            <td>{{item.author}}</td>
+                            <td>{{item.authored | date : 'dd-MMM-yyyy'}}</td>
+                            <td>{{item.linkId}}</td>
+                            <td>{{item.comment}}</td>
+                            <td>{{item.dispositionDate | date : 'dd-MMM-yyyy'}}</td>
+                            <td>{{item.disposition.display}}</td>
+                            <td>{{item.note}}</td>
+                        </tr>
+                    </table>
+                   <!-- <pre>{{dispositionsForQ | json}}</pre> -->
+                </div>
+            </div>
+
+
+        </uib-tab>
+
+
+
+        <uib-tab ng-show="false" heading="Terminology">
 
                 <div class="row">
                     <div class="col-md-2">

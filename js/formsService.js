@@ -49,6 +49,54 @@ angular.module("formsApp")
         }
 
         return {
+            loadDispositionsForQ : function(Q) {
+                let deferred = $q.defer()
+                let arResult = []
+                let qry = `/ds/fhir/Observation?focus=${Q.url}`  //add category
+                $http.get(qry).then(
+                    function(data){
+                        if (data.data.entry) {
+                            data.data.entry.forEach(function(entry){
+                                let obs = entry.resource
+                                let result = {}
+                                result.disposition = obs.code.coding[0]
+                                result.dispositionDate = obs.effectiveDateTime
+                                result.QR_url = obs.derivedFrom[0].reference //the QR that had the initial comment
+                                obs.component.forEach(function (comp){
+                                    let code = comp.code.coding[0].code
+                                    switch (code) {
+                                        case "comment" :
+                                            result.comment = comp.valueString
+                                            break
+                                        case "note" :
+                                            result.note = comp.valueString
+                                            break
+                                        case "reviewer" :
+                                            result.author = comp.valueString
+                                            break
+                                        case "linkId" :
+                                            result.linkId = comp.valueString
+                                            break
+                                        case "authored" :
+                                            result.authored = comp.valueDateTime
+                                            break
+                                    }
+                                })
+                                arResult.push(result)
+                            })
+                            deferred.resolve(arResult)
+                        }
+
+
+
+
+                        //$scope.dispositionsForQ = data.data
+                    },
+                    function(err){
+                        console.log(err)
+                    })
+                return deferred.promise
+            },
             loadQByUrl : function(url) {
                 let qry = "/fm/fhir/Questionnaire?url=" + url
                 return $http.get(qry)

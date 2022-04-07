@@ -1,26 +1,26 @@
 <div>
+    <!--
+        <div ng-show="selectedReviewQ" class="banner">
+            <div >
+                Review UI Url: <strong>
+                <a target="_blank"
+                   ng-href="ehr.html?{{selectedReviewQ.name}}">
+                    http://canshare.clinfhir.com/ehr.html?{{selectedReviewQ.name}}
+                </a> </strong>
+            </div>
 
-    <div ng-show="selectedReviewQ" class="banner">
-        <div >
-            Review UI Url: <strong>
-            <a target="_blank"
-               ng-href="ehr.html?{{selectedReviewQ.name}}">
-                http://canshare.clinfhir.com/ehr.html?{{selectedReviewQ.name}}
-            </a> </strong>
         </div>
 
-    </div>
-<!--
-    <div class="row">
-        <div class="col-md-3">
-            <select ng-model="input.selectReviewQ" class="form-control"
-                    ng-options = "Q.name for Q in allQ"
-                    ng-change = "selectQReviews(input.selectReviewQ)"></select>
+        <div class="row">
+            <div class="col-md-3">
+                <select ng-model="input.selectReviewQ" class="form-control"
+                        ng-options = "Q.name for Q in allQ"
+                        ng-change = "selectQReviews(input.selectReviewQ)"></select>
+            </div>
         </div>
-    </div>
 
-    <hr/>
--->
+        <hr/>
+    -->
 
 
     <div class="row">
@@ -82,27 +82,38 @@
         </div>
 
         <div class="col-md-7">
+            <div class="rounded-box-filled"><div style="text-align: center">{{selectedQ.name}}</div> </div>
             <div class="row">
 
 
                 <div class="col-md-5">
-                <strong>Comments</strong>
-                <div ng-repeat="r in selectedReview.reviews">
+                    <div ng-controller="dispositionCtrl">
+                        <strong>Comments</strong>
+                        <div ng-repeat="r in selectedReview.reviews">
 
-                    <div><strong>{{r.text}}</strong></div>
-                    <div>{{r.answer[0].valueString}}</div>
-                    <br/>
+                            <div class="rounded-box">
+                                <div><strong>{{r.text}}</strong></div>
+                                <div>{{r.answer[0].valueString}}</div>
+                                <div>
+                                    <button class="btn btn-link pull-right"
+                                            ng-click="addDisposition(selectedQR,r)">Add disposition</button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
 
-                </div>
-
-                <br/>
-                <div class="row" ng-show="selectedSR">
-                    <div class="col-md-12">
-                        <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)" class=" btn btn-primary">Mark as review completed</button>
+                        </div>
+                        <br/>
                     </div>
-                </div>
 
-            </div>
+
+                    <br/>
+                    <div class="row" ng-show="selectedSR">
+                        <div class="col-md-12">
+                            <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)" class=" btn btn-primary">Mark as review completed</button>
+                        </div>
+                    </div>
+
+                </div>
 
                 <div class="col-md-7">
                 <div ng-show = "selectedQR">

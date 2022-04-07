@@ -3,8 +3,6 @@ angular.module("formsApp")
     .controller('formReviewsCtrl',
         function ($scope,$http,formsSvc) {
 
-
-
             //load outstanding SR's
             function loadActiveSR() {
                 let qry = "/ds/fhir/ServiceRequest?category=reviewRefer&status=active"
@@ -73,15 +71,11 @@ angular.module("formsApp")
                                                 //$scope.reviewQRs.push({QR:QR,reviews:arReviewComments})
 
                                                 $scope.selectedQR = QR
+                                                $scope.selectedQ = Q
                                             }
-
-
 
                                         }
                                     )
-
-
-
 
 
                                 }, function (err) {
@@ -139,6 +133,7 @@ angular.module("formsApp")
                 delete $scope.selectedQR
                 delete $scope.selectedReview
                 $scope.selectedReviewQ = Q
+                $scope.selectedQ = Q
                 $scope.reviews = []     //QRs that have reviews...
 
                 //get the linkId's of reviewer comment items in the Q based on the code system

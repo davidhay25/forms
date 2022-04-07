@@ -4,7 +4,21 @@ angular.module("formsApp")
     .controller('dashboardCtrl',
         function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc) {
 
-            $scope.QVS = []
+
+            //load all the disposition Observations for a Q
+            $scope.loadDispositionsForQ = function(Q) {
+                delete $scope.dispositionsForQ
+                $scope.selectedQ = Q
+                formsSvc.loadDispositionsForQ(Q).then(
+                    function(data) {
+                        $scope.dispositionsForQ = data
+                        console.log(data)
+                    }
+                )
+            }
+            //let qry = "/ds/fhir/Observation"
+
+            //$scope.QVS = []
 
             $scope.input = {}
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime','choice','open-choice','display','group','reference']
@@ -14,8 +28,6 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
             $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review'})
-
-
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
