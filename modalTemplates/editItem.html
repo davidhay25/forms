@@ -12,6 +12,14 @@
 
                 <button class="btn btn-link pull-right" ng-click="cancel()">Cancel</button>
 
+                <button class="btn btn-success pull-right"
+                        ng-click="save()">
+
+                    <div ng-show="editType == 'edit'">Save changes</div>
+                    <div ng-show="editType == 'new'">Add new item</div>
+                </button>
+
+
             </div>
 
         </div>
@@ -47,16 +55,16 @@
                                    ng-model="newItem.text" class="form-control"/> </td>
 
                     </tr>
-                    <!--
+
                     <tr>
                         <td>Description</td>
                         <td><textarea
                                    placeholder="Description of the item. Displayed in the UI"
-                                   ng-model="newItem.text" class="form-control"></textarea>
+                                   ng-model="meta.description" class="form-control"></textarea>
                         </td>
 
                     </tr>
-                    -->
+
 
 
                     <tr>
@@ -300,13 +308,18 @@
     <div class="modal-header">
 
         {{editType}} {{insertType}}
+
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                <!--
                 <button class="btn btn-success pull-right"
                         ng-click="save()">
+
                     <div ng-show="editType == 'edit'">Save changes</div>
                     <div ng-show="editType == 'new'">Add new item</div>
                 </button>
+
+                -->
             </div>
         </div>
     </div>

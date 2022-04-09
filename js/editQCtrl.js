@@ -57,12 +57,15 @@ angular.module("formsApp")
 
                     //check for selected sections
 
-                    $scope.eQ.item.forEach(function (section) {
-                        if ($scope.input.section[section.linkId]) {
-                            $scope.Q.item = $scope.Q.item || []
-                            $scope.Q.item.push(section)
-                        }
-                    })
+                    if ($scope.eQ) {
+                        $scope.eQ.item.forEach(function (section) {
+                            if ($scope.input.section[section.linkId]) {
+                                $scope.Q.item = $scope.Q.item || []
+                                $scope.Q.item.push(section)
+                            }
+                        })
+                    }
+
                     $scope.$close($scope.Q)
 /*
 return

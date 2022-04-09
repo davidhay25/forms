@@ -61,6 +61,8 @@
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
     <script src="js/dispositionCtrl.js"></script>
+    <script src="js/exportSvc.js"></script>
+    <script src="js/importSectionCtrl.js"></script>
     <!--
         <script src="js/designerCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
@@ -356,6 +358,13 @@
                                                                 Add new section
                                                             </button>
 
+                                                            <div>
+                                                                <button class="btn btn-link"
+                                                                        ng-click="importSection()">
+                                                                    Import section
+                                                                </button>
+                                                            </div>
+
                                                         </div>
 
                                                         <div ng-show="selectedNode.data.level == 'section' ">
@@ -398,8 +407,18 @@
                                                                     ng-click="moveUp(selectedNode)">
                                                                 Move up
                                                             </button>
+
+                                                            <div>
+                                                                <button class="btn btn-link"
+                                                                        ng-click="moveDown(selectedNode)">
+                                                                    Move Down
+                                                                </button>
+                                                            </div>
+
+
                                                         </div>
                                                     </div>
+                                                    <!--
                                                     <div class="col-md-2">
                                                         <div ng-show="selectedNode">
                                                             <button class="btn btn-link"
@@ -407,8 +426,9 @@
                                                                 Move Down
                                                             </button>
                                                         </div>
-                                                    </div>
 
+                                                    </div>
+-->
                                                     <div class="col-md-2">
                                                         <div ng-show="selectedNode">
                                                             <button class="btn btn-link"
@@ -598,6 +618,9 @@
                                         http://canshare.clinfhir.com/ehr.html?{{selectedQ.name}}
                                     </a> </strong>
                                 </div>
+
+                            <button class="btn-primary btn" ng-click="makeCSV()">Make CSV</button>
+
 
 
                         </uib-tab>

@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc) {
 
 
             //load all the disposition Observations for a Q
@@ -59,12 +59,11 @@ angular.module("formsApp")
                 })
 
                 return cnt
-
             }
 
 
             // --------- provenance stuff
-
+/*
             $http.get("/ds/fhir/Provenance").then(
                 function(data){
                     $scope.allProvenance = []
@@ -73,8 +72,6 @@ angular.module("formsApp")
                             $scope.allProvenance.push(entry.resource)
                         })
                     }
-
-
                 }, function(err) {
 
                 }
@@ -83,8 +80,8 @@ angular.module("formsApp")
             $scope.selectProvenance = function(prov) {
                 $scope.selectedProvenance = prov
             }
-            //----------
 
+*/
 
             $scope.expandAll = function() {
                 expandAll()
@@ -103,6 +100,11 @@ angular.module("formsApp")
             }
 
 
+            $scope.makeCSV = function() {
+                let csv = exportSvc.createDownloadCSV($scope.selectedQ)
+                console.log(csv)
+            }
+
             $scope.input.vsList = $localStorage.formsVS
 
             if (!  $scope.input.vsList)  {
@@ -113,9 +115,6 @@ angular.module("formsApp")
                 $scope.input.vsList.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
 
             }
-
-
-            //retrieve the Provenance resources
 
 
             //create a new Q
@@ -173,12 +172,51 @@ angular.module("formsApp")
 
             }
 
-            $scope.addVS = function(){
-                alert("To be developed")
+            $scope.importSection = function(){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/importSection.html',
+                    backdrop: 'static',
+                    controller: 'importSectionCtrl',
+                    resolve: {
+                        allQ: function () {
+                            return $scope.allQ
+                        },
+                        Q: function () {
+                            return $scope.selectedQ
+                        }
+                    }
+                }).result.then(
+                    function (arSection) {
+                        //add the sections to the Q. The linkIds have been checked to be unique
+                        arSection.forEach(function (section) {
+                            $scope.selectedQ.item = $scope.selectedQ.item || []
+                            $scope.selectedQ.item.push(section)
+
+                            //$scope.treeIdToSelect = node.id
+                            $scope.drawQ($scope.selectedQ,true)
+                            $scope.input.dirty = true;
+                            //$scope.editingQ = false
+
+                            updateReport()
+                        })
+                    }
+                )
+
             }
+
+
+
 
             //update the selctedQ on the forms manager server
             $scope.updateQ = function(cb) {
+                qSvc.updatePrefix($scope.selectedQ)     //update the item.prefix
+                let duplicates = qSvc.checkUniqueLinkId($scope.selectedQ)
+                if (duplicates) {
+
+                    alert("Duplicate linkId found:\n " + duplicates + "\n Q not saved.")
+                    return
+                }
+
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
@@ -194,7 +232,7 @@ angular.module("formsApp")
                 )
             }
 
-            let updateAfterEdit = function(){
+            let updateAfterEditDEP = function(){
                 let items = formsSvc.makeQItemsFromTree($scope.treeData)
                 $scope.selectedQ.item = items;
                 $scope.drawQ($scope.selectedQ)
@@ -392,20 +430,17 @@ angular.module("formsApp")
                             updateReport()
 
                         }
-
-
-
-                        })
-
+                    })
             }
 
             //save new item (insert it into the treeData). Later, will convert the tree data to a Q
             //and update. Note that update is only for the items in the Q - leave the others
 
             function updateReport() {
+                qSvc.updatePrefix($scope.selectedQ)
                 let vo = formsSvc.generateQReport($scope.selectedQ)
                 $scope.report = vo.report
-            console.log(vo.report)
+
                 $scope.hashAllItems = vo.hashAllItems
             }
 
@@ -592,8 +627,6 @@ angular.module("formsApp")
                     return
                 }
 
-                //expandAll()
-                //deSelectExcept()
                 $('#designTree').jstree('destroy');
 
                 let x = $('#designTree').jstree(

@@ -2,10 +2,69 @@ angular.module("formsApp")
     //editing questionnaire
     .service('qSvc', function($q,$http,$filter,moment) {
 
-        //let hashQ
+
 
         return {
             //fin
+
+            checkUniqueLinkId : function (Q,arSection) {
+                //check that linkId's are unique in a Q. If a section is passed in, include that in the check (when importing sections)
+                let hash = {}
+                let duplicates = ""         //will contain any duplicates found
+
+                checkBranch(Q)
+                if (arSection) {
+                    arSection.forEach(function (section) {
+                        checkBranch(section)
+                    })
+                }
+
+                return duplicates       //updated by check branch
+
+                function checkBranch(branch) {
+                    if (branch.item) {
+                        branch.item.forEach(function (section){
+                            checkLinkId(section.linkId)
+                            if (section.item) {
+                                section.item.forEach( function(child){
+                                    checkLinkId(child.linkId)
+                                    if (child.item) {
+                                        child.item.forEach(function (grandchild) {
+                                            checkLinkId(grandchild.linkId)
+                                        })
+                                    }
+                                })
+                            }
+
+                        })
+                    }
+
+                }
+
+                function checkLinkId(linkId) {
+                    if (hash[linkId]) {
+                        duplicates += (linkId) + " "
+                    } else {
+                        hash[linkId] = true
+                    }
+
+                }
+
+            },
+
+            updatePrefix : function(Q) {
+                Q.item.forEach(function (section, inxSection){
+                    section.prefix = inxSection +1
+                    section.item.forEach( function(child, inxChild){
+                        child.prefix = inxChild +1
+                        if (child.item) {
+                            child.item.forEach(function (grandchild,inxGrandChild) {
+                                grandchild.prefix = inxGrandChild +1
+                            })
+                        }
+                    })
+                })
+            },
 
             editItem : function(Q,item) {
                 //edit an item

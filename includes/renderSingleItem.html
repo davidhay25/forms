@@ -12,7 +12,8 @@
             </span>
 
             <div ng-hide = "cell.item.type == 'boolean'">
-                <strong>{{cell.item.text}}</strong>
+                <span>{{cell.item.prefix}}. </span>
+                <strong>  {{cell.item.text}}</strong>
 
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
                 <span ng-show = "cell.meta.usageNotes">

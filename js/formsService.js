@@ -28,6 +28,9 @@ angular.module("formsApp")
         extColumn = "http://canshare.com/fhir/StructureDefinition/questionnaire-column"
         extColumnCount = "http://canshare.com/fhir/StructureDefinition/questionnaire-column-count"
 
+        extDescription = "http://canshare.com/fhir/StructureDefinition/questionnaire-item-description"
+
+
         canShareServer = "http://canshare/fhir/"
 
         function getHN(hn) {
@@ -194,16 +197,7 @@ angular.module("formsApp")
                 //the opposite of getMetaInfoForItem() - update an item (extensions) based on the meta VO
                 //assumption that and given extension only appears once...
 
-                //Extract Observation extension...
-                /*
-                if (meta.extraction && meta.extraction.extractObservation) {
-                    let ext = {url:extUrlObsExtract,valueBoolean:true}
 
-                    addExtension(item,ext)
-                } else {
-                    removeExtension(item,extUrlObsExtract)
-                }
-                */
                 if (meta.extraction) {
                     updateExtension(item,extUrlObsExtract,"Boolean",meta.extraction.extractObservation)
 
@@ -213,6 +207,9 @@ angular.module("formsApp")
 
                 //usage notes
                 updateExtension(item,extUsageNotes,"String",meta.usageNotes)
+
+                //description
+                updateExtension(item,extDescription,"String",meta.description)
 
                 //source standard
                 updateExtension(item,extSourceStandard,"String",meta.sourceStandard)
@@ -274,6 +271,13 @@ angular.module("formsApp")
                     meta.extraction.notes = ar1[0].valueString
                 }
 
+                //now look for description
+                let arDesc = this.findExtension(item,extDescription)
+                if (arDesc.length > 0) {
+
+                    meta.description = arDesc[0].valueString
+                }
+
                 //and usage notes
                 let ar2 = this.findExtension(item,extUsageNotes)
                 if (ar2.length > 0) {
@@ -327,62 +331,66 @@ angular.module("formsApp")
                 let report = {section:[],coded:[],conditional:[],reference:[]}
                 let issues = []     //issues found during report generation
 
-                clone.item.forEach(function(sectionItem){
-                    //items off the root are the top level sections. They have children that are either single questions
-                    //or groups of questions. A group has only a single level of child questions
+                if (clone.item) {
+                    clone.item.forEach(function(sectionItem){
+                        //items off the root are the top level sections. They have children that are either single questions
+                        //or groups of questions. A group has only a single level of child questions
 
-                    let section = {item:sectionItem,children:[],meta:{}}
-                    populateMeta(section)
-                    hashAllItems[sectionItem.linkId] = {item:sectionItem,dependencies:[]}
+                        let section = {item:sectionItem,children:[],meta:{}}
+                        populateMeta(section)
+                        hashAllItems[sectionItem.linkId] = {item:sectionItem,dependencies:[]}
 
-                    report.section.push(section)
-
-
-                    if (sectionItem.item) {        //should always have children
-                        sectionItem.item.forEach(function (child){
-
-                            updateSpecificArrays(sectionItem,report,child)
+                        report.section.push(section)
 
 
-                            if (child.type == 'group') {
-                                //this is a group of questions - commonly used for conditionals.
-                                //when displayed in the UI, the first item is in the left pane, the others in the right
-                                //most commonly, the first item (in the left pane) is the key question, the others
-                                //being conditional on the value of that item. ie the answer to the first question will
-                                //determine what is shown on the right...
-                                let group = {type:'group',item:child,children:[],meta:{}}
-                                section.children.push(group)
+                        if (sectionItem.item) {        //should always have children
+                            sectionItem.item.forEach(function (child){
 
-                                //set the column count
-                                populateMeta(group)
+                                updateSpecificArrays(sectionItem,report,child)
 
-                                //step through the children of the group..
-                                child.item.forEach(function (grandChild) {
 
-                                    updateSpecificArrays(sectionItem,report,grandChild)
+                                if (child.type == 'group') {
+                                    //this is a group of questions - commonly used for conditionals.
+                                    //when displayed in the UI, the first item is in the left pane, the others in the right
+                                    //most commonly, the first item (in the left pane) is the key question, the others
+                                    //being conditional on the value of that item. ie the answer to the first question will
+                                    //determine what is shown on the right...
+                                    let group = {type:'group',item:child,children:[],meta:{}}
+                                    section.children.push(group)
 
-                                    let entry = {item:grandChild,meta:{}}
+                                    //set the column count
+                                    populateMeta(group)
+
+                                    //step through the children of the group..
+                                    child.item.forEach(function (grandChild) {
+
+                                        updateSpecificArrays(sectionItem,report,grandChild)
+
+                                        let entry = {item:grandChild,meta:{}}
+                                        populateMeta(entry)
+
+                                        group.children.push(entry)
+                                    })
+
+
+                                } else {
+                                    //this is a single question with no grandchildren.
+
+                                    let entry = {type:'single',item:child,meta:{}}
                                     populateMeta(entry)
+                                    section.children.push(entry)
 
-                                    group.children.push(entry)
-                                })
-
-
-                            } else {
-                                //this is a single question with no grandchildren.
-
-                                let entry = {type:'single',item:child,meta:{}}
-                                populateMeta(entry)
-                                section.children.push(entry)
-
-                                if (child.item) {
-                                    //there shouldn't be any child items todo ?issue
+                                    if (child.item) {
+                                        //there shouldn't be any child items todo ?issue
+                                    }
                                 }
-                            }
 
-                        })
-                    }
-                })
+                            })
+                        }
+                    })
+                }
+
+
 
                 return {report:report,hashAllItems:hashAllItems}
 
@@ -468,112 +476,115 @@ angular.module("formsApp")
 
                 let template = []
 
-                Q.item.forEach(function (sectionItem) {
-                    let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem,meta:{}}
-                    section.meta = that.getMetaInfoForItem(sectionItem)
-                    template.push(section)
+                if (Q.item) {
+                    Q.item.forEach(function (sectionItem) {
+                        let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem,meta:{}}
+                        section.meta = that.getMetaInfoForItem(sectionItem)
+                        template.push(section)
 
-                    //now look at the items below the section level.
+                        //now look at the items below the section level.
 
-                    if (sectionItem.item) {
-                        sectionItem.item.forEach(function (item) {
-                            let meta = that.getMetaInfoForItem(item)
+                        if (sectionItem.item) {
+                            sectionItem.item.forEach(function (item) {
+                                let meta = that.getMetaInfoForItem(item)
 
-                            if (item.type == 'group') {
-                                //groups has a specific structure ATM
-                                //the first item goes in col 1
-                                //other items go in col 2 - and will often have conditionals on them
+                                if (item.type == 'group') {
+                                    //groups has a specific structure ATM
+                                    //the first item goes in col 1
+                                    //other items go in col 2 - and will often have conditionals on them
 
-                                let row = {}    //will have multiple columns
-                                //let dirty = true
-                                //row.item = item
-                                row.meta = meta
+                                    let row = {}    //will have multiple columns
+                                    //let dirty = true
+                                    //row.item = item
+                                    row.meta = meta
 
-                                if (item.item) {    //these are the child items
-                                    if (meta.columnCount) {
-                                        //if there's a column count, then fill rows left -> right
-                                        let col = 1
-                                        item.item.forEach(function (child,inx) {
+                                    if (item.item) {    //these are the child items
+                                        if (meta.columnCount) {
+                                            //if there's a column count, then fill rows left -> right
+                                            let col = 1
+                                            item.item.forEach(function (child,inx) {
 
-                                            let side = 'col' + col
-                                            let cell = {item:child}
-                                            setDecoration(cell,child)
-                                            row[side] = row[side] || []
-                                            row[side].push(cell)
-
-                                            //dirty = true
-
-                                            if (col % meta.columnCount == 0) {
-                                                //add the current row, and move on to the next..
-                                                section.rows.push(row)
-                                                row = {}
-                                                row.meta = meta
-                                                col = 1
-                                                //dirty = false
-                                               /// newRow =
-                                            } else {
-                                                col++
-                                            }
-                                        })
-
-                                        if (row.col1) {
-                                            section.rows.push(row)
-                                        }
-
-                                    } else {
-
-                                        //when the columnCount is not present, use the strategy first in left, others in right
-                                        item.item.forEach(function (child,inx) {
-                                            let childMeta = that.getMetaInfoForItem(child)
-                                            //ignore any item entries on the child - we don't go any deeper atm
-
-                                            if (inx == 0) {
-                                                //this is the first item in the group - it goes in the left
-                                                let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
-                                                setDecoration(cell,child)        //sets things like control type
-                                                //row.left = [cell]
-                                                row['col1'] = [cell]
-                                            } else {
-                                                //this is a subsequent item - it will go in the right col by default
-                                                //let side = "right"
-                                                let side = 'col2'
-                                                /* for now, ignore the column number. re-visit when I think more about fill startegies...
-                                                if (childMeta.column ) {
-                                                    side = 'col' + childMeta.column
-                                                }*/
-
-
+                                                let side = 'col' + col
                                                 let cell = {item:child}
                                                 setDecoration(cell,child)
                                                 row[side] = row[side] || []
                                                 row[side].push(cell)
+
+                                                //dirty = true
+
+                                                if (col % meta.columnCount == 0) {
+                                                    //add the current row, and move on to the next..
+                                                    section.rows.push(row)
+                                                    row = {}
+                                                    row.meta = meta
+                                                    col = 1
+                                                    //dirty = false
+                                                    /// newRow =
+                                                } else {
+                                                    col++
+                                                }
+                                            })
+
+                                            if (row.col1) {
+                                                section.rows.push(row)
                                             }
-                                        })
-                                        section.rows.push(row)   //assume that the whole group fits in a single row...
+
+                                        } else {
+
+                                            //when the columnCount is not present, use the strategy first in left, others in right
+                                            item.item.forEach(function (child,inx) {
+                                                let childMeta = that.getMetaInfoForItem(child)
+                                                //ignore any item entries on the child - we don't go any deeper atm
+
+                                                if (inx == 0) {
+                                                    //this is the first item in the group - it goes in the left
+                                                    let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
+                                                    setDecoration(cell,child)        //sets things like control type
+                                                    //row.left = [cell]
+                                                    row['col1'] = [cell]
+                                                } else {
+                                                    //this is a subsequent item - it will go in the right col by default
+                                                    //let side = "right"
+                                                    let side = 'col2'
+                                                    /* for now, ignore the column number. re-visit when I think more about fill startegies...
+                                                    if (childMeta.column ) {
+                                                        side = 'col' + childMeta.column
+                                                    }*/
+
+
+                                                    let cell = {item:child}
+                                                    setDecoration(cell,child)
+                                                    row[side] = row[side] || []
+                                                    row[side].push(cell)
+                                                }
+                                            })
+                                            section.rows.push(row)   //assume that the whole group fits in a single row...
+                                        }
+
+
+
                                     }
 
+                                } else {
+                                    //if the item isn't a group, then add it to column 1.
+                                    let row = {}   //will have a single entry - left
+                                    row.item = item
+                                    row.meta = meta
+                                    let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                    setDecoration(cell,item)
+                                    //row.left = [cell]             //make it an array to match the group
+                                    row['col1'] = [cell] //make it an array to match the group
 
+                                    section.rows.push(row)
 
                                 }
 
-                            } else {
-                                //if the item isn't a group, then add it to column 1.
-                                let row = {}   //will have a single entry - left
-                                row.item = item
-                                row.meta = meta
-                                let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
-                                setDecoration(cell,item)
-                                //row.left = [cell]             //make it an array to match the group
-                                row['col1'] = [cell] //make it an array to match the group
+                            })
+                        }
 
-                                section.rows.push(row)
+                    })
+                }
 
-                            }
-
-                        })
-                    }
-
-                })
 
                 return template
 
@@ -1290,55 +1301,58 @@ angular.module("formsApp")
                 let root = {id:'root',text:'Root',parent:'#',state:{},data:{level:'root'}}
                 treeData.push(root)
 
-                Q.item.forEach(function(sectionItem){
-                    //each top level item is a section
-                    let item = {id: sectionItem.linkId,state:{},data:{}}
-                    item.text = sectionItem.text //+ " " + treeData.length;
-                    item.parent = "root";
-                    let meta = that.getMetaInfoForItem(sectionItem)
-                    item.data = {item:sectionItem,level:'section',meta:meta}
+                if (Q.item) {
+                    Q.item.forEach(function(sectionItem){
+                        //each top level item is a section
+                        let item = {id: sectionItem.linkId,state:{},data:{}}
+                        item.text = sectionItem.text //+ " " + treeData.length;
+                        item.parent = "root";
+                        let meta = that.getMetaInfoForItem(sectionItem)
+                        item.data = {item:sectionItem,level:'section',meta:meta}
 
 
 
-                    item.answerValueSet = sectionItem.answerValueSet
-                    // why do I need this?item.data.description = getDescription(parentItem)
+                        item.answerValueSet = sectionItem.answerValueSet
+                        // why do I need this?item.data.description = getDescription(parentItem)
 
-                    hash[item.id] = item.data;
-                    treeData.push(item)
+                        hash[item.id] = item.data;
+                        treeData.push(item)
 
-                    //second layer - ie each section
-                    if (sectionItem.item) {
-                        sectionItem.item.forEach(function (child,childInx) {
-                            let item = {id: child.linkId,state:{},data:{}}
-                            item.text = child.text //+ " " + treeData.length;
-                            item.parent = sectionItem.linkId;
-                            let meta = that.getMetaInfoForItem(child)
-                            item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
+                        //second layer - ie each section
+                        if (sectionItem.item) {
+                            sectionItem.item.forEach(function (child,childInx) {
+                                let item = {id: child.linkId,state:{},data:{}}
+                                item.text = child.text //+ " " + treeData.length;
+                                item.parent = sectionItem.linkId;
+                                let meta = that.getMetaInfoForItem(child)
+                                item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
 
-                            hash[item.id] = item.data;
-                            treeData.push(item)
+                                hash[item.id] = item.data;
+                                treeData.push(item)
 
-                            //third level - the contents of a section element...
-                            if (child.item) {
-                                child.item.forEach(function (grandchild) {
-                                    let item = {id: grandchild.linkId, state: {}, data: {}}
-                                    item.text = grandchild.text //+ " " + treeData.length;
-                                    item.parent = child.linkId;
-                                    let meta = that.getMetaInfoForItem(grandchild)
-                                    item.data = {item: grandchild, level: 'grandchild', meta:meta} //child
+                                //third level - the contents of a section element...
+                                if (child.item) {
+                                    child.item.forEach(function (grandchild) {
+                                        let item = {id: grandchild.linkId, state: {}, data: {}}
+                                        item.text = grandchild.text //+ " " + treeData.length;
+                                        item.parent = child.linkId;
+                                        let meta = that.getMetaInfoForItem(grandchild)
+                                        item.data = {item: grandchild, level: 'grandchild', meta:meta} //child
 
-                                    hash[grandchild.id] = grandchild.data;
-                                    treeData.push(item)
-                                })
-                            }
+                                        hash[grandchild.id] = grandchild.data;
+                                        treeData.push(item)
+                                    })
+                                }
 
 
 
-                        })
+                            })
 
-                    }
+                        }
 
-                })
+                    })
+                }
+
 
 
 
