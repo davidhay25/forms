@@ -32,6 +32,7 @@ console.log(arModel)
                         }
 
                         let entry = {}
+                        entry.item = item       //for the edit option
                         entry.linkId = item.linkId
                         entry.name = item.text
                         entry.description = meta.description || ""

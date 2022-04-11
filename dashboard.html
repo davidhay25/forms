@@ -633,11 +633,19 @@
 
 
                             <div ng-repeat = "section in exportJsonList">
-                                <h3>{{section.display}}</h3>
+                                <h4>{{section.display}}</h4>
                                 <table class="table table-bordered">
                                     <tr><th>Name</th><th>Description</th><th>card.</th><th>Obligation</th><th>Usage notes</th><th>Data Domain</th></tr>
                                     <tr ng-repeat = "line in section.lines">
-                                        <td width="10%">{{line.name}}</td>
+                                        <td width="10%">
+
+
+                                           <div class="clickable" ng-click="editItemFromReport({item:line.item})">
+                                                   {{line.name}}
+                                            </div>
+
+
+                                        </td>
                                        <!-- <td>{{line.category}}</td> -->
                                         <td width="20%">{{line.description}}</td>
                                         <td width="10%">{{line.cardinality}}</td>
