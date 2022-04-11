@@ -17,17 +17,14 @@
                     <strong>Text</strong>
                 </div>
                 <div class="col-md-2">
-
                     <strong>Q code</strong>
-
                 </div>
                 <div class="col-md-1">
                     <strong>Type</strong>
                 </div>
                 <div class="col-md-1">
-                    <strong>Repeats</strong>
+                    <strong>Card.</strong>
                 </div>
-
 
                 <div class="col-md-3">
                     <strong>Conditional / Usage notes / Source</strong>
@@ -42,9 +39,13 @@
                             <h4>{{section.item.text}}</h4>
                         </div>
                         <div class="col-md-1">
+
+                            {{section.item | cardinality}}
+<!--
                             <div ng-show="section.item.repeats">
                                 Yes
                             </div>
+                            -->
                         </div>
                         <div class="col-md-3">
                             <div ng-repeat="ew in section.item.enableWhen">
@@ -83,9 +84,9 @@
                                     {{child.item.type}}
                                 </div>
                                 <div class="col-md-1">
-                                    <div ng-show="child.item.repeats">
-                                        Yes
-                                    </div>
+
+                                    {{child.item | cardinality}}
+
 
                                 </div>
 
@@ -132,8 +133,9 @@
                                     <div class="col-md-1">
                                         {{grandchild.item.type}}
                                     </div>
+
                                     <div class="col-md-1">
-                                        {{grandchild.item.repeats}}
+                                        {{grandchild.item | cardinality}}
                                     </div>
 
 

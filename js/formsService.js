@@ -1294,6 +1294,8 @@ angular.module("formsApp")
             makeTreeFromQ : function (Q) {
                 //specifically 3 levels. Not recursive
                 //levels root, section, child, grandchild
+                //elements with 'enableWhen' set are placed below 'parent' (assume = and one only)
+                let hashEnableWhen = {} //key is the element with EW set, value is the item they are dependant on
                 let that = this
                 let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                 let treeData = []
@@ -1309,8 +1311,6 @@ angular.module("formsApp")
                         item.parent = "root";
                         let meta = that.getMetaInfoForItem(sectionItem)
                         item.data = {item:sectionItem,level:'section',meta:meta}
-
-
 
                         item.answerValueSet = sectionItem.answerValueSet
                         // why do I need this?item.data.description = getDescription(parentItem)
@@ -1329,6 +1329,7 @@ angular.module("formsApp")
 
                                 hash[item.id] = item.data;
                                 treeData.push(item)
+                                checkEnableWhen(child)
 
                                 //third level - the contents of a section element...
                                 if (child.item) {
@@ -1341,10 +1342,9 @@ angular.module("formsApp")
 
                                         hash[grandchild.id] = grandchild.data;
                                         treeData.push(item)
+                                        checkEnableWhen(grandchild)
                                     })
                                 }
-
-
 
                             })
 
@@ -1354,9 +1354,23 @@ angular.module("formsApp")
                 }
 
 
+                console.log(hashEnableWhen)
+                //adjust the parent of all 'enableWhen' - todo is this the best visualization?
+                treeData.forEach(function (item){
+                    if (hashEnableWhen[item.id]) {
+                        item.parent = hashEnableWhen[item.id]
+                    }
+                })
 
 
                 return {treeData : treeData,hash:hash}
+
+                function checkEnableWhen(item) {
+                    if (item.enableWhen) {
+                        hashEnableWhen[item.linkId] = item.enableWhen[0].question
+                    }
+                }
+
 
                 function getDescription(item) {
                     let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"

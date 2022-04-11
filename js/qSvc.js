@@ -53,9 +53,13 @@ angular.module("formsApp")
             },
 
             updatePrefix : function(Q) {
+                //make them sequential within a section
                 Q.item.forEach(function (section, inxSection){
+
+                    let prefix = 1
                     section.prefix = inxSection +1
                     section.item.forEach( function(child, inxChild){
+
                         child.prefix = inxChild +1
                         if (child.item) {
                             child.item.forEach(function (grandchild,inxGrandChild) {

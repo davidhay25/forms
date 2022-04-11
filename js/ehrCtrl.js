@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('ehrCtrl',
-        function ($scope,$http,formsSvc,actnowSvc,$window) {
+        function ($scope,$http,formsSvc,actnowSvc,$window,$timeout) {
 
             $scope.input = {}
             $scope.form = {}
@@ -34,8 +34,23 @@ angular.module("formsApp")
                             $scope.input.appTitle = "Review form design"
                             //assume only 1
                             $scope.reviewMode = true    //will hide most of the tabs...
+                            $scope.reviewState = "form"  //can be 'form','display','model'
                             $scope.selectQ(ar[0])
 
+                            //need to allow from for the full page to load...
+                            $timeout(function(){
+                                let vo = formsSvc.makeTreeFromQ(ar[0])
+                                let treeData = vo.treeData
+                                treeData.forEach(function (item) {
+                                    item.state.opened = true
+                                    if (item.parent == 'root') {
+                                        item.state.opened = false;
+                                    }
+                                })
+
+                                drawTree(treeData)
+
+                            },1000)
 
 
                         } else {
@@ -46,9 +61,6 @@ angular.module("formsApp")
             )
 
             $scope.prepop = function () {
-
-                //let patient = {resourceType:"Patient","birthDate":"1990-01-01"}
-
                 formsSvc.prepopForm($scope.hashItem,$scope.form,$scope.input.selectedPatient.resource)
 
                 $scope.makeQR()
@@ -82,17 +94,7 @@ angular.module("formsApp")
                     })
 
                 })
-                    /*
-                getResources(cp.id,'Observation',function(ar){
-                    hashIncomming['Observation'] = ar
-                    console.log(hashIncomming)
-                })
 
-                getResources(cp.id,'ServiceRequest',function(ar){
-                    hashIncomming['ServiceRequest'] = ar
-                    console.log(hashIncomming)
-                })
-*/
                 function getResources(cpId,type,cb) {
 
                     let qry = `/ds/fhir/CarePlan?_id=${cpId}&_revinclude=${type}:*`
@@ -269,6 +271,8 @@ angular.module("formsApp")
 
 
                 drawTree(vo.treeData)
+
+
               // makeFormDef()
             }
 
@@ -595,7 +599,7 @@ angular.module("formsApp")
                                 }
 
                             })
-                            console.log($scope.hashObservations)
+                            //console.log($scope.hashObservations)
                         }
 
 
@@ -604,19 +608,19 @@ angular.module("formsApp")
             }
 
             let drawTree = function(treeData){
-console.log(treeData)
-                expandAll(treeData)
+                //console.log(treeData)
+                //expandAll(treeData)
                 //deSelectExcept()
-                $('#QTree').jstree('destroy');
+                $('#QTreeReview').jstree('destroy');
 
-                let x = $('#QTree').jstree(
+                let x = $('#QTreeReview').jstree(
                     {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
                     //seems to be the node selection event...
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
-                        console.log(data.node)
+                        //console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

@@ -1,5 +1,23 @@
 angular.module("formsApp")
 
+    .filter('cardinality',function(){
+        return function(item) {
+            let display = false
+            let min = "0"
+            let max = "1"
+            if (item.repeats) {
+                max = "*"
+                display = true
+            }
+            if (item.required) {min = "1"; display = true}
+
+            if (display) {
+                return min + ".." + max
+            }
+
+        }
+    })
+
     .filter('HumanName',function(){
         return function (hn) {
             if (hn && hn.text) {

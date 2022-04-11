@@ -440,8 +440,10 @@ angular.module("formsApp")
                 qSvc.updatePrefix($scope.selectedQ)
                 let vo = formsSvc.generateQReport($scope.selectedQ)
                 $scope.report = vo.report
-
                 $scope.hashAllItems = vo.hashAllItems
+                //$scope.exportJsonList = exportSvc.createJsonModel($scope.selectedQ,vo.hashAllItems)
+                console.log($scope.exportJsonList)
+                makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
             }
 
             //-----------  tree utility functions
@@ -575,15 +577,26 @@ angular.module("formsApp")
                     let vo = formsSvc.generateQReport(Q)
                     $scope.report = vo.report
                     $scope.hashAllItems = vo.hashAllItems
-                    //let vo1 = formsSvc.generateQReport(Q)
-                   // console.log($scope.report)
+
+                    makeCsvAndDownload(Q,vo.hashAllItems)
 
                     //the template for the forms preview
                     $scope.formTemplate = formsSvc.makeFormTemplate(Q)
                     $scope.drawQ(Q,true)
                     $scope.treeIdToSelect = "root"
                 }
+            }
 
+            function makeCsvAndDownload(Q,hashAllItems) {
+                $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
+
+                let csv = exportSvc.createDownloadCSV($scope.exportJsonList)
+
+                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
+                var now = moment().format();
+                $scope.downloadLinkCsvName =  Q.name + '_' + now + '.csv';
+
+                console.log(csv)
             }
 
             //perfroms a 'redraw' of the Q - called frequently
