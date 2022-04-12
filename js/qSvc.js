@@ -58,15 +58,21 @@ angular.module("formsApp")
 
                     let prefix = 1
                     section.prefix = inxSection +1
-                    section.item.forEach( function(child, inxChild){
 
-                        child.prefix = inxChild +1
-                        if (child.item) {
-                            child.item.forEach(function (grandchild,inxGrandChild) {
-                                grandchild.prefix = inxGrandChild +1
-                            })
-                        }
-                    })
+                    if (section.item) {
+                        section.item.forEach( function(child, inxChild){
+
+                            child.prefix = prefix ++ //inxChild +1
+                            if (child.item) {
+                                child.item.forEach(function (grandchild,inxGrandChild) {
+                                    grandchild.prefix = prefix ++ //inxGrandChild +1
+                                })
+                            }
+                        })
+                    }
+
+
+
                 })
             },
 

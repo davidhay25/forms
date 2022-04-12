@@ -75,7 +75,7 @@
                                     <checkbox ng-model="newItem.repeats"></checkbox> Repeats
                                 </div>
                                 <div class="col-sm-4 col-md-4">
-                                    <checkbox ng-model="newItem.required"></checkbox> Required
+                                    <checkbox ng-model="newItem.required"></checkbox> Mandatory
                                 </div>
                                 <div class="col-sm-4 col-md-4">
 
@@ -216,16 +216,22 @@
 
             <uib-tab heading = "Notes">
                 <br/>
-                <strong>Usage Notes</strong>
+                <strong>Guide for use</strong>
                 <textarea class="form-control" ng-model="meta.usageNotes">
 
                 </textarea>
 
-                <strong>Resource extraction Notes</strong>
-                <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
-
                 <strong>Source Standard</strong>
                 <textarea class="form-control" ng-model="meta.sourceStandard"> </textarea>
+
+                <strong>Verification rules</strong>
+                <textarea class="form-control" ng-model="meta.verification"> </textarea>
+
+                <strong>General Notes</strong>
+                <textarea class="form-control" ng-model="meta.notes"> </textarea>
+
+                <strong>Resource extraction Notes</strong>
+                <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
 
 
             </uib-tab>

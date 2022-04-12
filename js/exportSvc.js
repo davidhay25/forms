@@ -9,20 +9,23 @@ angular.module("formsApp")
                 createJsonModel : function(Q,hashAllItems) {
                     let arModel = []
 
-                    Q.item.forEach(function (section){
-                        let sectionLines = {display:section.text,lines:[]}
-                        arModel.push(sectionLines)
-                        section.item.forEach(function(child){
+                    if (Q.item) {
+                        Q.item.forEach(function (section){
+                            let sectionLines = {display:section.text,lines:[]}
+                            arModel.push(sectionLines)
+                            section.item.forEach(function(child){
 
-                            makeEntry(child, formsSvc.getMetaInfoForItem(child), section,sectionLines.lines)
-                            if (child.item) {
-                                child.item.forEach(function (grandchild) {
-                                    makeEntry(grandchild, formsSvc.getMetaInfoForItem(grandchild), section,sectionLines.lines)
-                                })
-                            }
+                                makeEntry(child, formsSvc.getMetaInfoForItem(child), section,sectionLines.lines)
+                                if (child.item) {
+                                    child.item.forEach(function (grandchild) {
+                                        makeEntry(grandchild, formsSvc.getMetaInfoForItem(grandchild), section,sectionLines.lines)
+                                    })
+                                }
+                            })
                         })
-                    })
-console.log(arModel)
+                    }
+
+//console.log(arModel)
                     return arModel
 
                     function makeEntry(item,meta,section,ar) {

@@ -469,13 +469,11 @@
 
                         </uib-tab>
 
-                        <uib-tab heading="Summary">
+                        <uib-tab heading="Summaries">
                             <br/>
                             <ng-include src = "'includes/renderReport.html'"></ng-include>
                             <br/>
                         </uib-tab>
-
-
 
                         <uib-tab heading="Q metadata">
                             <br/>
@@ -614,8 +612,8 @@
                                 <div >
                                     Review UI Url: <strong>
                                     <a target="_blank"
-                                       ng-href="ehr.html?{{selectedQ.name}}">
-                                        http://canshare.clinfhir.com/ehr.html?{{selectedQ.name}}
+                                       ng-href="reviewForm.html?{{selectedQ.name}}">
+                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.name}}
                                     </a> </strong>
                                 </div>
 
