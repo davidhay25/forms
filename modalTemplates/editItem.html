@@ -230,14 +230,20 @@
                 <strong>General Notes</strong>
                 <textarea class="form-control" ng-model="meta.notes"> </textarea>
 
-                <strong>Resource extraction Notes</strong>
-                <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
-
-
             </uib-tab>
 
             <uib-tab ng-show = "false" heading = "Dependencies">
                 Items that have a conditional clause (enableWhen) set to this question.
+            </uib-tab>
+
+            <uib-tab heading = "Resource mapping">
+               Instructions to map from this element into a resource
+
+                <strong>Resource extraction Notes</strong>
+                <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
+
+                <em>Add checkbox for Observation extraction. Plus note on first tab</em>
+
             </uib-tab>
 
             <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >

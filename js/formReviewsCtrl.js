@@ -32,6 +32,22 @@ angular.module("formsApp")
 
             }
 
+            //pull out key details from QR like access control stuff
+            function processQR(QR) {
+                $scope.arReviewRestrictions = $scope.arReviewRestrictions || []
+                $scope.arReviewRestrictions.length = 0
+                let arCanPublish = formsSvc.findExtension(QR,formsSvc.getExtUrl("extCanPublish"))
+                if (arCanPublish.length > 0 && ! arCanPublish[0].valueBoolean) {
+                    $scope.arReviewRestrictions.push("This review cannot be published")
+                }
+
+                let arRemoveOia = formsSvc.findExtension(QR,formsSvc.getExtUrl("extPublishOia"))
+                if (arRemoveOia.length > 0 && ! arRemoveOia[0].valueBoolean) {
+                    $scope.arReviewRestrictions.push("Please remove contact details from OIA request")
+                }
+            }
+
+            //when a service request (indicating a review is needed) is selected
             $scope.selectSR = function(sr){
                 $scope.selectedSR = sr
                 //get the QR from the 'supportinginfo in the SR
@@ -46,6 +62,7 @@ angular.module("formsApp")
                                 function(data) {
                                     console.log(data)
                                     let QR = data.data
+
 
                                     //now get the associated Q
                                     formsSvc.loadQByUrl(QR.questionnaire).then(   //returns a bundle
@@ -68,10 +85,10 @@ angular.module("formsApp")
                                                 // if (arReviewComments.length > 0) {
 
                                                 $scope.selectedReview = {QR:QR,reviews:arReviewComments}
-                                                //$scope.reviewQRs.push({QR:QR,reviews:arReviewComments})
 
                                                 $scope.selectedQR = QR
                                                 $scope.selectedQ = Q
+                                                processQR(QR)           //eg access extensions
                                             }
 
                                         }
@@ -88,7 +105,7 @@ angular.module("formsApp")
 
             }
 
-            let reviewCommentsSystem = "http://canshare.com/cs/review"
+            let reviewCommentsSystem = "http://canshare.com/cs/review"      //todo move to service
 
             $scope.selectReview = function(review) {
                 delete $scope.selectedSR
@@ -98,6 +115,7 @@ angular.module("formsApp")
             }
 
             //iterate through QR to get comments
+            //hashCommentItems is a hash of all the linkIds that are comments - ie have a code in the comments system...  http://canshare.com/cs/review
             function getReviewItems(arReview,hashCommentItems,item) {
                 if (item.item) {
                     item.item.forEach(function (child) {
@@ -160,7 +178,7 @@ angular.module("formsApp")
                                     $scope.reviewQRs.push({QR:QR,reviews:arReviewComments})
 
                                 }
-                                //console.log(arReviewComments)
+
                             })
                         }
                     }

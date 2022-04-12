@@ -100,7 +100,7 @@ angular.module("formsApp")
             }
 
 
-            $scope.makeCSV = function() {
+            $scope.makeCSVDEP = function() {
                 let csv = exportSvc.createDownloadCSV($scope.selectedQ)
                 console.log(csv)
             }

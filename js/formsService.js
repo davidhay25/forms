@@ -12,6 +12,8 @@ angular.module("formsApp")
             }
         )
 
+        let extensionUrl = {}
+
         //HPIRoot = "http://localhost:9099/baseR4/"
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
 
@@ -27,9 +29,10 @@ angular.module("formsApp")
         extSourceStandard = "http://canshare.com/fhir/StructureDefinition/questionnaire-sourceStandard"
         extColumn = "http://canshare.com/fhir/StructureDefinition/questionnaire-column"
         extColumnCount = "http://canshare.com/fhir/StructureDefinition/questionnaire-column-count"
-
         extDescription = "http://canshare.com/fhir/StructureDefinition/questionnaire-item-description"
 
+        extensionUrl.extCanPublish = "http://canshare.com/structureDefinition/can-publish-reviewer-name"
+        extensionUrl.extPublishOia = "http://canshare.com/structureDefinition/can-publish-reviewer-oia"
 
         canShareServer = "http://canshare/fhir/"
 
@@ -52,6 +55,10 @@ angular.module("formsApp")
         }
 
         return {
+            getExtUrl : function(key) {
+
+                return extensionUrl[key]
+            },
             loadDispositionsForQ : function(Q) {
                 let deferred = $q.defer()
                 let arResult = []

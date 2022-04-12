@@ -126,6 +126,13 @@
 
 
                         </uib-tab>
+
+                        <uib-tab ng-show="arReviewRestrictions.length > 0" heading="Restrictions">
+                            <div ng-repeat="lne in arReviewRestrictions">
+                                {{lne}}
+                            </div>
+                        </uib-tab>
+
                         <uib-tab heading="QR Json">
                             <pre>{{selectedQR | json}}</pre>
                         </uib-tab>

@@ -256,6 +256,13 @@
                                                     </div>
                                                     <div class="col-md-9">
                                                         {{selectedNode.data.item.answerOption.length}} options in Q
+
+                                                        <div>
+                                                            <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                                                {{option.valueCoding.display}},
+                                                            </span>
+                                                        </div>
+
                                                     </div>
                                                 </div>
 
@@ -612,12 +619,12 @@
                                 <div >
                                     Review UI Url: <strong>
                                     <a target="_blank"
-                                       ng-href="reviewForm.html?{{selectedQ.name}}">
-                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.name}}
+                                       ng-href="reviewForm.html?{{selectedQ.url}}">
+                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.url}}
                                     </a> </strong>
                                 </div>
 
-                            <button class="btn-primary btn" ng-click="makeCSV()">Make CSV</button>
+
 
 
 

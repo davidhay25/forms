@@ -57,7 +57,7 @@
     </script>
     <script src="js/libs/ngStorage.min.js"></script>
 
-    <script src="js/ehrCtrl.js"></script>
+    <script src="js/reviewFormCtrl.js"></script>
     <script src="js/formsService.js"></script>
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
@@ -78,7 +78,7 @@
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-    <div ng-app="formsApp" ng-controller="ehrCtrl" class="container-fluid">
+    <div ng-app="formsApp" ng-controller="reviewFormCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -86,7 +86,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            {{input.appTitle}}
+                            Review form:  {{selectedQ.title}}
                         </a>
                     </span>
 
@@ -108,9 +108,7 @@
                 </form>
             </div>
 
-            <div class="col-md-1 col-sm-1">
 
-            </div>
 
             <div class="col-md-3 col-sm-3">
                 <div class="navbar-text">
@@ -125,6 +123,15 @@
                 </div>
 
             </div>
+
+
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    <button ng-show = "QR && input.reviewerName && input.includeOIA && input.canPublish" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                </div>
+            </div>
+
+
         </div>
     </nav>
 
@@ -134,44 +141,37 @@
 
         <div>
             <div class="row" >
-                <div class="col-md-4">
-                    {{selectedQ.title}}
-                </div>
-
                 <div class="col-md-2">
-
                     <input type = text ng-model = "input.reviewerName"
                            placeholder = "Reviewer name"
                            class="form-control"/>
-
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input type="radio" ng-model="input.canPublish" value="yes"/> My submission can be published
-                    <div><input type="radio" ng-model="input.canPublish" value="no"/>My submission cannot be published</div>
+                    <div><input type="radio" ng-model="input.canPublish" value="no"/> My submission cannot be published</div>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="radio" ng-model="input.includeOIA" value="yes"/> My personal details can be included in OIA requests
+                    <div><input type="radio" ng-model="input.includeOIA" value="no"/> My personal details should be removed from OIA requests </div>
                 </div>
 
                 <div class="col-md-3">
 
                     <div class="pull-right">
                           <span ng-class="{reviewStateChange:true,clickable:true,selected:reviewState == 'form'}"
-
                                 ng-click="reviewState = 'form'">Edit form</span>
 
                         <span ng-class="{reviewStateChange:true,clickable:true,selected:reviewState == 'preview'}"
-
                               ng-click="reviewState = 'preview'">Preview</span>
 
                         <span ng-class="{reviewStateChange:true,clickable:true,selected:reviewState == 'model'}"
-
                               ng-click="reviewState = 'model'">Model</span>
                     </div>
 
                 </div>
 
-                <div class="col-md-1">
-                    <button ng-show = "QR && input.reviewerName" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
-                </div>
             </div>
         </div>
         <hr/>
