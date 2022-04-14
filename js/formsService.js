@@ -632,7 +632,7 @@ angular.module("formsApp")
                     //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
                     //console.log(referenceValue)
-                    if (formValue) {
+                    if (formValue !== null) {
                         switch(conditional.operator) {
                             case '=' :
 

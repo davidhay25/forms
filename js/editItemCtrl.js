@@ -56,6 +56,31 @@ angular.module("formsApp")
                     let ew = item.enableWhen[0]
                     let linkId = ew.question
 
+
+                    $scope.dependencySources.forEach(function(choiceItem) {
+                        if (choiceItem.linkId == linkId) {
+                            $scope.input.ewQuestion = choiceItem
+                            if (ew.answerCoding) {
+                                //the value to check is Coding
+                                let answerCode = ew.answerCoding.code   //the current code value. ignore the system
+                                $scope.ewSelected(choiceItem)       //sets the list of values
+
+                                $scope.input.ewQuestionOptions.forEach(function (concept) {
+                                    if (concept.code == answerCode) {
+                                        $scope.input.ewAnswer = concept
+                                    }
+                                })
+                            }
+
+                            if (ew.answerBoolean !== null) {
+                                //the value to check is boolean
+                                $scope.input.ewAnswer =  ew.answerBoolean ? "yes" : "no"
+                            }
+                        }
+                    })
+
+                    /*
+
                     //the value to check is Coding
                     if (ew.answerCoding) {
                         let answerCode = ew.answerCoding.code   //the current code value. ignore the system
@@ -75,9 +100,14 @@ angular.module("formsApp")
                         })
                     }
                     //the value to check is boolean
-                    if (ew.answerBoolean) {
+                    if (ew.answerBoolean !== null) {
+
+                        $scope.input.ewQuestion = choiceItem
+
                         $scope.input.ewAnswer = ew.answerBoolean
                     }
+
+                    */
 
                 }
             }
@@ -187,7 +217,9 @@ angular.module("formsApp")
                     }
 
                     if ($scope.input.ewQuestion.type == 'boolean') {
-                        ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerBoolean:$scope.input.ewAnswer}
+
+                        ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
+                        ew.answerBoolean = $scope.input.ewAnswer == 'yes' ? true : false
                     }
 
 
