@@ -1,27 +1,4 @@
 <div>
-    <!--
-        <div ng-show="selectedReviewQ" class="banner">
-            <div >
-                Review UI Url: <strong>
-                <a target="_blank"
-                   ng-href="ehr.html?{{selectedReviewQ.name}}">
-                    http://canshare.clinfhir.com/ehr.html?{{selectedReviewQ.name}}
-                </a> </strong>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-md-3">
-                <select ng-model="input.selectReviewQ" class="form-control"
-                        ng-options = "Q.name for Q in allQ"
-                        ng-change = "selectQReviews(input.selectReviewQ)"></select>
-            </div>
-        </div>
-
-        <hr/>
-    -->
-
 
     <div class="row">
         <!-- maybe remove this when debugging done-->
@@ -39,6 +16,8 @@
                                 {{entry.resource.requester.display}}
                             </div>
                         </div>
+
+                        <button class="btn btn-link" ng-click="refresh()">Refresh</button>
 
                     </uib-tab>
                     <uib-tab heading="By Questionnaire">

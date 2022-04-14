@@ -21,22 +21,30 @@ angular.module("formsApp")
                 $scope.newItem = angular.copy(item)
             }
 
-            //construct an array of all the items where the type is choice - for the conditiona; (enable when)
-            $scope.choiceItems = []
+            //construct an array of all the items which can be a conditional source where the type is choice or boolean
+
+            $scope.dependencySources = []
             Object.keys(hashAllItems).forEach(function (key) {
                 let item = hashAllItems[key].item
-                if (item.type == 'choice') {
-                    $scope.choiceItems.push(item)
+                if (item.type == 'choice' || item.type == 'boolean') {
+                    $scope.dependencySources.push(item)
                 }
             })
 
             //needs to be at the top
-            $scope.ewSelected = function(item) {
-                console.log(item)
+            $scope.ewSelected = function(sourceItem) {
+                console.log(sourceItem)
+
                 $scope.input.ewQuestionOptions = []
-                item.answerOption.forEach(function (opt) {
-                    $scope.input.ewQuestionOptions.push(opt.valueCoding)
-                })
+                if (sourceItem.type == 'choice' || sourceItem.type == 'open-choice') {
+                    if (sourceItem.answerOption) {
+                        sourceItem.answerOption.forEach(function (opt) {
+                            $scope.input.ewQuestionOptions.push(opt.valueCoding)
+                        })
+                    }
+
+                }
+
             }
 
             if (item) {
@@ -47,21 +55,30 @@ angular.module("formsApp")
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let ew = item.enableWhen[0]
                     let linkId = ew.question
-                    let answerCode = ew.answerCoding.code   //the current code value. ignore the system
-                    $scope.choiceItems.forEach(function(choiceItem){
-                        if (choiceItem.linkId == linkId) {
-                            $scope.input.ewQuestion = choiceItem
 
-                            $scope.ewSelected(choiceItem)       //sets the list of values
+                    //the value to check is Coding
+                    if (ew.answerCoding) {
+                        let answerCode = ew.answerCoding.code   //the current code value. ignore the system
+                        $scope.dependencySources.forEach(function(choiceItem){
+                            if (choiceItem.linkId == linkId) {
+                                $scope.input.ewQuestion = choiceItem
 
-                            $scope.input.ewQuestionOptions.forEach(function (concept) {
-                                if (concept.code == answerCode) {
-                                    $scope.input.ewAnswer = concept
-                                }
-                            })
+                                $scope.ewSelected(choiceItem)       //sets the list of values
 
-                        }
-                    })
+                                $scope.input.ewQuestionOptions.forEach(function (concept) {
+                                    if (concept.code == answerCode) {
+                                        $scope.input.ewAnswer = concept
+                                    }
+                                })
+
+                            }
+                        })
+                    }
+                    //the value to check is boolean
+                    if (ew.answerBoolean) {
+                        $scope.input.ewAnswer = ew.answerBoolean
+                    }
+
                 }
             }
 
@@ -163,8 +180,21 @@ angular.module("formsApp")
                 console.log($scope.input.ewAnswer)
 
                 if ($scope.input.ewQuestion && $scope.input.ewAnswer) {
-                    let ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer}
-                    $scope.newItem.enableWhen = [ew]
+
+                    let ew
+                    if ($scope.input.ewQuestion.type == 'choice' || $scope.input.ewQuestion.type == 'open-choice') {
+                        ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer}
+                    }
+
+                    if ($scope.input.ewQuestion.type == 'boolean') {
+                        ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerBoolean:$scope.input.ewAnswer}
+                    }
+
+
+                    if (ew) {
+                        $scope.newItem.enableWhen = [ew]
+                    }
+
 
                 }
 

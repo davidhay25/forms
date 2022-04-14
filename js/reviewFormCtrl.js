@@ -14,7 +14,7 @@ angular.module("formsApp")
 
             // ------------ this code is almost the same as that in the dashboard. ? move to a service
 
-
+/*
 
             let search = $window.location.search;
             if (search) {
@@ -30,7 +30,7 @@ angular.module("formsApp")
                 return
             }
 
-
+*/
 
             //load all the questionnaires
             $http.get("/fm/fhir/Questionnaire").then(
@@ -389,9 +389,6 @@ angular.module("formsApp")
                 )
 
 
-
-
-
                 //get the provenance resource for this QR
                 $http.get("/ds/fhir/Provenance?entity=" + QR.id + "&_include=Provenance:target").then(
                     function (data) {
@@ -410,7 +407,6 @@ angular.module("formsApp")
                                     $scope.selectedProvenanceTargets.push(resource)
                                 }
                             })
-
                         }
 
                     }, function (err) {
@@ -437,7 +433,7 @@ angular.module("formsApp")
                         let reviewerName = $scope.input.reviewerName || "Unknown reviewer"
                         $scope.QR.author = {display : reviewerName}
 
-                        if ($scope.input.canPublish = 'no') {
+                        if ($scope.input.canPublish == 'no') {
                             //let url = formsSvc.getExtUrl('extCanPublish')
 
                             //formsSvc.extCan
@@ -445,7 +441,7 @@ angular.module("formsApp")
                             $scope.QR.extension.push({url:formsSvc.getExtUrl('extCanPublish'),valueBoolean:false})
                         }
 
-                        if ($scope.input.includeOIA = 'no') {
+                        if ($scope.input.includeOIA == 'no') {
                             $scope.QR.extension = $scope.QR.extension || []
                             $scope.QR.extension.push({url:formsSvc.getExtUrl('extPublishOia'),valueBoolean:false})
                         }
@@ -459,8 +455,7 @@ angular.module("formsApp")
                         function(data) {
                             //console.log(data.data)
                             alert("Form has been saved, and any Observations or other resources extracted and saved")
-
-
+                            window.location = "afterReview.html"
 
                             $scope.selectPatient()  //to read the new data
                         }, function(err) {

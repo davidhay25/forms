@@ -442,7 +442,7 @@ angular.module("formsApp")
                 $scope.report = vo.report
                 $scope.hashAllItems = vo.hashAllItems
                 //$scope.exportJsonList = exportSvc.createJsonModel($scope.selectedQ,vo.hashAllItems)
-                console.log($scope.exportJsonList)
+                //console.log($scope.exportJsonList)
                 makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
             }
 
@@ -596,7 +596,7 @@ angular.module("formsApp")
                 var now = moment().format();
                 $scope.downloadLinkCsvName =  Q.name + '_' + now + '.csv';
 
-                console.log(csv)
+               // console.log(csv)
             }
 
             //perfroms a 'redraw' of the Q - called frequently

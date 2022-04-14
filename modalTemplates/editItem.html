@@ -232,17 +232,23 @@
 
             </uib-tab>
 
-            <uib-tab ng-show = "false" heading = "Dependencies">
-                Items that have a conditional clause (enableWhen) set to this question.
-            </uib-tab>
+
 
             <uib-tab heading = "Resource mapping">
                Instructions to map from this element into a resource
 
+                <br/><br/>
+
+                <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Extract as Observation
+                <br/><br/>
+
                 <strong>Resource extraction Notes</strong>
                 <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
 
-                <em>Add checkbox for Observation extraction. Plus note on first tab</em>
+
+
+
+
 
             </uib-tab>
 
@@ -293,15 +299,29 @@
                         <strong>Source question</strong>
                         <select ng-model="input.ewQuestion" class="form-control"
                                 ng-change = "ewSelected(input.ewQuestion)"
-                                ng-options = "item.linkId for item in choiceItems"></select>
+                                ng-options = "item.text for item in dependencySources"></select>
                         <em>The question that this one depends on</em>
                     </div>
+
                     <div class="col-sm-6">
-                        <strong>Value to show this item</strong>
-                        <select ng-model="input.ewAnswer"  class="form-control"
+
+                        <div ng-show="input.ewQuestion.type == 'choice' || input.ewQuestion.type == 'open-choice'">
+                            <strong>Value to show this item</strong>
+
+                            <select ng-model="input.ewAnswer"  class="form-control"
                                 ng-change = ""
                                 ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
-                        <em>The value of the source question that will display this one</em>
+
+                            <br/>
+                            <em>The value of the source question that will display this one</em>
+                        </div>
+
+                        <div ng-show="input.ewQuestion.type == 'boolean'">
+                            <strong>Value to show this item</strong>
+                            <br/><br/>
+                            <input type="radio" ng-model="input.ewAnswer" value="true"/> True
+                            <input type="radio" ng-model="input.ewAnswer" value="false"/> False
+                        </div>
 
                     </div>
                 </div>
@@ -309,6 +329,7 @@
                 <pre>{{newItem.enableWhen | json}}</pre>
 -->
 
+                <br/><br/>
                 <em>Set the question and value that controls if this item is to be displayed.
                 Only questions of type 'choice' with in-line options can be selected.</em>
                 <em>Currently, only a single conditional is supported - this can be relaxed if needed...</em>

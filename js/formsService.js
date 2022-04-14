@@ -628,12 +628,41 @@ angular.module("formsApp")
             checkConditional : function(item,formData) {
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let conditional = item.enableWhen[0]       //only looking at the first one for now
+
                     //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
                     //console.log(referenceValue)
                     if (formValue) {
                         switch(conditional.operator) {
                             case '=' :
+
+                                if (conditional.answerCoding) {
+                                    return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
+                                }
+                                if (conditional.answerBoolean !== undefined) {
+
+                                    if (conditional.answerBoolean) {
+                                        //when the trigger value is true
+                                        if (formValue) {
+                                            return true
+                                        } else {
+                                            return false
+                                        }
+                                    } else {
+                                        //when the triggervalue is false
+                                        if (formValue) {
+                                            return false
+                                        } else {
+                                            return true
+                                        }
+                                    }
+
+
+                                    console.log(answerBoolean)
+
+                                }
+
+
                                 //todo - check for different datatypes...
                                 //right now, we're assuming that Codings are being used...
 
@@ -644,7 +673,7 @@ angular.module("formsApp")
                                     }
                              //   }
 
-                                return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
+
                                 break
                         }
                     }
@@ -1362,13 +1391,14 @@ angular.module("formsApp")
 
 
                 console.log(hashEnableWhen)
-                //adjust the parent of all 'enableWhen' - todo is this the best visualization?
+                /*
+                //adjust the parent of all 'enableWhen' - todo is this the best visualization? - not in the editor
                 treeData.forEach(function (item){
                     if (hashEnableWhen[item.id]) {
                         item.parent = hashEnableWhen[item.id]
                     }
                 })
-
+*/
 
                 return {treeData : treeData,hash:hash}
 

@@ -16,6 +16,11 @@ angular.module("formsApp")
             }
             loadActiveSR()
 
+
+            $scope.refresh = function() {
+                loadActiveSR()
+            }
+
             $scope.markSRComplete = function(SR) {
                 SR.status = "completed"
                 let qry = `/ds/fhir/ServiceRequest/${SR.id}`
@@ -112,6 +117,8 @@ angular.module("formsApp")
 
                 $scope.selectedReview = review
                 $scope.selectedQR = review.QR       //for the display
+
+                processQR($scope.selectedQR)    //the access control stuff
             }
 
             //iterate through QR to get comments
@@ -153,6 +160,7 @@ angular.module("formsApp")
                 $scope.selectedReviewQ = Q
                 $scope.selectedQ = Q
                 $scope.reviews = []     //QRs that have reviews...
+
 
                 //get the linkId's of reviewer comment items in the Q based on the code system
                 let hashIds = {}

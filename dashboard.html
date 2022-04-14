@@ -173,7 +173,6 @@
 
                         <uib-tab heading="Q Items tree">
 
-
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="pull-right">
@@ -288,11 +287,18 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="row" ng-show="selectedNode.data.meta.extraction.notes">
+
+
+                                                <div class="row" ng-show="selectedNode.data.meta.extraction.notes || selectedNode.data.meta.extraction.extractObservation">
                                                     <div class="col-md-3">
                                                         Extraction Notes
                                                     </div>
                                                     <div class="col-md-9">
+
+                                                        <div ng-show="selectedNode.data.meta.extraction.extractObservation">
+                                                            Extract as Observation
+                                                        </div>
+
                                                         {{selectedNode.data.meta.extraction.notes}}
                                                     </div>
                                                 </div>
@@ -445,10 +451,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!--
-                                             <hr/>
-                                            <pre>{{selectedNode.data.item | json}}</pre>
--->
+
                                             </div>
 
 
@@ -468,10 +471,6 @@
 
                                 </div>
                             </div>
-
-
-
-
 
 
                         </uib-tab>
@@ -619,14 +618,10 @@
                                 <div >
                                     Review UI Url: <strong>
                                     <a target="_blank"
-                                       ng-href="reviewForm.html?{{selectedQ.url}}">
-                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.url}}
+                                       ng-href="reviewForm.html?{{selectedQ.name}}">
+                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.name}}
                                     </a> </strong>
                                 </div>
-
-
-
-
 
                         </uib-tab>
                         <uib-tab heading = "SpreadSheet">
