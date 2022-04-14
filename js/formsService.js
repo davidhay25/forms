@@ -477,7 +477,7 @@ angular.module("formsApp")
             makeFormTemplate : function(Q) {
                 let that = this;
 
-                //create a template suitable for rendering in 2 columns
+                //create a template suitable for rendering in up to 4 columns
                 //is a collection of sections. Each section contains an array of rows,
                 // each row is an array with 2 elements (left / right) and the cell has an array of items
 
@@ -503,8 +503,8 @@ angular.module("formsApp")
                                     let row = {}    //will have multiple columns
                                     //let dirty = true
                                     //row.item = item
-                                    row.meta = meta
-
+                                    row.meta = meta   //this is th emeta for the group item...
+                                    row.text = item.text
                                     if (item.item) {    //these are the child items
                                         if (meta.columnCount) {
                                             //if there's a column count, then fill rows left -> right
