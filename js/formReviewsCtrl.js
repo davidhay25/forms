@@ -110,7 +110,12 @@ angular.module("formsApp")
 
             }
 
-            let reviewCommentsSystem = "http://canshare.com/cs/review"      //todo move to service
+            //let reviewCommentsSystem = "http://canshare.com/cs/review-comment"      //todo move to service
+            let reviewCommentsSystem = "http://canshare.com/cs/review-comment"
+
+
+
+
 
             $scope.selectReview = function(review) {
                 delete $scope.selectedSR

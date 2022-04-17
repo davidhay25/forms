@@ -149,7 +149,11 @@ async function extractResources(QR) {
         //provenance.target = provenance.target || []
         provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...
-        //resources.others = []       //all resources
+
+        //to support more sophisticated workflow
+        let task = createTask(QR,SR)
+        provenance.target.push({reference: "urn:uuid:"+ task.id})
+        resources.obs.push(task)          //not really all obs...
 
 
         //generate MDM referral (servicerequest) if requested by QR
@@ -387,6 +391,23 @@ function performObservationExtraction(Q,QR) {
     arObservations.push(provenance)
 
     return {'obs':arObservations,provenance:provenance,QHash:hashQ,QRHash:hashQR};
+
+}
+
+
+function createTask (QR,SR) {
+    let task = {resourceType:"Task"}
+    task.id = createUUID()   //will be ignored by fhir server
+    let description = "Task"
+    task.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>"+description+"</div>",status:"additional"}
+    task.authoredOn = new Date.toISOString()
+    task.status = "requested"
+    task.intent = 'plan'
+    task.basedOn = []
+    task.basedOn.push({reference: "urn:uuid:"+QR.id})
+    task.focus = {reference: "urn:uuid:"+SR.id}
+    return task
+
 
 }
 

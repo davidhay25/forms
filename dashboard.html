@@ -249,15 +249,18 @@
                                                         {{selectedNode.data.item.answerValueSet}}
                                                     </div>
                                                 </div>
+
                                                 <div class="row" ng-show="selectedNode.data.item.answerOption">
                                                     <div class="col-md-3">
-                                                        Coded options
+                                                        Answer options
                                                     </div>
                                                     <div class="col-md-9">
+
                                                         {{selectedNode.data.item.answerOption.length}} options in Q
 
                                                         <div>
                                                             <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                                                {{option.valueInteger}}{{option.valueString}}
                                                                 {{option.valueCoding.display}},
                                                             </span>
                                                         </div>
@@ -267,7 +270,7 @@
 
                                                 <div class="row" ng-show="selectedNode.data.item.enableWhen">
                                                     <div class="col-md-3">
-                                                        Conditionals
+                                                        Conditional on
                                                     </div>
                                                     <div class="col-md-9">
                                                         <div ng-repeat="ew in selectedNode.data.item.enableWhen">
@@ -466,6 +469,10 @@
                                         <uib-tab heading="Json">
                                             <pre>{{selectedNode.data.item | json}}</pre>
                                             <em>Only for internal use</em>
+                                        </uib-tab>
+
+                                        <uib-tab heading="Tree node ndata">
+                                            <pre>{{selectedNode.data | json}}</pre>
                                         </uib-tab>
 
                                     </uib-tabset>

@@ -22,12 +22,25 @@ angular.module("formsApp")
             }
 
             //construct an array of all the items which can be a conditional source where the type is choice or boolean
+            //at the same time, see if this item is a dependenct source for another - if so, linkId is read-only. And display those sources in the UI
+            $scope.dependencySources = []       //items that can be the source of a dependanys
+            $scope.dependantOnThis = []         //those items dependant on this one...
 
-            $scope.dependencySources = []
+
             Object.keys(hashAllItems).forEach(function (key) {
-                let item = hashAllItems[key].item
-                if (item.type == 'choice' || item.type == 'boolean') {
-                    $scope.dependencySources.push(item)
+                let item1 = hashAllItems[key].item
+
+                if (item1.enableWhen) {
+                    item1.enableWhen.forEach(function (ew){
+                        if (ew.question == $scope.newItem.linkId) {
+                            $scope.dependantOnThis.push(item1)
+                        }
+                    })
+                }
+
+
+                if (item1.type == 'choice' || item1.type == 'boolean') {
+                    $scope.dependencySources.push(item1)
                 }
             })
 
@@ -51,11 +64,18 @@ angular.module("formsApp")
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
 
+                //the 'display as radio' for lists
+                if ($scope.meta.itemControl && $scope.meta.itemControl.coding) {
+                    if ($scope.meta.itemControl.coding[0].code == 'radio-button') {
+                        $scope.input.displayAsRadio = true
+                    }
+
+                }
+
                 //set the 'enableWhen' - only 1 supported at present...
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let ew = item.enableWhen[0]
                     let linkId = ew.question
-
 
                     $scope.dependencySources.forEach(function(choiceItem) {
                         if (choiceItem.linkId == linkId) {
@@ -169,15 +189,38 @@ angular.module("formsApp")
                 })
             }
 
-
-
-
             $scope.removeAnswerOption = function(inx){
                 $scope.newItem.answerOption.splice(inx)
             }
 
+
+            $scope.moveAnswerUp = function(inx) {
+                let ar = $scope.newItem.answerOption.splice(inx-1,1)
+                $scope.newItem.answerOption.splice(inx,0,ar[0])
+            }
+
+            $scope.moveAnswerDown = function(inx) {
+                let ar = $scope.newItem.answerOption.splice(inx,1)
+                $scope.newItem.answerOption.splice(inx+1,0,ar[0])
+            }
+
+            $scope.addOtherAnswerOption = function(opt) {
+                $scope.newItem.answerOption = $scope.newItem.answerOption || []
+                switch ($scope.newItem.type) {
+                    case 'integer' :
+                        $scope.newItem.answerOption.push({valueInteger:opt})
+                        break
+                    case 'string' :
+                        $scope.newItem.answerOption.push({valueString:opt})
+                        break
+                }
+
+                delete $scope.input.newAnswerOption
+            }
+
+
             $scope.addAnswerOption = function(code,system,display){
-                if ($scope.newItem.valueSet) {
+                if ($scope.newItem.answerValueSet) {
                     alert("You can't have both a ValueSet and list of options.")
                     return
                 }
@@ -234,6 +277,18 @@ angular.module("formsApp")
                     alert("The linkId is mandatory...")
                     return
                 }
+
+                //the radio
+                if ($scope.input.displayAsRadio) {
+                    $scope.meta.itemControl = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"radio-button"}]}
+                } else {
+                    //todo - this will delete all controls....
+                    delete $scope.meta.itemControl
+                }
+
+
+
+
 
                 //update the extensions in the item based on the meta object
                 formsSvc.updateMetaInfoForItem($scope.newItem,$scope.meta)

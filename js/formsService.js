@@ -17,22 +17,27 @@ angular.module("formsApp")
         //HPIRoot = "http://localhost:9099/baseR4/"
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
 
-        extUrlFormControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
         extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
 
+
+
         //todo fsh doesn't underatnd expression extension...
-        extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
+        extPrepop = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-prepop"
 
-        extExtractNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-extractNotes"
-        extUsageNotes = "http://canshare.com/fhir/StructureDefinition/questionnaire-usageNotes"
-        extSourceStandard = "http://canshare.com/fhir/StructureDefinition/questionnaire-sourceStandard"
-        extColumn = "http://canshare.com/fhir/StructureDefinition/questionnaire-column"
-        extColumnCount = "http://canshare.com/fhir/StructureDefinition/questionnaire-column-count"
-        extDescription = "http://canshare.com/fhir/StructureDefinition/questionnaire-item-description"
+        extExtractNotes = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
 
-        extensionUrl.extCanPublish = "http://canshare.com/structureDefinition/can-publish-reviewer-name"
-        extensionUrl.extPublishOia = "http://canshare.com/structureDefinition/can-publish-reviewer-oia"
+        extUsageNotes = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
+        extSourceStandard = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
+
+
+        extColumn = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column"
+        extColumnCount = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column-count"
+        extDescription = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-item-description"
+
+        extensionUrl.extCanPublish = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
+        extensionUrl.extPublishOia = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
 
         canShareServer = "http://canshare/fhir/"
 
@@ -226,6 +231,9 @@ angular.module("formsApp")
 
                 updateExtension(item,extColumnCount,"Integer",meta.columnCount)
 
+                //form control
+                updateExtension(item,extItemControl,"CodeableConcept",meta.itemControl)
+
                 //reference types
 /* todo - need to allow multiple extensions of same url...
                 meta.referenceTypes = meta.referenceTypes || []
@@ -321,6 +329,12 @@ angular.module("formsApp")
                 if (ar6.length > 0) {
                     meta.columnCount = ar6[0].valueInteger
                     console.log(ar6[0].valueInteger)
+                }
+
+                //form control
+                let ar7 = this.findExtension(item,extItemControl)
+                if (ar7.length > 0) {
+                    meta.itemControl = ar7[0].valueCodeableConcept
                 }
 
 
@@ -632,7 +646,8 @@ angular.module("formsApp")
                     //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
                     //console.log(referenceValue)
-                    if (formValue !== null) {
+                    if (formValue !== undefined) {
+                        //if (formValue !== null) {
                         switch(conditional.operator) {
                             case '=' :
 
@@ -1358,7 +1373,7 @@ angular.module("formsApp")
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (child,childInx) {
                                 let item = {id: child.linkId,state:{},data:{}}
-                                item.text = child.text //+ " " + treeData.length;
+                                item.text = child.text || child.linkId //+ " " + treeData.length;
                                 item.parent = sectionItem.linkId;
                                 let meta = that.getMetaInfoForItem(child)
                                 item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
@@ -1371,7 +1386,7 @@ angular.module("formsApp")
                                 if (child.item) {
                                     child.item.forEach(function (grandchild) {
                                         let item = {id: grandchild.linkId, state: {}, data: {}}
-                                        item.text = grandchild.text //+ " " + treeData.length;
+                                        item.text = grandchild.text || grandchild.linkId//+ " " + treeData.length;
                                         item.parent = child.linkId;
                                         let meta = that.getMetaInfoForItem(grandchild)
                                         item.data = {item: grandchild, level: 'grandchild', meta:meta} //child

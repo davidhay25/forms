@@ -7,6 +7,7 @@
             <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
                  ng-click = "selectSection(section)"
                  style="cursor: pointer"
+                 ng-show="showConditional({item:section.item})"
                  ng-repeat="section in formTemplate">
 
                  {{section.text}}

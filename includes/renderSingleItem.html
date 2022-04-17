@@ -79,7 +79,6 @@
 
                     <div ng-hide="cell.displayHint == 'radio-button'">
 
-
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                                 ng-change="makeQR(cell.item.linkId)"
                                 ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
@@ -122,6 +121,71 @@
 
             </div>
 
+            <!-- When there are options for an integer type...-->
+
+            <div ng-switch-when = "integer" >
+
+                <div ng-show = "cell.item.answerOption.length > 0">
+                    <div ng-hide="cell.displayHint == 'radio-button'">
+                        <select class="form-control" ng-model="form[cell.item.linkId]"
+                            ng-change="makeQR(cell.item.linkId)"
+                            ng-options = "value.valueInteger for value in cell.item.answerOption"/>
+                    </div>
+
+                    <div ng-show="cell.displayHint == 'radio-button'">
+
+                        <span ng-repeat="option in cell.item.answerOption">
+
+                            <input type="radio" value="{{option}}"
+                                   ng-change="makeQR(cell.item.linkId)"
+                                   ng-model="form[cell.item.linkId]"/>
+
+                            {{option.valueInteger}}
+                        </span>
+
+                    </div>
+
+                </div>
+                <div ng-hide = "cell.item.answerOption.length > 0">
+                    <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                           ng-model="form[cell.item.linkId]" class="form-control"/>
+                </div>
+
+            </div>
+
+
+            <div ng-switch-when = "string" >
+
+                <div ng-show = "cell.item.answerOption.length > 0">
+
+                    <div ng-hide="cell.displayHint == 'radio-button'">
+                        <select class="form-control" ng-model="form[cell.item.linkId]"
+                            ng-change="makeQR(cell.item.linkId)"
+                            ng-options = "value.valueString for value in cell.item.answerOption"/>
+                    </div>
+
+                    <div ng-show="cell.displayHint == 'radio-button'">
+
+                        <span ng-repeat="option in cell.item.answerOption">
+
+                            <input type="radio" value="{{option}}"
+                                   ng-change="makeQR(cell.item.linkId)"
+                                   ng-model="form[cell.item.linkId]"/>
+
+                            {{option.valueString}}
+                        </span>
+
+                    </div>
+
+
+
+                </div>
+                <div ng-hide = "cell.item.answerOption.length > 0">
+                    <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                           ng-model="form[cell.item.linkId]" class="form-control"/>
+                </div>
+
+            </div>
 
 
             <div ng-switch-default>

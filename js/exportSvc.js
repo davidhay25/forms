@@ -61,7 +61,7 @@ angular.module("formsApp")
                             entry.obligation = "Optional"
                         }
                         
-                        if (item.answerOption) {
+                        if (item.answerOption && (item.type == 'choice' || item.type== 'open-choice')) {
                             let dd = ""
                             item.answerOption.forEach(function (ao) {
                                 dd += ao.valueCoding.display + "; "

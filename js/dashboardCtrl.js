@@ -27,7 +27,8 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
-            $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review'})
+            $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review-comment'})
+            $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
@@ -325,6 +326,7 @@ angular.module("formsApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editItem.html',
                     backdrop: 'static',
+                    size: 'lg',
                     controller: 'editItemCtrl',
                     resolve: {
                         itemTypes: function () {
@@ -375,6 +377,7 @@ angular.module("formsApp")
                         templateUrl: 'modalTemplates/editItem.html',
                         backdrop: 'static',
                         controller: 'editItemCtrl',
+                        size: 'lg',
                         resolve: {
                             itemTypes: function () {
                                 return $scope.input.itemTypes

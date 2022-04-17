@@ -42,7 +42,8 @@
                     </tr>
                     <tr>
                         <td>LinkId</td>
-                        <td><input type="text" ng-disabled = "editType !== 'new'"
+
+                        <td><input type="text" ng-disabled = "dependantOnThis.length > 0"
                                    placeholder="A unique (in this Q) identifier for the item"
                                    ng-blur="checkUniqueLinkId(newItem.linkId)"
                                    ng-model="newItem.linkId" class="form-control"/> </td>
@@ -235,7 +236,7 @@
 
 
             <uib-tab heading = "Resource mapping">
-               Instructions to map from this element into a resource
+
 
                 <br/><br/>
 
@@ -244,6 +245,53 @@
 
                 <strong>Resource extraction Notes</strong>
                 <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
+
+
+                <em>Instructions to map from this element into a resource</em>
+
+
+
+            </uib-tab>
+
+            <uib-tab ng-show = "newItem.type == 'integer' || newItem.type == 'string'" >
+                <uib-tab-heading>Answer options <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
+                <br/>
+
+                <div class="row ">
+                    <div class="col-md-6">
+                        <div class="list-group">
+                            <div class="list-group-item" ng-repeat = "option in newItem.answerOption">
+                                <span class="pull-right">
+
+                                     <i class=" clickable glyphicon glyphicon-arrow-up" ng-show="$index > 0"
+                                        ng-click = "moveAnswerUp($index)"></i>
+                                     <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < newItem.answerOption.length -1"
+                                        ng-click = "moveAnswerDown($index)"></i>
+
+                                    <i class=" clickable glyphicon glyphicon-remove"
+                                       ng-click = "removeAnswerOption($index)"></i>
+
+                                </span>
+
+                                {{option.valueInteger}} {{option.valueString}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <checkbox ng-model="input.displayAsRadio"></checkbox> Display as Radio buttons
+                    </div>
+                </div>
+
+
+                <div class="row ">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" ng-model="input.newAnswerOption"/>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn-link btn" ng-click="addOtherAnswerOption(input.newAnswerOption)">Add</button>
+                    </div>
+                </div>
+
 
 
 
@@ -266,6 +314,13 @@
                         <td>
                             <i class=" clickable glyphicon glyphicon-remove"
                                ng-click = "removeAnswerOption($index)"></i>
+                        </td>
+                        <td>
+                            <i class=" clickable glyphicon glyphicon-arrow-up" ng-show="$index > 0"
+                                ng-click = "moveAnswerUp($index)"></i>
+                            <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < newItem.answerOption.length -1"
+                                ng-click = "moveAnswerDown($index)"></i>
+
                         </td>
                     </tr>
                     <tr>
@@ -291,8 +346,6 @@
             </uib-tab>
 
             <uib-tab heading = "Conditionals">
-
-
 
                 <div class="row">
                     <div class="col-sm-6">
@@ -336,10 +389,26 @@
 
             </uib-tab>
 
-            <uib-tab ng-show = "false" heading = "Library">
+
+
+            <uib-tab ng-show = "dependantOnThis.length > 0" heading = "Dependant on this">
                 <br/>
-                TBD  - allow selection from the library of items
+                <table class="table-bordered table">
+                    <tr><th>LinkId</th><th>Text</th><th>Condition</th></tr>
+                    <tr ng-repeat = "item in dependantOnThis">
+                        <td>{{item.linkId}}</td>
+                        <td>{{item.text}}</td>
+                        <td><div ng-repeat = "ew in item.enableWhen">
+                            <strong>{{ew.operator}}</strong> {{ew.answerCoding}} {{ew.answerBoolean}}
+                        </div></td>
+
+                    </tr>
+                </table>
+
+                <em>Items that have a show/hide dependency on this one</em>
+
             </uib-tab>
+
             <uib-tab ng-show = "false" heading = "Json">
                 <br/>
                 <pre>{{newItem | json}}</pre>
