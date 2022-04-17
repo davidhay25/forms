@@ -198,24 +198,52 @@
                                                     <div class="col-md-9">
                                                         <H4>Element: {{selectedNode.data.item.text}}</H4>
                                                     </div>
+
                                                     <div class="col-md-3">
+                                                        <!--
                                                         <div ng-show="selectedNode.data.item.repeats">
                                                             <div class="alert alert-danger pull-right">
                                                                 <strong>Element can repeat</strong>
                                                             </div>
 
                                                         </div>
+                                                        -->
                                                     </div>
                                                 </div>
 
+                                                <div class="row" ng-show="selectedNode.data.item.repeats">
+                                                    <div class="col-md-3">
+                                                        <strong>Item can repeat</strong>
+                                                    </div>
+                                                    <div class="col-md-9">
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row" ng-show="selectedNode.data.meta.hidden">
+                                                    <div class="col-md-3">
+                                                        <strong>Item is hidden</strong>
+                                                    </div>
+                                                    <div class="col-md-9">
+
+                                                    </div>
+                                                </div>
 
                                                 <div class="row">
                                                     <div class="col-md-3">
                                                         LinkId
                                                     </div>
                                                     <div class="col-md-9">
-
                                                         {{selectedNode.data.item.linkId}}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row" ng-show="selectedNode.data.meta.description">
+                                                    <div class="col-md-3">
+                                                        Description
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.description}}
                                                     </div>
                                                 </div>
 
@@ -469,10 +497,6 @@
                                         <uib-tab heading="Json">
                                             <pre>{{selectedNode.data.item | json}}</pre>
                                             <em>Only for internal use</em>
-                                        </uib-tab>
-
-                                        <uib-tab heading="Tree node ndata">
-                                            <pre>{{selectedNode.data | json}}</pre>
                                         </uib-tab>
 
                                     </uib-tabset>

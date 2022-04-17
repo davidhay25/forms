@@ -16,12 +16,13 @@
                 <strong>  {{cell.item.text}}</strong>
 
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
-                <span ng-show = "cell.meta.usageNotes">
-                <i class="glyphicon glyphicon-info-sign"
-                   uib-popover="{{cell.meta.usageNotes}}"
-                   popover-placement="right"
-                   popover-trigger="'mouseenter'"/>
-            </span>
+                <span ng-show = "cell.meta.description">
+
+                    <i class="glyphicon glyphicon-info-sign"
+                       uib-popover="{{cell.meta.description}}"
+                       popover-placement="right"
+                       popover-trigger="'mouseenter'"/>
+                </span>
             </div>
 
 

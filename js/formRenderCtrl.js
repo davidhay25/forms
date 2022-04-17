@@ -37,8 +37,22 @@ angular.module("formsApp")
             }
 
 
+            //determine if an element should be displayed
             $scope.showConditional = function (cell) {
+
+                if (! cell.meta) {
+                    console.log(cell.item.text + " no meta")
+                }
+
+                //the group item doesn't have a meta directly
+                if (! $scope.input.showHidden &&  cell.meta && cell.meta.hidden) {
+                    return false
+                }
+
                 return formsSvc.checkConditional(cell.item,$scope.form)
+
+
+
             }
 
             //code to show (or not) a conditional group - limited to Coding comparisons ATM

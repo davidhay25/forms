@@ -7,7 +7,7 @@
             <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
                  ng-click = "selectSection(section)"
                  style="cursor: pointer"
-                 ng-show="showConditional({item:section.item})"
+                 ng-show="showConditional(section)"
                  ng-repeat="section in formTemplate">
 
                  {{section.text}}
@@ -16,6 +16,9 @@
 
             </div>
         </div>
+        <br/>
+        <checkbox ng-model="input.showHidden"></checkbox> Show hidden fields
+
     </div>
 
     <div class="col-md-9">

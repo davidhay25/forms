@@ -20,7 +20,7 @@ angular.module("formsApp")
         extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
         extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
-
+        extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
 
         //todo fsh doesn't underatnd expression extension...
@@ -234,6 +234,11 @@ angular.module("formsApp")
                 //form control
                 updateExtension(item,extItemControl,"CodeableConcept",meta.itemControl)
 
+                //hidden
+                updateExtension(item,extHidden,"Boolean",meta.hidden)
+
+
+
                 //reference types
 /* todo - need to allow multiple extensions of same url...
                 meta.referenceTypes = meta.referenceTypes || []
@@ -337,6 +342,11 @@ angular.module("formsApp")
                     meta.itemControl = ar7[0].valueCodeableConcept
                 }
 
+                //hidden
+                let ar8 = this.findExtension(item,extHidden)
+                if (ar8.length > 0) {
+                    meta.hidden = ar8[0].valueBoolean
+                }
 
 
                 return meta
@@ -493,13 +503,13 @@ angular.module("formsApp")
 
                 //create a template suitable for rendering in up to 4 columns
                 //is a collection of sections. Each section contains an array of rows,
-                // each row is an array with 2 elements (left / right) and the cell has an array of items
+                // each row is an array with up to 4 elements (col1-4) and the cell has an array of items
 
                 let template = []
 
                 if (Q.item) {
                     Q.item.forEach(function (sectionItem) {
-                        let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem,meta:{}}
+                        let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
                         template.push(section)
 
@@ -519,6 +529,7 @@ angular.module("formsApp")
                                     //row.item = item
                                     row.meta = meta   //this is th emeta for the group item...
                                     row.text = item.text
+
                                     if (item.item) {    //these are the child items
                                         if (meta.columnCount) {
                                             //if there's a column count, then fill rows left -> right
@@ -526,7 +537,7 @@ angular.module("formsApp")
                                             item.item.forEach(function (child,inx) {
 
                                                 let side = 'col' + col
-                                                let cell = {item:child}
+                                                let cell = {item:child,meta:that.getMetaInfoForItem(child)}
                                                 setDecoration(cell,child)
                                                 row[side] = row[side] || []
                                                 row[side].push(cell)
@@ -573,7 +584,8 @@ angular.module("formsApp")
                                                     }*/
 
 
-                                                    let cell = {item:child}
+                                                    let cell = {item:child,meta:childMeta}
+                                                    //,that.getMetaInfoForItem(child)
                                                     setDecoration(cell,child)
                                                     row[side] = row[side] || []
                                                     row[side].push(cell)
@@ -610,6 +622,8 @@ angular.module("formsApp")
                 return template
 
                 //looks for specific instructions from the Q about an item - eg render as radio
+                //todo - does this overlap with the meta stuff??
+
                 function setDecoration(cell,item) {
 
                     //look for item control
@@ -650,7 +664,6 @@ angular.module("formsApp")
                         //if (formValue !== null) {
                         switch(conditional.operator) {
                             case '=' :
-
                                 if (conditional.answerCoding) {
                                     return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
                                 }

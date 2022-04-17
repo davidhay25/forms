@@ -16,9 +16,7 @@ angular.module("formsApp")
                     }
                 )
             }
-            //let qry = "/ds/fhir/Observation"
 
-            //$scope.QVS = []
 
             $scope.input = {}
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime','choice','open-choice','display','group','reference']

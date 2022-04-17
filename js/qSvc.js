@@ -197,47 +197,51 @@ angular.module("formsApp")
 
                     } else {
                         //now check the section children
-                        for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
-                            let child = section.item[childIndex]
-                            if (child.linkId == linkId) {
-                                console.log('found',childIndex)
+                        if (section.item) {
+                            for (var childIndex =0; childIndex < section.item.length;childIndex ++) {
+                                let child = section.item[childIndex]
+                                if (child.linkId == linkId) {
+                                    console.log('found',childIndex)
 
-                                if (dirn == 'up' && childIndex > 0) {
-                                    let ar = section.item.splice(childIndex,1)
-                                    section.item.splice(childIndex-1,0,ar[0])
-
-                                }
-                                if (dirn == 'dn' && childIndex < section.item.length) {
-                                    let ar = section.item.splice(childIndex,1)
-                                    section.item.splice(childIndex+1,0,ar[0])
-
-                                }
-                                break
-                            } else {
-                                //grandchildren
-                                if (child.item) {
-                                    for (var grandchildIndex = 0; grandchildIndex < child.item.length;grandchildIndex ++) {
-                                        let grandchild = child.item[grandchildIndex]
-                                        if (grandchild.linkId == linkId) {
-                                            if (dirn == 'up' && grandchildIndex > 0) {
-                                                let ar = child.item.splice(grandchildIndex,1)
-                                                child.item.splice(grandchildIndex-1,0,ar[0])
-
-                                            }
-                                            if (dirn == 'dn' && grandchildIndex < section.item.length) {
-                                                let ar = child.item.splice(grandchildIndex,1)
-                                                child.item.splice(grandchildIndex+1,0,ar[0])
-
-                                            }
-                                            break
-                                        }
-
+                                    if (dirn == 'up' && childIndex > 0) {
+                                        let ar = section.item.splice(childIndex,1)
+                                        section.item.splice(childIndex-1,0,ar[0])
 
                                     }
-                                }
-                            }
+                                    if (dirn == 'dn' && childIndex < section.item.length) {
+                                        let ar = section.item.splice(childIndex,1)
+                                        section.item.splice(childIndex+1,0,ar[0])
 
+                                    }
+                                    break
+                                } else {
+                                    //grandchildren
+                                    if (child.item) {
+                                        for (var grandchildIndex = 0; grandchildIndex < child.item.length;grandchildIndex ++) {
+                                            let grandchild = child.item[grandchildIndex]
+                                            if (grandchild.linkId == linkId) {
+                                                if (dirn == 'up' && grandchildIndex > 0) {
+                                                    let ar = child.item.splice(grandchildIndex,1)
+                                                    child.item.splice(grandchildIndex-1,0,ar[0])
+
+                                                }
+                                                if (dirn == 'dn' && grandchildIndex < section.item.length) {
+                                                    let ar = child.item.splice(grandchildIndex,1)
+                                                    child.item.splice(grandchildIndex+1,0,ar[0])
+
+                                                }
+                                                break
+                                            }
+
+
+                                        }
+                                    }
+                                }
+
+                            }
                         }
+
+
                     }
 
 
