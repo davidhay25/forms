@@ -40,6 +40,7 @@
         }
 
 
+
     </style>
 
     <script>
@@ -66,6 +67,8 @@
     <script src="directive/displayProvenanceDir.js"></script>
     <script src="js/actnowSvc.js"></script>
     <script src="js/formRenderCtrl.js"></script>
+    <script src="js/designerSvc.js"></script>
+    <script src="js/exportSvc.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -201,7 +204,9 @@
 
         <div ng-show="reviewState == 'model'">
             <em>The complete data model</em>
-            <ng-include src="'includes/showQTree.html'"></ng-include>
+
+
+            <ng-include src="'includes/showModel.html'"></ng-include>
 
 
         </div>
@@ -210,7 +215,7 @@
 
     </div>
 
-
+<!--
 
     <uib-tabset ng-hide="reviewMode">
 
@@ -244,19 +249,7 @@
 
 
             <div class="row">
-                <!--
-               <div class="col-md-2">
 
-                   <div class="list-group" style="cursor:pointer;">
-                       <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                            ng-click="selectQ(Q)"
-                            ng-repeat="Q in allQ">
-                           {{Q.name}}
-                       </div>
-                   </div>
-
-               </div>
-                -->
                 <div class="col-md-12">
                     <br/>
                     <uib-tabset ng-show="selectedQ">
@@ -383,9 +376,7 @@
                                     <pre>{{selectedQ | json}}</pre>
                                 </uib-tab>
                                 <uib-tab heading="Tree">
-<!-- used in review mode.
-                                    <ng-include src="'includes/showQTree.html'"></ng-include>
--->
+
                                 </uib-tab>
                             </uib-tabset>
                         </uib-tab>
@@ -417,21 +408,12 @@
                 </div>
                 <div class="col-md-10">
                     <uib-tabset ng-show="selectedQR">
-                        <!--
-                        <uib-tab heading="Form">
 
-
-                            <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
-
-                        </uib-tab>
-                        -->
 
                         <uib-tab heading="Form">
 
                             <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
-                            <!--
-                            <displayform patient="selectedPatient" qr="selectedQR"></displayform>
--->
+
                         </uib-tab>
 
 
@@ -593,39 +575,6 @@
                 </div>
 
             </div>
-
-<!--
-            <uib-tabset>
-                <br/>
-                <uib-tab heading="List">
-                    <table class="table table-condensed">
-                        <tr><th>Date</th><th>Report</th></tr>
-                        <tr ng-repeat = "dr in allDR" ng-click="selectDR(dr)">
-                            <td width = "15%">
-                                {{dr.resource.effectiveDateTime | date :  "MMM d yyyy"}}
-                            </td>
-
-                            <td>
-                                {{dr.obs[0].valueString}}
-                            </td>
-
-                        </tr>
-                    </table>
-                </uib-tab>
-
-                <uib-tab heading="Json">
-                    <div class="row"  ng-repeat = "dr in allDR">
-                        <div class="col-md-6">
-                            <pre>{{dr.resource | json}}</pre>
-                        </div>
-                        <div class="col-md-6">
-                            <pre>{{dr.obs | json}}</pre>
-                        </div>
-                    </div>
-                </uib-tab>
-            </uib-tabset>
-
--->
 
 
         </uib-tab>
@@ -883,6 +832,8 @@
 
         </uib-tab>
     </uib-tabset>
+
+        -->
 
 </div>
 

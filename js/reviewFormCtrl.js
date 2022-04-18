@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('reviewFormCtrl',
-        function ($scope,$http,formsSvc,actnowSvc,$window,$timeout) {
+        function ($scope,$http,formsSvc,actnowSvc,$window,$timeout,designerSvc,exportSvc) {
 
             $scope.input = {}
             $scope.form = {}
@@ -12,27 +12,46 @@ angular.module("formsApp")
             let validationServer = "http://localhost:9099/baseR4/"
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
-            // ------------ this code is almost the same as that in the dashboard. ? move to a service
-
-/*
-
             let search = $window.location.search;
             if (search) {
-                let srch = search.substr(1)
-                if (srch) {
-                    let url = decodeURIComponent(srch)
-                    console.log(url)
-                }
+                let QName = search.substr(1)
 
-                return
+                formsSvc.loadQByName(QName).then(   //returns a bundle
+                    function(data) {
+                        console.log(data)
+                        if (data.data.entry && data.data.entry.length > 0) {
+                            let Q = data.data.entry[0].resource
+
+                            $scope.input.appTitle = "Review form design"
+                            //assume only 1
+                            $scope.reviewMode = true    //will hide most of the tabs...
+                            $scope.reviewState = "form"  //can be 'form','display','model'
+                            $scope.selectQ(Q)  //generates form template & $scope.hashItem
+
+                            //$scope.model = designerSvc.makeLMObject(Q)
+
+                            $scope.model = exportSvc.createJsonModel(Q)
+
+
+
+
+                        } else {
+                            window.location = "QNotFound.html"
+                        }
+                    })
             } else {
-                alert("There was no form name found. Contact support.")
-                return
+                window.location = "QNotFound.html"
+               // alert("Q not found")   //todo better error
             }
 
-*/
 
+
+
+
+
+/*
             //load all the questionnaires
+            //todo - just read the one passed in...
             $http.get("/fm/fhir/Questionnaire").then(
                 function (data) {
                     $scope.allQ = [];
@@ -49,11 +68,15 @@ angular.module("formsApp")
 
                         let ar = $scope.allQ.filter(q => q.name == QName)
                         if (ar.length > 0) {
+
                             $scope.input.appTitle = "Review form design"
                             //assume only 1
                             $scope.reviewMode = true    //will hide most of the tabs...
                             $scope.reviewState = "form"  //can be 'form','display','model'
-                            $scope.selectQ(ar[0])
+                            $scope.selectQ(ar[0])  //generates form template & $scope.hashItem
+
+                            $scope.model = designerSvc.makeLMObject(ar[0],$scope.hashItem)
+
 
                             //need to allow from for the full page to load for the tree...
                             $timeout(function(){
@@ -78,6 +101,7 @@ angular.module("formsApp")
                 }
             )
 
+            */
             $scope.prepop = function () {
                 formsSvc.prepopForm($scope.hashItem,$scope.form,$scope.input.selectedPatient.resource)
                 $scope.makeQR()
@@ -261,7 +285,7 @@ angular.module("formsApp")
 
                 $scope.formTemplate = formsSvc.makeFormTemplate(Q)
 
-                console.log($scope.formTemplate)
+                //console.log($scope.formTemplate)
 
 
                 let vo = formsSvc.makeTreeFromQ(Q)
@@ -270,14 +294,14 @@ angular.module("formsApp")
                 $scope.hashItem = vo.hash       //all items in teh form hashed by id
                 //$scope.selectedSection = Q.item[0]  //show first tab in tab view
 
-
+/*
                 //$scope.formDef = vo.treeData
                 formsSvc.makeFormDefinition(vo.treeData).then(
                     function (data) {
                         $scope.formDef = data
                     }
                 )
-
+*/
                 //generate tabbed model (for tab form view)
                 //let arSection = []
 
@@ -474,7 +498,7 @@ angular.module("formsApp")
                 $scope.selectedPatient = $scope.input.selectedPatient.resource;
 
 
-
+/*
                 //get all the QR for this patient from the data server
                 let url = "/ds/fhir/QuestionnaireResponse?patient="+$scope.input.selectedPatient.resource.id
                 $http.get(url).then(
@@ -493,10 +517,11 @@ angular.module("formsApp")
                         }
                     }
                 )
+                */
 
                 //get all the DR - DiagnosticReports
 
-
+/*
                 let qry = "/ds/fhir/DiagnosticReport?patient="+$scope.selectedPatient.id+"&_include=DiagnosticReport:result"
                 $http.get(qry).then(
                     function(data) {
@@ -507,12 +532,12 @@ angular.module("formsApp")
                         console.log(err)
                     }
                 )
-
+*/
                 //get all the observations
-                getObservationsForPatient($scope.input.selectedPatient.resource.id)
+                //getObservationsForPatient($scope.input.selectedPatient.resource.id)
 
                 //get all the act-now data (assumes the careplan supporting-info search parameter has been applied to the server
-
+/*
                 //server script does paging
                 let qryActnow = "/ds/fhir/CarePlan?patient=" +$scope.input.selectedPatient.resource.id
                 qryActnow += "&_include=CarePlan:condition"
@@ -548,7 +573,7 @@ angular.module("formsApp")
                     }
                 )
 
-
+*/
                 //All service Requests
                 let qrySR = "/ds/fhir/ServiceRequest?patient=" +$scope.input.selectedPatient.resource.id
                 $scope.allSR = []
@@ -574,7 +599,7 @@ angular.module("formsApp")
 
             }
 
-            $scope.updateQuery = function(){
+            $scope.updateQueryDEP = function(){
                 getObservationsForPatient($scope.input.selectedPatient.resource.id)
             }
 
@@ -583,7 +608,7 @@ angular.module("formsApp")
                 $scope.observationGroup = group
             }
 
-            let getObservationsForPatient = function(patId){
+            let getObservationsForPatientDEP = function(patId){
                 let url = "/ds/fhir/Observation?patient="+patId //+ "&_count=50"
 
                 $http.get(url).then(

@@ -60,6 +60,35 @@ angular.module("formsApp")
         }
 
         return {
+            makeHashAllItems(Q) {
+                let that = this
+                let hash = {}
+                if (Q.item) {
+                    Q.item.forEach(function (sectionItem) {
+                        hash[sectionItem.linkId] = {item:sectionItem,meta:that.getMetaInfoForItem(sectionItem)}
+
+                        if (sectionItem.item) {
+                            sectionItem.item.forEach(function (childItem) {
+                                hash[childItem.linkId] = {item:childItem,meta:that.getMetaInfoForItem(childItem)}
+                                //hash[childItem.linkId] = childItem
+
+
+                                if (childItem.item) {
+                                    childItem.item.forEach(function (grandchildItem) {
+                                        hash[grandchildItem.linkId] = {item:grandchildItem,meta:that.getMetaInfoForItem(grandchildItem)}
+                                        //hash[grandchildItem.linkId] = grandchildItem
+
+                                    })
+                                }
+
+                            })
+                        }
+
+                    })
+                }
+                return hash
+
+            },
             getExtUrl : function(key) {
 
                 return extensionUrl[key]
@@ -114,6 +143,11 @@ angular.module("formsApp")
             },
             loadQByUrl : function(url) {
                 let qry = "/fm/fhir/Questionnaire?url=" + url
+                return $http.get(qry)
+
+            },
+            loadQByName : function(name) {
+                let qry = "/fm/fhir/Questionnaire?name=" + name
                 return $http.get(qry)
 
             },
@@ -393,15 +427,18 @@ angular.module("formsApp")
                                     populateMeta(group)
 
                                     //step through the children of the group..
-                                    child.item.forEach(function (grandChild) {
+                                    if (child.item) {
+                                        child.item.forEach(function (grandChild) {
 
-                                        updateSpecificArrays(sectionItem,report,grandChild)
+                                            updateSpecificArrays(sectionItem,report,grandChild)
 
-                                        let entry = {item:grandChild,meta:{}}
-                                        populateMeta(entry)
+                                            let entry = {item:grandChild,meta:{}}
+                                            populateMeta(entry)
 
-                                        group.children.push(entry)
-                                    })
+                                            group.children.push(entry)
+                                        })
+                                    }
+
 
 
                                 } else {
@@ -660,7 +697,7 @@ angular.module("formsApp")
                     //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
                     //console.log(referenceValue)
-                    if (formValue !== undefined) {
+                    if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
                         //if (formValue !== null) {
                         switch(conditional.operator) {
                             case '=' :

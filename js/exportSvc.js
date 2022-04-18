@@ -6,7 +6,9 @@ angular.module("formsApp")
 
             return {
 
-                createJsonModel : function(Q,hashAllItems) {
+                createJsonModel : function(Q) {
+                    let hashAllItems = formsSvc.makeHashAllItems(Q)
+
                     let arModel = []
 
                     if (Q.item) {
@@ -29,6 +31,34 @@ angular.module("formsApp")
 //console.log(arModel)
                     return arModel
 
+                    //create a note based on any conditionals found in the item
+                    function getConditionalNote(item,hashAllItemsXXX) {
+                        let note = ""
+                        if (item.enableWhen) {
+                            item.enableWhen.forEach(function (ew) {
+                                let source = hashAllItems[ew.question]
+                                if (source) {
+                                    note += "'" + source.item.text + "' is equal to "
+                                    if (ew.answerCoding) {
+                                        note += ew.answerCoding.display
+
+                                    } else if (ew.answerBoolean) {
+                                        note += ew.answerBoolean
+                                    } else {
+                                        note += "Unknown value"
+                                    }
+
+                                } else {
+                                    note += "No item with a linkId of '"+ew.question + "' was found."
+                                }
+                            })
+
+                        }
+                        return note
+
+
+                    }
+
                     function makeEntry(item,meta,section,ar) {
                         //ignore 'reviewer comments' elements
                         if (item.code && item.code[0].system == csReview) {
@@ -42,6 +72,8 @@ angular.module("formsApp")
                         entry.description = meta.description || ""
                         entry.category = section.text
                         entry.usageNotes = meta.usageNotes || ""
+
+                        entry.conditionalNotes = getConditionalNote(item)
 
                         if (item.required) {
                             if (item.enableWhen) {

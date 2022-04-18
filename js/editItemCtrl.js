@@ -30,6 +30,7 @@ angular.module("formsApp")
             Object.keys(hashAllItems).forEach(function (key) {
                 let item1 = hashAllItems[key].item
 
+                //this item has a dependancy on the current one being edited
                 if (item1.enableWhen) {
                     item1.enableWhen.forEach(function (ew){
                         if (ew.question == $scope.newItem.linkId) {
@@ -39,11 +40,13 @@ angular.module("formsApp")
                 }
 
 
+                //an item with a type of choice or boolean is considered to be a possible source of a dependency
                 if (item1.type == 'choice' || item1.type == 'boolean') {
                     $scope.dependencySources.push(item1)
                 }
             })
 
+            //when a possible dependency source is selected. Will get the vakues from the source answerOption
             //needs to be at the top
             $scope.ewSelected = function(sourceItem) {
                 console.log(sourceItem)
@@ -79,22 +82,71 @@ angular.module("formsApp")
 
                     $scope.dependencySources.forEach(function(choiceItem) {
                         if (choiceItem.linkId == linkId) {
-                            $scope.input.ewQuestion = choiceItem
-                            if (ew.answerCoding) {
-                                //the value to check is Coding
-                                let answerCode = ew.answerCoding.code   //the current code value. ignore the system
-                                $scope.ewSelected(choiceItem)       //sets the list of values
+                            $scope.input.ewQuestion = choiceItem  //this is the 'source' item whose value will determine if this one is shown
 
-                                $scope.input.ewQuestionOptions.forEach(function (concept) {
-                                    if (concept.code == answerCode) {
-                                        $scope.input.ewAnswer = concept
-                                    }
-                                })
+                            //need to specify how to display the set of source values
+                            //will either be a list of things (string, Coding) or a boolean
+                            let sourceType      //what type (Coding or string) the source question has as answerOption
+                            if (choiceItem.answerOption && choiceItem.answerOption.length > 0) {
+                                //this is a list of things
+                                $scope.dependencyChoices = "list"
+                                //need to determine the type of choices in the list - Coding, string
+                                if (choiceItem.answerOption[0].valueCoding) {
+                                    sourceType = "Coding"
+                                } else if (choiceItem.answerOption[0].valueString) {
+                                    sourceType = "string"
+                                }
+
+
+                            } else if (choiceItem.type == 'boolean') {
+                                //this is a boolean
+                                $scope.dependencyChoices = "boolean"
+                            } else {
+                                alert("The source for a dependency should either be a list of things or a boolean")
+                                return
                             }
 
-                            if (ew.answerBoolean !== null) {
+/*
+                            //let sourceType      //what type (Coding or boolean) the source question has as answerOption
+                            if (choiceItem.answerOption && choiceItem.answerOption.length > 0) {
+                                if (choiceItem.answerOption[0].valueCoding) {
+                                    sourceType = "Coding"
+                                } else if (choiceItem.answerOption[0].valueBoolean) {
+                                    sourceType = "boolean"
+                                }
+
+                            } else {
+                                //the source type is not supported! - doesn't have answerOption
+                                //this shouldn't happen
+                                alert("error setting current dependency status")
+                            }
+*/
+                            if ($scope.dependencyChoices == 'list') {
+                                //if this is a list, need to set the current value in the list
+
+                                if (sourceType == "Coding") {
+
+                                    //the value to check is Coding
+                                    let answerCode = ew.answerCoding.code   //the current code value. ignore the system
+                                    $scope.ewSelected(choiceItem)       //sets the list of values - $scope.input.ewQuestionOptions
+
+                                    //set the current value in the list
+                                    $scope.input.ewQuestionOptions.forEach(function (concept) {
+                                        if (concept.code == answerCode) {
+                                            $scope.input.ewAnswer = concept
+                                        }
+                                    })
+                                }
+
+
+
+                            }
+
+
+                            if (sourceType == "boolean") {
+                                //if (ew.answerBoolean !== null) {
                                 //the value to check is boolean
-                                $scope.input.ewAnswer =  ew.answerBoolean ? "yes" : "no"
+                                $scope.input.ewAnswerBoolean =  ew.answerBoolean ? "yes" : "no"
                             }
                         }
                     })
@@ -219,6 +271,7 @@ angular.module("formsApp")
             }
 
 
+            //when adding a new answer option which is a Coding
             $scope.addAnswerOption = function(code,system,display){
                 if ($scope.newItem.answerValueSet) {
                     alert("You can't have both a ValueSet and list of options.")
@@ -228,7 +281,6 @@ angular.module("formsApp")
                 $scope.newItem.answerOption = $scope.newItem.answerOption || []
                 let opt = {valueCoding:{}}
                 opt.valueCoding.code = code
-
                 opt.valueCoding.system = system
                 opt.valueCoding.display = display
 
@@ -249,10 +301,13 @@ angular.module("formsApp")
 
                 //todo - check for answerOption when type is not choice...
 
-                console.log($scope.input.ewQuestion)
-                console.log($scope.input.ewAnswer)
+                //console.log($scope.input.ewQuestion)
+                //console.log($scope.input.ewAnswer)
 
-                if ($scope.input.ewQuestion && $scope.input.ewAnswer) {
+
+
+
+                if ($scope.input.ewQuestion && ($scope.input.ewAnswer || $scope.input.ewAnswerBoolean )) {
 
                     let ew
                     if ($scope.input.ewQuestion.type == 'choice' || $scope.input.ewQuestion.type == 'open-choice') {
@@ -260,17 +315,13 @@ angular.module("formsApp")
                     }
 
                     if ($scope.input.ewQuestion.type == 'boolean') {
-
                         ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
-                        ew.answerBoolean = $scope.input.ewAnswer == 'yes' ? true : false
+                        ew.answerBoolean = $scope.input.ewAnswerBoolean == 'yes' ? true : false
                     }
-
 
                     if (ew) {
                         $scope.newItem.enableWhen = [ew]
                     }
-
-
                 }
 
                 if (! $scope.newItem.linkId) {
@@ -285,10 +336,6 @@ angular.module("formsApp")
                     //todo - this will delete all controls....
                     delete $scope.meta.itemControl
                 }
-
-
-
-
 
                 //update the extensions in the item based on the meta object
                 formsSvc.updateMetaInfoForItem($scope.newItem,$scope.meta)
@@ -318,21 +365,15 @@ angular.module("formsApp")
                         }
 
                     $scope.newItem.code = [code]
-                    //delete item.tmp
-
-                    $scope.newItem.extension = $scope.newItem.extension || []
-                    $scope.newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
 
 
-                    //add the extension for observation extraction
-                  //  item.extension = []
-                  //  item.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
+                    //explicetely set
+                    //$scope.newItem.extension = $scope.newItem.extension || []
+                    //$scope.newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
+
                 }
 
                 delete $scope.newItem.tmp
-
-
-
 
                 $scope.$close($scope.newItem)
 

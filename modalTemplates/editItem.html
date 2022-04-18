@@ -5,12 +5,12 @@
         <div class="row">
             <div class="col-md-6 col-sm-6 col-xs-6">
 
-                <h3 ng-show="editType == 'edit'" class="modal-title">Edit Item</h3>
+                <h3 ng-show="editType == 'edit'" class="modal-title">Edit Item: <em>{{newItem.text}}</em></h3>
                 <h3 ng-show="editType == 'new'" class="modal-title">New Item</h3>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-6">
 
-                <button class="btn btn-link pull-right" ng-click="cancel()">Cancel</button>
+
 
                 <button class="btn btn-success pull-right"
                         ng-click="save()">
@@ -18,7 +18,7 @@
                     <div ng-show="editType == 'edit'">Save changes</div>
                     <div ng-show="editType == 'new'">Add new item</div>
                 </button>
-
+                <button class="btn btn-link pull-right" ng-click="cancel()">Cancel</button>
 
             </div>
 
@@ -333,7 +333,7 @@
                         </td>
                         <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
                         <td>
-                            <i ng-show="input.newAnswerCode"
+                            <i ng-show="input.newAnswerCode && input.newAnswerDisplay"
                                class="clickable glyphicon glyphicon-plus-sign"
                                ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
 
@@ -360,18 +360,19 @@
                             <strong>Value to show this item</strong>
 
                             <select ng-model="input.ewAnswer"  class="form-control"
-                                ng-change = ""
+
                                 ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
 
                             <br/>
                             <em>The value of the source question that will display this one</em>
                         </div>
 
+
                         <div ng-show="input.ewQuestion.type == 'boolean'">
                             <strong>Value to show this item</strong>
                             <br/><br/>
-                            <input type="radio" ng-model="input.ewAnswer" value="yes"/> True
-                            <input type="radio" ng-model="input.ewAnswer" value="no"/> False
+                            <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
+                            <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
                         </div>
 
                     </div>
