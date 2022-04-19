@@ -413,10 +413,20 @@
                                                         </div>
 
                                                         <div ng-show="selectedNode.data.level == 'section' ">
+
                                                             <button class="btn btn-link"
                                                                     ng-click="addItem(selectedNode,'child')">
                                                                 Add child element item
                                                             </button>
+
+                                                            <div>
+                                                                <button class="btn btn-link"
+                                                                        ng-click="addItem(selectedNode,'group')">
+                                                                    Add Group
+                                                                </button>
+                                                            </div>
+
+
 
                                                         </div>
 

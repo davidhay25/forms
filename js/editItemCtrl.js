@@ -75,6 +75,7 @@ angular.module("formsApp")
 
                 }
 
+            
                 //set the 'enableWhen' - only 1 supported at present...
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let ew = item.enableWhen[0]
@@ -127,15 +128,21 @@ angular.module("formsApp")
                                 if (sourceType == "Coding") {
 
                                     //the value to check is Coding
-                                    let answerCode = ew.answerCoding.code   //the current code value. ignore the system
-                                    $scope.ewSelected(choiceItem)       //sets the list of values - $scope.input.ewQuestionOptions
+                                    if (ew.answerCoding) {
+                                        let answerCode = ew.answerCoding.code   //the current code value. ignore the system
 
-                                    //set the current value in the list
-                                    $scope.input.ewQuestionOptions.forEach(function (concept) {
-                                        if (concept.code == answerCode) {
-                                            $scope.input.ewAnswer = concept
-                                        }
-                                    })
+                                        $scope.ewSelected(choiceItem)       //sets the list of values - $scope.input.ewQuestionOptions
+
+                                        //set the current value in the list
+                                        $scope.input.ewQuestionOptions.forEach(function (concept) {
+                                            if (concept.code == answerCode) {
+                                                $scope.input.ewAnswer = concept
+                                            }
+                                        })
+                                    } else {
+                                        alert("The conditional seems incorrect. Suggest you clear it, save then re-edit.")
+                                    }
+
                                 }
 
 
@@ -190,9 +197,6 @@ angular.module("formsApp")
             }
 
 
-
-
-
             $scope.hashAllItems = hashAllItems
 
             let lcHashAllItems = {}
@@ -200,7 +204,7 @@ angular.module("formsApp")
                 lcHashAllItems[key.toLowerCase()] = true
             })
 
-            if (insertType == 'section'){
+            if (insertType == 'section' || insertType == 'group' ){
                 $scope.newItem.type = 'group'
                 $scope.hideType = true
             }
@@ -213,6 +217,14 @@ angular.module("formsApp")
 
             //$scope.originalItem = angular.copy(item)    //save the original in case of cancel
 
+            $scope.clearConditional = function() {
+                let msg = "This will clear conditional show/hide for this question. Are you sure?"
+                if (confirm(msg)) {
+                    delete $scope.newItem.enableWhen
+                    delete $scope.input.ewQuestion
+                    delete $scope.input.ewQuestionOptions
+                }
+            }
 
             $scope.checkUniqueLinkId = function(linkId){
 

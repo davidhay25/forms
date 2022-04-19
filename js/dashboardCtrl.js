@@ -364,7 +364,7 @@ angular.module("formsApp")
             //set up to add new item
 
             $scope.addItem = function(node,insertType,isSibling) {
-                //insertType is 'section' or 'child' or 'grandchild'
+                //insertType is 'section' or 'child' or 'grandchild' or 'group'
                 //tree.id is the linkId
 
 

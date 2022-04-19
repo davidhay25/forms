@@ -562,8 +562,7 @@ angular.module("formsApp")
                                     //other items go in col 2 - and will often have conditionals on them
 
                                     let row = {}    //will have multiple columns
-                                    //let dirty = true
-                                    //row.item = item
+
                                     row.meta = meta   //this is th emeta for the group item...
                                     row.text = item.text
 
@@ -628,12 +627,14 @@ angular.module("formsApp")
                                                     row[side].push(cell)
                                                 }
                                             })
-                                            section.rows.push(row)   //assume that the whole group fits in a single row...
+                                            //section.rows.push(row)   //assume that the whole group fits in a single row...
                                         }
 
 
 
                                     }
+                                    //add the row even if there are no items in there yet
+                                    section.rows.push(row)   //assume that the whole group fits in a single row...
 
                                 } else {
                                     //if the item isn't a group, then add it to column 1.

@@ -351,6 +351,7 @@
                         <select ng-model="input.ewQuestion" class="form-control"
                                 ng-change = "ewSelected(input.ewQuestion)"
                                 ng-options = "item.text for item in dependencySources"></select>
+                        <br/>
                         <em>The question that this one depends on</em>
                     </div>
 
@@ -381,10 +382,25 @@
                 <pre>{{newItem.enableWhen | json}}</pre>
 -->
 
+
+
                 <br/><br/>
-                <em>Set the question and value that controls if this item is to be displayed.
-                Only questions of type 'choice' with in-line options can be selected.</em>
+                <em>Set the source question and value that controls if this item is to be displayed. Source questions can be:
+                    <ul>
+                        <li>Questions of type 'choice' with in-line options.</li>
+                        <li>Questions of type string with in-line options.</li>
+                        <li>Boolean (yes/no) questions</li>
+                    </ul>
+
+
+                </em>
                 <em>Currently, only a single conditional is supported - this can be relaxed if needed...</em>
+
+                <div class="row" ng-show = "newItem.enableWhen">
+                    <div class="col-sm-12 col-md-12">
+                        <button class="btn btn-danger pull-right" ng-click="clearConditional()">Clear conditional</button>
+                    </div>
+                </div>
 
             </uib-tab>
 
@@ -408,7 +424,7 @@
 
             </uib-tab>
 
-            <uib-tab ng-show = "false" heading = "Json">
+            <uib-tab ng-show = "true" heading = "Json">
                 <br/>
                 <pre>{{newItem | json}}</pre>
             </uib-tab>
