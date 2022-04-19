@@ -577,7 +577,7 @@ angular.module("formsApp")
                     //for the summary tab...
                     let vo = formsSvc.generateQReport(Q)
                     $scope.report = vo.report
-                    $scope.hashAllItems = vo.hashAllItems
+                    $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
 
                     makeCsvAndDownload(Q,vo.hashAllItems)
 

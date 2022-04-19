@@ -348,6 +348,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <strong>Source question</strong>
+                        <br/>
                         <select ng-model="input.ewQuestion" class="form-control"
                                 ng-change = "ewSelected(input.ewQuestion)"
                                 ng-options = "item.text for item in dependencySources"></select>
@@ -357,6 +358,35 @@
 
                     <div class="col-sm-6">
 
+                        <div ng-show = "selectedSourceItem.type == 'choice' || selectedSourceItem.type == 'open-choice'">
+                            <strong>Value to show this item</strong>
+<!--
+                            <select ng-model="input.ewAnswer"  class="form-control"
+                                    ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
+-->
+                            <select ng-model="input.ewAnswer"  class="form-control"
+                                    ng-options = "concept.valueCoding.display for concept in selectedSourceItem.answerOption"></select>
+
+                            <br/>
+                            {{selectedSourceItem.type}}
+                            <em>The value of the source question that will display this one</em>
+                        </div>
+
+                        <div ng-show = "selectedSourceItem.type == 'string'">
+                            <strong>Value to show this item</strong>
+                            <br/>
+                            <select ng-model="input.ewAnswerString"  class="form-control"
+                                    ng-options = "item.valueString for item in selectedSourceItem.answerOption"></select>
+                        </div>
+
+                        <div ng-show = "selectedSourceItem.type == 'boolean'">
+                            <strong>Value to show this item</strong>
+                            <br/><br/>
+                            <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
+                            <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
+                        </div>
+
+<!--
                         <div ng-show="input.ewQuestion.type == 'choice' || input.ewQuestion.type == 'open-choice'">
                             <strong>Value to show this item</strong>
 
@@ -375,6 +405,8 @@
                             <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
                             <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
                         </div>
+
+                        -->
 
                     </div>
                 </div>

@@ -423,7 +423,6 @@ angular.module("formsApp")
                                     let group = {type:'group',item:child,children:[],meta:{}}
                                     section.children.push(group)
 
-                                    //set the column count
                                     populateMeta(group)
 
                                     //step through the children of the group..
@@ -471,12 +470,17 @@ angular.module("formsApp")
 // function updateSpecificArrays(sectionItem,report,child)
                 function updateSpecificArrays(sectionItem,report,child) {
                     //update the coded & reference
+
+                    //because a dependency could be an item after the current one in the tree, there may be a hash entry that just has the dependencies
                     if (hashAllItems[child.linkId]) {
-                        console.log("There are multiple items with the linkId: " + child.linkId)
-                        return
+                        hashAllItems[child.linkId].item = child
+                        //console.log("There are multiple items with the linkId: " + child.linkId)
+                        //return
+                    } else {
+                        hashAllItems[child.linkId] = {item:child,dependencies:[]}
                     }
 
-                    hashAllItems[child.linkId] = {item:child,dependencies:[]}
+
 
                     //update specific summary arrays - coded & reference
                     switch (child.type) {
@@ -493,8 +497,6 @@ angular.module("formsApp")
                                     entry.options[system] = entry.options[system] || []
                                     entry.options[system].push(vc.valueCoding)
 
-
-                                    
                                 })
                             }
                             //console.log('code')
@@ -521,12 +523,16 @@ angular.module("formsApp")
 
                         //update the 'parent' hash
                         child.enableWhen.forEach(function (ew) {
+                            hashAllItems[ew.question] = hashAllItems[ew.question] || {dependencies : []}
+                            hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
+                            /*
                             if (hashAllItems[ew.question]) {
                                 hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
                             } else {
-                                alert('error: missing linkId of conditional target' + ew.question)
+                                alert('error: item: '+ child.linkId +' has unknown conditional target:' + ew.question)
                                // console.log('error: missing linkId' + ew.question)
                             }
+                    */
                         })
 
 
@@ -705,6 +711,15 @@ angular.module("formsApp")
                                 if (conditional.answerCoding) {
                                     return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
                                 }
+
+                                if (conditional.answerString) {
+                                    if (formValue.valueString == conditional.answerString) {
+                                        return true
+                                    } else {
+                                        return false
+                                    }
+                                }
+
                                 if (conditional.answerBoolean !== undefined) {
 
                                     if (conditional.answerBoolean) {

@@ -39,28 +39,39 @@ angular.module("formsApp")
                     })
                 }
 
-
-                //an item with a type of choice or boolean is considered to be a possible source of a dependency
-                if (item1.type == 'choice' || item1.type == 'boolean') {
+                //an item with a type of choice or boolean or string with is considered to be a possible source of a dependency
+                if (item1.type == 'choice' || item1.type == 'boolean' || (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0)) {
                     $scope.dependencySources.push(item1)
                 }
+
+
             })
 
             //when a possible dependency source is selected. Will get the vakues from the source answerOption
             //needs to be at the top
             $scope.ewSelected = function(sourceItem) {
+
                 console.log(sourceItem)
 
-                $scope.input.ewQuestionOptions = []
-                if (sourceItem.type == 'choice' || sourceItem.type == 'open-choice') {
-                    if (sourceItem.answerOption) {
-                        sourceItem.answerOption.forEach(function (opt) {
-                            $scope.input.ewQuestionOptions.push(opt.valueCoding)
-                        })
-                    }
+                $scope.selectedSourceItem = sourceItem
+/*
+                switch (sourceItem.type) {
+                    case "choice" :
+                        $scope.input.ewQuestionOptions = []
+                        if (sourceItem.type == 'choice' || sourceItem.type == 'open-choice') {
+                            if (sourceItem.answerOption) {
+                                sourceItem.answerOption.forEach(function (opt) {
+                                    $scope.input.ewQuestionOptions.push(opt.valueCoding)
+                                })
+                            }
+
+                        }
+                        break
 
                 }
 
+
+*/
             }
 
             if (item) {
@@ -72,18 +83,46 @@ angular.module("formsApp")
                     if ($scope.meta.itemControl.coding[0].code == 'radio-button') {
                         $scope.input.displayAsRadio = true
                     }
-
                 }
 
-            
+
                 //set the 'enableWhen' - only 1 supported at present...
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let ew = item.enableWhen[0]
                     let linkId = ew.question
 
+                    //locate the
                     $scope.dependencySources.forEach(function(choiceItem) {
                         if (choiceItem.linkId == linkId) {
                             $scope.input.ewQuestion = choiceItem  //this is the 'source' item whose value will determine if this one is shown
+                            $scope.selectedSourceItem = choiceItem
+                            switch (choiceItem.type) {
+                                case 'string' :
+
+                                    choiceItem.answerOption.forEach(function(opt){
+                                        if (opt.valueString == ew.answerString) {
+                                            $scope.input.ewAnswerString = opt
+                                        }
+                                    })
+                                    //$scope.input.ewAnswerString = ew.answerString
+                                    break
+                                case 'boolean' :
+                                    $scope.input.ewAnswerBoolean = ew.answerBoolean ? "yes" : "no"
+                                    break
+                                case 'choice' :
+                                    choiceItem.answerOption.forEach(function(opt){
+                                        let c = opt.valueCoding
+                                        if (c.code == ew.answerCoding.code && c.system == ew.answerCoding.system) {
+                                            $scope.input.ewAnswer = opt
+                                        }
+
+                                    })
+
+                                    break
+
+                            }
+
+/*
 
                             //need to specify how to display the set of source values
                             //will either be a list of things (string, Coding) or a boolean
@@ -107,21 +146,7 @@ angular.module("formsApp")
                                 return
                             }
 
-/*
-                            //let sourceType      //what type (Coding or boolean) the source question has as answerOption
-                            if (choiceItem.answerOption && choiceItem.answerOption.length > 0) {
-                                if (choiceItem.answerOption[0].valueCoding) {
-                                    sourceType = "Coding"
-                                } else if (choiceItem.answerOption[0].valueBoolean) {
-                                    sourceType = "boolean"
-                                }
 
-                            } else {
-                                //the source type is not supported! - doesn't have answerOption
-                                //this shouldn't happen
-                                alert("error setting current dependency status")
-                            }
-*/
                             if ($scope.dependencyChoices == 'list') {
                                 //if this is a list, need to set the current value in the list
 
@@ -155,6 +180,8 @@ angular.module("formsApp")
                                 //the value to check is boolean
                                 $scope.input.ewAnswerBoolean =  ew.answerBoolean ? "yes" : "no"
                             }
+
+                            */
                         }
                     })
 
@@ -318,7 +345,33 @@ angular.module("formsApp")
 
 
 
+                if ($scope.selectedSourceItem) {
+                    let ew
+                    switch ($scope.selectedSourceItem.type) {
+                        case "choice":
+                        case "open-choice":
+                            if ($scope.input.ewAnswer) {
+                                ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer.valueCoding}
+                            }
+                            break
+                        case "string" :
+                            if ($scope.input.ewAnswerString) {
+                                ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
+                                ew.answerString = $scope.input.ewAnswerString.valueString       //seems a bit convuluted...
+                            }
+                            break
+                        case "boolean" :
+                            ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
+                            ew.answerBoolean = $scope.input.ewAnswerBoolean == 'yes' ? true : false
+                            break
+                    }
 
+                    if (ew) {
+                        $scope.newItem.enableWhen = [ew]
+                    }
+
+                }
+/*
                 if ($scope.input.ewQuestion && ($scope.input.ewAnswer || $scope.input.ewAnswerBoolean )) {
 
                     let ew
@@ -335,6 +388,9 @@ angular.module("formsApp")
                         $scope.newItem.enableWhen = [ew]
                     }
                 }
+                */
+
+
 
                 if (! $scope.newItem.linkId) {
                     alert("The linkId is mandatory...")
