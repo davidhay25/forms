@@ -343,10 +343,10 @@
 
             </uib-tab>
 
-            <uib-tab heading = "Conditionals">
+            <uib-tab heading = "Conditional show">
 
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <strong>Source question</strong>
                         <br/>
                         <select ng-model="input.ewQuestion" class="form-control"
@@ -355,8 +355,17 @@
                         <br/>
                         <em>The question that this one depends on</em>
                     </div>
+<!--
+                    <div class="col-sm-2">
+                        <div style="padding-top: 8px">
+                            <input type="radio" ng-model="input.conditionalOperator" value="="/> =
+                            <div><input type="radio" ng-model="input.conditionalOperator" value=">"/> ></div>
+                        </div>
 
-                    <div class="col-sm-6">
+                    </div>
+                    -->
+
+                    <div class="col-sm-5">
 
                         <div ng-show = "selectedSourceItem.type == 'choice' || selectedSourceItem.type == 'open-choice'">
                             <strong>Value to show this item</strong>

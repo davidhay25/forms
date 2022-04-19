@@ -345,6 +345,7 @@ angular.module("formsApp")
 
 
 
+                //is there a conditional defined?
                 if ($scope.selectedSourceItem) {
                     let ew
                     switch ($scope.selectedSourceItem.type) {
@@ -371,25 +372,6 @@ angular.module("formsApp")
                     }
 
                 }
-/*
-                if ($scope.input.ewQuestion && ($scope.input.ewAnswer || $scope.input.ewAnswerBoolean )) {
-
-                    let ew
-                    if ($scope.input.ewQuestion.type == 'choice' || $scope.input.ewQuestion.type == 'open-choice') {
-                        ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer}
-                    }
-
-                    if ($scope.input.ewQuestion.type == 'boolean') {
-                        ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
-                        ew.answerBoolean = $scope.input.ewAnswerBoolean == 'yes' ? true : false
-                    }
-
-                    if (ew) {
-                        $scope.newItem.enableWhen = [ew]
-                    }
-                }
-                */
-
 
 
                 if (! $scope.newItem.linkId) {

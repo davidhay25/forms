@@ -140,9 +140,12 @@ angular.module("formsApp")
                 })
             },
 
-            editItem : function(Q,item) {
+            editItem : function(Q,item,originalLinkId) {
                 //edit an item - called after the item editor
-                let linkId = item.linkId
+
+                //if the originalLinkId is passed in, then the linkId was changed (we assume that any dependencies were checked)
+                //in this case we need to search based on the original linkId
+                let linkId = originalLinkId || item.linkId
 
                 for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
                     let section = Q.item[sectionIndex]

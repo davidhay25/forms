@@ -353,7 +353,14 @@ angular.module("formsApp")
 
                     function (updatedItem) {
                         if (updatedItem) {
-                            qSvc.editItem($scope.selectedQ,updatedItem)
+
+                            let originalLinkId
+                            //if the linkId has changed, then pass the original linkId into the editItem service so the original can be replaced...
+                            if (updatedItem.linkId !== item.linkId) {
+                                originalLinkId = item.linkId
+                            }
+
+                            qSvc.editItem($scope.selectedQ,updatedItem,originalLinkId)
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.input.dirty = true;

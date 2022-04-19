@@ -670,8 +670,8 @@ angular.module("formsApp")
                 function setDecoration(cell,item) {
 
                     //look for item control
-                    let extControlType = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
-                    let ar = that.findExtension(item,extControlType)
+                    //let extControlType = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+                    let ar = that.findExtension(item,extItemControl)
                     if (ar.length > 0) {
                         let ext = ar[0].valueCodeableConcept
                         if (ext && ext.coding.length > 0) {
@@ -687,8 +687,8 @@ angular.module("formsApp")
 
 
                     //look for observation extraction
-                    let extExtractObs = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
-                    let arObs = that.findExtension(item,extExtractObs)
+                    //let extExtractObs = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+                    let arObs = that.findExtension(item,extUrlObsExtract)
                     if (arObs.length > 0) {
                         if (arObs[0].valueBoolean) {
 
@@ -1419,7 +1419,7 @@ angular.module("formsApp")
                 //elements with 'enableWhen' set are placed below 'parent' (assume = and one only)
                 let hashEnableWhen = {} //key is the element with EW set, value is the item they are dependant on
                 let that = this
-                let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
+                //let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                 let treeData = []
                 let hash = {}
                 let root = {id:'root',text:'Root',parent:'#',state:{},data:{level:'root'}}
@@ -1431,6 +1431,7 @@ angular.module("formsApp")
                         let item = {id: sectionItem.linkId,state:{},data:{}}
                         item.text = sectionItem.text //+ " " + treeData.length;
                         item.parent = "root";
+                        item.icon = "icons/icon-qi-horizontal.png"
                         let meta = that.getMetaInfoForItem(sectionItem)
                         item.data = {item:sectionItem,level:'section',meta:meta}
 
@@ -1440,7 +1441,7 @@ angular.module("formsApp")
                         hash[item.id] = item.data;
                         treeData.push(item)
 
-                        //second layer - ie each section
+                        //second layer - contents of each section
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (child,childInx) {
                                 let item = {id: child.linkId,state:{},data:{}}
@@ -1449,16 +1450,28 @@ angular.module("formsApp")
                                 let meta = that.getMetaInfoForItem(child)
                                 item.data = {item:child,level:'child',meta:meta,parentItem : sectionItem, parentItemInx:childInx} //child
 
+                                let iconFile = "icons/icon-q-" + child.type + ".png"
+                                item.icon = iconFile
+
+                               // if (child.type == 'group') {
+                               //     item.icon = "icons/icon_q_root.gif"
+                              //  }
+
                                 hash[item.id] = item.data;
                                 treeData.push(item)
                                 checkEnableWhen(child)
 
-                                //third level - the contents of a section element...
+                                //third level - the contents of a group...
                                 if (child.item) {
                                     child.item.forEach(function (grandchild) {
                                         let item = {id: grandchild.linkId, state: {}, data: {}}
                                         item.text = grandchild.text || grandchild.linkId//+ " " + treeData.length;
                                         item.parent = child.linkId;
+
+                                        let iconFile = "icons/icon-q-" + grandchild.type + ".png"
+                                        item.icon = iconFile
+
+                                        //item.icon = "icons/icon_q_item.png"
                                         let meta = that.getMetaInfoForItem(grandchild)
                                         item.data = {item: grandchild, level: 'grandchild', meta:meta} //child
 
@@ -1488,6 +1501,7 @@ angular.module("formsApp")
 
                 return {treeData : treeData,hash:hash}
 
+
                 function checkEnableWhen(item) {
                     if (item.enableWhen) {
                         hashEnableWhen[item.linkId] = item.enableWhen[0].question
@@ -1495,12 +1509,12 @@ angular.module("formsApp")
                 }
 
 
-                function getDescription(item) {
-                    let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
+                function getDescriptionDEP(item) {
+                    //let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
                     let v = ""
                     if (item.extension) {
                         item.extension.forEach(function (ext) {
-                            if (ext.url == extUrl ) {
+                            if (ext.url == extDescription ) {
 
                                 v = ext.valueString
                             }
