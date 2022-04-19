@@ -1,7 +1,16 @@
 
-<!-- Renter a single item. Used in the new tabbed double column interface-->
+<!-- Renter a single item. Used in the new tabbed multi column interface-->
 
 <div>
+    <style>
+        .required {
+           color: red;
+           background-color: white;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
 
 
     <div ng-show="showConditional(cell)">
@@ -11,9 +20,12 @@
                    ng-click="selectResourceFromService(cell.item)"></i>
             </span>
 
+
             <div ng-hide = "cell.item.type == 'boolean'">
                 <span>{{cell.item.prefix}}. </span>
-                <strong>  {{cell.item.text}}</strong>
+
+                    <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
+
 
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
                 <span ng-show = "cell.meta.description">

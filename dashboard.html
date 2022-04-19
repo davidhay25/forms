@@ -355,6 +355,7 @@
                                                         {{selectedNode.data.meta.columnCount}}
                                                     </div>
                                                 </div>
+
                                                 <div class="row" ng-show="selectedNode.data.meta.column">
                                                     <div class="col-md-3">
                                                         Column number
@@ -363,18 +364,25 @@
                                                         {{selectedNode.data.meta.column}}
                                                     </div>
                                                 </div>
+
                                                 <div class="row" ng-show="hashAllItems[selectedNode.data.item.linkId].dependencies.length > 0">
                                                     <div class="col-md-3">
-                                                        Items dependant on this
+                                                        Items dependent on this
                                                     </div>
                                                     <div class="col-md-9">
                                                         <div ng-repeat = "entry in hashAllItems[selectedNode.data.item.linkId].dependencies">
                                                             <div class="row">
                                                                 <div class="col-md-6">
-                                                                    {{entry.item.linkId}}
+
+                                                                         {{hashAllItems[entry.item.linkId].item.text}}
+                                                                    <span class="clickable" ng-click="editItemFromLinkId(entry.item.linkId)">
+                                                                         ({{entry.item.linkId}})
+                                                                     </span>
                                                                 </div>
                                                                 <div class="col-md-6">
+                                                                    <!--
                                                                     code = {{entry.ew.answerCoding.code}}
+                                                                    -->
                                                                     <!--
                                                                     <div ng-repeat="ew in entry.ew">
                                                                         {{ew}}

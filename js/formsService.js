@@ -592,8 +592,7 @@ angular.module("formsApp")
                                                     row = {}
                                                     row.meta = meta
                                                     col = 1
-                                                    //dirty = false
-                                                    /// newRow =
+
                                                 } else {
                                                     col++
                                                 }
@@ -681,6 +680,12 @@ angular.module("formsApp")
 
                         }
                     }
+
+                    //check required
+
+                    cell.required = item.required
+
+
                     //look for observation extraction
                     let extExtractObs = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
                     let arObs = that.findExtension(item,extExtractObs)

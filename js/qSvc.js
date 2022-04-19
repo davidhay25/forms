@@ -1,11 +1,75 @@
 angular.module("formsApp")
     //editing questionnaire
-    .service('qSvc', function($q,$http,$filter,moment) {
+    .service('qSvc', function(formsSvc) {
 
 
 
         return {
             //fin
+
+            dnd : function(Q,sourceItem,targetItem) {
+                //invoked after dnd drop. Assume the caller has checked this is a valid move
+
+                //locate the parent of the source and remove it
+
+                for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+                    let section = Q.item[sectionIndex]
+                    if (section.item) {
+                        for (var childIndex = 0; childIndex < section.item.length;childIndex ++) {
+                            let child = section.item[childIndex]
+                            if (child.linkId == sourceItem.linkId) {
+                                //this section item is the parent of the source. remove it
+                                section.item.splice(childIndex,1)
+                                break
+                            }
+                            if (child.item) {   //might be coming out of a group...
+                                for (var grandchildIndex = 0; grandchildIndex < child.item.length;grandchildIndex ++) {
+                                    let grandchild = child.item[grandchildIndex]
+                                    if (grandchild.linkId == sourceItem.linkId) {
+                                        //this section item is the parent of the source. remove it
+                                        child.item.splice(grandchildIndex,1)
+                                        break
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                //locate the target (assumed to be a group) and add the source to the .item array
+                for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+                    let section = Q.item[sectionIndex]
+
+                    if (section.linkId == targetItem.linkId) {
+                        //dragged on to a section
+                        section.item = section.item || []
+                        section.item.push(sourceItem)
+                        console.log('insert section')
+                        break
+                    }
+
+                    if (section.item) {
+                        for (var childIndex = 0; childIndex < section.item.length;childIndex ++) {
+                            let child = section.item[childIndex]
+                            if (child.linkId == targetItem.linkId && child.type == 'group') {
+                                //dropping on to a group. Checking the type is probably not necessary...
+                                child.item = child.item || []
+                                child.item.push(sourceItem)
+                                console.log('insert chile')
+                                break
+                            }
+
+
+                        }
+                    }
+                }
+
+
+
+
+
+            },
 
             checkUniqueLinkId : function (Q,arSection) {
                 //check that linkId's are unique in a Q. If a section is passed in, include that in the check (when importing sections)
@@ -77,7 +141,7 @@ angular.module("formsApp")
             },
 
             editItem : function(Q,item) {
-                //edit an item
+                //edit an item - called after the item editor
                 let linkId = item.linkId
 
                 for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {

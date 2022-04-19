@@ -642,9 +642,46 @@ angular.module("formsApp")
                 }
 
                 $('#designTree').jstree('destroy');
-
+                //https://www.c-sharpcorner.com/article/drag-and-drop-in-jstree/
                 let x = $('#designTree').jstree(
-                    {'core': {'multiple': false, 'data': $scope.treeData, 'themes': {name: 'proton', responsive: true}}}
+                    {'core':
+                            {'multiple': false,
+                                'data': $scope.treeData,
+                                'check_callback' : function(operation, node, node_parent, node_position, more) {
+                                    //return false to prevent the tree being updated (we'd re-create it on a successful move anyway
+                                    delete $scope.dndTarget
+                                    if (more.ref) {
+                                        let target = more.ref.id    //the id of the node being dragged over
+
+                                        let item = $scope.hashAllItems[target].item
+                                        if (item && item.type == 'group') {
+                                            //only set the drop target for a group
+                                            $scope.dndTarget = item
+                                            console.log('good')
+                                            return false
+                                        }
+
+                                    }
+
+                                    return false
+                                },
+                                'themes': {name: 'proton', responsive: true}},
+                        plugins:['dnd'],
+                        dnd: {
+                            'is_draggable' : function(nodes,e) {
+                                //don't allow groups to be dragged
+                                delete $scope.dndSource
+                                let node = nodes[0]
+                                if (node.data.item.type == 'group') {
+                                    return false
+                                } else {
+                                    $scope.dndSource = node.data.item
+                                    return true
+                                }
+
+                            }
+                        }
+                    }
                 ).on('changed.jstree', function (e, data) {
                     //The node selection event...
                     delete $scope.newItem
@@ -665,13 +702,29 @@ angular.module("formsApp")
                     }
                     //console.log($scope.treeData)
 
-                }).on('dblclick.jstree', function (e, data) {
-
-
-                }).on('change_state.jstree',function(e,data){
-                    console.log(e,data)
                 })
             }
+
+            $(document).on('dnd_stop.vakata', function (e, data) {
+                //called when a dnd action stops (is dropped).
+                console.log(data)
+                console.log(e)
+                console.log($scope.dndTarget)
+                if ($scope.dndSource && $scope.dndTarget) {
+                    //this is a valid dnd  - from a non-group to a group.
+                    //if the dnd rules change, then the move function may need to change also
+                    qSvc.dnd($scope.selectedQ, $scope.dndSource, $scope.dndTarget)       //perform the move
+
+                    //temp $scope.treeIdToSelect = node.id
+                    $scope.drawQ($scope.selectedQ, false)
+                    $scope.input.dirty = true;
+                }
+
+            })
+
+            $(document).on('dnd_start.vakata', function (e, data) {
+                console.log('Started');
+            });
 
             let expandAll = function() {
                 $scope.treeData.forEach(function (item) {
