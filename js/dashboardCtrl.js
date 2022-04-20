@@ -364,6 +364,7 @@ angular.module("formsApp")
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.input.dirty = true;
+
                             updateReport()
                         }
                     })

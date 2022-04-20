@@ -40,7 +40,9 @@ angular.module("formsApp")
                 }
 
                 //an item with a type of choice or boolean or string with is considered to be a possible source of a dependency
-                if (item1.type == 'choice' || item1.type == 'boolean' || (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0)) {
+                if (item1.type == 'choice' || item1.type == 'boolean' ||
+                    (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0) ||
+                    (item1.type == 'integer' && item1.answerOption && item1.answerOption.length > 0)) {
                     $scope.dependencySources.push(item1)
                 }
 
@@ -104,7 +106,18 @@ angular.module("formsApp")
                                             $scope.input.ewAnswerString = opt
                                         }
                                     })
-                                    //$scope.input.ewAnswerString = ew.answerString
+
+                                    break
+
+                                case 'integer' :
+                                    $scope.input.conditionalOperator = ew.operator      //Integer allows more filter options
+                                    choiceItem.answerOption.forEach(function(opt){
+                                        if (opt.valueInteger == ew.answerInteger) {
+                                            $scope.input.ewAnswerInteger = opt
+                                        }
+                                    })
+
+
                                     break
                                 case 'boolean' :
                                     $scope.input.ewAnswerBoolean = ew.answerBoolean ? "yes" : "no"
@@ -122,98 +135,10 @@ angular.module("formsApp")
 
                             }
 
-/*
-
-                            //need to specify how to display the set of source values
-                            //will either be a list of things (string, Coding) or a boolean
-                            let sourceType      //what type (Coding or string) the source question has as answerOption
-                            if (choiceItem.answerOption && choiceItem.answerOption.length > 0) {
-                                //this is a list of things
-                                $scope.dependencyChoices = "list"
-                                //need to determine the type of choices in the list - Coding, string
-                                if (choiceItem.answerOption[0].valueCoding) {
-                                    sourceType = "Coding"
-                                } else if (choiceItem.answerOption[0].valueString) {
-                                    sourceType = "string"
-                                }
-
-
-                            } else if (choiceItem.type == 'boolean') {
-                                //this is a boolean
-                                $scope.dependencyChoices = "boolean"
-                            } else {
-                                alert("The source for a dependency should either be a list of things or a boolean")
-                                return
-                            }
-
-
-                            if ($scope.dependencyChoices == 'list') {
-                                //if this is a list, need to set the current value in the list
-
-                                if (sourceType == "Coding") {
-
-                                    //the value to check is Coding
-                                    if (ew.answerCoding) {
-                                        let answerCode = ew.answerCoding.code   //the current code value. ignore the system
-
-                                        $scope.ewSelected(choiceItem)       //sets the list of values - $scope.input.ewQuestionOptions
-
-                                        //set the current value in the list
-                                        $scope.input.ewQuestionOptions.forEach(function (concept) {
-                                            if (concept.code == answerCode) {
-                                                $scope.input.ewAnswer = concept
-                                            }
-                                        })
-                                    } else {
-                                        alert("The conditional seems incorrect. Suggest you clear it, save then re-edit.")
-                                    }
-
-                                }
-
-
-
-                            }
-
-
-                            if (sourceType == "boolean") {
-                                //if (ew.answerBoolean !== null) {
-                                //the value to check is boolean
-                                $scope.input.ewAnswerBoolean =  ew.answerBoolean ? "yes" : "no"
-                            }
-
-                            */
                         }
                     })
 
-                    /*
 
-                    //the value to check is Coding
-                    if (ew.answerCoding) {
-                        let answerCode = ew.answerCoding.code   //the current code value. ignore the system
-                        $scope.dependencySources.forEach(function(choiceItem){
-                            if (choiceItem.linkId == linkId) {
-                                $scope.input.ewQuestion = choiceItem
-
-                                $scope.ewSelected(choiceItem)       //sets the list of values
-
-                                $scope.input.ewQuestionOptions.forEach(function (concept) {
-                                    if (concept.code == answerCode) {
-                                        $scope.input.ewAnswer = concept
-                                    }
-                                })
-
-                            }
-                        })
-                    }
-                    //the value to check is boolean
-                    if (ew.answerBoolean !== null) {
-
-                        $scope.input.ewQuestion = choiceItem
-
-                        $scope.input.ewAnswer = ew.answerBoolean
-                    }
-
-                    */
 
                 }
             }
@@ -359,6 +284,20 @@ angular.module("formsApp")
                             if ($scope.input.ewAnswerString) {
                                 ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
                                 ew.answerString = $scope.input.ewAnswerString.valueString       //seems a bit convuluted...
+                            }
+                            break
+                        case "integer" :
+                            if ($scope.input.ewAnswerInteger) {
+
+                                let operator = '='
+                                if ($scope.input.conditionalOperator) {
+                                    operator = $scope.input.conditionalOperator
+                                }
+
+
+
+                                ew = {question:$scope.input.ewQuestion.linkId,operator:operator}
+                                ew.answerInteger = $scope.input.ewAnswerInteger.valueInteger       //seems a bit convuluted...
                             }
                             break
                         case "boolean" :

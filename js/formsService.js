@@ -703,16 +703,26 @@ angular.module("formsApp")
             },
             //determine whether the condition on an item is true...
             checkConditional : function(item,formData) {
+                //console.log(item.linkId)
+
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let conditional = item.enableWhen[0]       //only looking at the first one for now
+                    //console.log(item.linkId)
 
                     //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
+
+                    //when a radio is used as the input, the value is a string rather than an object
+                    if (typeof formValue === 'string' || formValue instanceof String) {
+                        formValue = JSON.parse(formValue)
+                    }
+
                     //console.log(referenceValue)
                     if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
                         //if (formValue !== null) {
                         switch(conditional.operator) {
                             case '=' :
+                                //all kinds of conditional support '='
                                 if (conditional.answerCoding) {
                                     return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
                                 }
@@ -747,19 +757,31 @@ angular.module("formsApp")
                                     console.log(answerBoolean)
 
                                 }
+/*
+                                //when a radio is used as the input, the value is a string rather than an object
+                                if (typeof formValue === 'string' || formValue instanceof String) {
+                                    formValue = JSON.parse(formValue)
+                                }
+                                */
+                                break
+                            case ">" :
+                                //Only supported by integer
 
 
-                                //todo - check for different datatypes...
-                                //right now, we're assuming that Codings are being used...
-
-                               // if (source) {
-                                    //when a radio is used as the input, the value is a string rather than an object
-                                    if (typeof formValue === 'string' || formValue instanceof String) {
-                                        formValue = JSON.parse(formValue)
+                                if (conditional.answerInteger !== undefined) {
+                                    let targetValue = parseInt(conditional.answerInteger)
+                                    let value = formValue.valueInteger
+                                    if (value > targetValue) {
+                                        return true
                                     }
-                             //   }
-
-
+                                    /*
+                                    if (formValue.valueString == conditional.answerString) {
+                                        return true
+                                    } else {
+                                        return false
+                                    }
+                                    */
+                                }
                                 break
                         }
                     }
@@ -1408,9 +1430,6 @@ angular.module("formsApp")
                 })
                 //console.log(arItems)
                 return arItems
-
-
-
             },
 
             makeTreeFromQ : function (Q) {
