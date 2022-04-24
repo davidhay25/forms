@@ -49,6 +49,22 @@
 
             </div>
 
+            <div ng-switch-when="date">
+
+                <p class="input-group">
+                    <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
+                           ng-model="form[cell.item.linkId]" is-open="datePopup.opened"
+                           ng-blur="makeQR(cell.item.linkId)"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openDate()">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                      </span>
+                </p>
+
+
+            </div>
+
             <div ng-switch-when="display">
                 <em>{{cell.item.text}}</em>
 
@@ -108,12 +124,57 @@
 
                 <div class="row">
                     <div class="col-md-10">
-                        <input type="text" class = "form-control" ng-model="form[cell.item.linkId]"
-                               placeholder="Auto lookup after 3 characters"
-                               typeahead-min-length="3"
-                               typeahead-wait-ms="1000"
-                               typeahead-on-select="selectConcept($item, $model, $label)"
-                               uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,cell.item.answerValueSet)"/>
+
+
+                        {{cell.meta.renderVS}}
+
+                        <div ng-show = "cell.meta.renderVS == 'radio'">
+                            <span ng-repeat="option in cell.meta.expandedVSOptions">
+
+                                <input type="radio" value="{{option}}"
+                                       ng-change="makeQR(cell.item.linkId)"
+                                       ng-model="form[cell.item.linkId]"/>
+
+                                {{option.display}}
+                            </span>
+                        </div>
+
+                        <div ng-show = "cell.meta.renderVS == 'dropdown'">
+
+                            <select class="form-control" ng-model="form[cell.item.linkId]"
+                                    ng-change="makeQR(cell.item.linkId)"
+                                    ng-options = "concept.display for concept in cell.meta.expandedVSOptions">
+
+                            </select>
+
+
+                        </div>
+
+
+                        <div ng-hide="cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown'">
+                            <input type="text" class = "form-control" ng-model="form[cell.item.linkId]"
+                                   placeholder="Auto lookup after 3 characters"
+                                   typeahead-min-length="3"
+                                   typeahead-wait-ms="1000"
+                                   typeahead-on-select="selectConcept($item, $model, $label)"
+                                   uib-typeahead="opt as opt.display for opt in getConcepts($viewValue,cell.item.answerValueSet)"/>
+                        </div>
+
+
+
+
+<!--
+                        <p class="input-group">
+                            <input type="text" class="form-control" ng-model = "inout.vsLookup"/>
+                            <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="openDate()">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                          </span>
+                        </p>
+                        -->
+
+
                     </div>
                     <div class="col-md-2">
                         <button class="btn btn-link" ng-click=""></button>

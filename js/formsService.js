@@ -13,6 +13,7 @@ angular.module("formsApp")
         )
 
         let extensionUrl = {}
+        termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
         //HPIRoot = "http://localhost:9099/baseR4/"
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
@@ -36,6 +37,7 @@ angular.module("formsApp")
         extColumnCount = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column-count"
         extDescription = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
+        extensionUrl.extRenderVS = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
 
@@ -271,6 +273,10 @@ angular.module("formsApp")
                 //hidden
                 updateExtension(item,extHidden,"Boolean",meta.hidden)
 
+                //renderVS
+                updateExtension(item,extensionUrl.extRenderVS,"Code",meta.renderVS)
+
+
 
 
                 //reference types
@@ -380,6 +386,13 @@ angular.module("formsApp")
                 let ar8 = this.findExtension(item,extHidden)
                 if (ar8.length > 0) {
                     meta.hidden = ar8[0].valueBoolean
+                }
+
+                //render VS
+
+                let ar9 = this.findExtension(item,extensionUrl.extRenderVS)
+                if (ar9.length > 0) {
+                    meta.renderVS = ar9[0].valueCode
                 }
 
 
@@ -543,6 +556,7 @@ angular.module("formsApp")
             },
             makeFormTemplate : function(Q) {
                 let that = this;
+                //let termServer = that.termServer
 
                 //create a template suitable for rendering in up to 4 columns
                 //is a collection of sections. Each section contains an array of rows,
@@ -580,6 +594,7 @@ angular.module("formsApp")
 
                                                 let side = 'col' + col
                                                 let cell = {item:child,meta:that.getMetaInfoForItem(child)}
+                                                fillFromValueSet(cell,termServer)
                                                 setDecoration(cell,child)
                                                 row[side] = row[side] || []
                                                 row[side].push(cell)
@@ -604,7 +619,8 @@ angular.module("formsApp")
 
                                         } else {
 
-                                            //when the columnCount is not present, use the strategy first in left, others in right
+                                            //when the columnCount is not present or 0, use the strategy first in left, others in right
+                                            //this is to make it easier to have the 'control' item in the left column and the others in th eright
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
                                                 //ignore any item entries on the child - we don't go any deeper atm
@@ -612,6 +628,7 @@ angular.module("formsApp")
                                                 if (inx == 0) {
                                                     //this is the first item in the group - it goes in the left
                                                     let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
+                                                    fillFromValueSet(cell,termServer)
                                                     setDecoration(cell,child)        //sets things like control type
                                                     //row.left = [cell]
                                                     row['col1'] = [cell]
@@ -626,6 +643,7 @@ angular.module("formsApp")
 
 
                                                     let cell = {item:child,meta:childMeta}
+                                                    fillFromValueSet(cell,termServer)
                                                     //,that.getMetaInfoForItem(child)
                                                     setDecoration(cell,child)
                                                     row[side] = row[side] || []
@@ -647,6 +665,7 @@ angular.module("formsApp")
                                     row.item = item
                                     row.meta = meta
                                     let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                    fillFromValueSet(cell,termServer)
                                     setDecoration(cell,item)
                                     //row.left = [cell]             //make it an array to match the group
                                     row['col1'] = [cell] //make it an array to match the group
@@ -699,6 +718,41 @@ angular.module("formsApp")
 
                 }
 
+
+                //if the item has answervalueSet and the rendering is dorpdorn or radio then fetch the values from the
+                //term server and add them to the meta (so they can't update the item)
+                //todo - this coul dbe non-perormant when editing / previewing, do we care?
+                function fillFromValueSet(cell,termServer) {
+
+                    if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {
+                        let vs = cell.item.answerValueSet
+                        let qry =  termServer + "ValueSet/$expand?url=" + vs
+
+                         $http.get(qry).then(
+                            function(data){
+                                //console.log(data.data)
+                                let vs = data.data
+
+                                if (vs.expansion) {
+                                    cell.meta.expandedVSOptions = vs.expansion.contains
+                                } else {
+                                    cell.meta.expandedVSOptions = []
+                                }
+
+
+                            },
+                            function(err){
+                                console.log(err)
+                                return [{display:"no matching values"}]
+                            }
+                        ).finally(
+                            function(){
+                                $scope.showWaiting = false
+                            }
+                        )
+                    }
+
+                }
 
             },
             //determine whether the condition on an item is true...
@@ -1136,6 +1190,16 @@ angular.module("formsApp")
                         case "boolean":
                             result = {valueBoolean : value}
                             //itemToAdd.answer.push({valueBoolean : value})    //will be a coding
+                            break;
+
+                        case "date":
+                            //remove the time component. value is a Date object
+                            let dateStr = value.toISOString()
+                            let ar = dateStr.split('T')
+
+
+                            result = {valueDate : ar[0]}
+
                             break;
 
                         case "reference" :

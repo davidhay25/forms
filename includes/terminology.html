@@ -1,0 +1,95 @@
+<div>
+
+
+
+        <div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,listItemSelected:selectedVSEntry == value}"
+                             ng-click="selectVSEntry(value,key)"
+                             style="cursor: pointer"
+                             ng-repeat="(key,value) in hashTerminology">
+                            {{key}}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-9">
+
+                    <uib-tabset>
+                        <uib-tab heading="Where used">
+                            <table class="table table-bordered">
+                                <tr><th>Q / Section</th><th>Item</th></tr>
+                                <tr ng-repeat="entry in selectedVSEntry">
+                                    <td>
+                                        {{entry.Q.name}}
+                                        <div>{{entry.section.text}}</div>
+
+                                    </td>
+                                    <td><pre>{{entry.item | json}}</pre></td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="VS Contents">
+
+                            <h4>Expansion</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
+                                </div>
+                                <div class="col-md-1">
+                                    <input type="text" class="form-control" ng-model="input.expandCount"
+                                           placeholder="Count"/>
+
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-link" ng-click="expandVS(selectedVSUrl,input.filter)">Expand</button>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="pull-right" ng-show="expandedVs.expansion.total">
+                                        Total count:{{expandedVs.expansion.total}}
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+                            <uib-tabset>
+                                <uib-tab heading="List">
+                                    <table class="table table-bordered table-condensed">
+                                        <tr ng-repeat="concept in expandedVs.expansion.contains">
+                                            <td>{{concept.code}}</td>
+                                            <td>{{concept.display}}</td>
+                                            <td>{{concept.system}}</td>
+                                        </tr>
+                                    </table>
+
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{expandedVs | json}}</pre>
+                                </uib-tab>
+
+
+                            </uib-tabset>
+
+
+
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+</div>

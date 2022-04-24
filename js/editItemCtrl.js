@@ -4,6 +4,7 @@ angular.module("formsApp")
 
 
 
+
             $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild'
@@ -15,7 +16,7 @@ angular.module("formsApp")
                 item.tmp = {codeSystem: codeSystems[0] } //default to snomed
                 item.linkId = "id-" + new Date().getTime()
                 item.type = itemTypes[0]
-                item.text = 'Test insert'
+                //item.text = 'Test insert'
                 $scope.newItem = item
             } else {
                 $scope.newItem = angular.copy(item)
@@ -80,6 +81,12 @@ angular.module("formsApp")
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
 
+                //display mode for answervalueSet
+
+                if ($scope.meta.renderVS) {
+                    $scope.input.vs = {rendermode: $scope.meta.renderVS}
+                }
+
                 //the 'display as radio' for lists
                 if ($scope.meta.itemControl && $scope.meta.itemControl.coding) {
                     if ($scope.meta.itemControl.coding[0].code == 'radio-button') {
@@ -125,8 +132,11 @@ angular.module("formsApp")
                                 case 'choice' :
                                     choiceItem.answerOption.forEach(function(opt){
                                         let c = opt.valueCoding
-                                        if (c.code == ew.answerCoding.code && c.system == ew.answerCoding.system) {
-                                            $scope.input.ewAnswer = opt
+                                        if (ew.answerCoding) {
+                                            if (c.code == ew.answerCoding.code && c.system == ew.answerCoding.system) {
+                                                $scope.input.ewAnswer = opt
+                                            }
+
                                         }
 
                                     })
@@ -261,6 +271,32 @@ angular.module("formsApp")
                 $scope.$close()
             }
 
+            $scope.makeLinkId = function(text) {
+                if ($scope.editType !== 'new') {
+                    //not for editing
+                    return
+                }
+                //construct a unique linkId from the text
+                let t = text.replace(/\s+/g, '')  //remove all spaces
+                t = t.substr(0,20)   //max length of linkId
+                t = t.toLowerCase()
+
+                let tBase = t       //so we can add integers to the base to make it unique
+                let ctr = 1
+                while (lcHashAllItems[t] && ctr < 100) {
+                    t = tBase + ctr
+                    ctr ++
+                }
+                if (ctr < 100) {
+                    $scope.newItem.linkId = t
+
+                } else {
+                    //more than 100 matches>=? gosh...
+                }
+
+
+            }
+
             $scope.save = function() {
 
                 //todo - check for answerOption when type is not choice...
@@ -268,6 +304,12 @@ angular.module("formsApp")
                 //console.log($scope.input.ewQuestion)
                 //console.log($scope.input.ewAnswer)
 
+                //rendering a valueset as answeroption
+
+                if ($scope.input.vs && $scope.input.vs.rendermode) {
+                    $scope.meta.renderVS = $scope.input.vs.rendermode
+
+                }
 
 
                 //is there a conditional defined?

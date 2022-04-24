@@ -5,6 +5,45 @@ angular.module("formsApp")
         function ($scope,$http,formsSvc,$uibModal) {
 
 
+            $scope.datePopup = {opened :false}
+            $scope.openDate = function() {
+                $scope.datePopup.opened = true
+            }
+
+
+            //used by the preview for coded elements - not sure it is actually used yet
+            $scope.searchTermServer = function(val,url) {
+                $scope.showWaiting = true
+                let qry =  termServer + "ValueSet/$expand?url=" + url
+                //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
+                qry += "&filter=" + val
+
+                return $http.get(qry).then(
+                    function(data){
+                        //console.log(data.data)
+                        let vs = data.data
+                        if (vs.expansion) {
+                            let ar = []
+                            return vs.expansion.contains
+
+                        } else {
+                            return [{display:"no matching values"}]
+                        }
+
+                        //return [{display:"aaa"},{display:'bbbb'}]
+                    },
+                    function(err){
+                        console.log(err)
+                        return [{display:"no matching values"}]
+                    }
+                ).finally(
+                    function(){
+                        $scope.showWaiting = false
+                    }
+                )
+            };
+
+
             //return true if the item will be extracted as an observation by the forms receiver
             $scope.observationExtract = function(item) {
                 let extUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
@@ -58,28 +97,7 @@ angular.module("formsApp")
             //code to show (or not) a conditional group - limited to Coding comparisons ATM
             $scope.showConditionalGroupDEP = function(group) {
                 return formsSvc.checkConditional(group,$scope.form)
-/*
-                //console.log(item)
-               // if (item.length > 0) {
-                    //we're assuming that there is only a single item of type group
-                    //let group = item[0]
-                    if (group.enableWhen && group.enableWhen.length > 0) {
-                        let conditional = group.enableWhen[0]       //only looking at the first one for now
-                        console.log(conditional)
-                        let referenceValue = $scope.form[conditional.question]  //the value from the form to be compared
-                        console.log(referenceValue)
-                        if (referenceValue) {
-                            switch(conditional.operator) {
-                                case '=' :
-                                    //todo - check for different datatypes...
-                                    return checkEqualCoding(referenceValue.valueCoding,conditional.answerCoding)
 
-                                    break
-                            }
-                        }
-                    }
-               // }
-                */
             }
 
             //a function to check whether 2 codings are equal

@@ -63,6 +63,9 @@
     <script src="js/dispositionCtrl.js"></script>
     <script src="js/exportSvc.js"></script>
     <script src="js/importSectionCtrl.js"></script>
+    <script src="js/terminologySvc.js"></script>
+    <script src="js/terminologyCtrl.js"></script>
+
     <!--
         <script src="js/designerCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
@@ -275,6 +278,9 @@
                                                     </div>
                                                     <div class="col-md-9">
                                                         {{selectedNode.data.item.answerValueSet}}
+                                                        <div ng-show="selectedNode.data.meta.renderVS">
+                                                            Render as {{selectedNode.data.meta.renderVS}}
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -802,11 +808,15 @@
 
         </uib-tab>
 
+        <uib-tab  heading="ValueSets used">
 
+            <div ng-controller="terminologyCtrl">
+                <br/>
+                <ng-include src = "'includes/terminology.html'"></ng-include>
 
-        <uib-tab ng-show="false" heading="Terminology">
-
-                <div class="row">
+            </div>
+<!--
+                <div ng-show="false" class="row">
                     <div class="col-md-2">
                         <br/>
                         <button class="btn btn-link " ng-click="addVS()">Add VS</button>
@@ -863,7 +873,7 @@
                     </div>
                 </div>
 
-
+-->
             </uib-tab>
 
 

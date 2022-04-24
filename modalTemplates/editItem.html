@@ -12,7 +12,7 @@
 
 
 
-                <button class="btn btn-success pull-right"
+                <button ng-show="newItem.text" class="btn btn-success pull-right"
                         ng-click="save()">
 
                     <div ng-show="editType == 'edit'">Save changes</div>
@@ -40,6 +40,16 @@
                                    ng-model="parent.item.text" class="form-control"/> </td>
 
                     </tr>
+
+                    <tr>
+                        <td>Text</td>
+                        <td><input type="text" autofocus
+                                   ng-change="makeLinkId(newItem.text)"
+                                   placeholder="Text to display to the user"
+                                   ng-model="newItem.text" class="form-control"/> </td>
+
+                    </tr>
+
                     <tr>
                         <td>LinkId</td>
 
@@ -49,13 +59,7 @@
                                    ng-model="newItem.linkId" class="form-control"/> </td>
 
                     </tr>
-                    <tr>
-                        <td>Text</td>
-                        <td><input type="text"
-                                   placeholder="Text to display to the user"
-                                   ng-model="newItem.text" class="form-control"/> </td>
 
-                    </tr>
 
                     <tr>
                         <td>Description</td>
@@ -138,8 +142,21 @@
                     <tr ng-show = "newItem.type == 'choice' || newItem.type == 'open-choice'">
                         <td>ValueSet</td>
                         <td>
-                            <input class="form-control" type="text" ng-model="newItem.answerValueSet"
-                                   placeholder="ValueSet url ToDo: allow select off server"/>
+                            <div class="row">
+                                <div class="col-md-7 col-sm-7">
+                                    <input class="form-control" type="text" ng-model="newItem.answerValueSet"
+                                           placeholder="ValueSet url ToDo: allow select off server"/>
+                                </div>
+                                <div class="col-md-5 col-sm-5">
+                                    <div style="padding-top: 6px"> Render:
+                                        <input type="radio" ng-model="input.vs.rendermode" value="radio"> Radio
+                                        <input type="radio" ng-model="input.vs.rendermode" value="dropdown"> Dropdown
+                                        <input type="radio" ng-model="input.vs.rendermode" value="lookup"> Lookup
+                                    </div>
+
+                                </div>
+                            </div>
+
 
                         </td>
                     </tr>

@@ -10,7 +10,7 @@ angular.module("formsApp")
             $scope.input.appTitle = "CanShare: Create Path request and view patient data"
 
             let validationServer = "http://localhost:9099/baseR4/"
-            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
+            let termServer = "https://r4.ontoserver.csiro.au/fhir/"  //todo - move to config of somesort ? odd formsSvc
 
             let search = $window.location.search;
             if (search) {

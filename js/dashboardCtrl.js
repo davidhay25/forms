@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc) {
 
 
             //load all the disposition Observations for a Q
@@ -19,7 +19,7 @@ angular.module("formsApp")
 
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime','choice','open-choice','display','group','reference']
+            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference']
 
             $scope.input.codeSystems = []
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
@@ -44,7 +44,6 @@ angular.module("formsApp")
             //when a top level item is selected in the tabbed interface
             $scope.selectSection = function(section) {
                 $scope.selectedSection = section
-
             }
 
             //count the number of completed answers in each section - used by tabbed form...
@@ -493,7 +492,7 @@ angular.module("formsApp")
                 return resultNode
             }
 
-            $scope.expandVS = function(url,filter) {
+            $scope.expandVSDEP = function(url,filter) {
                 let qry =  termServer + "ValueSet/$expand?url=" + url
                 if (filter) {
                     qry += "&filter="+filter
@@ -590,7 +589,7 @@ angular.module("formsApp")
                     makeCsvAndDownload(Q,vo.hashAllItems)
 
                     //the template for the forms preview
-                    $scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                    //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
                     $scope.drawQ(Q,true)
                     $scope.treeIdToSelect = "root"
                 }
@@ -764,6 +763,8 @@ angular.module("formsApp")
                             $scope.allQ.push(entry.resource)
 
                         })
+                        $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
+                        console.log($scope.hashTerminology)
                     }
                 )
             }
