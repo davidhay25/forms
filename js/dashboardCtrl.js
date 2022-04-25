@@ -364,6 +364,9 @@ angular.module("formsApp")
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.input.dirty = true;
 
+
+                            //delete $scope.selectedSection
+
                             updateReport()
                         }
                     })

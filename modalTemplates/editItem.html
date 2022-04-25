@@ -12,7 +12,7 @@
 
 
 
-                <button ng-show="newItem.text" class="btn btn-success pull-right"
+                <button ng-show="newItem.text && newItem.linkId" class="btn btn-success pull-right"
                         ng-click="save()">
 
                     <div ng-show="editType == 'edit'">Save changes</div>
