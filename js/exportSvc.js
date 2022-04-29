@@ -73,6 +73,8 @@ angular.module("formsApp")
                         entry.category = section.text
                         entry.usageNotes = meta.usageNotes || ""
 
+                        entry.sourceStandard = meta.sourceStandard
+
                         entry.conditionalNotes = getConditionalNote(item)
 
                         if (item.required) {
@@ -111,6 +113,47 @@ angular.module("formsApp")
                         if (item.required) {min = "1"}
 
                         entry.cardinality = min + ".." + max
+                        entry.hisoClass = meta.hisoClass
+                        entry.hisoLength = meta.hisoLength
+                        entry.hisoDT = meta.hisoDT
+                        entry.hisoLayout = meta.hisoLayout
+
+                        /*
+
+                        //hiso datatype. D
+                        switch (item.type) {
+                            case "string" :
+                                entry.hisoDT = "Alphanumeric (X)"
+                                entry.hisoSize = 100
+                                entry.hisoLayout = "A(100)"
+                                break
+                            case "reference" :
+                                entry.hisoDT = "Alphanumeric (X)"
+                                entry.hisoSize = 100
+                                entry.hisoLayout = "A(100)"
+                                break
+                            case "text" :
+                                entry.hisoDT = "Alphanumeric (X)"
+                                entry.hisoSize = 1000
+                                entry.hisoLayout = "A(1000)"
+                                break
+
+                            case "choice" :
+                            case "open-choice" :
+                                entry.hisoSize = 18
+                                entry.hisoDT = "Numeric (N)"
+                                entry.hisoLayout = "N(18)"
+                                break
+                        }
+
+
+                        entry.hisoDT = "Numeric (N)"
+                        if (item.type == "text" || item.type == "string") {
+                            entry.hisoDT = "Alphanumeric (X)"
+                        }
+*/
+                        //create the
+
 
                         ar.push(entry)
 
@@ -121,6 +164,21 @@ angular.module("formsApp")
                 
                 createDownloadCSV : function(arJson) {
                     let arRows = []
+
+                    let ar = []
+                    ar.push("Category")
+                    ar.push("Name")
+                    ar.push("Description")
+                    ar.push("Cardinality")
+                    ar.push("Usage Notes")
+                    ar.push("Obligation")
+                    ar.push("Data Domain")
+                    ar.push("Data Type")
+                    ar.push("Representational Class")
+                    ar.push("Field Size")
+                    ar.push("Representational Layout")
+                    arRows.push(ar.join(","))
+
                     arJson.forEach(function (section) {
                         section.lines.forEach(function (row) {
                             let line = []
@@ -131,6 +189,12 @@ angular.module("formsApp")
                             line.push(makeSafe(row.usageNotes))
                             line.push(makeSafe(row.obligation))
                             line.push(makeSafe(row.dataDomain))
+
+                            line.push(makeSafe(row.hisoDT))
+                            line.push(makeSafe(row.hisoClass))
+                            line.push(makeSafe(row.hisoLength))
+                            line.push(makeSafe(row.hisoLayout))
+
                             arRows.push(line.join(","))
 
                         })
@@ -138,11 +202,14 @@ angular.module("formsApp")
 
 
                     return arRows.join("\r\n")
-
-
-
+                    
                     function makeSafe(str) {
                         if (str) {
+                            if (typeof str === 'number') {
+                                str = str.toString()
+                            }
+
+
                             //convert commas to spaces
                             str = str.replace(/,/g, " ")
 

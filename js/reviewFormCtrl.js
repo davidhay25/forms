@@ -7,6 +7,12 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.form = {}
 
+            $scope.input.alertMsg = "This is a test system. Please do not add any real data or Personal Health Information into the form."
+
+            $scope.closeAlert = function() {
+                delete $scope.input.alertMsg
+            }
+
             $scope.input.appTitle = "CanShare: Create Path request and view patient data"
 
             let validationServer = "http://localhost:9099/baseR4/"
@@ -603,7 +609,7 @@ angular.module("formsApp")
                 getObservationsForPatient($scope.input.selectedPatient.resource.id)
             }
 
-            $scope.selectObservationGroup = function(group) {
+            $scope.selectObservationGroupDEP = function(group) {
                 delete $scope.input.selectedObs
                 $scope.observationGroup = group
             }

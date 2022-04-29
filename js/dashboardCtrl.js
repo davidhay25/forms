@@ -19,12 +19,13 @@ angular.module("formsApp")
 
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference']
+            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference','display']
 
             $scope.input.codeSystems = []
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
+            //don't change the rev-comment url!!!!
             $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review-comment'})
             $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
 

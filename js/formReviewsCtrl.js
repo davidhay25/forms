@@ -21,6 +21,8 @@ angular.module("formsApp")
                 loadActiveSR()
             }
 
+
+
             $scope.markSRComplete = function(SR) {
                 SR.status = "completed"
                 let qry = `/ds/fhir/ServiceRequest/${SR.id}`
@@ -142,7 +144,7 @@ angular.module("formsApp")
                 }
             }
 
-            //iteate Q to find linkId's that are for reviewer comments
+            //iterate Q to find linkId's that are for reviewer comments
             function getReviewerLinkId(hashLinkId,item) {
                 if (item.item) {
                     item.item.forEach(function (child) {

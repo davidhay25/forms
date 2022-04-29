@@ -151,7 +151,7 @@ async function extractResources(QR) {
         resources.obs.push(sr)          //not really all obs...
 
         //to support more sophisticated workflow
-        let task = createTask(QR,SR)
+        let task = createTask(QR,sr)
         provenance.target.push({reference: "urn:uuid:"+ task.id})
         resources.obs.push(task)          //not really all obs...
 
@@ -400,7 +400,7 @@ function createTask (QR,SR) {
     task.id = createUUID()   //will be ignored by fhir server
     let description = "Task"
     task.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>"+description+"</div>",status:"additional"}
-    task.authoredOn = new Date.toISOString()
+    task.authoredOn = new Date().toISOString()
     task.status = "requested"
     task.intent = 'plan'
     task.basedOn = []

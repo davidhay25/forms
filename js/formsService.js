@@ -32,10 +32,16 @@ angular.module("formsApp")
         extUsageNotes = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
         extSourceStandard = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
+        extHisoClass = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
+        extHisoLength = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
+        extHisoDT = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
+        extHisoLayout = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
+
 
         extColumn = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column"
         extColumnCount = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column-count"
         extDescription = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-item-description"
+
 
         extensionUrl.extRenderVS = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
@@ -276,7 +282,11 @@ angular.module("formsApp")
                 //renderVS
                 updateExtension(item,extensionUrl.extRenderVS,"Code",meta.renderVS)
 
-
+                //hiso class
+                updateExtension(item,extHisoClass,"String",meta.hisoClass)
+                updateExtension(item,extHisoLength,"Integer",meta.hisoLength)
+                updateExtension(item,extHisoDT,"String",meta.hisoDT)
+                updateExtension(item,extHisoLayout,"String",meta.hisoLayout)
 
 
                 //reference types
@@ -313,6 +323,7 @@ angular.module("formsApp")
             },
             getMetaInfoForItem : function(item) {
                 //populate meta info - like resource extraction. Basically pull all extensions into a VO
+                var that = this
                 let meta = {}
 
                 //update the Observationextract
@@ -395,8 +406,37 @@ angular.module("formsApp")
                     meta.renderVS = ar9[0].valueCode
                 }
 
+                //hiso code
+                let ar10 = this.findExtension(item,extHisoClass)
+                if (ar10.length > 0) {
+                    meta.hisoClass = ar10[0].valueString
+                }
+//hiso code
+                let ar11 = this.findExtension(item,extHisoLength)
+                if (ar11.length > 0) {
+                    meta.hisoLength= ar11[0].valueInteger
+                }
+
+                let ar12 = this.findExtension(item,extHisoDT)
+                if (ar12.length > 0) {
+                    meta.hisoDT= ar12[0].valueString
+                }
+
+                let ar13 = this.findExtension(item,extHisoLayout)
+                if (ar13.length > 0) {
+                    meta.hisoLayout= ar13[0].valueString
+                }
+
 
                 return meta
+
+                function getSingleExtValueTypeDEP(meta,item,url,type) {
+                    let ar = that.findExtension(item,url)
+                    if (ar.length > 0) {
+                        let v = ar[0]
+                        return v[type]
+                    }
+                }
             },
 
             generateQReport : function(Q) {
@@ -562,6 +602,8 @@ angular.module("formsApp")
                 //is a collection of sections. Each section contains an array of rows,
                 // each row is an array with up to 4 elements (col1-4) and the cell has an array of items
 
+                //if the item has answerValueSet then call fillFromValueSet() to populate meta.expandedVSOptions
+
                 let template = []
 
                 if (Q.item) {
@@ -721,7 +763,7 @@ angular.module("formsApp")
 
                 //if the item has answervalueSet and the rendering is dorpdorn or radio then fetch the values from the
                 //term server and add them to the meta (so they can't update the item)
-                //todo - this coul dbe non-perormant when editing / previewing, do we care?
+                //todo - this could be non-perormant when editing / previewing, do we care?
                 function fillFromValueSet(cell,termServer) {
 
                     if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {

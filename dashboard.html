@@ -57,7 +57,7 @@
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 
-    <script src="js/formRenderCtrl.js"></script>
+    <script src="js/formsCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
     <script src="js/dispositionCtrl.js"></script>
@@ -65,11 +65,6 @@
     <script src="js/importSectionCtrl.js"></script>
     <script src="js/terminologySvc.js"></script>
     <script src="js/terminologyCtrl.js"></script>
-
-    <!--
-        <script src="js/designerCtrl.js"></script>
-    <script src="js/designerSvc.js"></script>
-    -->
 
     <style>
         #graph {
@@ -399,6 +394,19 @@
                                                             </div>
                                                         </div>
 
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        HISO
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <strong>DT:</strong> {{selectedNode.data.meta.hisoDT}}
+                                                        <strong>Class:</strong> {{selectedNode.data.meta.hisoClass}}
+                                                        <strong>Length:</strong> {{selectedNode.data.meta.hisoLength}}
+                                                        <strong>Layout:</strong> {{selectedNode.data.meta.hisoLayout}}
                                                     </div>
                                                 </div>
 

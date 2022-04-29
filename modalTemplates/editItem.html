@@ -99,6 +99,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <select class="form-control" ng-model="newItem.type"
+                                            ng-change = updateHiso(newItem.type)
                                             ng-options = "itemType for itemType in input.itemTypes"></select>
                                 </div>
                                 <div class="col-sm-6">
@@ -156,7 +157,37 @@
 
                                 </div>
                             </div>
+                        </td>
+                    </tr>
 
+                    <tr ng-hide="hideType">
+                        <td>HISO</td>
+                        <td>
+                            <div class="row">
+
+                                <div class="col-md-3 col-sm-3">
+                                    <label>Class</label>
+                                    <select class="form-control" ng-model="meta.hisoClass"
+                                            ng-options = "class for class in input.hisoClass"></select>
+                                </div>
+
+                                <div class="col-md-3 col-sm-3">
+                                    <label>Length</label>
+                                    <input type="text" class="form-control" ng-model = "meta.hisoLength" />
+                                </div>
+
+                                <div class="col-md-3 col-sm-3">
+                                    <label>DataType</label>
+                                    <select class="form-control" ng-model="meta.hisoDT"
+                                            ng-options = "dt for dt in input.hisoDT"></select>
+                                </div>
+
+                                <div class="col-md-3 col-sm-3">
+                                    <label>Layout</label>
+                                    <input type="text" class="form-control" ng-model = "meta.hisoLayout" />
+                                </div>
+
+                            </div>
 
                         </td>
                     </tr>
@@ -486,6 +517,21 @@
                 </table>
 
                 <em>Items that have a show/hide dependency on this one</em>
+
+            </uib-tab>
+
+            <uib-tab ng-show="false" heading = "HISO elements">
+                <br/>
+                <div class="row">
+                    <div class="col-md-3 col-sm-3">
+                        HISO DataType
+                    </div>
+                    <div class="col-md-9 col-sm-9">
+                        <select class="form-control" ng-model="meta.HisoDt">
+
+                        </select>
+                    </div>
+                </div>
 
             </uib-tab>
 

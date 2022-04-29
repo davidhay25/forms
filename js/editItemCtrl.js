@@ -11,6 +11,9 @@ angular.module("formsApp")
 
             $scope.input = {}
 
+            $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
+            $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
+
             if (! item) {
                 item = {}
                 item.tmp = {codeSystem: codeSystems[0] } //default to snomed
@@ -28,6 +31,7 @@ angular.module("formsApp")
             $scope.dependantOnThis = []         //those items dependant on this one...
 
 
+            //determine potentialdependency sources
             Object.keys(hashAllItems).forEach(function (key) {
                 let item1 = hashAllItems[key].item
 
@@ -50,36 +54,47 @@ angular.module("formsApp")
 
             })
 
-            //when a possible dependency source is selected. Will get the vakues from the source answerOption
+            //when a possible dependency source is selected. Will get the values from the source answerOption
             //needs to be at the top
             $scope.ewSelected = function(sourceItem) {
 
-                console.log(sourceItem)
+                //console.log(sourceItem)
 
                 $scope.selectedSourceItem = sourceItem
-/*
-                switch (sourceItem.type) {
-                    case "choice" :
-                        $scope.input.ewQuestionOptions = []
-                        if (sourceItem.type == 'choice' || sourceItem.type == 'open-choice') {
-                            if (sourceItem.answerOption) {
-                                sourceItem.answerOption.forEach(function (opt) {
-                                    $scope.input.ewQuestionOptions.push(opt.valueCoding)
-                                })
-                            }
 
-                        }
+            }
+
+            //update the hiso fields if they are empty
+            $scope.updateHiso = function(type) {
+                $scope.meta.hisoLength = 100        //default to 100
+                switch ($scope.newItem.type) {
+                    case "text" :
+                        $scope.meta.hisoLength = 1000
                         break
-
+                    case "choice" :
+                    case "open-choice" :
+                        $scope.meta.hisoLength = 18
+                        break
+                    case "integer" :
+                        $scope.meta.hisoLength = 3
+                        break
+                    case "boolean" :
+                        $scope.meta.hisoLength = 1
+                        break
+                    case "date" :
+                        break
                 }
-
-
-*/
             }
 
             if (item) {
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
+
+                //default the hisoLength
+                if (! $scope.meta.hisoLength ) {
+                    $scope.updateHiso($scope.newItem.type)
+                    //$scope.meta.hisoLength = 100
+                }
 
                 //display mode for answervalueSet
 
@@ -151,6 +166,18 @@ angular.module("formsApp")
 
 
                 }
+
+                /*
+                //set the hiso class
+                if ($scope.meta.hisoClass) {
+                    $scope.input.hisoClass.forEach(function (hc) {
+                        if (hc == $scope.meta.hisoClass) {
+                           // $scope.meta.hisoClass = hc
+                        }
+                    })
+                }
+
+                */
             }
 
             if (item.item && item.item.length > 0) {
@@ -176,6 +203,22 @@ angular.module("formsApp")
             $scope.input.itemTypes = itemTypes
             $scope.input.codeSystems = codeSystems
 
+            //update the hiso fields if they are empty
+            $scope.updateHiso = function(type) {
+                $scope.meta.hisoLength = 100        //default to 100
+                switch ($scope.newItem.type) {
+                    case "text" :
+                        $scope.meta.hisoLength = 1000
+                        break
+                    case "choice" :
+                    case "open-choice" :
+                        $scope.meta.hisoLength = 18
+                        break
+                    case "integer" :
+                        $scope.meta.hisoLength = 3
+                        break
+                }
+            }
 
             //$scope.originalItem = angular.copy(item)    //save the original in case of cancel
 

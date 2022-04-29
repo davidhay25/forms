@@ -66,7 +66,7 @@
     <script src="directive/displayFormDir.js"></script>
     <script src="directive/displayProvenanceDir.js"></script>
     <script src="js/actnowSvc.js"></script>
-    <script src="js/formRenderCtrl.js"></script>
+    <script src="js/formsCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
     <script src="js/exportSvc.js"></script>
     <style>
@@ -78,7 +78,6 @@
     </style>
 
 
-
 </head>
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="formsApp" ng-controller="reviewFormCtrl" class="container-fluid">
@@ -86,7 +85,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-5 col-sm-5">
+            <div class="col-md-7 col-sm-7">
                     <span>
                         <a class="navbar-brand" href="#">
                             Review form:  {{selectedQ.title}}
@@ -95,14 +94,7 @@
 
             </div>
 
-            <div class="col-md-2 col-sm-2">
-                <div class="navbar-text">
 
-
-
-                </div>
-
-            </div>
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
@@ -138,7 +130,14 @@
         </div>
     </nav>
 
-
+    <div ng-show = "input.alertMsg" class="alert alert-warning" close = "closeAlert()">
+        <div class="btn btn-default pull-right" style="margin-top: 1px"
+                ng-click="closeAlert()"
+        >Close</div>
+        <div class="text-center">
+            {{input.alertMsg}}
+        </div>
+    </div>
 
     <div ng-show="reviewMode">
 
