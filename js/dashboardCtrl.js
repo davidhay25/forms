@@ -12,7 +12,7 @@ angular.module("formsApp")
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {
                         $scope.dispositionsForQ = data
-                        console.log(data)
+                      //  console.log(data)
                     }
                 )
             }
@@ -235,11 +235,11 @@ angular.module("formsApp")
             //invoked from ng-blur on for elements in renderSingleItem
 
             $scope.makeQR = function() {
-                console.log('makeQR',$scope.form,$scope.hashItem)
+                //console.log('makeQR',$scope.form,$scope.hashItem)
                 //$scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
 
                 $scope.selectedQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-                console.log($scope.formQR)
+                //console.log($scope.formQR)
             }
 
             $scope.validateQR = function(QR){
@@ -327,7 +327,7 @@ angular.module("formsApp")
             }
 
             $scope.editItemFromReport = function (entry) {
-                console.log(entry)
+               // console.log(entry)
                 let item = entry.item
                 let node = findNodeById(item.linkId)
                 /*
@@ -694,7 +694,7 @@ angular.module("formsApp")
                                         if (item && item.type == 'group') {
                                             //only set the drop target for a group
                                             $scope.dndTarget = item
-                                            console.log('good')
+                                            //console.log('good')
                                             return false
                                         }
 
@@ -743,10 +743,7 @@ angular.module("formsApp")
             }
 
             $(document).on('dnd_stop.vakata', function (e, data) {
-                //called when a dnd action stops (is dropped).
-                console.log(data)
-                console.log(e)
-                console.log($scope.dndTarget)
+
                 if ($scope.dndSource && $scope.dndTarget) {
                     //this is a valid dnd  - from a non-group to a group.
                     //if the dnd rules change, then the move function may need to change also
@@ -758,11 +755,11 @@ angular.module("formsApp")
                 }
 
             })
-
+/*
             $(document).on('dnd_start.vakata', function (e, data) {
                 console.log('Started');
             });
-
+*/
             let expandAll = function() {
                 $scope.treeData.forEach(function (item) {
                     item.state.opened = true;
@@ -794,7 +791,7 @@ angular.module("formsApp")
 
                         })
                         $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
-                        console.log($scope.hashTerminology)
+                       // console.log($scope.hashTerminology)
                     }
                 )
             }

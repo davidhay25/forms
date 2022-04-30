@@ -2,12 +2,11 @@ angular.module("formsApp")
 
     .service('formsSvc', function($q,$http,$filter,moment) {
 
-        //mdmReferral = {text:"xxx"}
 
         let globals
         $http.get("globals.json").then(
             function(data) {
-               // console.log(data.data)
+
                 globals = data.data
             }
         )
@@ -184,7 +183,7 @@ angular.module("formsApp")
                         if (ar.length > 0 ) {
                             if (ar[0].valueString) {
 
-                                console.log(ar[0].valueString)
+
 
                                 let linkId = entry.item.linkId
 
@@ -250,7 +249,7 @@ angular.module("formsApp")
                 //get all the QR's for a given Q
                 let qry = "/ds/fhir/QuestionnaireResponse?questionnaire=" + url
                 $http.get(qry).then(function(data){
-                    console.log(data)
+
                     deferred.resolve(data.data)
 
                 },
@@ -397,7 +396,7 @@ angular.module("formsApp")
                 let ar6 = this.findExtension(item,extColumnCount)
                 if (ar6.length > 0) {
                     meta.columnCount = ar6[0].valueInteger
-                    console.log(ar6[0].valueInteger)
+
                 }
 
                 //form control
@@ -540,8 +539,7 @@ angular.module("formsApp")
                     //because a dependency could be an item after the current one in the tree, there may be a hash entry that just has the dependencies
                     if (hashAllItems[child.linkId]) {
                         hashAllItems[child.linkId].item = child
-                        //console.log("There are multiple items with the linkId: " + child.linkId)
-                        //return
+
                     } else {
                         hashAllItems[child.linkId] = {item:child,dependencies:[]}
                     }
@@ -565,7 +563,7 @@ angular.module("formsApp")
 
                                 })
                             }
-                            //console.log('code')
+
                             break
                         case 'reference' :
                             let refEntry = {item:child,resourceTypes:[]}
@@ -591,14 +589,7 @@ angular.module("formsApp")
                         child.enableWhen.forEach(function (ew) {
                             hashAllItems[ew.question] = hashAllItems[ew.question] || {dependencies : []}
                             hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
-                            /*
-                            if (hashAllItems[ew.question]) {
-                                hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
-                            } else {
-                                alert('error: item: '+ child.linkId +' has unknown conditional target:' + ew.question)
-                               // console.log('error: missing linkId' + ew.question)
-                            }
-                    */
+
                         })
 
 
@@ -785,7 +776,7 @@ angular.module("formsApp")
 
                          $http.get(qry).then(
                             function(data){
-                                //console.log(data.data)
+
                                 let vs = data.data
 
                                 if (vs.expansion) {
@@ -812,13 +803,11 @@ angular.module("formsApp")
             },
             //determine whether the condition on an item is true...
             checkConditional : function(item,formData) {
-                //console.log(item.linkId)
+
 
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let conditional = item.enableWhen[0]       //only looking at the first one for now
-                    //console.log(item.linkId)
 
-                    //console.log(conditional)
                     let formValue = formData[conditional.question]  //the value from the form to be compared
 
                     //when a radio is used as the input, the value is a string rather than an object
@@ -826,7 +815,7 @@ angular.module("formsApp")
                         formValue = JSON.parse(formValue)
                     }
 
-                    //console.log(referenceValue)
+
                     if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
                         //if (formValue !== null) {
                         switch(conditional.operator) {
@@ -863,7 +852,7 @@ angular.module("formsApp")
                                     }
 
 
-                                    console.log(answerBoolean)
+
 
                                 }
 /*
@@ -1038,7 +1027,7 @@ angular.module("formsApp")
             findExtension : function(item,url) {
                 //return an array with all matching extensions
                 let ar = []
-                //console.log(item)
+
                 if (item && item.extension) {
                     for (var i=0; i <  item.extension.length; i++){
                         let ext = item.extension[i]
@@ -1056,7 +1045,7 @@ angular.module("formsApp")
 
             makeQR :  function(Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail) {
                 let that = this
-console.log(reviewerName)
+
                 //make the QuestionnaireResponse from the form data
                 //hash is items from the Q keyed by linkId - not used any more!
                 //form is the data entered keyed by linkId
@@ -1129,8 +1118,7 @@ console.log(reviewerName)
 */
 
 
-               // console.log(form)
-                //console.log(hash)
+
 
 
                 let patientName = "No patient supplied"
@@ -1159,7 +1147,7 @@ console.log(reviewerName)
                             let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
 
                             if (value) {        //is there a value for this item. Won't be if this is a group...
-                               // console.log("adding",key,value)
+
 
                                 if (! parentItem) {
                                     parentItem = {linkId : section.linkId,text:section.text,item: []}
@@ -1189,7 +1177,7 @@ console.log(reviewerName)
                                     //todo - not checking whether the item has conditions - should we?
                                     let gcValue = form[gcItem.linkId]
                                     if (gcValue) {
-                                       // console.log(gcValue)
+
 
                                         //the parent (off the section) may not have been created yet
                                         if (! parentItem) {
@@ -1269,7 +1257,7 @@ console.log(reviewerName)
                     let result;
                     switch (item.type) {
                         case "choice":
-                            //console.log(value)
+
 
                             //when a radio is used as the input, the value is a string rather than an object
                             //but when pre-popping it is just the text, so trap the error
@@ -1344,8 +1332,7 @@ console.log(reviewerName)
                 //todo - make recursive...
                 let qrId = this.createUUID()
                 let err = false
-                //console.log(form)
-                //console.log(hash)
+
                 let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
                 QR.text = {status:'generated'}
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
@@ -1399,7 +1386,7 @@ console.log(reviewerName)
                         if (value) {
                             switch (item.type) {
                                 case "choice":
-                                   // console.log(value)
+
                                     if (value.valueCoding) {
                                         itemToAdd.answer.push(value)    //will be a coding
                                     } else {
@@ -1458,16 +1445,12 @@ console.log(reviewerName)
                     }
 
 
-                   // console.log(childrenOfNode.item[0])
 
-                   //topNode.push(childrenOfNode.item[0])    //otherwise too deeply nested
-                    //console.log(childrenOfNode)
                 })
 
 
                 QR.item = topNode
-                //console.log(topNode.item)
-               // console.log(QR)
+
 
 
                 /*
@@ -1552,7 +1535,7 @@ console.log(reviewerName)
                 // Add a flag so can show extractables
                 formDef.forEach(function (def) {
                     let ar = that.findExtension(def.data.item, extUrlObsExtract)
-                    //console.log(ar.length)
+
                     if (ar.length > 0 && ar[0].valueBoolean == true) {
                         def.meta = {obsExtract:true}
                     }
@@ -1576,7 +1559,6 @@ console.log(reviewerName)
 
             makeQItemsFromTree : function(treedata) {
                 //make a set of Q items from the tree. 3 levels only. todo make recursive
-                //console.log(treedata)
 
 
                 //create an array of root nodes
@@ -1607,7 +1589,7 @@ console.log(reviewerName)
                         }
                     }
                 })
-                //console.log(arItems)
+
                 return arItems
             },
 
@@ -1687,7 +1669,7 @@ console.log(reviewerName)
                 }
 
 
-                console.log(hashEnableWhen)
+
                 /*
                 //adjust the parent of all 'enableWhen' - todo is this the best visualization? - not in the editor
                 treeData.forEach(function (item){

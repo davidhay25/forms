@@ -256,6 +256,11 @@ function performObservationExtraction(Q,QR) {
     //the provenance resource for this action
     let provenance = {resourceType:"Provenance"}
     provenance.id = createUUID()   //will be ignored by fhir server
+    //the subject might be a reference to a contained PR resource...
+    if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
+        provenance.contained = QR.contained
+    }
+
     provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
     provenance.recorded = new Date().toISOString()
     provenance.entity = []
@@ -279,12 +284,19 @@ function performObservationExtraction(Q,QR) {
             QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
                 //theAnswer is a single answer value...
                 let observation = {resourceType:'Observation'}
+
+                //the subject might be a reference to a contained PR resource...
+                if (QR.author && QR.author.reference && QR.author.reference.substring(0,1)== '#') {
+                    observation.contained = QR.contained
+                }
+
                 observation.id = createUUID()
                 observation.text = {status:'generated'}
                 let text = ""
                 observation.status = "final"
                 observation.effectiveDateTime = QR.authored
                 observation.subject = QR.subject
+
                 observation.performer = [QR.author]
                 //the code comes from the Q
                 //The Q.code is an array of coding. Add them all to Observation.code as per the IG
@@ -415,6 +427,11 @@ function createTask (QR,SR) {
 function createServiceRequest(QR,category,carePlan,description,arExtractedResources) {
     let sr = {resourceType:"ServiceRequest"}
     sr.id = createUUID()   //will be ignored by fhir server
+    //the subject might be a reference to a contained PR resource...
+    if (QR.author && QR.author.reference && QR.author.reference.substring(0,1)== '#') {
+        sr.contained = QR.contained
+    }
+
     sr.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>"+description+"</div>",status:"additional"}
     sr.status = "active"
     sr.intent = "order"
