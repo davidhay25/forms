@@ -57,7 +57,8 @@
 
                             </div>
 
-                            <uib-tabset>
+                            <br/>
+                            <uib-tabset ng-show="expandedVs">
                                 <uib-tab heading="List">
                                     <table class="table table-bordered table-condensed">
                                         <tr ng-repeat="concept in expandedVs.expansion.contains">

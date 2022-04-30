@@ -1,7 +1,7 @@
 
 angular.module("formsApp")
     .controller('formReviewsCtrl',
-        function ($scope,$http,formsSvc) {
+        function ($scope,$http,formsSvc,$uibModal) {
 
             //load outstanding SR's
             function loadActiveSR() {
@@ -21,7 +21,87 @@ angular.module("formsApp")
                 loadActiveSR()
             }
 
+            //add any previous disposition
+            function updateReviewWithDispositions(review) {
+                console.log(review)
+                let QRId = review.QR.id
+                //retrieve observations that have a 'derived-from' that refers to this QR
+                let qry = `/ds/fhir/Observation?derived-from=${QRId}&code=disposition`
+                $http.get(qry).then(
+                    function (data) {
+                        if (data.data && data.data.entry) {
+                            data.data.entry.forEach(function (entry){
+                                let obs = entry.resource
+                                let disposition = makeDispositionDisplayObj(obs)            //the actual disposition. Allow >1 per comment (though generally only 1)
+                                /*
+                                disposition.disposition = obs.valueCodeableConcept.coding[0].code
+                                if (obs.component) {
+                                    obs.component.forEach(function (comp) {
+                                        switch (comp.code.coding[0].code) {
+                                            case 'comment' :
+                                                disposition.comment = comp.valueString
+                                                break
+                                            case 'reviewer' :
+                                                disposition.reviewer = comp.valueString
+                                                break
+                                            case 'authored' :
+                                                disposition.authored = comp.valueDateTime
+                                                break
+                                            case 'linkId' :
+                                                disposition.linkId = comp.valueString
+                                                break
+                                            case 'note' :
+                                                disposition.note = comp.valueString
+                                                break
+                                        }
+                                    })
+                                }
 
+                                */
+                                //now add the disposition to the correct review
+                                review.reviews.forEach(function (rev) {
+                                    if (rev.linkId == disposition.linkId) {
+                                        rev.disposition = disposition
+                                    }
+                                })
+                                console.log(disposition)
+                            })
+                        }
+
+                        console.log(data)
+                    }, function(err) {
+                        console.log(err)
+                    }
+                )
+            }
+
+
+            function makeDispositionDisplayObj(obs) {
+                let disposition = {}            //the actual disposition. Allow >1 per comment (though generally only 1)
+                disposition.disposition = obs.valueCodeableConcept.coding[0].code
+                if (obs.component) {
+                    obs.component.forEach(function (comp) {
+                        switch (comp.code.coding[0].code) {
+                            case 'comment' :
+                                disposition.comment = comp.valueString
+                                break
+                            case 'reviewer' :
+                                disposition.reviewer = comp.valueString
+                                break
+                            case 'authored' :
+                                disposition.authored = comp.valueDateTime
+                                break
+                            case 'linkId' :
+                                disposition.linkId = comp.valueString
+                                break
+                            case 'note' :
+                                disposition.note = comp.valueString
+                                break
+                        }
+                    })
+                }
+                return disposition
+            }
 
             $scope.markSRComplete = function(SR) {
                 SR.status = "completed"
@@ -85,14 +165,16 @@ angular.module("formsApp")
 
 
                                                 let arReviewComments = []
-                                                QR.item.forEach(function (item) {
-                                                    getReviewItems(arReviewComments,hashIds,item)
+                                                if (QR.item) {
+                                                    QR.item.forEach(function (item) {
+                                                        getReviewItems(arReviewComments,hashIds,item)
 
-                                                })
-                                                // if (arReviewComments.length > 0) {
+                                                    })
+                                                }
+
 
                                                 $scope.selectedReview = {QR:QR,reviews:arReviewComments}
-
+                                                updateReviewWithDispositions($scope.selectedReview)
                                                 $scope.selectedQR = QR
                                                 $scope.selectedQ = Q
                                                 processQR(QR)           //eg access extensions
@@ -116,6 +198,79 @@ angular.module("formsApp")
             let reviewCommentsSystem = "http://canshare.com/cs/review-comment"
 
 
+            //passes in a single review to update
+            $scope.addDisposition = function(QR,review){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/disposition.html',
+                    backdrop: 'static',
+                    controller: function($scope,review,QR){
+
+                        $scope.QR = QR
+
+                        let dispositionCode = {coding:[{code:"disposition",system:"http://canshare.com",display:"Disposition of Q comment"}]}
+
+                        $scope.input = {}
+
+                        $scope.input.dispositionOptions = []
+                        $scope.input.dispositionOptions.push({code:'accept','display':"Accept"})
+                        $scope.input.dispositionOptions.push({code:'mod','display':"Accept with mod"})
+                        $scope.input.dispositionOptions.push({code:'decline','display':"Decline"})
+
+                        $scope.review = review
+                        let linkId = review.linkId      //the comment in the QR
+
+                        $scope.saveDisposition = function(){
+                            let obs = {resourceType:'Observation'}
+                            obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
+                            obs.derivedFrom = {reference:`QuestionnaireResponse/${QR.id}`}
+                            obs.status = "final"
+                            //obs.category = category
+                            obs.code = dispositionCode
+                            obs.effectiveDateTime = new Date().toISOString()
+
+                            obs.valueCodeableConcept = {coding:[{system:"http://canshare.com",
+                                    code:$scope.input.disposition.code,
+                                    display:$scope.input.disposition.display}]}
+
+                            obs.component = []
+                            obs.component.push({code:{coding:[{code:'comment'}],text:'comment'},valueString:review.answer[0].valueString})
+                            obs.component.push({code:{coding:[{code:'reviewer'}],text:'reviewer'},valueString:QR.author.display})
+                            obs.component.push({code:{coding:[{code:'authored'}],text:'authored'},valueDateTime:QR.authored})
+                            obs.component.push({code:{coding:[{code:'linkId'}],text:'linkId'},valueString:review.linkId})
+
+                            if ($scope.input.dispositionNote) {
+                                obs.component.push({code:{coding:[{code:'note'}],text:'note'},valueString:$scope.input.dispositionNote})
+                            }
+
+                            console.log(obs)
+                            $http.post('/ds/fhir/Observation',obs).then(
+                                function(data) {
+                                    $scope.$close(obs)
+                                }, function(err) {
+                                    alert(angular.toJson(err))
+                                }
+                            )
+                        }
+
+
+
+                    },
+                    resolve: {
+                        review: function () {
+                            return review
+                        },
+
+                        QR : function() {
+                            return QR
+                        }
+                    }
+                }).result.then(
+                    function (obs) {
+                        review.disposition = makeDispositionDisplayObj(obs)
+                        //updateReviewWithDispositions(review)
+
+                    })
+            }
 
 
 
@@ -124,6 +279,7 @@ angular.module("formsApp")
 
                 $scope.selectedReview = review
                 $scope.selectedQR = review.QR       //for the display
+                updateReviewWithDispositions(review)
 
                 processQR($scope.selectedQR)    //the access control stuff
             }
@@ -160,6 +316,7 @@ angular.module("formsApp")
             }
 
 
+
             $scope.selectQReviews = function(Q) {
                 delete $scope.reviewQRs
                 delete $scope.selectedQR
@@ -175,7 +332,7 @@ angular.module("formsApp")
                     getReviewerLinkId(hashIds,item)
                 })
 
-                formsSvc.getQRforQ(Q.url).then(
+                formsSvc.getQRforQ(Q.url).then(   //get all the QR's for this Q
                     function(bundleResponses) {
                         //let bundleResponses = formsSvc.getQRforQ(Q.url)
                         $scope.reviewQRs = []       //will have all the QRs that have any comments...
@@ -184,10 +341,11 @@ angular.module("formsApp")
                                 let QR = entry.resource
                                 let arReviewComments = []
 
+                                //get all the review items (codesystem is review comment)
                                 QR.item.forEach(function (item) {
                                     getReviewItems(arReviewComments,hashIds,item)
-
                                 })
+
                                 if (arReviewComments.length > 0) {
 
                                     $scope.reviewQRs.push({QR:QR,reviews:arReviewComments})

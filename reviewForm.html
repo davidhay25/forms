@@ -122,7 +122,9 @@
 
             <div class="col-md-1">
                 <div class="navbar-text">
-                    <button ng-show = "QR && input.reviewerName && input.includeOIA && input.canPublish" class="btn btn-danger pull-right" ng-click="submitForm()">Submit form</button>
+                    <button ng-show = "QR && input.reviewerName && input.includeOIA && input.canPublish"
+                            class="btn btn-danger pull-right"
+                            ng-click="submitForm()">Submit form</button>
                 </div>
             </div>
 
@@ -132,8 +134,7 @@
 
     <div ng-show = "input.alertMsg" class="alert alert-warning" close = "closeAlert()">
         <div class="btn btn-default pull-right" style="margin-top: 1px"
-                ng-click="closeAlert()"
-        >Close</div>
+                ng-click="closeAlert()">Close</div>
         <div class="text-center">
             {{input.alertMsg}}
         </div>

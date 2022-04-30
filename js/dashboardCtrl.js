@@ -231,6 +231,32 @@ angular.module("formsApp")
                 )
             }
 
+            //------------ QR related functions
+            //invoked from ng-blur on for elements in renderSingleItem
+
+            $scope.makeQR = function() {
+                console.log('makeQR',$scope.form,$scope.hashItem)
+                //$scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
+
+                $scope.selectedQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
+                console.log($scope.formQR)
+            }
+
+            $scope.validateQR = function(QR){
+                let url = formsSvc.getServers().validationServer + "QuestionnaireResponse/$validate"
+                $http.post(url,QR).then(
+                    function(data) {
+                        $scope.qrValidationResult = data.data
+                    },function(err){
+                        $scope.qrValidationResult = err.data
+
+                    }
+                )
+            }
+
+            //--------------------
+
+/*
             let updateAfterEditDEP = function(){
                 let items = formsSvc.makeQItemsFromTree($scope.treeData)
                 $scope.selectedQ.item = items;
@@ -242,7 +268,7 @@ angular.module("formsApp")
             let makeSectionHash = function(treeData){
 
             }
-
+*/
             $scope.moveUp = function(node) {
                 if (! $scope.editingQ) {
                     $scope.editingQ = true

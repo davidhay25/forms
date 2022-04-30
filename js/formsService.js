@@ -14,6 +14,10 @@ angular.module("formsApp")
 
         let extensionUrl = {}
         termServer = "https://r4.ontoserver.csiro.au/fhir/"
+        validationServer = "http://localhost:9099/baseR4/"
+
+        // let validationServer = "http://localhost:9099/baseR4/"
+        //             let termServer = "https://r4.ontoserver.csiro.au/fhir/"vali
 
         //HPIRoot = "http://localhost:9099/baseR4/"
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
@@ -68,6 +72,9 @@ angular.module("formsApp")
         }
 
         return {
+            getServers : function(){
+                return {termServer: termServer,validationServer:validationServer}
+            },
             makeHashAllItems(Q) {
                 let that = this
                 let hash = {}
@@ -111,7 +118,13 @@ angular.module("formsApp")
                             data.data.entry.forEach(function(entry){
                                 let obs = entry.resource
                                 let result = {}
-                                result.disposition = obs.code.coding[0]
+                                result.disposition = {code:'unknown',display:'unknown'}
+
+                                if (obs.valueCodeableConcept) {
+                                    result.disposition = obs.valueCodeableConcept.coding[0]
+                                }
+
+
                                 result.dispositionDate = obs.effectiveDateTime
                                 result.QR_url = obs.derivedFrom[0].reference //the QR that had the initial comment
                                 obs.component.forEach(function (comp){
@@ -1041,36 +1054,96 @@ angular.module("formsApp")
         //make the treeData from the Q
 
 
-            makeQR :  function(Q,form,hash,patient,practitioner) {
+            makeQR :  function(Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail) {
                 let that = this
-
+console.log(reviewerName)
                 //make the QuestionnaireResponse from the form data
-                //hash is items from the Q keyed by linkId
-                //form is the data enterd keyed by linkId
-                //todo - make recursive...
+                //hash is items from the Q keyed by linkId - not used any more!
+                //form is the data entered keyed by linkId
                 let qrId = this.createUUID()
                 let err = false
-               // console.log(form)
-                //console.log(hash)
+
                 let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
                 QR.text = {status:'generated'}
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url
                 QR.authored = new Date().toISOString()
 
-                let patientName = ""
-                if (patient.name) {
-                    patientName = getHN(patient.name[0])
+                //the author will always be a PR
+                let PR = {resourceType:"PractitionerRole",id:"pr1"}
+                let display = ""
+
+                if (practitioner) {
+                    PR.practitioner = {reference:practitioner}
+                    if (practitioner.name) {
+                        display += getHN(practitioner.name[0])
+                    }
+                } else {
+                    let practitionerName = reviewerName || "No practitioner supplied"
+                    PR.practitioner = {display: reviewerName}
+                    display += practitionerName
                 }
 
-                QR.subject = {reference:"Patient/"+patient.id,display:patientName}
-
-                let practitionerName = ""
-                if (practitioner.name) {
-                    practitionerName = getHN(practitioner.name[0])
+                if (reviewOrganization) {
+                    PR.organization.display = reviewOrganization
+                    display += " at " + reviewOrganization
                 }
 
-                QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
+                if (reviewerEmail) {
+                    PR.telecom = [{system:'email',value:reviewerEmail}]
+                    //display +=
+                }
+
+                QR.contained = [PR]
+                QR.author = {reference:'#pr1',display:display}
+
+/*
+                //default author
+                let practitionerName = "No practitioner supplied"
+                if (practitioner) {
+                    if (practitioner.name) {
+                        practitionerName = getHN(practitioner.name[0])
+                    }
+                    QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
+                } else {
+                    QR.author = {display:practitionerName}
+                }
+
+
+                //make a PractitionerRole as a Contained resource. Allows for upgrades where full resources are included
+                //replace the author
+                if (reviewerName) {
+                    let PR = {resourceType:"PractitionerRole",id:"pr1"}
+                    PR.practitioner.display = reviewerName
+                    if (reviewOrganization) {
+                        PR.organization.display = reviewOrganization
+                    }
+
+                    PR.telecom = [{system:'email',value:reviewerEmail}]
+
+                    QR.contained = [PR]
+                    QR.author = {reference:'#pr1'}
+                }
+
+
+*/
+
+
+               // console.log(form)
+                //console.log(hash)
+
+
+                let patientName = "No patient supplied"
+                if (patient) {
+                    if (patient.name) {
+                        patientName = getHN(patient.name[0])
+                    }
+                    QR.subject = {reference:"Patient/"+patient.id,display:patientName}
+                } else {
+                    QR.subject = {display:patientName}
+                }
+
+
                 QR.item = []
 
                 //the top level items - sections - directly off the Q root...
@@ -1264,7 +1337,7 @@ angular.module("formsApp")
 
             },
 
-            makeQROld : function(Q,form,hash,patient,practitioner) {
+            makeQRDEP : function(Q,form,hash,patient,practitioner) {
                 //make the QuestionnaireResponse from the form data
                 //hash is items from the Q keyed by linkId
                 //form is the data enterd keyed by linkId

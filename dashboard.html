@@ -60,11 +60,13 @@
     <script src="js/formsCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
-    <script src="js/dispositionCtrl.js"></script>
+
     <script src="js/exportSvc.js"></script>
     <script src="js/importSectionCtrl.js"></script>
     <script src="js/terminologySvc.js"></script>
     <script src="js/terminologyCtrl.js"></script>
+
+    <!--  <script src="js/dispositionCtrl.js"></script> -->
 
     <style>
         #graph {
@@ -398,7 +400,7 @@
                                                 </div>
 
 
-                                                <div class="row">
+                                                <div ng-hide="selectedNode.data.item.type == 'group'" class="row" >
                                                     <div class="col-md-3">
                                                         HISO
                                                     </div>
@@ -597,10 +599,39 @@
                         </uib-tab>
 
                         <uib-tab heading="Form preview">
+                            <br/>
 
-                            <div ng-controller="formsCtrl">
-                                <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
-                            </div>
+                            <uib-tabset>
+
+                                <uib-tab heading = "Edit">
+                                    <div ng-controller="formsCtrl">
+                                        <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+                                    </div>
+                                </uib-tab>
+
+                                <uib-tab heading = "Preview">
+                                    <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                                </uib-tab>
+                                <uib-tab heading = "QR">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <pre>{{selectedQR | json}}</pre>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-link" ng-click="validateQR(selectedQR)">Validate</button>
+                                            <pre>{{qrValidationResult | json}}</pre>
+
+                                        </div>
+                                    </div>
+
+                                </uib-tab>
+
+
+                            </uib-tabset>
+
+
+
+
 
                         </uib-tab>
 
@@ -675,9 +706,7 @@
                             </table>
                         </uib-tab>
 
-                        <uib-tab ng-show = false heading="FSH">
-                            >>todo use gofsh to convert to FSH
-                        </uib-tab>
+
 
                         <uib-tab heading = "Review Url">
                             <br/>
@@ -691,7 +720,7 @@
                                 </div>
 
                         </uib-tab>
-                        <uib-tab heading = "SpreadSheet">
+                        <uib-tab heading = "HISO SpreadSheet">
 
                             <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
                                href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
@@ -735,12 +764,8 @@
 
         </uib-tab>
 
-
-
         <uib-tab heading="Form reviews">
             <br/>
-
-
 
             <div ng-controller="formReviewsCtrl">
                 <ng-include src = "'includes/formReviews.html'"></ng-include>

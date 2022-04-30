@@ -66,14 +66,26 @@
 
 
                 <div class="col-md-5">
-                    <div ng-controller="dispositionCtrl">
+                   <!-- <div ng-controller="dispositionCtrl"> -->
+
                         <strong>Comments</strong>
                         <div ng-repeat="r in selectedReview.reviews">
 
                             <div class="rounded-box">
                                 <div><strong>{{r.text}}</strong></div>
                                 <div>{{r.answer[0].valueString}}</div>
-                                <div>
+
+
+                                <div ng-show="r.disposition">
+                                    <table class="table">
+                                        <tr><td>Disposition</td><td>{{r.disposition.disposition}}</td></tr>
+                                        <tr><td>Entered by</td><td>{{r.disposition.reviewer}}</td></tr>
+                                        <tr><td>Date</td><td>{{r.disposition.authored}}</td></tr>
+                                        <tr><td>Note</td><td>{{r.disposition.note}}</td></tr>
+                                    </table>
+                                </div>
+
+                                <div ng-hide="r.disposition">
                                     <button class="btn btn-link pull-right"
                                             ng-click="addDisposition(selectedQR,r)">Add disposition</button>
                                 </div>
@@ -82,7 +94,9 @@
 
                         </div>
                         <br/>
-                    </div>
+
+                  <!--  </div> -->
+
 
 
                     <br/>

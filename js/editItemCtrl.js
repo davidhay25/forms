@@ -65,7 +65,10 @@ angular.module("formsApp")
             }
 
             //update the hiso fields if they are empty
-            $scope.updateHiso = function(type) {
+            $scope.updateHisoDEP = function(type) {
+
+                $scope.setHISODefaults()
+                /*
                 $scope.meta.hisoLength = 100        //default to 100
                 switch ($scope.newItem.type) {
                     case "text" :
@@ -84,6 +87,8 @@ angular.module("formsApp")
                     case "date" :
                         break
                 }
+
+                */
             }
 
             if (item) {
@@ -91,10 +96,11 @@ angular.module("formsApp")
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
 
                 //default the hisoLength
-                if (! $scope.meta.hisoLength ) {
-                    $scope.updateHiso($scope.newItem.type)
+                //if (! $scope.meta.hisoLength ) {
+
+                  //  $scope.updateHiso($scope.newItem.type)
                     //$scope.meta.hisoLength = 100
-                }
+             //   }
 
                 //display mode for answervalueSet
 
@@ -204,7 +210,7 @@ angular.module("formsApp")
             $scope.input.codeSystems = codeSystems
 
             //update the hiso fields if they are empty
-            $scope.updateHiso = function(type) {
+            $scope.updateHisoDEP = function(type) {
                 $scope.meta.hisoLength = 100        //default to 100
                 switch ($scope.newItem.type) {
                     case "text" :
@@ -337,6 +343,43 @@ angular.module("formsApp")
                     //more than 100 matches>=? gosh...
                 }
 
+            }
+            
+            $scope.setHISODefaults = function() {
+                switch ($scope.newItem.type) {
+                    case "string" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 100
+                        $scope.meta.hisoLayout = "A(100)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+                    case "reference" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 100
+                        $scope.meta.hisoLayout = "A(100)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+                    case "text" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 1000
+                        $scope.meta.hisoLayout = "A(1000)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+
+                    case "date" :
+                        $scope.meta.hisoDT = "Date"
+                        $scope.meta.hisoLength = 14
+                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
+                        $scope.meta.hisoClass = "full date"
+                        break
+                    case "choice" :
+                    case "open-choice" :
+                        $scope.meta.hisoLength = 18
+                        $scope.meta.hisoDT = "Numeric (N)"
+                        $scope.meta.hisoLayout = "N(18)"
+                        $scope.meta.hisoClass = "code"
+                        break
+                }
 
             }
 

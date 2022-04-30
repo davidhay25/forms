@@ -389,10 +389,10 @@
             </table>
 
         </uib-tab>
-        <uib-tab heading = "Conditionals by item">
+        <uib-tab heading = "Conditionals by target">
             <br/>
             <table class="table table-bordered table-condensed">
-                <tr><th>linkId of conditional item</th><th>Text</th><th>Type</th><th>Dependency</th></tr>
+                <tr><th>linkId of target item</th><th>Text</th><th>Type</th><th>Source trigger</th></tr>
                 <tr ng-repeat="conditional in report.conditional">
                     <td>
                         <div class="clickable" ng-click="editItemFromReport(conditional)">
@@ -419,7 +419,7 @@
         </uib-tab>
 
         <uib-tab heading = "Conditionals by source">
-
+            <br/>
             <table class="table table-condensed table-bordered">
                 <tr><th>Source Item</th><th>
                     <div class="row">

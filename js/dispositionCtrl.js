@@ -2,7 +2,8 @@ angular.module("formsApp")
     .controller('dispositionCtrl',
         function ($scope,$http,$uibModal) {
 
-            $scope.addDisposition = function(QR,review){
+
+            $scope.addDispositionDEP = function(QR,review){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/disposition.html',
                     backdrop: 'static',
@@ -10,7 +11,7 @@ angular.module("formsApp")
 
                         $scope.QR = QR
 
-                        let category = {coding:[{code:"disposition",display:"Disposition of Q comment"}]}
+                        let dispositionCode = {coding:[{code:"disposition",system:"http://canshare.com",display:"Disposition of Q comment"}]}
 
                         $scope.input = {}
 
@@ -27,9 +28,11 @@ angular.module("formsApp")
                             obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
                             obs.derivedFrom = {reference:`QuestionnaireResponse/${QR.id}`}
                             obs.status = "final"
-                            obs.category = category
+                            //obs.category = category
+                            obs.code = dispositionCode
                             obs.effectiveDateTime = new Date().toISOString()
-                            obs.code = {coding:[{system:"http://canshare.com",
+
+                            obs.valueCodeableConcept = {coding:[{system:"http://canshare.com",
                                     code:$scope.input.disposition.code,
                                     display:$scope.input.disposition.display}]}
 
@@ -70,4 +73,5 @@ angular.module("formsApp")
 
                     })
             }
-        })
+
+    })
