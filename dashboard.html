@@ -33,6 +33,14 @@
         }
 
 
+         #submitGraph {
+             width: 100%;
+             height: 400px;
+             border: 1px solid lightgray;
+         }
+
+
+
     </style>
 
     <script>
@@ -65,16 +73,11 @@
     <script src="js/importSectionCtrl.js"></script>
     <script src="js/terminologySvc.js"></script>
     <script src="js/terminologyCtrl.js"></script>
+    <script src="js/graphSvc.js"></script>
 
+    <script src="js/libs/vis.min.js"></script>
     <!--  <script src="js/dispositionCtrl.js"></script> -->
 
-    <style>
-        #graph {
-            width: 100%;
-            height: 550px;
-            border: 1px solid lightgray;
-        }
-    </style>
 
 
 
@@ -604,6 +607,15 @@
                             <uib-tabset>
 
                                 <uib-tab heading = "Edit">
+<!--
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Patient</label>
+                                            <select class="form-control"></select>
+                                        </div>
+                                    </div>
+-->
+
                                     <div ng-controller="formsCtrl">
                                         <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                     </div>
@@ -626,8 +638,47 @@
 
                                 </uib-tab>
 
-                                <uib-tab heading = "Extracted resources">
-                                   The test operation on the server
+                                <uib-tab ng-show="selectedQR" heading = "Test QR submission">
+                                    <button class="btn btn-link pull-right" ng-click="testSubmit()">Test submission</button>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="list-group">
+                                                <div ng-class="{'list-group-item':true,listItemSelected:selectedResource.id == item.resource.id}"
+                                                     ng-click = "selectResource(item)"
+                                                     style="cursor: pointer"
+                                                     ng-repeat = "item in extractedResources">
+
+                                                    <span class="pull-right">
+                                                        <i ng-show = "item.valid" style="color: green" class="glyphicon glyphicon-thumbs-up"></i>
+                                                        <i ng-hide = "item.valid" style="color: red" class="glyphicon glyphicon-thumbs-down"></i>
+                                                    </span>
+
+                                                    {{item.resource.resourceType}}
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <div id="submitGraph"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <uib-tabset ng-show="selectedResource">
+                                                <uib-tab heading="Json">
+                                                    <pre>{{selectedResource | json}}</pre>
+                                                </uib-tab>
+                                                <uib-tab heading="Validation result">
+                                                    <pre>{{selectedResourceValidation | json}}</pre>
+
+                                                </uib-tab>
+
+                                            </uib-tabset>
+
+                                        </div>
+                                    </div>
+
+
                                 </uib-tab>
 
 
@@ -718,8 +769,8 @@
                                 <div >
                                     Review UI Url: <strong>
                                     <a target="_blank"
-                                       ng-href="reviewForm.html?{{selectedQ.name}}">
-                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.name}}
+                                       ng-href="reviewForm.html?{{selectedQ.url}}">
+                                        http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.url}}
                                     </a> </strong>
                                 </div>
 

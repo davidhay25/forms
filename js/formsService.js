@@ -10,6 +10,7 @@ angular.module("formsApp")
                 globals = data.data
             }
         )
+//http://canshare.com/cs/review-comment
 
         let extensionUrl = {}
         termServer = "https://r4.ontoserver.csiro.au/fhir/"
@@ -28,27 +29,27 @@ angular.module("formsApp")
 
 
         //todo fsh doesn't underatnd expression extension...
-        extPrepop = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-prepop"
+        extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
 
-        extExtractNotes = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
+        extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
 
-        extUsageNotes = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
-        extSourceStandard = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
+        extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
+        extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
-        extHisoClass = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
-        extHisoLength = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
-        extHisoDT = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
-        extHisoLayout = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
-
-
-        extColumn = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column"
-        extColumnCount = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-column-count"
-        extDescription = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-item-description"
+        extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
+        extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
+        extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
+        extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
 
 
-        extensionUrl.extRenderVS = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaire-render-vs"
-        extensionUrl.extCanPublish = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
-        extensionUrl.extPublishOia = "http://hl7.org.nz/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
+        extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
+        extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
+        extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
+
+
+        extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
+        extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
+        extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
 
         canShareServer = "http://canshare/fhir/"
 
@@ -74,6 +75,7 @@ angular.module("formsApp")
             getServers : function(){
                 return {termServer: termServer,validationServer:validationServer}
             },
+
             makeHashAllItems(Q) {
                 let that = this
                 let hash = {}
@@ -1060,6 +1062,7 @@ angular.module("formsApp")
 
                 //the author will always be a PR
                 let PR = {resourceType:"PractitionerRole",id:"pr1"}
+
                 let display = ""
 
                 if (practitioner) {
@@ -1069,12 +1072,12 @@ angular.module("formsApp")
                     }
                 } else {
                     let practitionerName = reviewerName || "No practitioner supplied"
-                    PR.practitioner = {display: reviewerName}
+                    PR.practitioner = {display: practitionerName}
                     display += practitionerName
                 }
 
                 if (reviewOrganization) {
-                    PR.organization.display = reviewOrganization
+                    PR.organization = {display:reviewOrganization}
                     display += " at " + reviewOrganization
                 }
 
@@ -1082,6 +1085,8 @@ angular.module("formsApp")
                     PR.telecom = [{system:'email',value:reviewerEmail}]
                     //display +=
                 }
+                PR.text = {status:'generated'}
+                PR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>"+display+"</div>"
 
                 QR.contained = [PR]
                 QR.author = {reference:'#pr1',display:display}

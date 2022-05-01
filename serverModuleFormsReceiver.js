@@ -136,14 +136,17 @@ async function extractResources(QR) {
         // now create other resources (and track with provenance). The provenance was created and populated during resource extraction
         let provenance = resources.provenance
 
+        let cp = null
+        /* this is really specific  to act now...
         //create 'disease level' CP
         let cp = createCarePlan(QR)
         provenance.target.push({reference: "urn:uuid:"+ cp.id})
         resources.obs.push(cp)
 
+        */
         //the service request for a revire request - always added ATM as being used for forms development
         //could add other SR's as needed - or a task
-        //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
+
 
         let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request")      //todo refactor names of vo returned
         //provenance.target = provenance.target || []
@@ -444,7 +447,7 @@ function createServiceRequest(QR,category,carePlan,description,arExtractedResour
     //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
     sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
 
-    //if there's a careplan (and there should be) then add the SR as an activity, and a reference from SR -> CP
+    //if there's a careplan \ then add the SR as an activity, and a reference from SR -> CP
     if (carePlan) {
         carePlan.activity = carePlan.activity || []
         let activity = {}

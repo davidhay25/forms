@@ -20,17 +20,23 @@ angular.module("formsApp")
 
             let search = $window.location.search;
             if (search) {
-                let QName = search.substr(1)
+                let QUrl = search.substr(1)
 
-                formsSvc.loadQByName(QName).then(   //returns a bundle
+
+                formsSvc.loadQByUrl(QUrl).then(   //returns a bundle - but should only be 1
                     function(data) {
                         console.log(data)
                         if (data.data.entry && data.data.entry.length > 0) {
-                            let Q = data.data.entry[0].resource
+
+                            if (data.data.entry.length > 1) {
+                                alert("Multiple forms were found. Contact support as this is likely an error.")
+                            }
+
+                            let Q = data.data.entry[0].resource  //todo - error if > 1 entry
 
                             $scope.input.appTitle = "Review form design"
-                            //assume only 1
-                            $scope.reviewMode = true    //will hide most of the tabs...
+
+                            $scope.reviewMode = true    //will hide most of the tabs...  todo - can eventually remove
                             $scope.reviewState = "form"  //can be 'form','display','model'
                             $scope.selectQ(Q)  //generates form template & $scope.hashItem
 
@@ -291,7 +297,7 @@ angular.module("formsApp")
 
                 $scope.formTemplate = formsSvc.makeFormTemplate(Q)
 
-                //console.log($scope.formTemplate)
+                console.log(Q)
 
 
                 let vo = formsSvc.makeTreeFromQ(Q)

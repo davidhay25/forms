@@ -10,6 +10,10 @@
         .bold {
             font-weight: bold;
         }
+        .userComment  {
+            background-color: #eeeeee;
+
+        }
     </style>
 
 
@@ -81,8 +85,14 @@
             </div>
 
             <div ng-switch-when="text">
-                <textarea ng-model="form[cell.item.linkId]" class="form-control"
-                      ng-blur="makeQR(cell.item.linkId)"></textarea>
+                <div >
+
+                    <textarea ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://canshare.com/cs/review-comment' }"
+                              ng-model="form[cell.item.linkId]" class="form-control"
+                              ng-blur="makeQR(cell.item.linkId)"></textarea>
+                </div>
+
+
             </div>
 
             <div ng-switch-when="boolean">

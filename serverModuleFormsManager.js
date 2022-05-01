@@ -28,9 +28,12 @@ function setup(app,serverRoot) {
 
         if (req.query.url) {
             url += "?url=" + req.query.url
+        } else if (req.query.name) {
+            url += "?name=" + req.query.name
         }
 
         console.log(url)
+
         axios.get(url)
             .then(function (response){
                 res.status(response.status).json(response.data)

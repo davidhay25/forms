@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout) {
 
 
             //load all the disposition Observations for a Q
@@ -12,7 +12,7 @@ angular.module("formsApp")
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {
                         $scope.dispositionsForQ = data
-                      //  console.log(data)
+
                     }
                 )
             }
@@ -37,6 +37,91 @@ angular.module("formsApp")
                 $localStorage.formsVS.push({display:"Yes, No, Don't know",description:"Standard VS to replace boolean",url:"http://hl7.org/fhir/ValueSet/yesnodontknow"})
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
+
+            //see what resources are generated on a submit (and any errors)
+            $scope.testSubmit = function () {
+                if ($scope.selectedQR) {
+                    let url = "/fr/testextract"
+
+                    let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+                    bundle.entry.push({resource:$scope.selectedQR})
+
+                    $http.post(url,bundle).then(
+                        function(data) {
+                            console.log(data)
+                            $scope.extractedResources = []
+
+                            $scope.extractedResources.push({resource:$scope.selectedQR,OO:{},valid:true})
+                            //validate all the resources
+
+                            data.data.obs.forEach(function (resource){
+                                let url = validationServer + resource.resourceType + "/$validate"
+                                $http.post(url,resource).then(
+                                    function(data) {
+                                        $scope.extractedResources.push({resource:resource,OO:data.data,valid:true})
+                                    },function(err){
+                                        $scope.extractedResources.push({resource:resource,OO:err.data,valid:false})
+                                    }
+                                )
+                            })
+
+                            //create the graph
+                            // todo -  convert the above to promise based...
+                            $timeout(function(){
+                                let vo = graphSvc.makeGraph({arResources: $scope.extractedResources})
+
+                                let container = document.getElementById('submitGraph');
+                                let graphOptions = {
+                                    physics: {
+                                        enabled: true,
+                                        barnesHut: {
+                                            gravitationalConstant: -10000,
+                                        }
+                                    }
+                                };
+                                $scope.submitChart = new vis.Network(container, vo.graphData, graphOptions);
+
+                                $scope.submitChart.on("click", function (obj) {
+                                    let nodeId = obj.nodes[0];  //get the first node
+                                    let node = vo.graphData.nodes.get(nodeId);
+
+                                    //$scope.selectedFromSingleGraph = node.resource;
+
+
+                                    console.log(obj)
+                                    if (node.data && node.data.resource) {
+                                        $scope.selectResource({resource:node.data.resource,OO:{}})
+                                        $scope.$digest()
+                                    }
+
+
+
+                                })
+
+                                $scope.submitChart.on("stabilizationIterationsDone", function () {
+                                    $scope.submitChart.setOptions( { physics: false } );
+                                });
+
+                                console.log(vo)
+                            },2000)
+
+                            //add other resources so they're visible in the display
+                            //$scope.extractedResources.push({resource:$scope.QR,OO:{},valid:true})
+
+
+                        }, function(err) {
+                            alert(angular.toJson(err.data))
+                            console.log(err)
+                        }
+                    )
+                }
+            }
+
+            $scope.selectResource = function(item) {
+                $scope.selectedResource = item.resource
+                $scope.selectedResourceValidation = item.OO
+            }
+
 
 
             //---- tabbed forms support
