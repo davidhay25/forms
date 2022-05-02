@@ -10,7 +10,7 @@ angular.module("formsApp")
                 globals = data.data
             }
         )
-//http://canshare.com/cs/review-comment
+
 
         let extensionUrl = {}
         termServer = "https://r4.ontoserver.csiro.au/fhir/"
@@ -30,9 +30,7 @@ angular.module("formsApp")
 
         //todo fsh doesn't underatnd expression extension...
         extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
-
         extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
-
         extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
         extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
@@ -47,7 +45,7 @@ angular.module("formsApp")
         extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
 
-        extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
+        //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
 
@@ -294,7 +292,13 @@ angular.module("formsApp")
                 updateExtension(item,extHidden,"Boolean",meta.hidden)
 
                 //renderVS
-                updateExtension(item,extensionUrl.extRenderVS,"Code",meta.renderVS)
+                //this is actually saved as an item control extension
+                if (meta.renderVS) {
+                    let cc = {coding:[{system:'http://hl7.org/fhir/questionnaire-item-control',code:meta.renderVS}]}
+                    updateExtension(item,extItemControl,"CodeableConcept",cc)
+                }
+
+                //updateExtension(item,extensionUrl.extRenderVS,"Code",meta.renderVS)
 
                 //hiso class
                 updateExtension(item,extHisoClass,"String",meta.hisoClass)
@@ -405,6 +409,12 @@ angular.module("formsApp")
                 let ar7 = this.findExtension(item,extItemControl)
                 if (ar7.length > 0) {
                     meta.itemControl = ar7[0].valueCodeableConcept
+
+                    //set the element 'renderVS' to the code. Used when rendering a valueset
+                    if (meta.itemControl.coding) {
+                        meta.renderVS = meta.itemControl.coding[0].code
+                    }
+
                 }
 
                 //hidden
@@ -413,13 +423,15 @@ angular.module("formsApp")
                     meta.hidden = ar8[0].valueBoolean
                 }
 
-                //render VS
-
+                //render VS. Note that this is stored using the FHIR extension http://hl7.org/fhir/valueset-questionnaire-item-control.html
+                //but converted to a string for ease of use
+                /*
                 let ar9 = this.findExtension(item,extensionUrl.extRenderVS)
                 if (ar9.length > 0) {
                     meta.renderVS = ar9[0].valueCode
                 }
 
+                */
                 //hiso code
                 let ar10 = this.findExtension(item,extHisoClass)
                 if (ar10.length > 0) {

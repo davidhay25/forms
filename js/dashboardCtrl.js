@@ -25,8 +25,9 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
+
             //don't change the rev-comment url!!!!
-            $scope.input.codeSystems.push({display:'csReview',url:'http://canshare.com/cs/review-comment'})
+            $scope.input.codeSystems.push({display:'csReview',url:'http://clinfhir.com/fhir/CodeSystem/review-comment'})
             $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
@@ -564,8 +565,7 @@ angular.module("formsApp")
                 let vo = formsSvc.generateQReport($scope.selectedQ)
                 $scope.report = vo.report
                 $scope.hashAllItems = vo.hashAllItems
-                //$scope.exportJsonList = exportSvc.createJsonModel($scope.selectedQ,vo.hashAllItems)
-                //console.log($scope.exportJsonList)
+
                 makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
             }
 

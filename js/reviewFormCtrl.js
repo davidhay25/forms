@@ -1,8 +1,8 @@
-//Dashboard controller
+//controller for the review form presented to people reviewing a form
 
 angular.module("formsApp")
     .controller('reviewFormCtrl',
-        function ($scope,$http,formsSvc,actnowSvc,$window,$timeout,designerSvc,exportSvc) {
+        function ($scope,$http,formsSvc,$window,$timeout,designerSvc,exportSvc) {
 
             $scope.input = {}
             $scope.form = {}
@@ -176,10 +176,7 @@ angular.module("formsApp")
 
             }
 
-            //construct a simplified logical model of a regimen to ease UI
-            $scope.getRegimenSummaryDEP = function (cp){
-                $scope.regimenLM = actnowSvc.makeRegimenLM(cp,$scope.hashAllCarePlans)
-            }
+
 
 
             //===============  functions for form ===================

@@ -25,6 +25,69 @@ angular.module("formsApp")
                 $scope.newItem = angular.copy(item)
             }
 
+            //has to be above check for new
+            $scope.setHISODefaults = function(typ) {
+                switch (typ) {
+                    case "string" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 100
+                        $scope.meta.hisoLayout = "A(100)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+                    case "reference" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 100
+                        $scope.meta.hisoLayout = "A(100)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+                    case "text" :
+                        $scope.meta.hisoDT = "Alphanumeric (X)"
+                        $scope.meta.hisoLength = 1000
+                        $scope.meta.hisoLayout = "A(1000)"
+                        $scope.meta.hisoClass = "free text"
+                        break
+
+                    case "integer" :
+                        $scope.meta.hisoDT = "Numeric (N)"
+                        $scope.meta.hisoLength = 3
+                        $scope.meta.hisoLayout = "N(3)"
+                        $scope.meta.hisoClass = "value"
+                        break
+
+                    case "decimal" :
+                        $scope.meta.hisoDT = "Numeric (N)"
+                        $scope.meta.hisoLength = 8
+                        $scope.meta.hisoLayout = "N(8)"
+                        $scope.meta.hisoClass = "value"
+                        break
+
+                    case "boolean" :
+                        $scope.meta.hisoDT = "Boolean"
+                        $scope.meta.hisoLength = 1
+                        $scope.meta.hisoLayout = "A(1)"
+                        $scope.meta.hisoClass = "value"
+                        break
+
+                    case "date" :
+                        $scope.meta.hisoDT = "Date"
+                        $scope.meta.hisoLength = 14
+                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
+                        $scope.meta.hisoClass = "full date"
+                        break
+                    case "choice" :
+                    case "open-choice" :
+                        $scope.meta.hisoLength = 18
+                        $scope.meta.hisoDT = "Numeric (N)"
+                        $scope.meta.hisoLayout = "N(18)"
+                        $scope.meta.hisoClass = "code"
+                        break
+                }
+
+            }
+
+
+
+
             //construct an array of all the items which can be a conditional source where the type is choice or boolean
             //at the same time, see if this item is a dependenct source for another - if so, linkId is read-only. And display those sources in the UI
             $scope.dependencySources = []       //items that can be the source of a dependanys
@@ -58,51 +121,15 @@ angular.module("formsApp")
             //needs to be at the top
             $scope.ewSelected = function(sourceItem) {
 
-                //console.log(sourceItem)
-
                 $scope.selectedSourceItem = sourceItem
 
             }
 
-            //update the hiso fields if they are empty
-            $scope.updateHisoDEP = function(type) {
 
-                $scope.setHISODefaults()
-                /*
-                $scope.meta.hisoLength = 100        //default to 100
-                switch ($scope.newItem.type) {
-                    case "text" :
-                        $scope.meta.hisoLength = 1000
-                        break
-                    case "choice" :
-                    case "open-choice" :
-                        $scope.meta.hisoLength = 18
-                        break
-                    case "integer" :
-                        $scope.meta.hisoLength = 3
-                        break
-                    case "boolean" :
-                        $scope.meta.hisoLength = 1
-                        break
-                    case "date" :
-                        break
-                }
 
-                */
-            }
-
-            if (item) {
+            if (item) {         //todo - needs refactoring - there's always an item ATM
                 //in particular gets the extensions into a easier format
                 $scope.meta = formsSvc.getMetaInfoForItem(item)
-
-                //default the hisoLength
-                //if (! $scope.meta.hisoLength ) {
-
-                  //  $scope.updateHiso($scope.newItem.type)
-                    //$scope.meta.hisoLength = 100
-             //   }
-
-                //display mode for answervalueSet
 
                 if ($scope.meta.renderVS) {
                     $scope.input.vs = {rendermode: $scope.meta.renderVS}
@@ -173,17 +200,10 @@ angular.module("formsApp")
 
                 }
 
-                /*
-                //set the hiso class
-                if ($scope.meta.hisoClass) {
-                    $scope.input.hisoClass.forEach(function (hc) {
-                        if (hc == $scope.meta.hisoClass) {
-                           // $scope.meta.hisoClass = hc
-                        }
-                    })
+                if (editType == 'new') {
+                    $scope.setHISODefaults('string')
                 }
 
-                */
             }
 
             if (item.item && item.item.length > 0) {
@@ -345,43 +365,7 @@ angular.module("formsApp")
 
             }
             
-            $scope.setHISODefaults = function() {
-                switch ($scope.newItem.type) {
-                    case "string" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 100
-                        $scope.meta.hisoLayout = "A(100)"
-                        $scope.meta.hisoClass = "free text"
-                        break
-                    case "reference" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 100
-                        $scope.meta.hisoLayout = "A(100)"
-                        $scope.meta.hisoClass = "free text"
-                        break
-                    case "text" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 1000
-                        $scope.meta.hisoLayout = "A(1000)"
-                        $scope.meta.hisoClass = "free text"
-                        break
 
-                    case "date" :
-                        $scope.meta.hisoDT = "Date"
-                        $scope.meta.hisoLength = 14
-                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
-                        $scope.meta.hisoClass = "full date"
-                        break
-                    case "choice" :
-                    case "open-choice" :
-                        $scope.meta.hisoLength = 18
-                        $scope.meta.hisoDT = "Numeric (N)"
-                        $scope.meta.hisoLayout = "N(18)"
-                        $scope.meta.hisoClass = "code"
-                        break
-                }
-
-            }
 
             $scope.save = function() {
 
@@ -392,8 +376,12 @@ angular.module("formsApp")
 
                 //rendering a valueset as answeroption
 
+
                 if ($scope.input.vs && $scope.input.vs.rendermode) {
+
+
                     $scope.meta.renderVS = $scope.input.vs.rendermode
+
 
                 }
 

@@ -2,7 +2,7 @@ angular.module("formsApp")
     //primarily building logical model of act-now data
     .service('exportSvc', function($q,$http,formsSvc) {
 
-        csReview = "http://canshare.com/cs/review"
+        csReview = "http://clinfhir.com/fhir/CodeSystem/review-comment"
 
             return {
 

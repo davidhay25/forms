@@ -1,3 +1,6 @@
+
+//edit the Q metadata
+
 angular.module("formsApp")
     .controller('editQCtrl',
         function ($scope,$http,formsSvc,Q,allQ) {

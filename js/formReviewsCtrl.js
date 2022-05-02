@@ -195,7 +195,7 @@ angular.module("formsApp")
             }
 
             //let reviewCommentsSystem = "http://canshare.com/cs/review-comment"      //todo move to service
-            let reviewCommentsSystem = "http://canshare.com/cs/review-comment"
+            let reviewCommentsSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
 
 
             //passes in a single review to update
@@ -205,16 +205,18 @@ angular.module("formsApp")
                     backdrop: 'static',
                     controller: function($scope,review,QR){
 
+                        csDisposition = "http://clinfhir.com/fhir/CodeSystem/disposition-code"
+
                         $scope.QR = QR
 
-                        let dispositionCode = {coding:[{code:"disposition",system:"http://canshare.com",display:"Disposition of Q comment"}]}
+                        let dispositionCode = {coding:[{code:"disposition",system:"http://clinfhir.com/fhir/CodeSystem/observation-code",display:"Disposition of Q comment"}]}
 
                         $scope.input = {}
 
                         $scope.input.dispositionOptions = []
-                        $scope.input.dispositionOptions.push({code:'accept','display':"Accept"})
-                        $scope.input.dispositionOptions.push({code:'mod','display':"Accept with mod"})
-                        $scope.input.dispositionOptions.push({code:'decline','display':"Decline"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'accept','display':"Approved with no suggested changes"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'mod','display':"Approved with suggested changes"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'decline','display':"Not approved"})
 
                         $scope.review = review
                         let linkId = review.linkId      //the comment in the QR
@@ -228,7 +230,7 @@ angular.module("formsApp")
                             obs.code = dispositionCode
                             obs.effectiveDateTime = new Date().toISOString()
 
-                            obs.valueCodeableConcept = {coding:[{system:"http://canshare.com",
+                            obs.valueCodeableConcept = {coding:[{system:"http://clinfhir.com/fhir/CodeSystem/disposition-codes",
                                     code:$scope.input.disposition.code,
                                     display:$scope.input.disposition.display}]}
 
