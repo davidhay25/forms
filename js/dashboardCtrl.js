@@ -223,7 +223,7 @@ angular.module("formsApp")
                             //if a Q is passed back, it is a new one
 //console.log(Q)
                             Q.id = "cf-" + new Date().getTime()
-                            Q.resourceType = "Questionnaire"
+                            //Q.resourceType = "Questionnaire"
                             $scope.selectedQ = Q
                             $scope.updateQ(function(){
                                 $scope.allQ.push(Q)
@@ -866,7 +866,8 @@ angular.module("formsApp")
             }
 
             function loadAllQ() {
-                let url = "/fm/fhir/Questionnaire"
+                let url = "/ds/fhir/Questionnaire"
+                //let url = "/fm/fhir/Questionnaire"
                 $http.get(url).then(
                     function (data) {
                         $scope.allQ = [];

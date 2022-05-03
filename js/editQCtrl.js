@@ -15,7 +15,7 @@ angular.module("formsApp")
                 $scope.editType = "edit"
             } else {
                 $scope.editType = "new"
-                $scope.Q = {item:[]}
+                $scope.Q = {resourceType:'Questionnaire',item:[]}
             }
 
             //$scope.input = {}

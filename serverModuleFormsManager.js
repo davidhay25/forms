@@ -8,6 +8,7 @@ function setup(app,serverRoot) {
     app.put('/fm/fhir/Questionnaire/:id',function(req,res){
         let Q = req.body
         let url = serverRoot + "Questionnaire/" + Q.id
+        //console.log(url)
         axios.put(url,Q)
             .then(function (response){
                 res.status(response.status).json(response.data)
@@ -17,9 +18,6 @@ function setup(app,serverRoot) {
                 res.status(400).send(err.response.data)
             })
 
-        //console.log(Q)
-
-        //res.json()
     })
 
     //return all the questionnaires - or search by url
