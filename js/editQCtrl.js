@@ -21,7 +21,11 @@ angular.module("formsApp")
             //$scope.input = {}
 
             $scope.updateUrl = function (name) {
-                $scope.Q.url = QBase + name
+
+                let t = name.replace(/\s+/g, '')  //remove all spaces
+                t = t.toLowerCase()
+
+                $scope.Q.url = QBase + t
             }
 
             $scope.selectExistingQ = function (Q) {
@@ -59,7 +63,6 @@ angular.module("formsApp")
                     //this is a new Q
 
                     //check for selected sections
-
                     if ($scope.eQ) {
                         $scope.eQ.item.forEach(function (section) {
                             if ($scope.input.section[section.linkId]) {
@@ -70,31 +73,6 @@ angular.module("formsApp")
                     }
 
                     $scope.$close($scope.Q)
-/*
-return
-
-                    if ($scope.input.startWithBase) {
-
-                        formsSvc.loadQByUrl("http://clinfhir.com/Questionnaire/cervicalcancer").then(
-                            function(data) {
-                                //a bundle
-                                if (data.data && data.data.entry) {
-                                    let baseQ = data.data.entry[0].resource
-                                    //todo - could pull other elements from the base...
-                                    $scope.Q.item = baseQ.item
-                                    $scope.$close($scope.Q)
-                                }
-
-
-
-                            }, function(err) {
-                                alert(angular.toJson(err.data))
-                            }
-                        )
-                    } else {
-                        $scope.$close($scope.Q)
-                    }
-*/
 
                 }
 

@@ -18,6 +18,7 @@ angular.module("formsApp")
             }
 
 
+
             $scope.input = {}
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference','display']
 
@@ -257,6 +258,54 @@ angular.module("formsApp")
 
             }
 
+            $scope.importGroup = function(node){
+                //the node will be a section node
+                console.log(node)
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/importGroup.html',
+                    backdrop: 'static',
+                    controller: 'importGroupCtrl',
+                    resolve: {
+                        allQ: function () {
+                            return $scope.allQ
+                        }
+                    }
+                }).result.then(
+                    function (group) {
+                        console.log(group)
+                        $scope.selectedQ.item.forEach(function (section){
+                            if (section.linkId == node.id) {  //node.id = linkId
+                                section.item = section.item || []
+                                section.item.push(group)
+                            }
+                        })
+                        $scope.treeIdToSelect = node.id
+                        $scope.drawQ($scope.selectedQ) //,true)
+                        $scope.input.dirty = true;
+                        updateReport()
+
+
+                        /*
+                        //add the sections to the Q. The linkIds have been checked to be unique
+                        arSection.forEach(function (section) {
+                            $scope.selectedQ.item = $scope.selectedQ.item || []
+                            $scope.selectedQ.item.push(section)
+
+                            //$scope.treeIdToSelect = node.id
+                            $scope.drawQ($scope.selectedQ,true)
+                            $scope.input.dirty = true;
+                            //$scope.editingQ = false
+
+                            updateReport()
+                        })
+                        */
+                    }
+                )
+
+            }
+
+
             $scope.importSection = function(){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/importSection.html',
@@ -305,7 +354,7 @@ angular.module("formsApp")
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
-                        alert("Q updated on the Forms Manager")
+                        alert("Questionnaire updated on the Forms Manager")
                         $scope.input.dirty = false;
                         if (cb) {
                             cb()
@@ -532,6 +581,7 @@ angular.module("formsApp")
                         if (item) {
                             if (currentLevel == 'root') {
                                 //this is a section - directly off the root
+                                $scope.selectedQ.item = $scope.selectedQ.item || []
                                 $scope.selectedQ.item.push(item)
                             } else {
 
@@ -754,7 +804,9 @@ angular.module("formsApp")
 
                 drawTree()
                 makeFormDef()
-                $scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.formTemplate = $scope.objFormTemplate.template
               //  $scope.input.dirty = false
             }
 
@@ -794,7 +846,7 @@ angular.module("formsApp")
                                 //don't allow groups to be dragged
                                 delete $scope.dndSource
                                 let node = nodes[0]
-                                if (node.data.item.type == 'group') {
+                                if (node.data && node.data.item && node.data.item.type == 'group') {
                                     return false
                                 } else {
                                     $scope.dndSource = node.data.item

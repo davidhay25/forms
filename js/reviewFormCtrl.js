@@ -7,13 +7,13 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.form = {}
 
-            $scope.input.alertMsg = "This is a test system. Please do not add any real data or Personal Health Information into the form."
+            $scope.input.alertMsg = "This is a test system. Please do not include any real data or Personal Health Information into the form."
 
             $scope.closeAlert = function() {
                 delete $scope.input.alertMsg
             }
 
-            $scope.input.appTitle = "CanShare: Create Path request and view patient data"
+            //$scope.input.appTitle = "CanShare: Create Path request and view patient data"
 
             let validationServer = "http://localhost:9099/baseR4/"
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"  //todo - move to config of somesort ? odd formsSvc
@@ -292,7 +292,10 @@ angular.module("formsApp")
             $scope.selectQ = function(Q) {
                 $scope.selectedQ = Q
 
-                $scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.formTemplate = $scope.objFormTemplate.template
+
+                //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
 
                 console.log(Q)
 

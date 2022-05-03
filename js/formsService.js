@@ -486,6 +486,8 @@ angular.module("formsApp")
 
                         report.section.push(section)
 
+                        updateSpecificArrays(section,report,sectionItem)
+
 
                         if (sectionItem.item) {        //should always have children
                             sectionItem.item.forEach(function (child){
@@ -614,6 +616,7 @@ angular.module("formsApp")
             },
             makeFormTemplate : function(Q) {
                 let that = this;
+                let hiddenFields = []
                 //let termServer = that.termServer
 
                 //create a template suitable for rendering in up to 4 columns
@@ -628,6 +631,9 @@ angular.module("formsApp")
                     Q.item.forEach(function (sectionItem) {
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
+                        if (section.meta.hidden) {
+                            hiddenFields.push(section)
+                        }
                         template.push(section)
 
                         //now look at the items below the section level.
@@ -635,7 +641,9 @@ angular.module("formsApp")
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
                                 let meta = that.getMetaInfoForItem(item)
-
+                                if (meta.hidden) {
+                                    hiddenFields.push(item)
+                                }
                                 if (item.type == 'group') {
                                     //groups has a specific structure ATM
                                     //the first item goes in col 1
@@ -650,6 +658,7 @@ angular.module("formsApp")
                                         if (meta.columnCount) {
                                             //if there's a column count, then fill rows left -> right
                                             let col = 1
+                                            //let rowHasBeenAdded =
                                             item.item.forEach(function (child,inx) {
 
                                                 let side = 'col' + col
@@ -674,7 +683,8 @@ angular.module("formsApp")
                                             })
 
                                             if (row.col1) {
-                                                section.rows.push(row)
+                                                //why was I doing this?
+                                               // section.rows.push(row)
                                             }
 
                                         } else {
@@ -683,6 +693,9 @@ angular.module("formsApp")
                                             //this is to make it easier to have the 'control' item in the left column and the others in th eright
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
+                                                if (childMeta.hidden) {
+                                                    hiddenFields.push(child)
+                                                }
                                                 //ignore any item entries on the child - we don't go any deeper atm
 
                                                 if (inx == 0) {
@@ -741,7 +754,7 @@ angular.module("formsApp")
                 }
 
 
-                return template
+                return {template:template,hiddenFields:hiddenFields}
 
                 //looks for specific instructions from the Q about an item - eg render as radio
                 //todo - does this overlap with the meta stuff??

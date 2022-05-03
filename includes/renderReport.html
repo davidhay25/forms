@@ -391,6 +391,8 @@
         </uib-tab>
         <uib-tab heading = "Conditionals by target">
             <br/>
+            <em>These are the items whose visibility depends on another</em>
+            <br/>
             <table class="table table-bordered table-condensed">
                 <tr><th>linkId of target item</th><th>Text</th><th>Type</th><th>Source trigger</th></tr>
                 <tr ng-repeat="conditional in report.conditional">
@@ -406,7 +408,13 @@
                         <div ng-repeat="ew in conditional.item.enableWhen">
                             <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question])">
                                 {{ew.question}}
-                            </span> = {{ew.answerCoding.code}}
+                            </span> =
+
+                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                            <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
+                            <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+
+
 
 
                         </div>
@@ -420,11 +428,13 @@
 
         <uib-tab heading = "Conditionals by source">
             <br/>
+            <em>These are the items that control the visibility of another</em>
+            <br/>
             <table class="table table-condensed table-bordered">
-                <tr><th>Source Item</th><th>
+                <tr><th>Source Item</th><th>Type</th><th>
                     <div class="row">
                         <div class="col-md-4">
-                            Items dependant on the source
+                            Items dependant on this source
                         </div>
                         <div class="col-md-4">
                             Conditional value
@@ -441,16 +451,25 @@
                         </span>
 
                     </td>
+                    <td>{{hashAllItems[k].item.type}}</td>
                     <td>
                         <div ng-repeat="entry in v.dependencies">
                             <div class="row">
                                 <div class="col-md-4">
                                     <span class="clickable" ng-click="editItemFromReport(entry)">
-                                    {{entry.item.linkId}} ( {{entry.item.text}})
+                                    {{entry.item.linkId}} ({{entry.item.text}})
                                 </span>
                                 </div>
                                 <div class="col-md-4">
-                                    {{entry.ew.answerCoding.code}}
+
+
+                                    <span ng-show = "entry.ew.answerCoding"> {{entry.ew.answerCoding.code}} ({{entry.ew.answerCoding.display}})</span>
+                                    <span ng-show = "entry.ew.answerBoolean !== undefined"> {{entry.ew.answerBoolean}}</span>
+                                    <span ng-show = "entry.ew.answerString">{{entry.ew.answerString}}</span>
+
+
+
+
                                 </div>
                                 <div class="col-md-4">
 

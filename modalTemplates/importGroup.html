@@ -1,0 +1,131 @@
+
+<div>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <h3 class="modal-title">Import group</h3>
+
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+                <button class="btn btn-primary pull-right"
+                        ng-show="selectedGroup"
+                        ng-click="save()">Import</button>
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+
+        <br/>
+        <div class="row">
+            <div class="col-sm-3">
+                Existing Q
+            </div>
+            <div class="col-sm-9">
+                <select ng-model="input.libQ" class="form-control"
+                        ng-change = "selectExistingQ(input.libQ)"
+                        ng-options="q.name for q in allQ"></select>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div ng-repeat = "sectionGroup in arGroups" ng-show="sectionGroup.groups.length > 0">
+                    <div><strong>{{sectionGroup.section.text}}</strong></div>
+                    <div ng-repeat="group in sectionGroup.groups">
+                        <div class="clickable" ng-click="showGroup(group)">{{group.text}}</div>
+
+
+                    </div>
+                </div>
+                <!--
+                <table class="table">
+                    <tr ng-repeat="element in arGroups">
+
+                        <td>{{element.section.text}}</td>
+                        <td>{{element.group.text}}</td>
+                        <td><div ng-click="showGroup(element.group)">Show</div></td>
+                    </tr>
+                </table>
+-->
+                <!--
+                <div class="list-group">
+                    <div class="list-group-item"
+                        ng-repeat="element in arGroups">
+
+
+
+                        <checkbox ng-model="input.section[item.linkId]"
+                            ng-change = "checkSection(item.linkId,input.section[item.linkId])">
+
+                        </checkbox>  {{item.text}}
+
+                        <span>
+                            <i class="glyphicon glyphicon-info-sign pull-right"
+                               ng-click = "showSection(item.linkId)" />
+                        </span>
+
+                    </div>
+                </div>
+
+                -->
+            </div>
+
+            <div class="col-sm-6">
+
+                <ul>
+                    <li ng-repeat="item in selectedGroup.item">
+                        {{item.text}}
+                    </li>
+                </ul>
+                <!--
+                <div ng-show="selectedSection" class="banner">{{selectedSection.linkId}}</div>
+                <div class="list-group">
+                    <div class="list-group-item"
+                         ng-repeat="item in selectedSection.item">
+                        {{item.text}}
+
+                    </div>
+                </div>
+-->
+
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+    <div class="modal-header">
+
+        <div class="row">
+
+            <div class="col-md-6 col-sm-6">
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+
+            </div>
+        </div>
+    </div>
+</div>

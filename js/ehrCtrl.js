@@ -240,7 +240,8 @@ angular.module("formsApp")
             $scope.selectQ = function(Q) {
                 $scope.selectedQ = Q
 
-                $scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.formTemplate = $scope.objFormTemplate.template
 
                 console.log($scope.formTemplate)
 

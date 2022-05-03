@@ -5,12 +5,13 @@ angular.module("formsApp")
 
 
 
+
             $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
-            $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild'
+            $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
 
             $scope.input = {}
-
+            $scope.input.colCount = [2,3,4]
             $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
             $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
 
@@ -208,7 +209,7 @@ angular.module("formsApp")
 
             if (item.item && item.item.length > 0) {
                 //this has child elements. The type must remain as group.
-                $scope.hideType = true
+                $scope.fixType = true
             }
 
 
@@ -221,7 +222,7 @@ angular.module("formsApp")
 
             if (insertType == 'section' || insertType == 'group' ){
                 $scope.newItem.type = 'group'
-                $scope.hideType = true
+                $scope.fixType = true
             }
 
             //todo get units if extension present

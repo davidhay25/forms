@@ -55,6 +55,30 @@
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
         }]);
 
+        /*
+               angular.module("formsApp")
+                   .factory("$exceptionHandler",  function() {
+                       return function (exception, cause) {
+                           //exception handling here
+                           alert(exception + ".details in the console.")
+                       };
+                   });
+
+               angular.module('formsApp').factory('$exceptionHandler', [function() {
+                   return function myExceptionHandler(exception, cause) {
+
+                       console.log(cause)
+                       console.log(exception)
+                       //$log.warn(exception, cause);
+                       alert(exception)
+                   };
+               }]);
+
+        window.onerror = function(message, url, linenumber) {
+            alert("An unexpected error occurred: " + message + " on line " + linenumber + " for " + url);
+        }
+ */
+
     </script>
     <script src="js/libs/ngStorage.min.js"></script>
 
@@ -71,6 +95,7 @@
 
     <script src="js/exportSvc.js"></script>
     <script src="js/importSectionCtrl.js"></script>
+    <script src="js/importGroupCtrl.js"></script>
     <script src="js/terminologySvc.js"></script>
     <script src="js/terminologyCtrl.js"></script>
     <script src="js/graphSvc.js"></script>
@@ -144,14 +169,17 @@
             <br/>
             <div class="row">
                 <div class="col-md-2">
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                             style="cursor: pointer"
-                             ng-click="selectQ(Q)"
-                             ng-repeat="Q in allQ">
-                            {{Q.name}}
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                                 style="cursor: pointer"
+                                 ng-click="selectQ(Q)"
+                                 ng-repeat="Q in allQ">
+                                {{Q.name}}
+                            </div>
                         </div>
                     </div>
+
 
                     <button class="btn btn-link"
                             ng-click="newQ()">
@@ -452,10 +480,16 @@
                                                             <div>
                                                                 <button class="btn btn-link"
                                                                         ng-click="addItem(selectedNode,'group')">
-                                                                    Add Group
+                                                                    Add new Group
                                                                 </button>
                                                             </div>
 
+                                                            <div>
+                                                                <button class="btn btn-link"
+                                                                        ng-click="importGroup(selectedNode)">
+                                                                    Import Group
+                                                                </button>
+                                                            </div>
 
 
                                                         </div>
@@ -561,6 +595,15 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Name
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
                                 </div>
                             </div>
 

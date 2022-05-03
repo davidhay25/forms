@@ -93,14 +93,19 @@
 
 
                     <!-- If a section, then the type will be 'group'-->
-                    <tr ng-hide = "hideType">
+                    <tr>
                         <td>Type</td>
                         <td>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <select class="form-control" ng-model="newItem.type"
+                                    <select ng-hide = "fixType" class="form-control" ng-model="newItem.type"
                                             ng-change = setHISODefaults(newItem.type)
                                             ng-options = "itemType for itemType in input.itemTypes"></select>
+
+                                    <div ng-show="fixType">
+                                        {{newItem.type}}
+                                    </div>
+
                                 </div>
 
                                 <div class="col-sm-6">
@@ -111,7 +116,12 @@
                                                 Column count
                                             </div>
                                             <div class="col-sm-3 col-md-3">
-                                                <input type="text" class="form-control" ng-model="meta.columnCount"/>
+
+                                                <select class="form-control" ng-model="meta.columnCount"
+                                                        ng-options = "cnt for cnt in input.colCount">
+
+                                                </select>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -124,7 +134,9 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <button class="btn btn-link" ng-click="setHISODefaults(newItem.type)">Reset HISO</button>
+                                    <button class="btn btn-link" ng-hide="fixType"
+                                            ng-click="setHISODefaults(newItem.type)">Reset HISO
+                                    </button>
                                 </div>
                             </div>
 
@@ -164,7 +176,7 @@
                         </td>
                     </tr>
 
-                    <tr ng-hide="hideType">
+                    <tr ng-hide="fixType">
                         <td>HISO</td>
                         <td>
                             <div class="row">
