@@ -338,7 +338,7 @@
                                                         <div ng-repeat="ew in selectedNode.data.item.enableWhen">
                                                            <span class="clickable" ng-click="editItemFromLinkId(ew.question)">
                                                                {{ew.question}} </span>
-                                                            =
+                                                            {{ew.operator}}
 
                                                             <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
                                                             <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>

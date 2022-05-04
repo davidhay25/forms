@@ -833,83 +833,90 @@ angular.module("formsApp")
 
 
                 if (item.enableWhen && item.enableWhen.length > 0) {
-                    let conditional = item.enableWhen[0]       //only looking at the first one for now
+                    let canShow = false     //default is to hide (ie it is an OR )
 
-                    let formValue = formData[conditional.question]  //the value from the form to be compared
-
-                    //when a radio is used as the input, the value is a string rather than an object
-                    if (typeof formValue === 'string' || formValue instanceof String) {
-                        formValue = JSON.parse(formValue)
-                    }
+                    item.enableWhen.forEach(function(conditional){
 
 
-                    if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
-                        //if (formValue !== null) {
-                        switch(conditional.operator) {
-                            case '=' :
-                                //all kinds of conditional support '='
-                                if (conditional.answerCoding) {
-                                    return checkEqualCoding(formValue.valueCoding,conditional.answerCoding)
-                                }
 
-                                if (conditional.answerString) {
-                                    if (formValue.valueString == conditional.answerString) {
-                                        return true
-                                    } else {
-                                        return false
-                                    }
-                                }
+                        //let conditional = item.enableWhen[0]       //only looking at the first one for now
 
-                                if (conditional.answerBoolean !== undefined) {
+                        let formValue = formData[conditional.question]  //the value from the form to be compared
 
-                                    if (conditional.answerBoolean) {
-                                        //when the trigger value is true
-                                        if (formValue) {
-                                            return true
-                                        } else {
-                                            return false
-                                        }
-                                    } else {
-                                        //when the triggervalue is false
-                                        if (formValue) {
-                                            return false
-                                        } else {
-                                            return true
+                        //when a radio is used as the input, the value is a string rather than an object
+                        if (typeof formValue === 'string' || formValue instanceof String) {
+                            formValue = JSON.parse(formValue)
+                        }
+
+
+                        if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
+                            //if (formValue !== null) {
+                            switch(conditional.operator) {
+                                case '=' :
+                                    //all kinds of conditional support '='
+                                    if (conditional.answerCoding) {
+                                        if (checkEqualCoding(formValue.valueCoding,conditional.answerCoding)) {
+                                            canShow = true
                                         }
                                     }
 
-
-
-
-                                }
-/*
-                                //when a radio is used as the input, the value is a string rather than an object
-                                if (typeof formValue === 'string' || formValue instanceof String) {
-                                    formValue = JSON.parse(formValue)
-                                }
-                                */
-                                break
-                            case ">" :
-                                //Only supported by integer
-
-
-                                if (conditional.answerInteger !== undefined) {
-                                    let targetValue = parseInt(conditional.answerInteger)
-                                    let value = formValue.valueInteger
-                                    if (value > targetValue) {
-                                        return true
+                                    if (conditional.answerString) {
+                                        if (formValue.valueString == conditional.answerString) {
+                                            canShow = true
+                                        }
                                     }
-                                    /*
-                                    if (formValue.valueString == conditional.answerString) {
-                                        return true
-                                    } else {
-                                        return false
+
+                                    if (conditional.answerBoolean !== undefined) {
+
+                                        if (conditional.answerBoolean) {
+                                            //when the trigger value is true
+                                            if (formValue) {
+                                                canShow = true
+                                            }
+                                        } else {
+                                            //when the triggervalue is false
+                                            if (! formValue) {
+                                                canShow = true
+                                            }
+                                        }
+
+
+
+
+                                    }
+    /*
+                                    //when a radio is used as the input, the value is a string rather than an object
+                                    if (typeof formValue === 'string' || formValue instanceof String) {
+                                        formValue = JSON.parse(formValue)
                                     }
                                     */
-                                }
-                                break
+                                    break
+                                case ">" :
+                                    //Only supported by integer
+
+
+                                    if (conditional.answerInteger !== undefined) {
+                                        let targetValue = parseInt(conditional.answerInteger)
+                                        let value = formValue.valueInteger
+                                        if (value > targetValue) {
+                                            return true
+                                        }
+                                        /*
+                                        if (formValue.valueString == conditional.answerString) {
+                                            return true
+                                        } else {
+                                            return false
+                                        }
+                                        */
+                                    }
+                                    break
+                            }
                         }
-                    }
+
+                        })
+
+                    return canShow
+
                 } else {
                     return true
                 }

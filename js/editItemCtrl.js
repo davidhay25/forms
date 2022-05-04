@@ -3,9 +3,6 @@ angular.module("formsApp")
         function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems,parent) {
 
 
-
-
-
             $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
@@ -121,11 +118,43 @@ angular.module("formsApp")
             //when a possible dependency source is selected. Will get the values from the source answerOption
             //needs to be at the top
             $scope.ewSelected = function(sourceItem) {
-
-                $scope.selectedSourceItem = sourceItem
-
+                $scope.selectedSourceItem = sourceItem              //this is the original - can be removed eventually
+                $scope.newEwSelectedSourceItem = sourceItem
             }
 
+            //remove one of the enableWhens
+            $scope.deleteSourceTrigger = function(inx) {
+                $scope.newItem.enableWhen.splice(inx,1)
+            }
+
+            //add a new ew - when supporting multiple
+            $scope.addNewEw = function() {
+                let source = $scope.input.newEwQuestion
+                let operator = "="
+                let ew = {question:source.linkId,operator:operator}
+                switch ($scope.newEwSelectedSourceItem.type) {
+                    case "boolean" :
+                        if ($scope.input.ewAnswerBoolean == 'yes') {
+                            ew.answerBoolean = true
+                        } else {
+                            ew.answerBoolean = false
+                        }
+
+                        break
+                    case "integer" :
+                        ew.answerInteger = $scope.input.ewAnswerInteger.valueInteger
+                        break
+                    case "choice" :
+                    case "open-choice":
+                        ew.answerCoding = $scope.input.ewAnswerConcept.valueCoding
+                        break
+                }
+                $scope.newItem.enableWhen = $scope.newItem.enableWhen || []
+                $scope.newItem.enableWhen.push(ew)
+
+
+
+            }
 
 
             if (item) {         //todo - needs refactoring - there's always an item ATM
@@ -144,6 +173,7 @@ angular.module("formsApp")
                 }
 
 
+/*
                 //set the 'enableWhen' - only 1 supported at present...
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let ew = item.enableWhen[0]
@@ -156,13 +186,11 @@ angular.module("formsApp")
                             $scope.selectedSourceItem = choiceItem
                             switch (choiceItem.type) {
                                 case 'string' :
-
                                     choiceItem.answerOption.forEach(function(opt){
                                         if (opt.valueString == ew.answerString) {
                                             $scope.input.ewAnswerString = opt
                                         }
                                     })
-
                                     break
 
                                 case 'integer' :
@@ -200,7 +228,7 @@ angular.module("formsApp")
 
 
                 }
-
+*/
                 if (editType == 'new') {
                     $scope.setHISODefaults('string')
                 }
@@ -386,7 +414,7 @@ angular.module("formsApp")
 
                 }
 
-
+/*
                 //is there a conditional defined?
                 if ($scope.selectedSourceItem) {
                     let ew
@@ -429,7 +457,7 @@ angular.module("formsApp")
 
                 }
 
-
+*/
                 if (! $scope.newItem.linkId) {
                     alert("The linkId is mandatory...")
                     return

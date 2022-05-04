@@ -295,8 +295,6 @@
 
             </uib-tab>
 
-
-
             <uib-tab heading = "Resource mapping">
 
 
@@ -407,7 +405,7 @@
 
             </uib-tab>
 
-            <uib-tab heading = "Conditional show">
+            <uib-tab ng-show = "false" heading = "Conditional show">
 
                 <div class="row">
                     <div class="col-sm-5">
@@ -517,6 +515,92 @@
             </uib-tab>
 
 
+            <uib-tab heading = "Conditional show">
+                <table class="table table-bordered">
+                    <tr><th>Source (trigger)</th><th>Operator</th><th>Value</th><th></th></tr>
+                    <tr ng-repeat="ew in newItem.enableWhen">
+                        <td>{{ew.question}}</td>
+                        <td>{{ew.operator}}</td>
+                        <td>
+                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                            <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
+                            <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+                        </td>
+                        <td><i class="btn btn-link glyphicon glyphicon-remove clickable pull-right"
+                               ng-click="deleteSourceTrigger($index)"></i>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="clickable" ng-click="input.addDependency = ! input.addDependency">Add new dependency</div>
+
+                <div class="rounded-box" ng-show="input.addDependency">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <strong>Source question</strong>
+                            <br/>
+                            <select ng-model="input.newEwQuestion" class="form-control"
+                                    ng-change = "ewSelected(input.newEwQuestion)"
+                                    ng-options = "item.text for item in dependencySources"></select>
+                            <br/>
+                            <em>The question that this one depends on</em>
+                        </div>
+
+                        <div class="col-sm-1">
+                            <div ng-show = "newEwSelectedSourceItem.type == 'integer'" style="padding-top: 8px">
+                                <input type="radio" ng-model="input.conditionalOperator" value="="/> =
+                                <div><input type="radio" ng-model="input.conditionalOperator" value=">"/> ></div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-3">
+
+                            <div ng-show = "newEwSelectedSourceItem.type == 'choice' || newEwSelectedSourceItem.type == 'open-choice'">
+                                <strong>Value to show this item</strong>
+
+                                <select ng-model="input.ewAnswerConcept"  class="form-control"
+                                        ng-options = "concept.valueCoding.display for concept in selectedSourceItem.answerOption"></select>
+
+                                <br/>
+                                {{selectedSourceItem.type}}
+                                <em>The value of the source question that will display this one</em>
+                            </div>
+
+                            <div ng-show = "newEwSelectedSourceItem.type == 'string'">
+                                <strong>Value to show this item</strong>
+                                <br/>
+                                <select ng-model="input.ewAnswerString"  class="form-control"
+                                        ng-options = "item.valueString for item in selectedSourceItem.answerOption"></select>
+                            </div>
+
+                            <div ng-show = "newEwSelectedSourceItem.type == 'integer'">
+                                <strong>Value to show this item</strong>
+                                <br/>
+                                <select ng-model="input.ewAnswerInteger"  class="form-control"
+                                        ng-options = "item.valueInteger for item in selectedSourceItem.answerOption"></select>
+                            </div>
+
+                            <div ng-show = "newEwSelectedSourceItem.type == 'boolean'">
+                                <strong>Value to show this item</strong>
+                                <br/><br/>
+                                <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
+                                <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-3">
+                            <div  style="padding-top: 20px">
+                                <button class="btn btn-danger pull-right" ng-click="addNewEw()">Add</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </uib-tab>
 
             <uib-tab ng-show = "dependantOnThis.length > 0" heading = "Dependant on this">
                 <br/>
@@ -528,6 +612,7 @@
                         <td><div ng-repeat = "ew in item.enableWhen">
                             <strong>{{ew.operator}}</strong> {{ew.answerCoding}} {{ew.answerBoolean}}
                         </div></td>
+
 
                     </tr>
                 </table>
