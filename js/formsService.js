@@ -51,6 +51,8 @@ angular.module("formsApp")
 
         canShareServer = "http://canshare/fhir/"
 
+        //ballotList
+
         function getHN(hn) {
             let name = "Unknown name"
             if (hn) {
@@ -70,6 +72,80 @@ angular.module("formsApp")
         }
 
         return {
+
+            removeQfromBallotList : function(Q) {
+                //remove the Q with the id from the ballot list
+                let deferred = $q.defer()
+                this.getBallotList().then(
+                    function (list) {
+                        let inx = -1
+                        let ref = `Questionnaire/${Q.id}`
+                        list.entry.forEach(function (entry,ctr) {
+                            if (entry.item.reference == ref) {
+                                inx = ctr
+                            }
+                        })
+
+                        if (inx > -1) {
+                            list.entry.splice(inx,1)
+                            $http.put("/ds/fhir/List/ballot",list).then(
+                                function (data) {
+                                    deferred.resolve(list)
+                                }, function(err) {
+                                    //create and return an empty ballot list
+                                    deferred.reject( err)
+                                }
+                            )
+                        } else {
+                            deferred.reject({ msg:"id not found in list"})
+                        }
+
+                        //list.entry.push({item:{display:'Lung Cancer request',reference:`Questionnaire/${id}`}})
+
+
+
+                    }
+                )
+
+                return deferred.promise
+
+            },
+            addQtoBallotList : function(Q) {
+                //add the Q with the id to the ballot list
+                let deferred = $q.defer()
+                this.getBallotList().then(
+                    function (list) {
+                        list.entry = list.entry || []
+                        list.entry.push({item:{display:Q.title,reference:`Questionnaire/${Q.id}`}})
+                        $http.put("/ds/fhir/List/ballot",list).then(
+                            function (data) {
+                                deferred.resolve(list)
+                            }, function(err) {
+                                //create and return an empty ballot list
+                                deferred.reject( err)
+                            }
+                        )
+                    }
+                )
+
+                return deferred.promise
+
+            },
+            getBallotList : function() {
+                //get List of Q's open for ballot (same as for comment)
+                let deferred = $q.defer()
+                $http.get("/ds/fhir/List/ballot").then(
+                    function (data) {
+
+                        deferred.resolve(data.data)
+                    }, function(err) {
+                        //create and return an empty ballot list
+                        deferred.resolve( {resourceType:"List",id:"ballot", status:'current',mode:'snapshot',entry:[]})
+                    }
+                )
+                return deferred.promise
+            },
+
             getServers : function(){
                 return {termServer: termServer,validationServer:validationServer}
             },
@@ -1362,201 +1438,6 @@ angular.module("formsApp")
 
             },
 
-            makeQRDEP : function(Q,form,hash,patient,practitioner) {
-                //make the QuestionnaireResponse from the form data
-                //hash is items from the Q keyed by linkId
-                //form is the data enterd keyed by linkId
-                //todo - make recursive...
-                let qrId = this.createUUID()
-                let err = false
-
-                let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
-                QR.text = {status:'generated'}
-                QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
-                QR.questionnaire = Q.url
-                QR.authored = new Date().toISOString()
-
-                let patientName = ""
-                if (patient.name) {
-                    patientName = getHN(patient.name[0])
-                }
-
-                QR.subject = {reference:"Patient/"+patient.id,display:patientName}
-
-                let practitionerName = ""
-                if (practitioner.name) {
-                    practitionerName = getHN(practitioner.name[0])
-                }
-
-                QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
-                QR.item = []
-
-
-
-                let topNode = []
-                //node is the structure that is being constructed. It has an item[] property
-                //As this routine is called
-                //item is the item from the Q that is being parsed...
-
-                function parseQ(node,item,level) {
-                    if (item.item) {
-
-
-                        let parentNode = {linkId:item.linkId,item:[],text:item.text}
-                        node.item.push(parentNode)
-
-                        item.item.forEach(function(child){
-                            if (level == 0) {
-                                level++
-                                parseQ(parentNode,child,level)
-                            }
-
-
-
-                        })
-
-                    } else {
-                        //is there a value:
-                        let value = form[item.linkId]
-                        let itemToAdd = {linkId : item.linkId,answer:[],text:item.text}
-
-                        if (value) {
-                            switch (item.type) {
-                                case "choice":
-
-                                    if (value.valueCoding) {
-                                        itemToAdd.answer.push(value)    //will be a coding
-                                    } else {
-                                        itemToAdd.answer.push({valueCoding : value})
-                                    }
-                                    //itemToAdd.answer.push({valueCoding : value})    //will be a coding
-                                    //itemToAdd.answer.push(value)    //will be a coding
-                                    break;
-                                case "decimal" :
-                                    let v = parseFloat(value)
-                                    if (v) {
-                                        itemToAdd.answer.push({valueDecimal : v })
-                                    } else {
-                                        alert("Item: " + item.text + " must be a number")
-                                    }
-
-                                    break;
-                                case "boolean":
-                                    itemToAdd.answer.push({valueBoolean : value})    //will be a coding
-                                    break;
-
-                                case "reference" :
-                                    itemToAdd.answer.push({valueReference : value})
-                                    break
-
-                                default :
-                                    itemToAdd.answer.push({valueString : value})
-                            }
-
-                            node.item = node.item || []
-                            //node.item.push({answer: answer})
-                            node.item.push(itemToAdd)
-                        }
-
-                    }
-                }
-
-                //as the Q doesn't have a single top level item, we need to iterate through them and
-                //add them independently to the QR
-                Q.item.forEach(function (topLevelItem){
-                    let childrenOfNode = {item:[]}
-                    parseQ(childrenOfNode,topLevelItem,0)
-
-                    let branchToAdd = childrenOfNode.item[0]
-                    if (branchToAdd) {
-                        if ( branchToAdd.item) {
-                            //this is a top level grouper - ie has children. Only add if there are items..
-                            //todo need more testing with more deeply nested nodes...
-                            if (branchToAdd.item.length > 0) {
-                                topNode.push(branchToAdd)
-                            }
-                        } else {
-                            //this is a 'data' element directly off the top so add it...
-                            topNode.push(branchToAdd)
-                        }
-                    }
-
-
-
-                })
-
-
-                QR.item = topNode
-
-
-
-                /*
-
-                Q.item.forEach(function (parent) {
-                    let parentItem = {linkId : parent.linkId,text:parent.text,item: []}
-                    QR.item.push(parentItem)
-                    parent.item.forEach(function (child) {
-                        let key = child.linkId  //the key for this Q item
-                        let value = form[key]
-
-                        if (value) {
-                            console.log("adding",key,value)
-                            switch (child.type) {
-                                case "boolean" :
-                                    //regardless, push the answer
-                                   // parentItem.item.push({linkId:key,answer:[{valueBoolean : value}],text:child.text})
-                                    break
-                                case "choice" :
-                                  //  if ( value && value.code) {
-                                        parentItem.item.push({linkId: key, answer:[{valueCoding: value.valueCoding}],text:child.text})
-                                  //  }
-                                    break
-                                default:
-                                    if ( value) {
-                                        parentItem.item.push({linkId:key,answer:[{valueString : value}],text:child.text})
-                                    }
-                                    break
-                            }
-                        }
-
-
-
-
-                    })
-                })
-
-*/
-                return QR
-                /*
-                                Object.keys(form).forEach(function (key) {
-                                    let value = form[key]
-                                    let item = hash[key]  //the definition of the question
-                                    if (item) {
-                                        let answer = {linkId : key}
-                                        switch (item.type) {
-
-                                            case "choice":
-                                                answer = value      //will be a coding
-                                                break;
-                                            default :
-                                                answer.valueString = value
-                                        }
-                                        QR.answer.push(answer)
-                                    } else {
-                                        err = true
-                                        console.log("The hash entry for " + key + ' is missing')
-                                    }
-
-                                })
-
-                                */
-                if (err) {
-                    //alert("there was an error creating the QR - see the browser console for details")
-                }
-
-                return QR
-
-            },
 
             makeFormDefinition : function(treeData) {
                 //create the form definition object from the treeData derived from the Q. Used by the form render include...

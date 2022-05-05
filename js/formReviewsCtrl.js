@@ -344,9 +344,12 @@ angular.module("formsApp")
                                 let arReviewComments = []
 
                                 //get all the review items (codesystem is review comment)
-                                QR.item.forEach(function (item) {
-                                    getReviewItems(arReviewComments,hashIds,item)
-                                })
+                                if (QR.item) {
+                                    QR.item.forEach(function (item) {
+                                        getReviewItems(arReviewComments,hashIds,item)
+                                    })
+                                }
+
 
                                 if (arReviewComments.length > 0) {
 

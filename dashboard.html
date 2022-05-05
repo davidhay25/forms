@@ -164,7 +164,6 @@
 
     <uib-tabset>
 
-
         <uib-tab heading="Questionnaire resources">
             <br/>
             <div class="row">
@@ -636,8 +635,25 @@
                                 <div class="col-md-9">
                                        <textarea class="form-control" ng-model="selectedQ.description"
                                                  ng-change="input.dirty = true">
-
                                        </textarea>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-11">
+                                    <div ng-switch="isQinBallot()">
+                                        <div ng-switch-when = true>
+                                            <button class="btn btn-danger pull-right"
+                                                    ng-click="removeFromBallotList()">Remove from Ballot</button>
+                                        </div>
+
+                                        <div ng-switch-default>
+                                            <button class="btn btn-primary pull-right"
+                                                    ng-click="addToBallotList()">Add to Ballot</button>
+                                        </div>
+
+                                    </div>
 
                                 </div>
                             </div>
@@ -659,6 +675,27 @@
                                     </div>
 -->
 
+                                    <br/>
+
+                                    <!--
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                        </div>
+                                        <div class="col-md-1">
+                                            Patient
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control" ng-model="input.patient"></select>
+                                        </div>
+                                        <div class="col-md-1">
+                                            Practitioner
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control" ng-model="input.practitioner"></select>
+                                        </div>
+                                    </div>
+                                    <hr/>
+-->
                                     <div ng-controller="formsCtrl">
                                         <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                     </div>
@@ -860,7 +897,7 @@
 
                         </uib-tab>
 
-                        <uib-tab heading="Json">
+                        <uib-tab heading="Q Json">
                             <pre>{{selectedQ | json}}</pre>
                         </uib-tab>
                     </uib-tabset>

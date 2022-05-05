@@ -40,10 +40,61 @@ angular.module("formsApp")
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
 
+            //retrieve the list of Qs to be balloted
+            formsSvc.getBallotList().then(
+                function (list) {
+                    $scope.ballotList = list
+                }
+            )
+
+            //return true if this Q is in the ballot list
+            $scope.isQinBallot = function() {
+                if ($scope.selectedQ && $scope.ballotList && $scope.ballotList.entry) {
+                    let ref = `Questionnaire/${$scope.selectedQ.id}`
+                    //let ar = $scope.allQ.filter(q => q.name == QName)
+
+                    let ar = $scope.ballotList.entry.filter(e => e.item.reference == ref)
+                    if (ar.length >0 ) {
+                        return true
+                    }
+
+                }
+
+            }
+
+
+            $scope.addToBallotList = function() {
+                //add the current Q to the ballot list
+                formsSvc.addQtoBallotList($scope.selectedQ).then(
+                    function (list) {
+                        $scope.ballotList = list
+                        alert("Form has been added to the list to be balloted")
+
+                    }, function (err) {
+                        alert(angular.toJson(err))
+                    }
+                )
+            }
+            
+            $scope.removeFromBallotList = function () {
+                formsSvc.removeQfromBallotList($scope.selectedQ).then(
+                    function (list) {
+                        $scope.ballotList = list
+                        alert("Form has been removed from the list to be balloted")
+                    }, function (err) {
+                        alert(angular.toJson(err))
+                    }
+                )
+            }
+
             //see what resources are generated on a submit (and any errors)
             $scope.testSubmit = function () {
                 if ($scope.selectedQR) {
                     let url = "/fr/testextract"
+
+                    if ($scope.submitChart) {
+                        $scope.submitChart.destroy()
+                    }
 
                     let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
                     bundle.entry.push({resource:$scope.selectedQR})

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>View form reviews</title>
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+    <script src="js/libs/angular-sanitize.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <style>
+        .myScroll {
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+        .obsExtract {
+            background-color: #ebcccc;
+        }
+
+
+    </style>
+
+    <script>
+        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("formsApp").constant("moment", moment);
+        angular.module("formsApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+        }]);
+
+    </script>
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <script src="js/viewFormReviewsCtrl.js"></script>
+    <script src="js/formsService.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/filters.js"></script>
+
+    <script src="directive/displayFormDir.js"></script>
+
+    <style>
+        #graph {
+            width: 100%;
+            height: 550px;
+            border: 1px solid lightgray;
+        }
+    </style>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="formsApp" ng-controller="viewFormReviewsCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5 col-sm-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            View form reviews
+                        </a>
+                    </span>
+            </div>
+
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+
+                <div class="navbar-text">
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="list-group">
+                    <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                         style="cursor: pointer"
+                         ng-click="loadDispositionsForQ(Q)"
+                         ng-repeat="Q in allQ">
+                        {{Q.name}}
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-10">
+                <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
+                    <tr><th>Reviewer</th><th>Date</th><th>Type</th><th>Comment</th><th>Disposition date</th><th>Disposition</th><th>Note</th></tr>
+                    <tr ng-repeat = "item in dispositionsForQ">
+                        <td>{{item.author}}</td>
+                        <td>{{item.authored | date : 'dd-MMM-yyyy'}}</td>
+                        <td>{{item.linkId}}</td>
+                        <td>{{item.comment}}</td>
+                        <td>{{item.dispositionDate | date : 'dd-MMM-yyyy'}}</td>
+                        <td>{{item.disposition.display}}</td>
+                        <td>{{item.note}}</td>
+                    </tr>
+                </table>
+                <!-- <pre>{{dispositionsForQ | json}}</pre> -->
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+
+</body>
+</html>
