@@ -31,6 +31,21 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'csReview',url:'http://clinfhir.com/fhir/CodeSystem/review-comment'})
             $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
 
+            $scope.qStatus = ["draft","active","retired","unknown"]
+            $scope.checkStatus = function (status) {
+                //todo check status state machine
+                //if the status is active then remove from the ballot list
+                if (status == 'active') {
+                    if ($scope.isQinBallot()) {
+                        alert("An active Q should not also be in the ballot list")
+                    }
+                } else {
+                    $scope.input.dirty = true
+                }
+
+
+            }
+
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
             $localStorage.formsVS = $localStorage.formsVS || []
@@ -51,8 +66,6 @@ angular.module("formsApp")
             $scope.isQinBallot = function() {
                 if ($scope.selectedQ && $scope.ballotList && $scope.ballotList.entry) {
                     let ref = `Questionnaire/${$scope.selectedQ.id}`
-                    //let ar = $scope.allQ.filter(q => q.name == QName)
-
                     let ar = $scope.ballotList.entry.filter(e => e.item.reference == ref)
                     if (ar.length >0 ) {
                         return true
@@ -257,9 +270,9 @@ angular.module("formsApp")
             //create a new Q
             $scope.newQ = function() {
                 $uibModal.open({
-                    templateUrl: 'modalTemplates/editQ.html',
+                    templateUrl: 'modalTemplates/newQ.html',
                     backdrop: 'static',
-                    controller: 'editQCtrl',
+                    controller: 'newQCtrl',
                     //size : 'lg',
                     resolve: {
                         Q: function () {
@@ -272,8 +285,6 @@ angular.module("formsApp")
                 }).result.then(
                     function (Q) {
                         if (Q) {
-                            //if a Q is passed back, it is a new one
-//console.log(Q)
                             Q.id = "cf-" + new Date().getTime()
                             //Q.resourceType = "Questionnaire"
                             $scope.selectedQ = Q
@@ -287,7 +298,7 @@ angular.module("formsApp")
                 )
             }
 
-            $scope.editQ = function(Q) {
+            $scope.editQDEP = function(Q) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editQ.html',

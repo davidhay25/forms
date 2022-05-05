@@ -73,6 +73,8 @@ angular.module("formsApp")
 
         return {
 
+
+
             removeQfromBallotList : function(Q) {
                 //remove the Q with the id from the ballot list
                 let deferred = $q.defer()

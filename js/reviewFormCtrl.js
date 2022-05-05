@@ -45,6 +45,22 @@ angular.module("formsApp")
                             $scope.model = exportSvc.createJsonModel(Q)
 
 
+                            //now determine if this Q is in the ballot state (able to be commented on) or just viewed
+                            formsSvc.getBallotList().then(
+                                function(ballotList) {
+                                    //returns the list of Qs under ballot
+                                    if (ballotList.entry) {
+                                        let ref = `Questionnaire/${Q.id}`
+                                        let ar = ballotList.entry.filter(e => e.item.reference == ref)
+                                        if (ar.length >0 ) {
+                                            //yes, this Q is being ballotted - can make comments
+                                            $scope.canMakeComments = true
+                                        }
+                                    }
+                                }
+                            )
+
+
 
 
                         } else {

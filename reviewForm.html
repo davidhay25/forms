@@ -135,27 +135,28 @@
 
 
 
-
+        <!-- if the Q is not being ballotted then it's view only-->
         <div class="row">
             <div class="col-md-2">
-                <input type = text ng-model = "input.reviewerName"
-                       placeholder = "Reviewer name"
-                       class="form-control"/>
+                <div ng-show="canMakeComments">
+                    <input type = text ng-model = "input.reviewerName"
+                           placeholder = "Reviewer name"
+                           class="form-control"/>
 
-                <div>
-                    <input type = text ng-model = "input.reviewerOrganization"
-                           placeholder = "Organizatione"
-                           class="form-control"/>
-                </div>
-                <div>
-                    <input type = text ng-model = "input.reviewerEmail"
-                           placeholder = "Email"
-                           class="form-control"/>
+                    <div>
+                        <input type = text ng-model = "input.reviewerOrganization"
+                               placeholder = "Organizatione"
+                               class="form-control"/>
+                    </div>
+                    <div>
+                        <input type = text ng-model = "input.reviewerEmail"
+                               placeholder = "Email"
+                               class="form-control"/>
+                    </div>
                 </div>
             </div>
             <div class="col-md-10">
                 <div>
-
 
                     <i ng-show = "selectedQ.description" class="glyphicon glyphicon-info-sign pull-right"
                        uib-popover="{{selectedQ.description}}"
@@ -168,27 +169,30 @@
 
                 </div>
 
-                <div ng-show = "input.alertMsg" class="alert alert-warning" close = "closeAlert()">
-                    <div class="btn btn-default pull-right" style="margin-top: 1px"
-                         ng-click="closeAlert()">Close</div>
-                    <div class="text-center">
-                        <strong>{{input.alertMsg}}</strong>
+                <div ng-show="canMakeComments">
+                    <div ng-show = "input.alertMsg" class="alert alert-warning" close = "closeAlert()">
+                        <div class="btn btn-default pull-right" style="margin-top: 1px"
+                             ng-click="closeAlert()">Close</div>
+                        <div class="text-center">
+                            <strong>{{input.alertMsg}}</strong>
+                        </div>
                     </div>
                 </div>
 
-
-
                 <div class="row">
-
                     <div class="col-md-3">
-                        <input type="radio" ng-model="input.canPublish" value="yes"/> My submission can be published
-                        <div><input type="radio" ng-model="input.canPublish" value="no"/> My submission cannot be published</div>
+                        <div ng-show="canMakeComments">
+                            <input type="radio" ng-model="input.canPublish" value="yes"/> My submission can be published
+                            <div><input type="radio" ng-model="input.canPublish" value="no"/> My submission cannot be published</div>
+                        </div>
                     </div>
 
                     <div class="col-md-4">
-                        <input type="radio" ng-model="input.includeOIA" value="yes"/> My personal details can be included in OIA requests
-                        <div><input type="radio" ng-model="input.includeOIA" value="no"/> My personal details should be removed from OIA requests </div>
-                    </div>
+                        <div ng-show="canMakeComments">
+                            <input type="radio" ng-model="input.includeOIA" value="yes"/> My personal details can be included in OIA requests
+                            <div><input type="radio" ng-model="input.includeOIA" value="no"/> My personal details should be removed from OIA requests </div>
+                            </div>
+                        </div>
 
                     <div class="col-md-5">
 

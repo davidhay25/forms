@@ -2,11 +2,6 @@ angular.module("formsApp")
     .controller('frontPageCtrl',
         function ($scope,$http,formsSvc) {
 
-            //todo - load the List resource - dashboard adds / removes from the list
-         //   $scope.listQ = {resourceType:"List",status:'current',mode:'snapshot',entry:[]}
-           // $scope.listQ.entry.push({item:{display:'Lung Cancer request',reference:'Questionnaire/QLungCancer'}})
-          //  $scope.listQ.entry.push({item:{display:'Cervical Cancer request',reference:'Questionnaire/cf-1651534960400'}})
-
 
             formsSvc.getBallotList().then(
                 function (list) {
@@ -31,9 +26,22 @@ angular.module("formsApp")
                 }
             )
 
-            //let server =
+            $scope.reviewComments = function() {
+                alert("Todo. should this be all current comments or only those with dispositions? Sorta depends on the target audience...")
+            }
 
+            let url = "/ds/fhir/Questionnaire?status=active"
 
+            $http.get(url).then(
+                function (data) {
+                    $scope.activeQ = [];
+                    if (data.data.entry) {
+                        data.data.entry.forEach(function (entry){
+                            $scope.activeQ.push(entry.resource)
+                        })
+                    }
+                }
+            )
 
 
 /*

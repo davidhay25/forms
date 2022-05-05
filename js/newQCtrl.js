@@ -1,15 +1,16 @@
 
-//edit the Q metadata
+// a new Q  - NOT editing any more
 
 angular.module("formsApp")
-    .controller('editQCtrl',
-        function ($scope,$http,formsSvc,Q,allQ) {
+    .controller('newQCtrl',
+        function ($scope,$http,formsSvc,allQ) {
 
             $scope.allQ = allQ
             $scope.input = {}
             $scope.input.section = {}
             let QBase = "http://canshare.com/fhir/Questionnaire/" //just for the url
-
+            $scope.Q = {resourceType:'Questionnaire',status:"draft",item:[]}
+            /*
             if (Q) {
                 $scope.Q = angular.copy(Q)  //needs to be a clone so can cancel edits
                 $scope.editType = "edit"
@@ -17,7 +18,7 @@ angular.module("formsApp")
                 $scope.editType = "new"
                 $scope.Q = {resourceType:'Questionnaire',item:[]}
             }
-
+*/
             //$scope.input = {}
 
             $scope.updateUrl = function (name) {
@@ -34,8 +35,6 @@ angular.module("formsApp")
 
             $scope.checkSection = function(linkId,checked) {
                 console.log(linkId,checked)
-
-
             }
 
             $scope.showSection = function(linkId){
@@ -47,6 +46,19 @@ angular.module("formsApp")
             }
 
             $scope.save = function() {
+                //check for selected sections
+                if ($scope.eQ) {
+                    $scope.eQ.item.forEach(function (section) {
+                        if ($scope.input.section[section.linkId]) {
+                            $scope.Q.item = $scope.Q.item || []
+                            $scope.Q.item.push(section)
+                        }
+                    })
+                }
+
+                $scope.$close($scope.Q)
+                /*
+
                 if ($scope.editType == "edit") {
                     //can update the properties of the Q that was passed in
                     if ($scope.Q.name.indexOf(" ") > -1) {
@@ -54,6 +66,7 @@ angular.module("formsApp")
                         return
                     }
                     Q.id = $scope.Q.name
+                    Q.status = $scope.Q.status
                     Q.url = $scope.Q.url
                     Q.name = $scope.Q.name
                     Q.title = $scope.Q.title
@@ -73,8 +86,8 @@ angular.module("formsApp")
                     }
 
                     $scope.$close($scope.Q)
-
-                }
+*/
+               // }
 
             }
 

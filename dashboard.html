@@ -85,14 +85,14 @@
     <script src="js/dashboardCtrl.js"></script>
     <script src="js/formsService.js"></script>
     <script src="js/editItemCtrl.js"></script>
-    <script src="js/editQCtrl.js"></script>
+
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 
     <script src="js/formsCtrl.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
-
+    <script src="js/newQCtrl.js"></script>
     <script src="js/exportSvc.js"></script>
     <script src="js/importSectionCtrl.js"></script>
     <script src="js/importGroupCtrl.js"></script>
@@ -589,6 +589,12 @@
                         <uib-tab heading="Q metadata">
                             <br/>
                             <div class="row">
+                                <div class="col-md-6">
+
+
+
+                            <div class="row">
+
                                 <div class="col-md-2">
                                     Id
                                 </div>
@@ -597,14 +603,6 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-2">
-                                    Name
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
-                                </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-2">
@@ -620,13 +618,14 @@
                                     Title
                                 </div>
                                 <div class="col-md-9">
-                                       <textarea class="form-control" ng-model="selectedQ.title"
-                                                 ng-change="input.dirty = true">
+                               <textarea class="form-control" ng-model="selectedQ.title"
+                                         ng-change="input.dirty = true">
 
-                                       </textarea>
+                               </textarea>
 
                                 </div>
                             </div>
+
 
                             <div class="row">
                                 <div class="col-md-2">
@@ -640,23 +639,59 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-11">
-                                    <div ng-switch="isQinBallot()">
-                                        <div ng-switch-when = true>
-                                            <button class="btn btn-danger pull-right"
-                                                    ng-click="removeFromBallotList()">Remove from Ballot</button>
-                                        </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        Status
+                                    </div>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="selectedQ.status"
+                                                ng-change="checkStatus(selectedQ.status)"
+                                                ng-options="status for status in qStatus">
 
-                                        <div ng-switch-default>
-                                            <button class="btn btn-primary pull-right"
-                                                    ng-click="addToBallotList()">Add to Ballot</button>
-                                        </div>
+                                        </select>
+
 
                                     </div>
+                                </div>
 
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        Name
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        Version
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div ng-switch="isQinBallot()">
+                                    <div ng-switch-when = true>
+                                        <button class="btn btn-danger pull-right"
+                                                ng-click="removeFromBallotList()">Remove from Ballot</button>
+                                    </div>
+
+                                    <div ng-switch-default>
+                                        <button class="btn btn-primary pull-right"
+                                                ng-click="addToBallotList()">Add to Ballot</button>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
                         </uib-tab>
 
@@ -917,9 +952,7 @@
         </uib-tab>
 
 
-        <uib-tab ng-show="false" heading="Query server">
-            <em>Query for supported resources - ? or link to Server Query - yes!</em>
-        </uib-tab>
+
 
         <uib-tab ng-show="false" heading="Provenance">
             <br/>
@@ -991,89 +1024,12 @@
                 <ng-include src = "'includes/terminology.html'"></ng-include>
 
             </div>
-<!--
-                <div ng-show="false" class="row">
-                    <div class="col-md-2">
-                        <br/>
-                        <button class="btn btn-link " ng-click="addVS()">Add VS</button>
-                        <br/>
-                        <div class="list-group">
-                            <div ng-class="{'list-group-item':true}"
-                                 ng-click="selectVS(vs)"
-                                 ng-repeat="vs in input.vsList">
-                                {{vs.display}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <pre>{{selectedVsItem | json}}</pre>
-                                <br/>
-                                <pre>{{selectedVs | json}}</pre>
-                            </div>
-                            <div class="col-md-6">
-                                <h4>Expansion</h4>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <button class="btn btn-link" ng-click="expandVS(selectedVs.url,input.filter)">Expand</button>
-                                    </div>
-                                </div>
-
-                                <uib-tabset>
-                                    <uib-tab heading="Json">
-                                        <pre>{{expandedVs | json}}</pre>
-                                    </uib-tab>
-                                    <uib-tab heading="List">
-                                        <table class="table table-bordered table-condensed">
-                                            <tr ng-repeat="concept in expandedVs.expansion.contains">
-                                                <td>{{concept.code}}</td>
-                                                <td>{{concept.display}}</td>
-                                                <td>{{concept.system}}</td>
-                                            </tr>
-                                        </table>
-
-                                    </uib-tab>
-
-                                </uib-tabset>
-
-
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-
--->
-            </uib-tab>
-
-
-        <uib-tab ng-show="false" heading="Q item library">
-            <br/>
-            <ul>
-                <li>A collection of Q items that can be directly added to a new Q </li>
-                <li>eg individual iteme (diagnosis lookup with valueset / codes set</li>
-                <li>complete sections - eg TNM items</li>
-                <li>? store as single 'reference' Q and the Q builder can select</li>
-            </ul>
-
-
-        </uib-tab>
-
-
-        <uib-tab ng-show="false" heading="External services">
-                <br/>
-                <uib-tabset>
-                    <uib-tab heading="NHI"></uib-tab>
-                    <uib-tab heading="HPI"></uib-tab>
-                </uib-tabset>
 
             </uib-tab>
+
+
+
+
 
 
 

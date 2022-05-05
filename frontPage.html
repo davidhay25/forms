@@ -116,34 +116,60 @@
 
 
         <div class="row">
+
             <div class="col-md-6">
-                <h4>Applications</h4>
+                <h4>Datasets open for review</h4>
 
                 <table class="table table-bordered">
-                    <tr><th width="20%">Application</th><th width="40%">Description</th><th>Notes and todo</th></tr>
-                    <tr>
-                        <td><a href="viewFormReviews.html" target="_blank">View comment dispositions</a></td>
-                        <td>All comments that are made against any data model are formally reviewed by
-                        the Working Group responsible for that model, and the disposition of the
-                        comment is recorded.
-
-                        </td>
+                    <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
+                    <tr ng-repeat = "entry in ballotList.entry">
+                        <td>{{entry.item.display}}</td>
+                        <td>{{entry.item.Q.version}}</td>
+                        <td>{{entry.item.Q.description}}</td>
                         <td>
-                            <p>Should there be some way to specify the model here, or is the selection in the app
-                                enough?</p>
-                            <p>todo: hide the responses where the commenter has requested that their comment not
-                                be displayed - or just hide their name?</p>
+                            <div ng-show="entry.item.Q">
+                                <a target="_blank"
+                                   ng-href="reviewForm.html?{{entry.item.Q.url}}">
+                                    Load form
+                                </a>
+                                <div>
+                                    <div class="clickable" ng-click="reviewComments()">Review comments</div>
+                                    <!--
+                                    <a target="_blank"
+                                       ng-href="reviewForm.html?{{entry.item.Q.url}}">
+                                        Review comments
+                                    </a>
+                                    -->
+                                </div>
+                            </div>
                         </td>
-                    </tr>
-                    <tr>
-                        <td><a href="dashboard.html.html" target="_blank">Forms designer</a></td>
-                        <td>The application that allows models and forms to be created and edited</td>
-                        <td>Some user authentication needed
-                        <p>?hide entry unless user has logged in</p>
-                        </td>
-                    </tr>
 
+
+                    </tr>
                 </table>
+
+
+                <h4>Approved Datasets</h4>
+
+                <table class="table table-bordered">
+                    <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
+                    <tr ng-repeat = "Q in activeQ">
+                        <td>{{Q.title}}</td>
+                        <td>{{Q.version}}</td>
+
+                        <td>{{Q.description}}</td>
+                        <td>
+                            <a target="_blank"
+                               ng-href="reviewForm.html?{{Q.url}}">
+                                Load form
+                            </a>
+                        </td>
+
+
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
 
                 <h4>Implementation Guides</h4>
 
@@ -151,7 +177,7 @@
                 <table class="table table-bordered">
                     <tr><th width="20%">Link to IG</th><th width="40%">Description</th><th>Notes and todo</th></tr>
                     <tr>
-                        <td><a href="http://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">View comment dispositions</a></td>
+                        <td><a href="http://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">ACT-NOW</a></td>
                         <td>The ACT-NOW Implementation Guide describes how to record chemotherapy data.
                         </td>
                         <td>
@@ -170,71 +196,53 @@
 
                         </td>
                     </tr>
+                    <tr>
+                        <td><a href="http://build.fhir.org/ig/HL7NZ/structured-path/branches/main/index.html" target="_blank">Models</a></td>
+                        <td>The approved models. Has the Logical model, descriptive text, mappings to FHIR resources etc.
+                        </td>
+                        <td>
+                            Is there a single IG for all models, one per model or some other grouping of models?
+                            <p>Who is the audience for the IG? Generally they are for implementers</p>
+
+                        </td>
+                    </tr>
                 </table>
 
 
-
-
-            </div>
-            <div class="col-md-6">
-                <h4>Datasets open for review</h4>
+                <h4>Applications</h4>
+                <em>These are modules from the Reference Implementation. Is this needed on this page?</em>
 
                 <table class="table table-bordered">
-                    <tr ng-repeat = "entry in ballotList.entry">
-                        <td>{{entry.item.display}}</td>
-                        <td>{{entry.item.Q.description}}</td>
-                        <td>
-                            <div ng-show="entry.item.Q">
-                                <a target="_blank"
-                                   ng-href="reviewForm.html?{{entry.item.Q.url}}">
-                                    Load form
-                                </a>
-                            </div>
+                    <tr><th width="20%">Application</th><th width="40%">Description</th><th>Notes and todo</th></tr>
+                    <tr>
+                        <td><a href="viewFormReviews.html" target="_blank">View comment dispositions</a></td>
+                        <td>All comments that are made against any data model are formally reviewed by
+                            the Working Group responsible for that model, and the disposition of the
+                            comment is recorded.
+
                         </td>
-
-
+                        <td>
+                            <p>Should there be some way to specify the model here, or is the selection in the app
+                                enough?</p>
+                            <p>todo: hide the responses where the commenter has requested that their comment not
+                                be displayed - or just hide their name?</p>
+                        </td>
                     </tr>
+                    <tr>
+                        <td><a href="dashboard.html" target="_blank">Forms designer</a></td>
+                        <td>The application that allows models and forms to be created and edited</td>
+                        <td>Some user authentication needed
+                            <p>?hide entry unless user has logged in</p>
+                        </td>
+                    </tr>
+
                 </table>
 
 
-
             </div>
-
 
         </div>
 
-        <!---
-        <div class="row">
-            <div class="col-md-2">
-                <div class="list-group">
-                    <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                         style="cursor: pointer"
-                         ng-click="loadDispositionsForQ(Q)"
-                         ng-repeat="Q in allQ">
-                        {{Q.name}}
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-md-10">
-                <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
-                    <tr><th>Reviewer</th><th>Date</th><th>Type</th><th>Comment</th><th>Disposition date</th><th>Disposition</th><th>Note</th></tr>
-                    <tr ng-repeat = "item in dispositionsForQ">
-                        <td>{{item.author}}</td>
-                        <td>{{item.authored | date : 'dd-MMM-yyyy'}}</td>
-                        <td>{{item.linkId}}</td>
-                        <td>{{item.comment}}</td>
-                        <td>{{item.dispositionDate | date : 'dd-MMM-yyyy'}}</td>
-                        <td>{{item.disposition.display}}</td>
-                        <td>{{item.note}}</td>
-                    </tr>
-                </table>
-
-            </div>
-        </div>
-
-
--->
 
 
     </div>
