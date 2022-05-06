@@ -1,0 +1,48 @@
+<br/>
+
+<table class="table table-bordered table-condensed">
+    <tr><th>Display</th><th>Code</th><th>System</th></tr>
+    <tr ng-repeat = "option in selectedValueSet.compose.include">
+        <td>{{option.valueCoding.display}}</td>
+        <td>{{option.valueCoding.code}}</td>
+        <td>
+            {{option.valueCoding.system}}
+        </td>
+
+        <td>
+            <i class=" clickable glyphicon glyphicon-remove"
+               ng-click = "removeOption($index)"></i>
+        </td>
+        <td>
+            <i class=" clickable glyphicon glyphicon-arrow-up" ng-show="$index > 0"
+               ng-click = "moveAnswerUp($index)"></i>
+            <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < selectedValueSet.compose.include.length -1"
+               ng-click = "moveAnswerDown($index)"></i>
+
+        </td>
+    </tr>
+    <tr>
+        <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
+        <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
+        <td>
+
+            <select class="form-control" ng-model="input.newAnswerSystem"
+                    ng-options = "system.display for system in input.codeSystems"></select>
+
+
+        </td>
+
+        <td>
+            <i ng-show=" input.newAnswerDisplay"
+               class="clickable glyphicon glyphicon-plus-sign"
+               ng-click = "addOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
+    </tr>
+</table>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-primary" ng-click="save()">Save</button>
+    </div>
+</div>
+<pre>{{selectedValueSet | json}}</pre>

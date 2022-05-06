@@ -1,0 +1,131 @@
+<div>
+    <!-- Assume in dashBoard controller-->
+<div class="row">
+    <div class="col-md-6">
+
+        <div class="row">
+
+            <div class="col-md-2">
+                Id
+            </div>
+            <div class="col-md-9">
+                <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-2">
+                Url
+            </div>
+            <div class="col-md-9">
+                <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                Title
+            </div>
+            <div class="col-md-9">
+               <textarea class="form-control" ng-model="selectedQ.title"
+                         ng-change="input.dirty = true">
+
+               </textarea>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-2">
+                Description
+            </div>
+            <div class="col-md-9">
+                   <textarea class="form-control" ng-model="selectedQ.description"
+                             ng-change="input.dirty = true">
+                   </textarea>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                Folders
+            </div>
+            <div class="col-md-9">
+                <table class="table table-bordered">
+                    <tr><th>Code (folder)</th><th>Display</th><th></th></tr>
+                    <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem">
+                        <td>{{tag.code}}</td>
+                        <!--<td>{{tag.system}}</td> todo maybe as a popover-->
+                        <td>{{tag.display}}</td>
+                        <td><i class=" clickable glyphicon glyphicon-remove"
+                               ng-click = "removeTag($index)"></i></td>
+                    </tr>
+                    <tr>
+                        <td><input class="form-control" type="text" ng-model="input.newTagCode"/></td>
+                        <td><input class="form-control" type="text" placeholder="Optional" ng-model="input.newTagDisplay"/></td>
+                        <td><i class=" clickable glyphicon glyphicon-plus-sign"
+                               ng-click = "addTag(input.newTagCode,tagFolderSystem,input.newTagDisplay)"></i></td>
+                    </tr>
+                </table>
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-2">
+                Status
+            </div>
+            <div class="col-md-9">
+                <select class="form-control" ng-model="selectedQ.status"
+                        ng-change="checkStatus(selectedQ.status)"
+                        ng-options="status for status in qStatus">
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                Name
+            </div>
+            <div class="col-md-9">
+                <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                Version
+            </div>
+            <div class="col-md-9">
+                <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <div ng-switch="isQinBallot()">
+            <div ng-switch-when = true>
+                <button class="btn btn-danger pull-right"
+                        ng-click="removeFromBallotList()">Remove from Ballot</button>
+            </div>
+
+            <div ng-switch-default>
+                <button class="btn btn-primary pull-right"
+                        ng-click="addToBallotList()">Add to Ballot</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

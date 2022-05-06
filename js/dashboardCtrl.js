@@ -17,8 +17,6 @@ angular.module("formsApp")
                 )
             }
 
-
-
             $scope.input = {}
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference','display']
 
@@ -31,7 +29,66 @@ angular.module("formsApp")
             $scope.input.codeSystems.push({display:'csReview',url:'http://clinfhir.com/fhir/CodeSystem/review-comment'})
             $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
 
+            //system url for folder tags
+            $scope.tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
+
             $scope.qStatus = ["draft","active","retired","unknown"]
+
+            $scope.addTag = function(code,system,display) {
+                $scope.folderTags[code] = {code:code}
+                $scope.selectedQ.meta = $scope.selectedQ.meta || {}
+                $scope.selectedQ.meta.tag = $scope.selectedQ.meta.tag || []
+                $scope.selectedQ.meta.tag.push({code:code,system:system,display:display})
+                delete $scope.input.newTagDisplay
+                delete $scope.input.newTagCode
+                $scope.input.dirty = true
+            }
+
+            $scope.removeTag = function(inx) {
+                $scope.selectedQ.meta.tag.splice(inx,1)
+                $scope.input.dirty = true
+            }
+
+            $scope.selectTag = function(){
+                delete $scope.selectedQ
+            }
+
+
+            //determines if an individual Q can be shown in the list - folder support
+            $scope.canShowQ = function(Q) {
+                if ($scope.input.selectedFolderTag) {
+                    //a folder has been selected - does this Q have the required tag?
+                    if ($scope.input.selectedFolderTag.code == 'all') {
+                        //changing a tag deletes the selected Q - this will select the first one
+                        if (! $scope.selectedQ) {
+                            $scope.selectedQ = Q
+                        }
+                        return true
+                    } else {
+                        if (Q.meta && Q.meta.tag) {
+                            let rslt = false
+                            Q.meta.tag.forEach(function (tag) {
+                                if (tag.system == $scope.tagFolderSystem && tag.code == $scope.input.selectedFolderTag.code) {
+                                    if (! $scope.selectedQ) {
+                                        $scope.selectedQ = Q
+                                    }
+                                    rslt = true
+                                }
+                            })
+                            return  rslt
+                        } else {
+                            return false
+                        }
+                    }
+
+                } else {
+                    return true
+                }
+
+                //console.log($scope.input.selectedFolderTag)
+
+            }
+
             $scope.checkStatus = function (status) {
                 //todo check status state machine
                 //if the status is active then remove from the ballot list
@@ -719,21 +776,7 @@ angular.module("formsApp")
                 return resultNode
             }
 
-            $scope.expandVSDEP = function(url,filter) {
-                let qry =  termServer + "ValueSet/$expand?url=" + url
-                if (filter) {
-                    qry += "&filter="+filter
-                }
 
-                $http.get(qry).then(
-                    function(data){
-                        $scope.expandedVs  = data.data
-
-                    }, function(err) {
-
-                    }
-                )
-            }
 
             $scope.selectVS = function(vsItem) {
                 clearWorkArea()
@@ -981,7 +1024,13 @@ angular.module("formsApp")
 
             function loadAllQ() {
                 let url = "/ds/fhir/Questionnaire"
-                //let url = "/fm/fhir/Questionnaire"
+
+                let t = {code:'all'}
+                $scope.folderTags = {} //
+                $scope.folderTags['all'] = t
+
+                $scope.input.selectedFolderTag = {code:"all"}
+
                 $http.get(url).then(
                     function (data) {
                         $scope.allQ = [];
@@ -989,9 +1038,18 @@ angular.module("formsApp")
 
                             $scope.allQ.push(entry.resource)
 
+                            //populate tag list
+                            if (entry.resource && entry.resource.meta && entry.resource.meta.tag) {
+                                entry.resource.meta.tag.forEach(function (tag) {
+                                    if (tag.system == $scope.tagFolderSystem) {
+                                        $scope.folderTags[tag.code] = tag
+                                    }
+                                })
+                            }
                         })
+
                         $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
-                       // console.log($scope.hashTerminology)
+
                     }
                 )
             }

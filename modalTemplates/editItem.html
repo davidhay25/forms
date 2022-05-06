@@ -360,7 +360,8 @@
 
             </uib-tab>
 
-            <uib-tab ng-show="newItem.type == 'choice' || newItem.type == 'open-choice'" >
+
+            <uib-tab ng-show="! newItem.answerValueSet && (newItem.type == 'choice' || newItem.type == 'open-choice')" >
                 <uib-tab-heading>Options <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
                 <table class="table table-bordered table-condensed">
@@ -404,6 +405,20 @@
                 </table>
 
             </uib-tab>
+
+            <uib-tab ng-show = "newItem.answerValueSet" heading = "ValueSet contents">
+
+                if one of our VS (?publisher ?url root) - allow editing. simple list of concepts. later could have $expand
+                If not, then allow $expand
+
+                <div ng-controller="terminologyCtrl">
+                    <ng-include src = "'includes/vsEditor.html'"></ng-include>
+                </div>
+
+
+
+            </uib-tab>
+
 
             <uib-tab ng-show = "false" heading = "Conditional show">
 

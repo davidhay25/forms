@@ -103,9 +103,6 @@
     <script src="js/libs/vis.min.js"></script>
     <!--  <script src="js/dispositionCtrl.js"></script> -->
 
-
-
-
 </head>
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="formsApp" ng-controller="dashboardCtrl" class="container-fluid">
@@ -168,17 +165,31 @@
             <br/>
             <div class="row">
                 <div class="col-md-2">
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            Folder
+                        </div>
+                        <div class="col-md-8">
+                            <select class="form-control" ng-model="input.selectedFolderTag"
+                                    ng-change = "selectTag()"
+                                    ng-options = "coding.code for coding in folderTags">
+                            </select>
+                        </div>
+                    </div>
+                    <br/>
+
                     <div class="myScroll">
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
                                  style="cursor: pointer"
+                                 ng-show="canShowQ(Q)"
                                  ng-click="selectQ(Q)"
                                  ng-repeat="Q in allQ">
                                 {{Q.name}}
                             </div>
                         </div>
                     </div>
-
 
                     <button class="btn btn-link"
                             ng-click="newQ()">
@@ -588,110 +599,8 @@
 
                         <uib-tab heading="Q metadata">
                             <br/>
-                            <div class="row">
-                                <div class="col-md-6">
 
-
-
-                            <div class="row">
-
-                                <div class="col-md-2">
-                                    Id
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="col-md-2">
-                                    Url
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-2">
-                                    Title
-                                </div>
-                                <div class="col-md-9">
-                               <textarea class="form-control" ng-model="selectedQ.title"
-                                         ng-change="input.dirty = true">
-
-                               </textarea>
-
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="col-md-2">
-                                    Description
-                                </div>
-                                <div class="col-md-9">
-                                       <textarea class="form-control" ng-model="selectedQ.description"
-                                                 ng-change="input.dirty = true">
-                                       </textarea>
-
-                                </div>
-                            </div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        Status
-                                    </div>
-                                    <div class="col-md-9">
-                                        <select class="form-control" ng-model="selectedQ.status"
-                                                ng-change="checkStatus(selectedQ.status)"
-                                                ng-options="status for status in qStatus">
-
-                                        </select>
-
-
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        Name
-                                    </div>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        Version
-                                    </div>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div ng-switch="isQinBallot()">
-                                    <div ng-switch-when = true>
-                                        <button class="btn btn-danger pull-right"
-                                                ng-click="removeFromBallotList()">Remove from Ballot</button>
-                                    </div>
-
-                                    <div ng-switch-default>
-                                        <button class="btn btn-primary pull-right"
-                                                ng-click="addToBallotList()">Add to Ballot</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            <ng-include src = "'includes/qMetaData.html'"></ng-include>
 
                         </uib-tab>
 
@@ -1021,6 +930,7 @@
 
             <div ng-controller="terminologyCtrl">
                 <br/>
+
                 <ng-include src = "'includes/terminology.html'"></ng-include>
 
             </div>
