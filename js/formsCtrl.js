@@ -5,9 +5,13 @@ angular.module("formsApp")
         function ($scope,$http,formsSvc,$uibModal) {
 
 
-            $scope.datePopup = {opened :false}
-            $scope.openDate = function() {
-                $scope.datePopup.opened = true
+           // $scope.datePopup = {opened :false}
+            $scope.datePopup = {}
+
+
+            $scope.openDate = function(linkId) {
+                $scope.datePopup[linkId] = {opened:true}
+               // $scope.datePopup.opened = true
             }
 
 

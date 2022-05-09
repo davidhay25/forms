@@ -214,9 +214,10 @@ angular.module("formsApp")
                         $scope.input = {}
 
                         $scope.input.dispositionOptions = []
-                        $scope.input.dispositionOptions.push({system:csDisposition,code:'accept','display':"Approved with no suggested changes"})
-                        $scope.input.dispositionOptions.push({system:csDisposition,code:'mod','display':"Approved with suggested changes"})
-                        $scope.input.dispositionOptions.push({system:csDisposition,code:'decline','display':"Not approved"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'accept','display':"Change fully accepted"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'mod','display':"Change partially accepted"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'decline','display':"Change not accepted"})
+                        $scope.input.dispositionOptions.push({system:csDisposition,code:'noted','display':"Noted"})
 
                         $scope.review = review
                         let linkId = review.linkId      //the comment in the QR

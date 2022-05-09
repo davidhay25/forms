@@ -55,14 +55,16 @@
             <div ng-switch-when="date">
 
                 <p class="input-group">
+
                     <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
-                           ng-model="form[cell.item.linkId]" is-open="datePopup.opened"
+                           ng-model="form[cell.item.linkId]" is-open="datePopup[cell.item.linkId].opened"
                            ng-blur="makeQR(cell.item.linkId)"/>
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" ng-click="openDate()">
+                        <button type="button" class="btn btn-default" ng-click="openDate(cell.item.linkId)">
                             <i class="glyphicon glyphicon-calendar"></i>
                         </button>
                       </span>
+
                 </p>
 
 

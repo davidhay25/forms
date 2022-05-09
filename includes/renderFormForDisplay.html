@@ -22,41 +22,13 @@
 
     <div class="banner">Pathology request form</div>
 
-    <!-- Assume that the for itself has demographics entries
-
-    <div class="row" ng-show="selectedPatient">
-        <div class="col-md-3">
-            <div class="section">Demographics</div>
-
-        </div>
-        <div class="col-md-9">
-
-        </div>
-    </div>
-
-    <div class="row" ng-show="selectedPatient">
-        <div class="col-md-3">
-
-
-        </div>
-        <div class="col-md-9">
-
-            <div>{{selectedPatient.name[0] | HumanName}}</div>
-            <div>{{selectedPatient | NHI}}</div>
-            <div>{{selectedPatient.gender}} {{selectedPatient.birthDate}}</div>
-
-
-        </div>
-    </div>
--->
 
     <div ng-repeat="section in selectedQR.item">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <div class="section">{{section.text}}</div>
             </div>
-            <div class="col-md-8">
-            </div>
+
         </div>
 
 

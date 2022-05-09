@@ -8,6 +8,7 @@
     </div>
 
     <div class="col-md-8">
+
         <div ng-show="answer.valueDecimal">
             {{answer.valueDecimal}}
         </div>
@@ -25,6 +26,10 @@
         </div>
         <div ng-show="answer.valueReference">
             {{answer.valueReference.display}}
+        </div>
+
+        <div ng-show="answer.valueDate">
+            {{answer.valueDate}}
         </div>
     </div>
 

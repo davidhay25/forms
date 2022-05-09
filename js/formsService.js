@@ -1481,11 +1481,15 @@ console.log(expandedVS)
 
                         case "date":
                             //remove the time component. value is a Date object
-                            let dateStr = value.toISOString()
-                            let ar = dateStr.split('T')
+
+                            result = {valueDate: moment(value).format("YYYY-MM-DD")}
+                            //let dateStr = value.toISOString()
 
 
-                            result = {valueDate : ar[0]}
+                           // let ar = dateStr.split('T')
+
+
+                           // result = {valueDate : ar[0]}
 
                             break;
 
