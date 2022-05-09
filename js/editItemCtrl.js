@@ -1,6 +1,6 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
-        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems,parent) {
+        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems,parent,$uibModal) {
 
 
             $scope.parent = parent
@@ -22,6 +22,36 @@ angular.module("formsApp")
             } else {
                 $scope.newItem = angular.copy(item)
             }
+
+            //create a new VS for this item - or edit the existing
+            $scope.editVS = function(url){
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsEditor.html',
+                    backdrop: 'static',
+                    controller: 'vsEditorCtrl',
+                    size : 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        },
+                        modes : function() {
+                            return ['select','view','edit']
+                        }
+                    }
+                }).result.then(
+                    function (vs) {
+                        if (vs) {
+                            $scope.newItem.answerValueSet = vs.url
+                        }
+
+
+                    }
+
+                )
+            }
+
+
 
             //has to be above check for new
             $scope.setHISODefaults = function(typ) {

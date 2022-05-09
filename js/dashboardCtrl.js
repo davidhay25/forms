@@ -34,6 +34,24 @@ angular.module("formsApp")
 
             $scope.qStatus = ["draft","active","retired","unknown"]
 
+            $scope.viewVS = function(url){
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsEditor.html',
+                    backdrop: 'static',
+                    controller: 'vsEditorCtrl',
+                    size : 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        },
+                        modes: function () {
+                            return ['view','edit']  //todo remove select
+                        }
+                    }
+                })
+            }
+
             $scope.addTag = function(code,system,display) {
                 $scope.folderTags[code] = {code:code}
                 $scope.selectedQ.meta = $scope.selectedQ.meta || {}

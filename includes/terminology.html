@@ -35,7 +35,20 @@
                         </uib-tab>
                         <uib-tab heading="Expand VS Contents">
 
-                            <h4>Expansion</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h4>Expansion</h4>
+                                </div>
+                                <div class="col-md-8">
+
+                                    <div class="clickable pull-right" ng-click="viewVS(selectedVSUrl)">
+                                        Edit {{selectedVSUrl}}</div>
+
+                                </div>
+                            </div>
+
+
+
                             <div class="row">
                                 <div class="col-md-4">
                                     <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
@@ -84,9 +97,9 @@
                         <uib-tab heading="Edit contents">
 
                             <br/>
-
-                            <ng-include src = "'includes/vsEditor.html'"></ng-include>
-
+<!--
+                            <ng-include src = "'includes/terminology.html'"></ng-include>
+-->
 
                             <!--
                             <table class="table table-bordered table-condensed">

@@ -73,8 +73,6 @@ angular.module("formsApp")
 
         return {
 
-
-
             removeQfromBallotList : function(Q) {
                 //remove the Q with the id from the ballot list
                 let deferred = $q.defer()
@@ -870,12 +868,45 @@ angular.module("formsApp")
                 }
 
 
-                //if the item has answervalueSet and the rendering is dorpdorn or radio then fetch the values from the
-                //term server and add them to the meta (so they can't update the item)
+                //if the item has answerValueSet and the rendering is dropdorn or radio then fetch the values from the
+                //term server and add them to the meta (so they can't update the item). They will never be saved back....
                 //todo - this could be non-perormant when editing / previewing, do we care?
                 function fillFromValueSet(cell,termServer) {
 
                     if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {
+
+                        //We can't use the termserver $expand operation as we need to support 'uncoded'
+                        //concepts - where the code is set to ‘261665006’. When there are multiple entries
+                        //with the same code, only 1 of them is returned by $expand - which seems reasonable actually.
+                        //so, we get the copy of the VS from the local server and just pull out the elements...
+
+                        //note also that Ontoserver by default returns ValuSets as if _summary was set - no compose element...
+
+                        let vsUrl = cell.item.answerValueSet
+                        let qry =   "/ds/fhir/ValueSet?url=" + vsUrl
+
+                        $http.get(qry).then(
+                            function(data) {
+                                if (data.data && data.data.entry) {
+                                    //assume only a single VS with this url. todo will need to re-visit is we want to support versions...
+                                    let vs = data.data.entry[0].resource
+                                    cell.meta.expandedVSOptions = []
+                                    if (vs.compose.include && vs.compose.include[0].concept) {
+                                        let system =vs.compose.include[0].system
+                                        vs.compose.include[0].concept.forEach(function (concept) {
+                                            cell.meta.expandedVSOptions.push({system:system,code:concept.code,display:concept.display})
+
+                                        })
+                                    }
+                                }
+
+                            }, function (err) {
+
+                            }
+                        )
+
+
+                            /* don't delete for now...
                         let vs = cell.item.answerValueSet
                         let qry =  termServer + "ValueSet/$expand?url=" + vs
 
@@ -894,6 +925,7 @@ angular.module("formsApp")
                             },
                             function(err){
                                 console.log(err)
+                                alert("There was an error expanding the VS with the url: "+ vs + " " + angular.toJson(err.data))
                                 return [{display:"no matching values"}]
                             }
                         ).finally(
@@ -901,6 +933,8 @@ angular.module("formsApp")
                                 $scope.showWaiting = false
                             }
                         )
+
+                        */
                     }
 
                 }

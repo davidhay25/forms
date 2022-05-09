@@ -12,7 +12,7 @@ angular.module("formsApp")
 
 
             //used by the preview for coded elements - not sure it is actually used yet
-            $scope.searchTermServer = function(val,url) {
+            $scope.searchTermServerDEP = function(val,url) {
                 $scope.showWaiting = true
                 let qry =  termServer + "ValueSet/$expand?url=" + url
                 //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url

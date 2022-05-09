@@ -1,0 +1,288 @@
+
+<div>
+    <style>
+        .selected {
+            font-weight: bold;
+        }
+        .spacing {
+            margin-left: 8px;
+        }
+    </style>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 ">
+
+                <h3>ValueSet editor</h3>
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <button class="btn btn-primary pull-right"
+                    ng-show="dirty"
+                    ng-click="save()">Save</button>
+                <button class="btn btn-link pull-right"
+                        ng-click="$dismiss()">Cancel</button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <span ng-class="{clickable:true,spacing:true,'pull-right':true,selected:display == 'select'}"
+                      ng-show = "modes.indexOf('select') > -1"
+                      ng-click ="display = 'select'">Select VS</span>
+
+                <span ng-class="{clickable:true,spacing:true,'pull-right':true,selected:display == 'edit'}"
+                      ng-show = "modes.indexOf('edit') > -1"
+                      ng-click ="display = 'edit'">Edit VS</span>
+
+
+                <span ng-class="{clickable:true,spacing:true,'pull-right':true,selected:display == 'view'}"
+                      ng-show = "modes.indexOf('view') > -1"
+                      ng-click ="display = 'view'">View VS</span>
+
+
+
+            </div>
+        </div>
+
+        <div ng-show = "display == 'select'">
+            <uib-tabset>
+                <uib-tab heading = "Create new">
+                    <div class="row">
+                        <div class="col-md-3">
+                            Name
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" disallow-spaces placeholder="No spaces" class="form-control" ng-model="input.newVsName"/>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-link" ng-click="checkUniqueName(input.newVsName)">Check unique name</button>
+                        </div>
+                        <div class="col-md-2">
+                            <i ng-show = "allowCreate"
+                               style="color: green;margin-top: 8px; font-size: 25px;"
+                               class="glyphicon glyphicon-thumbs-up pull-right">
+
+                            </i>
+                            <!--
+                            <i ng-hide = "item.valid" style="color: red" class="glyphicon glyphicon-thumbs-down"></i>
+                            -->
+                        </div>
+
+
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-3">
+                            Title
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" placeholder="Required" class="form-control"ng-model="input.newVsTitle"/>
+                        </div>
+                        <div class="col-md-2">
+
+
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-3">
+                            Description
+                        </div>
+                        <div class="col-md-7">
+                            <textarea class="form-control" placeholder="Optional" ng-model="input.newVsDescription"></textarea>
+
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-link" ng-show="allowCreate && input.newVsTitle"
+                                    ng-click = "createNewVs()">Create</button>
+
+                        </div>
+                    </div>
+
+
+                </uib-tab>
+                <uib-tab heading = "Select from existing">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="list-group">
+                                <div ng-class="{'list-group-item':true,listItemSelected:input.existingVS.id == vs.id}"
+                                     style="cursor: pointer"
+                                     ng-click = "input.existingVS = vs"
+                                     ng-repeat = "vs in allVS">
+                                    {{vs.name}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-sm-9">
+                            <button class="btn btn-primary pull-right"
+                                    ng-show="input.existingVS"
+                                    ng-click="selectExistingVS(input.existingVS)">Select this VS</button>
+
+                            <uib-tabset>
+                                <uib-tab heading="Contents">
+                                    <table class="table">
+                                        <tr ng-repeat = "concept in input.existingVS.compose.include[0].concept">
+                                            <td>{{concept.display}}</td>
+                                            <td>{{concept.code}}</td>
+                                        </tr>
+
+                                    </table>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{input.existingVS | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+                        </div>
+                    </div>
+
+                </uib-tab>
+            </uib-tabset>
+
+        </div>
+
+        <div ng-show = "display == 'view'">
+            <uib-tabset>
+                <uib-tab heading = "List from VS">
+                    <br/>
+                    <table class="table table-bordered table-condensed">
+                        <tr ng-repeat="concept in selectedValueSet.compose.include[0].concept">
+                            <td>{{concept.code}}</td>
+                            <td>{{concept.display}}</td>
+                            <td>{{concept.system}}</td>
+                        </tr>
+                    </table>
+
+                </uib-tab>
+                <uib-tab heading = "Expand">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control" ng-model="input.expandCount"
+                                   placeholder="Count"/>
+
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-link" ng-click="expandVS(vsUrl,input.filter)">Expand</button>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="pull-right" ng-show="expandedVs.expansion.total">
+                                Total count:{{expandedVs.expansion.total}}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br/>
+
+                    <table class="table table-bordered table-condensed">
+                        <tr ng-repeat="concept in expandedVs.expansion.contains">
+                            <td>{{concept.code}}</td>
+                            <td>{{concept.display}}</td>
+                            <td>{{concept.system}}</td>
+                        </tr>
+                    </table>
+                </uib-tab>
+                <uib-tab heading = "json">
+                    <br/>
+                    <pre>{{selectedValueSet | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+        </div>
+
+        <div ng-show = "display == 'edit'">
+
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <label>Name</label>
+                    <input type="text" disabled = "disabled" class="form-control" ng-model="selectedValueSet.name"/>
+                </div>
+                <div class="col-md-3 col-sm-3">
+                    <label>Title</label>
+                    <input type="text" class="form-control" ng-model="selectedValueSet.title"/>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <label>Description</label>
+                    <textarea class="form-control" ng-model="selectedValueSet.description"></textarea>
+                </div>
+            </div>
+
+            <br/>
+
+            <table class="table table-bordered table-condensed">
+                <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                <tr ng-repeat = "option in selectedValueSet.compose.include[0].concept">
+                    <td>{{option.display}}</td>
+                    <td>{{option.code}}</td>
+                    <td>
+                        {{selectedValueSet.compose.include[0].system}}
+                    </td>
+
+
+                    <td>
+                        <i class=" clickable glyphicon glyphicon-arrow-up"
+                           ng-show="$index > 0"
+                           ng-click = "moveConceptUp($index)"></i>
+                        <i class=" clickable glyphicon glyphicon-arrow-down"
+                           ng-show="$index < selectedValueSet.compose.include[0].concept.length -1"
+                           ng-click = "moveConceptDown($index)"></i>
+
+                    </td>
+                    <td>
+                        <i class=" clickable glyphicon glyphicon-remove"
+                           ng-click = "removeConcept($index)"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="form-control" placeholder="Display (required)" ng-model="input.newAnswerDisplay"/> </td>
+                    <td><input type="text" class="form-control" placeholder="will default to 'unknown'" ng-model="input.newAnswerCode"/> </td>
+                    <td>
+                        {{input.newAnswerSystem}}
+
+
+                    </td>
+                    <td></td>
+                    <td>
+                        <i ng-show=" input.newAnswerDisplay"
+                           class="clickable glyphicon glyphicon-plus-sign"
+                           ng-click = "addConcept(input.newAnswerCode,input.newAnswerSystem,input.newAnswerDisplay)"></i>
+                </tr>
+            </table>
+
+
+        </div>
+
+    </div>
+
+    <div class="modal-header">
+
+        <div class="row">
+
+            <div class="col-md-6 col-sm-6">
+                <div>{{selectedValueSet.title}}</div>
+                <em>{{selectedValueSet.url}}</em>
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div>{{selectedValueSet.description}}</div>
+            </div>
+        </div>
+
+    </div>
+</div>
