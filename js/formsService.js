@@ -991,17 +991,12 @@ console.log(expandedVS)
 
                     item.enableWhen.forEach(function(conditional){
 
-
-
-                        //let conditional = item.enableWhen[0]       //only looking at the first one for now
-
                         let formValue = formData[conditional.question]  //the value from the form to be compared
 
                         //when a radio is used as the input, the value is a string rather than an object
                         if (typeof formValue === 'string' || formValue instanceof String) {
                             formValue = JSON.parse(formValue)
                         }
-
 
                         if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
                             //if (formValue !== null) {
@@ -1049,19 +1044,17 @@ console.log(expandedVS)
                                     //Only supported by integer
 
 
+
                                     if (conditional.answerInteger !== undefined) {
                                         let targetValue = parseInt(conditional.answerInteger)
                                         let value = formValue.valueInteger
+
+                                        console.log(item.linkId,value,targetValue)
+
                                         if (value > targetValue) {
-                                            return true
+                                            canShow = true
                                         }
-                                        /*
-                                        if (formValue.valueString == conditional.answerString) {
-                                            return true
-                                        } else {
-                                            return false
-                                        }
-                                        */
+
                                     }
                                     break
                             }

@@ -162,6 +162,7 @@ angular.module("formsApp")
                 let source = $scope.input.newEwQuestion
                 let operator = "="
                 let ew = {question:source.linkId,operator:operator}
+
                 switch ($scope.newEwSelectedSourceItem.type) {
                     case "boolean" :
                         if ($scope.input.ewAnswerBoolean == 'yes') {
@@ -173,6 +174,7 @@ angular.module("formsApp")
                         break
                     case "integer" :
                         ew.answerInteger = $scope.input.ewAnswerInteger.valueInteger
+                        ew.operator = $scope.input.conditionalOperator
                         break
                     case "choice" :
                     case "open-choice":

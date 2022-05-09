@@ -88,7 +88,9 @@ angular.module("formsApp")
 
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
-console.log('checking ' + cell.item.text)
+
+                console.log('checking ' + cell.item.text)
+
                 if (! cell.meta) {
                     console.log(cell.item.text + " no meta")
                 }
@@ -98,7 +100,10 @@ console.log('checking ' + cell.item.text)
                     return false
                 }
 
-                return formsSvc.checkConditional(cell.item,$scope.form)
+                let show = formsSvc.checkConditional(cell.item,$scope.form)
+                console.log(cell.item.text, show)
+
+                return show
 
 
 

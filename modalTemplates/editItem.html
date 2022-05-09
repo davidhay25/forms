@@ -362,12 +362,6 @@
                     </div>
                 </div>
 
-
-
-
-
-
-
             </uib-tab>
 
 
@@ -416,132 +410,6 @@
 
             </uib-tab>
 
-            <!--
-            <uib-tab ng-show = "newItem.answerValueSet" heading = "ValueSet contents">
-
-                if one of our VS (?publisher ?url root) - allow editing. simple list of concepts. later could have $expand
-                If not, then allow $expand
-
-                <div ng-controller="terminologyCtrl">
-                    <ng-include src = "'includes/vsEditor.html'"></ng-include>
-                </div>
-
-
-
-            </uib-tab>
-            -->
-
-
-            <uib-tab ng-show = "false" heading = "Conditional show">
-
-                <div class="row">
-                    <div class="col-sm-5">
-                        <strong>Source question</strong>
-                        <br/>
-                        <select ng-model="input.ewQuestion" class="form-control"
-                                ng-change = "ewSelected(input.ewQuestion)"
-                                ng-options = "item.text for item in dependencySources"></select>
-                        <br/>
-                        <em>The question that this one depends on</em>
-                    </div>
-
-                    <div class="col-sm-2">
-                        <div ng-show = "selectedSourceItem.type == 'integer'" style="padding-top: 8px">
-                            <input type="radio" ng-model="input.conditionalOperator" value="="/> =
-                            <div><input type="radio" ng-model="input.conditionalOperator" value=">"/> ></div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-5">
-
-                        <div ng-show = "selectedSourceItem.type == 'choice' || selectedSourceItem.type == 'open-choice'">
-                            <strong>Value to show this item</strong>
-<!--
-                            <select ng-model="input.ewAnswer"  class="form-control"
-                                    ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
--->
-                            <select ng-model="input.ewAnswer"  class="form-control"
-                                    ng-options = "concept.valueCoding.display for concept in selectedSourceItem.answerOption"></select>
-
-                            <br/>
-                            {{selectedSourceItem.type}}
-                            <em>The value of the source question that will display this one</em>
-                        </div>
-
-                        <div ng-show = "selectedSourceItem.type == 'string'">
-                            <strong>Value to show this item</strong>
-                            <br/>
-                            <select ng-model="input.ewAnswerString"  class="form-control"
-                                    ng-options = "item.valueString for item in selectedSourceItem.answerOption"></select>
-                        </div>
-
-                        <div ng-show = "selectedSourceItem.type == 'integer'">
-                            <strong>Value to show this item</strong>
-                            <br/>
-                            <select ng-model="input.ewAnswerInteger"  class="form-control"
-                                    ng-options = "item.valueInteger for item in selectedSourceItem.answerOption"></select>
-                        </div>
-
-                        <div ng-show = "selectedSourceItem.type == 'boolean'">
-                            <strong>Value to show this item</strong>
-                            <br/><br/>
-                            <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
-                            <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
-                        </div>
-
-<!--
-                        <div ng-show="input.ewQuestion.type == 'choice' || input.ewQuestion.type == 'open-choice'">
-                            <strong>Value to show this item</strong>
-
-                            <select ng-model="input.ewAnswer"  class="form-control"
-
-                                ng-options = "concept.display for concept in input.ewQuestionOptions"></select>
-
-                            <br/>
-                            <em>The value of the source question that will display this one</em>
-                        </div>
-
-
-                        <div ng-show="input.ewQuestion.type == 'boolean'">
-                            <strong>Value to show this item</strong>
-                            <br/><br/>
-                            <input type="radio" ng-model="input.ewAnswerBoolean" value="yes"/> True
-                            <input type="radio" ng-model="input.ewAnswerBoolean" value="no"/> False
-                        </div>
-
-                        -->
-
-                    </div>
-                </div>
-<!--
-                <pre>{{newItem.enableWhen | json}}</pre>
--->
-
-
-
-                <br/><br/>
-                <em>Set the source question and value that controls if this item is to be displayed. Source questions can be:
-                    <ul>
-                        <li>Questions of type 'choice' with in-line options.</li>
-                        <li>Questions of type string with in-line options.</li>
-                        <li>Boolean (yes/no) questions</li>
-                    </ul>
-
-
-                </em>
-                <em>Currently, only a single conditional is supported - this can be relaxed if needed...</em>
-
-                <div class="row" ng-show = "newItem.enableWhen">
-                    <div class="col-sm-12 col-md-12">
-                        <button class="btn btn-danger pull-right" ng-click="clearConditional()">Clear conditional</button>
-                    </div>
-                </div>
-
-            </uib-tab>
-
-
             <uib-tab heading = "Conditional show">
                 <table class="table table-bordered">
                     <tr><th>Source (trigger)</th><th>Operator</th><th>Value</th><th></th></tr>
@@ -552,6 +420,7 @@
                             <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
                             <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
                             <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+                            <span ng-show = "ew.answerInteger !== undefined">{{ew.answerInteger}}</span>
                         </td>
                         <td><i class="btn btn-link glyphicon glyphicon-remove clickable pull-right"
                                ng-click="deleteSourceTrigger($index)"></i>
