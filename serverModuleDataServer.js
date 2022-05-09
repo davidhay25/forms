@@ -12,6 +12,22 @@ function setup(app,serverRoot) {
     //create an update bundle:
     //PUT SR, POST DR & Obs
 
+    app.post('/ds/fhir/Questionnaire/validate',function(req,res) {
+        let resource = req.body
+        let url = serverRoot + "Questionnaire/$validate"
+
+        axios.post(url,resource)
+            .then(function (response){
+                //console.log(response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                res.status(err.response.status).send(err.response.data)
+            })
+
+    })
+
     app.post('/ds/fhir/:type/',function(req,res){
         let url = serverRoot + req.params.type
         let resource = req.body

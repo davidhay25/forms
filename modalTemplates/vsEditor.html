@@ -52,7 +52,7 @@
 
         <div ng-show = "display == 'select'">
             <uib-tabset>
-                <uib-tab heading = "Create new">
+                <uib-tab heading = "Create new VS">
                     <div class="row">
                         <div class="col-md-3">
                             Name
@@ -107,7 +107,7 @@
 
 
                 </uib-tab>
-                <uib-tab heading = "Select from existing">
+                <uib-tab heading = "Select from existing CanShare VS">
                     <br/>
                     <div class="row">
                         <div class="col-md-3 col-sm-3">
@@ -146,6 +146,28 @@
                     </div>
 
                 </uib-tab>
+
+                <uib-tab heading = "Non CanShare VS">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            Url
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" placeholder="The url for the ValueSet to use" class="form-control" ng-model="input.nonCSUrl"/>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary pull-right" ng-click = "addNonCSUrl(input.nonCSUrl)">Set url</button>
+                        </div>
+
+                    </div>
+                    <br/> <br/>
+                    <em>Use this option to assign an externally created VS - like one from the spec - to this item.
+                    If this is a large valueset, be sure to set the 'render' option to 'lookup' in the item editor.
+                        For either radio or dropdown, only 50 concepts will be added.
+                    </em>
+                </uib-tab>
+
             </uib-tabset>
 
         </div>

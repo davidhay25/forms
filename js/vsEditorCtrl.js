@@ -132,6 +132,10 @@ angular.module("formsApp")
             //$scope.input.codeSystems = [{display:'snomed',url:'http://snomed.info/sct'}]
 
 
+            //when some external url - like gender is used. This is only available for the 'select' mode
+            $scope.addNonCSUrl = function(url) {
+                $scope.$close({url:url})
+            }
 
 
             $scope.removeConcept = function(inx){
@@ -191,12 +195,14 @@ angular.module("formsApp")
                         $http.put(url,$scope.selectedValueSet).then(
                             function(data) {
                                 alert("ValueSet updated on local and term server")
+                                $scope.$close($scope.selectedValueSet)
                             },
                             function (err) {
                                 alert("There was a problem saving the VS to the term server (but is saved locally): "+ angular.toJson(err.data))
+                                $scope.$close($scope.selectedValueSet)
                             }
                         )
-                        $scope.$close($scope.selectedValueSet)
+                      //  $scope.$close($scope.selectedValueSet)
                         //$scope.hashTerminology[$scope.selectedValueSet.url] = $scope.selectedValueSet
                     },function(err) {
                         alert("Error saving the VS:" +angular.toJson(err))

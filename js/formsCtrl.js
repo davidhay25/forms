@@ -88,7 +88,7 @@ angular.module("formsApp")
 
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
-
+console.log('checking ' + cell.item.text)
                 if (! cell.meta) {
                     console.log(cell.item.text + " no meta")
                 }

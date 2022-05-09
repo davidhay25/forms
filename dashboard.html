@@ -716,77 +716,6 @@
 
                         </uib-tab>
 
-                        <uib-tab ng-show = false heading="Audit">
-                            <br/>
-                            <uib-tabset>
-                                <uib-tab heading = "No code">
-                                    <br/>
-                                    <em>These items have no code, so will not be extracted as observations.
-                                        This is not necessarily an error, but if you do wish extraction to occur, then
-                                        the code needs to be added.</em>
-                                    <br/> <br/>
-                                    <table class="table">
-                                        <tr ng-repeat="item in QAudit.nocode">
-                                            <td>{{item.parent.text}} > {{item.item.text}} </td>
-                                        </tr>
-                                    </table>
-
-                                    <br/>
-                                </uib-tab>
-                                <uib-tab heading = "No Valueset">
-                                    <br/>
-                                    <em>Coded items missing answerValueSet or answerOptions. These are errors that need correction.</em>
-                                    <br/> <br/>
-                                    <table class="table">
-                                        <tr ng-repeat="item in QAudit.missingvs">
-                                            <td>{{item.parent.text}} > {{item.item.text}} </td>
-                                        </tr>
-                                    </table>
-                                    <br/>
-                                </uib-tab>
-                            </uib-tabset>
-
-                        </uib-tab>
-
-                        <uib-tab ng-show = false heading="Report">
-                            <br/>
-
-                            <table class="table-bordered table table-condensed">
-                                <tr><th>Text</th><th>Type</th><th>Flags</th><th>Code</th><th>Coded info</th></tr>
-                                <tr ng-repeat="row in treeData">
-
-                                    <td>
-                                        <div ng-show = "row.parent == 'root'">
-                                            <strong>{{row.data.item.text}}</strong>
-                                        </div>
-                                        <div ng-hide = "row.parent == 'root'">
-                                            {{row.data.item.text}}
-                                        </div>
-
-
-                                    </td>
-                                    <td>{{row.data.item.type}}</td>
-                                    <td>
-                                        <div ng-show = "row.data.item.required == true">
-                                            Req.
-                                        </div>
-                                    </td>
-
-                                    <td>{{row.data.item.code[0].code}} {{row.data.item.code[0].system}}</td>
-
-                                    <td>
-                                        {{row.data.item.answerValueSet}}
-                                        <div ng-repeat="option in row.data.item.answerOption">
-                                            {{option.valueCoding.code}} &nbsp; &nbsp; ({{option.valueCoding.display}})
-                                            <span class="pull-right">{{option.valueCoding.system}}</span>
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-                            </table>
-                        </uib-tab>
-
 
 
                         <uib-tab heading = "Review Url">
@@ -843,9 +772,41 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="Validate Q">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-link pull-right" ng-click="validateQ()">Validate</button>
+                                </div>
+                            </div>
+
+                            <br/>
+                            <uib-tabset>
+                                <uib-tab heading="List">
+                                    <table class="table table-bordered">
+                                        <tr ng-repeat = "iss in QValidation.issue">
+                                            <td>{{iss.diagnostics}}</td>
+                                            <td>
+                                                {{iss.location[0]}}
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{QValidation | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+                        </uib-tab>
+
                         <uib-tab heading="Q Json">
                             <pre>{{selectedQ | json}}</pre>
                         </uib-tab>
+
+
                     </uib-tabset>
 
                 </div>
@@ -861,9 +822,6 @@
             </div>
 
         </uib-tab>
-
-
-
 
         <uib-tab ng-show="false" heading="Provenance">
             <br/>
@@ -932,7 +890,6 @@
 
 
 
-
             <div ng-controller="terminologyCtrl">
                 <br/>
 
@@ -941,12 +898,6 @@
             </div>
 
             </uib-tab>
-
-
-
-
-
-
 
 
         </uib-tabset>

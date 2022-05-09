@@ -72,6 +72,19 @@ angular.module("formsApp")
             }
 
 
+            $scope.validateQ = function() {
+                let url = "/ds/fhir/Questionnaire/validate"
+                $http.post(url,$scope.selectedQ).then(
+                    function(data) {
+                        $scope.QValidation = data.data
+                    },
+                    function(err) {
+                        $scope.QValidation = err.data
+                    }
+                )
+
+            }
+
             //determines if an individual Q can be shown in the list - folder support
             $scope.canShowQ = function(Q) {
                 if ($scope.input.selectedFolderTag) {
@@ -911,7 +924,7 @@ angular.module("formsApp")
 
                 clearWorkArea()
                 $scope.selectedQ = Q
-               // - not doing audit I think... $scope.QAudit = formsSvc.auditQ(Q)      //the audit report
+
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
 

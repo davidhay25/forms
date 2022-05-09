@@ -692,7 +692,8 @@ angular.module("formsApp")
             },
             makeFormTemplate : function(Q) {
                 let that = this;
-                let hiddenFields = []
+                let hiddenFields = {}
+                let hiddenSections = []
                 //let termServer = that.termServer
 
                 //create a template suitable for rendering in up to 4 columns
@@ -708,7 +709,7 @@ angular.module("formsApp")
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
                         if (section.meta.hidden) {
-                            hiddenFields.push(section)
+                            hiddenSections.push(section)
                         }
                         template.push(section)
 
@@ -718,7 +719,9 @@ angular.module("formsApp")
                             sectionItem.item.forEach(function (item) {
                                 let meta = that.getMetaInfoForItem(item)
                                 if (meta.hidden) {
-                                    hiddenFields.push(item)
+                                    hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
+                                    hiddenFields[sectionItem.linkId].push(item)
+                                   // hiddenFields.push(item)
                                 }
                                 if (item.type == 'group') {
                                     //groups has a specific structure ATM
@@ -770,7 +773,10 @@ angular.module("formsApp")
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
                                                 if (childMeta.hidden) {
-                                                    hiddenFields.push(child)
+                                                    hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
+                                                    hiddenFields[sectionItem.linkId].push(item)
+
+                                                    //hiddenFields.push(child)
                                                 }
                                                 //ignore any item entries on the child - we don't go any deeper atm
 
@@ -830,7 +836,7 @@ angular.module("formsApp")
                 }
 
 
-                return {template:template,hiddenFields:hiddenFields}
+                return {template:template,hiddenFields:hiddenFields,hiddenSections: hiddenSections}
 
                 //looks for specific instructions from the Q about an item - eg render as radio
                 //todo - does this overlap with the meta stuff??
@@ -873,37 +879,73 @@ angular.module("formsApp")
                 //todo - this could be non-perormant when editing / previewing, do we care?
                 function fillFromValueSet(cell,termServer) {
 
-                    if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {
 
-                        //We can't use the termserver $expand operation as we need to support 'uncoded'
+
+                    if (cell.item.answerValueSet && (cell.meta.renderVS !== 'lookup')) {
+                        //if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {
+                        //We can't use the termserver $expand operation on VS created by canshare as we need to support 'uncoded'
                         //concepts - where the code is set to ‘261665006’. When there are multiple entries
                         //with the same code, only 1 of them is returned by $expand - which seems reasonable actually.
                         //so, we get the copy of the VS from the local server and just pull out the elements...
 
                         //note also that Ontoserver by default returns ValuSets as if _summary was set - no compose element...
-
                         let vsUrl = cell.item.answerValueSet
-                        let qry =   "/ds/fhir/ValueSet?url=" + vsUrl
+                        cell.meta.expandedVSOptions = []
 
-                        $http.get(qry).then(
-                            function(data) {
-                                if (data.data && data.data.entry) {
-                                    //assume only a single VS with this url. todo will need to re-visit is we want to support versions...
-                                    let vs = data.data.entry[0].resource
-                                    cell.meta.expandedVSOptions = []
-                                    if (vs.compose.include && vs.compose.include[0].concept) {
-                                        let system =vs.compose.include[0].system
-                                        vs.compose.include[0].concept.forEach(function (concept) {
-                                            cell.meta.expandedVSOptions.push({system:system,code:concept.code,display:concept.display})
+                        if (vsUrl.indexOf('canshare') > -1) {
+                            console.log("load by enumeration:" + vsUrl)
+                            //this is a canshare created VS - enumerate the concepts from the local copy
+                            let qry = "/ds/fhir/ValueSet?url=" + vsUrl
 
-                                        })
+                            $http.get(qry).then(
+                                function(data) {
+                                    if (data.data && data.data.entry) {
+                                        //assume only a single VS with this url. todo will need to re-visit is we want to support versions...
+                                        let vs = data.data.entry[0].resource
+                                        //cell.meta.expandedVSOptions = []
+                                        if (vs.compose.include && vs.compose.include[0].concept) {
+                                            let system =vs.compose.include[0].system
+                                            vs.compose.include[0].concept.forEach(function (concept) {
+                                                cell.meta.expandedVSOptions.push({system:system,code:concept.code,display:concept.display})
+
+                                            })
+                                        }
                                     }
+
+                                }, function (err) {
+
                                 }
+                            )
 
-                            }, function (err) {
+                        } else {
 
-                            }
-                        )
+                            console.log("load by $expand:" + vsUrl)
+                            //this is a VS produced by someone else - likely the spec - use $expand on the term server
+                            //let vs = cell.item.answerValueSet
+                            //maximum number to return is 50
+                            let qry =  termServer + "ValueSet/$expand?url=" + vsUrl + "&count=50"
+
+                            $http.get(qry).then(
+                                function(data){
+
+                                    let expandedVS = data.data
+console.log(expandedVS)
+                                    if (expandedVS.expansion && expandedVS.expansion.contains) {
+                                        expandedVS.expansion.contains.forEach(function (concept) {
+                                            cell.meta.expandedVSOptions.push({system:concept.system,code:concept.code,display:concept.display})
+                                        })
+
+                                    }
+
+                                },
+                                function(err){
+                                    console.log(err)
+                                    alert("There was an error expanding the VS with the url: "+ vsUrl + " " + angular.toJson(err.data))
+                                    return [{display:"no matching values"}]
+                                }
+                            )
+                        }
+
 
 
                             /* don't delete for now...

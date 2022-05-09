@@ -1,8 +1,6 @@
 <div>
 
-
-
-        <div>
+    <div>
             <div class="row">
                 <div class="col-md-3">
                     <div class="list-group">
@@ -94,6 +92,28 @@
 
 
                         </uib-tab>
+                        <uib-tab heading="Unknown codes">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-primary pull-right" ng-show="input.vsUpdated">Update VS</button>
+                                </div>
+                            </div>
+                            <table class="table table-bordered">
+                                <tr ng-repeat = "concept in termVS.compose.include[0].concept">
+                                    <td width="20%">{{concept.display}}</td>
+                                    <td width="20%"><input type="text" class="form-control"
+                                               ng-change="input.vsUpdated = true"
+                                               ng-model="concept.code"/></td>
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+
+                        <uib-tab heading="Json">
+                            <pre>{{termVS | json}}</pre>
+                        </uib-tab>
+
+
                         <uib-tab heading="Edit contents">
 
                             <br/>

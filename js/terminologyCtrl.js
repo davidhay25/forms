@@ -8,6 +8,29 @@ angular.module("formsApp")
             $scope.input.codeSystems = [{display:'snomed',url:'http://snomed.info/ct'}]
 
             $scope.newVS = function() {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsEditor.html',
+                    backdrop: 'static',
+                    controller: 'vsEditorCtrl',
+                    size : 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        },
+                        modes : function() {
+                            return ['select','view','edit']
+                        }
+                    }
+                }).result.then(
+                    function (vs) {
+                        if (vs) {
+                           //add
+                        }
+                    }
+
+                )
+
+                /*
                 let name = $window.prompt("Enter name for vs (no spaces, will become url). Make sure it's unique")
                 if (name) {
                     let url = "http://canshare.com/fhir/ValueSet/temp-"+name
@@ -24,25 +47,26 @@ angular.module("formsApp")
                         }
                     )
                 }
+                */
             }
 
 
-            $scope.removeOption = function(inx){
+            $scope.removeOptionDEP = function(inx){
                 $scope.selectedValueSet.compose.include.splice(inx)
             }
 
 
-            $scope.moveAnswerUp = function(inx) {
+            $scope.moveAnswerUpDEP = function(inx) {
                 let ar =  $scope.selectedValueSet.compose.include.splice(inx-1,1)
                 $scope.selectedValueSet.compose.include.splice(inx,0,ar[0])
             }
 
-            $scope.moveAnswerDown = function(inx) {
+            $scope.moveAnswerDownDEP = function(inx) {
                 let ar =  $scope.selectedValueSet.compose.include.splice(inx,1)
                 $scope.selectedValueSet.compose.include.splice(inx+1,0,ar[0])
             }
 
-            $scope.addOtherAnswerOption = function(opt) {
+            $scope.addOtherAnswerOptionDEP = function(opt) {
                 $scope.newItem.answerOption = $scope.newItem.answerOption || []
                 switch ($scope.newItem.type) {
                     case 'integer' :
@@ -58,7 +82,7 @@ angular.module("formsApp")
 
 
             //when adding a new answer option which is a Coding
-            $scope.addOption = function(code,system,display){
+            $scope.addOptionDEP = function(code,system,display){
                 $scope.selectedValueSet.compose.include = $scope.selectedValueSet.compose.include || []
 
                 let opt = {valueCoding:{}}
@@ -107,8 +131,20 @@ angular.module("formsApp")
 
             $scope.selectVSEntry = function (entry,vsUrl) {
                 delete $scope.expandedVs
+                delete $scope.termVS
                 $scope.selectedVSUrl = vsUrl
                 $scope.selectedVSEntry = entry
+
+                let url = "/ds/fhir/ValueSet?url=" + vsUrl
+
+                $http.get(url).then(
+                    function(data) {
+                        if (data.data && data.data.entry) {
+                            $scope.termVS = data.data.entry[0].resource
+
+                        }
+                    }
+                )
             }
 
         }

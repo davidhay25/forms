@@ -17,11 +17,20 @@
             </div>
         </div>
         <br/>
-        <div ng-show = "objFormTemplate.hiddenFields.length > 0">
 
-            <checkbox
-                    ng-model="input.showHidden"></checkbox> Show hidden fields ({{objFormTemplate.hiddenFields.length}})
+        <div ng-show = "objFormTemplate.hiddenSections.length > 0">
+            <checkbox ng-model="input.showHidden"></checkbox>
+            Show hidden sections
         </div>
+
+        <div ng-show = "objFormTemplate.hiddenFields[selectedSection.linkId].length > 0">
+            <checkbox ng-model="input.showHidden"></checkbox>
+            Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
+        </div>
+
+
+
+
 
 
     </div>
