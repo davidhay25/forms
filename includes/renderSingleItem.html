@@ -17,6 +17,7 @@
 
 
     <div ng-show="showConditional(cell)">
+
         <div ng-hide="cell.item.type == 'display'">
             <span ng-show="cell.item.type == 'reference'">
                 <i class="btn btn-link glyphicon glyphicon-search clickable pull-right"
@@ -30,7 +31,9 @@
                     <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
 
 
+                <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
+
                 <span ng-show = "cell.meta.description">
 
                     <i class="glyphicon glyphicon-info-sign"

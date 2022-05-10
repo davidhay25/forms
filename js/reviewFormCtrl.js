@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('reviewFormCtrl',
-        function ($scope,$http,formsSvc,$window,$timeout,designerSvc,exportSvc) {
+        function ($scope,$http,formsSvc,$window,$timeout,designerSvc,exportSvc,$uibModal) {
 
             $scope.input = {}
             $scope.form = {}
@@ -210,29 +210,19 @@ angular.module("formsApp")
 
                 let vo = formsSvc.makeTreeFromQ(Q)
 
+
+
+                $scope.treeData = vo.treeData       //for drawing the tree
+
+
+
                 //$scope.treeData = vo.treeData
                 $scope.hashItem = vo.hash       //all items in teh form hashed by id
-                //$scope.selectedSection = Q.item[0]  //show first tab in tab view
-
-/*
-                //$scope.formDef = vo.treeData
-                formsSvc.makeFormDefinition(vo.treeData).then(
-                    function (data) {
-                        $scope.formDef = data
-                    }
-                )
-*/
-                //generate tabbed model (for tab form view)
-                //let arSection = []
 
 
                 $scope.makeQR()     //create initial QR
-
-
                 drawTree(vo.treeData)
 
-
-              // makeFormDef()
             }
 
             //when a top level item is selected in the tabbed interface
@@ -432,91 +422,10 @@ angular.module("formsApp")
                 console.log($scope.input.selectedPatient)
                 $scope.selectedPatient = $scope.input.selectedPatient.resource;
 
-
 /*
-                //get all the QR for this patient from the data server
-                let url = "/ds/fhir/QuestionnaireResponse?patient="+$scope.input.selectedPatient.resource.id
-                $http.get(url).then(
-                    function (data) {
-                        console.log(data.data)
-                        if (data.data && data.data.entry) {
-                            data.data.entry.forEach(function (entry){
-                                let QR = entry.resource
-
-                                if (QR.questionnaire) {
-                                    let ar = QR.questionnaire.split('/')
-                                    $scope.existingQR.push({QR:QR,Q:QR.questionnaire,display:ar[ar.length -1]})
-                                }
-
-                            })
-                        }
-                    }
-                )
-                */
-
-                //get all the DR - DiagnosticReports
-
-/*
-                let qry = "/ds/fhir/DiagnosticReport?patient="+$scope.selectedPatient.id+"&_include=DiagnosticReport:result"
-                $http.get(qry).then(
-                    function(data) {
-
-                        $scope.allDR = formsSvc.makeDRList(data.data)
-                        //console.log($scope.allDR)
-                    }, function(err) {
-                        console.log(err)
-                    }
-                )
-*/
-                //get all the observations
-                //getObservationsForPatient($scope.input.selectedPatient.resource.id)
-
-                //get all the act-now data (assumes the careplan supporting-info search parameter has been applied to the server
-/*
-                //server script does paging
-                let qryActnow = "/ds/fhir/CarePlan?patient=" +$scope.input.selectedPatient.resource.id
-                qryActnow += "&_include=CarePlan:condition"
-                qryActnow += "&_include=CarePlan:supporting-info"
-                qryActnow += "&_include:iterate=Observation:has-member"     //eg the TNM codes
-                qryActnow += "&_revinclude=Observation:based-on"
-                qryActnow += "&_revinclude=MedicationAdministration:ma-based-on"
-                qryActnow += "&_sort=_id"
-                //qryActnow += "&_count=50"
-
-                $http.get(qryActnow).then(
-                    function(data) {
-
-                        $scope.allCarePlans = []
-                        $scope.hashAllCarePlans = {}      //hash by resource id
-                        if (data.data.entry) {
-                            //convert to list and hash of resources
-                            data.data.entry.forEach(function (entry){
-                                if (entry.resource.resourceType == 'CarePlan') {
-                                    $scope.allCarePlans.push(entry.resource)
-                                }
-                                //used to create act-now LM - ?needs better name
-                                $scope.hashAllCarePlans[entry.resource.resourceType + "/" + entry.resource.id] = entry.resource
-                            })
-                        }
-                        console.log($scope.allCarePlans)
-
-
-
-
-                    }, function(err) {
-                        console.log(err)
-                    }
-                )
-
-*/
                 //All service Requests
                 let qrySR = "/ds/fhir/ServiceRequest?patient=" +$scope.input.selectedPatient.resource.id
                 $scope.allSR = []
-                //qryActnow += "&_include=CarePlan:condition"
-                //qryActnow += "&_include=CarePlan:supporting-info"
-                //qryActnow += "&_include:iterate=Observation:has-member"     //eg the TNM codes
-                //qryActnow += "&_revinclude=Observation:based-on"
-                //qryActnow += "&_revinclude=MedicationAdministration:ma-based-on"
                 $http.get(qrySR).then(
                     function(data) {
                         if (data.data.entry) {
@@ -531,56 +440,45 @@ angular.module("formsApp")
                     }, function(err) {
 
                     })
+                */
 
             }
 
-            $scope.updateQueryDEP = function(){
-                getObservationsForPatient($scope.input.selectedPatient.resource.id)
-            }
 
-            $scope.selectObservationGroupDEP = function(group) {
-                delete $scope.input.selectedObs
-                $scope.observationGroup = group
-            }
+            $scope.viewVS = function(url){
 
-            let getObservationsForPatientDEP = function(patId){
-                let url = "/ds/fhir/Observation?patient="+patId //+ "&_count=50"
-
-                $http.get(url).then(
-                    function (data) {
-                        $scope.bundleObservations = data.data
-
-                        //create observation hash by code
-                        $scope.hashObservations = {}
-                        if ($scope.bundleObservations.entry) {
-                            $scope.bundleObservations.entry.forEach(function (entry) {
-                                let obs = entry.resource
-                                let code,display
-                                if (obs.code && obs.code.coding && obs.code.coding.length > 0) {
-                                    code = obs.code.coding[0].system + "#" + obs.code.coding[0].code
-                                    display = obs.code.coding[0].display
-                                }
-                                if (code) {
-                                    $scope.hashObservations[code] = $scope.hashObservations[code] || {display:display,resources:[]}
-                                    $scope.hashObservations[code].resources.push(obs)
-                                }
-
-                            })
-                            //console.log($scope.hashObservations)
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsEditor.html',
+                    backdrop: 'static',
+                    controller: 'vsEditorCtrl',
+                    size : 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        },
+                        modes: function () {
+                            return ['view']  //todo remove select
                         }
-
-
                     }
-                )
+                })
             }
+
 
             let drawTree = function(treeData){
                 //console.log(treeData)
+
+                treeData.forEach(function (item) {
+                    item.state.opened = true
+                    if (item.parent == 'root') {
+                        item.state.opened = false;
+                    }
+                })
+
                 //expandAll(treeData)
                 //deSelectExcept()
-                $('#QTreeReview').jstree('destroy');
+                $('#designTree').jstree('destroy');
 
-                let x = $('#QTreeReview').jstree(
+                let x = $('#designTree').jstree(
                     {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
                     //seems to be the node selection event...

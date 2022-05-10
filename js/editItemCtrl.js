@@ -8,7 +8,7 @@ angular.module("formsApp")
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
 
             $scope.input = {}
-            $scope.input.colCount = [2,3,4]
+            $scope.input.colCount = [0,2,3,4]
             $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
             $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
 
@@ -138,12 +138,21 @@ angular.module("formsApp")
                 //an item with a type of choice or boolean or string with is considered to be a possible source of a dependency
                 if (item1.type == 'choice' || item1.type == 'boolean' ||
                     (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0) ||
-                    (item1.type == 'integer' && item1.answerOption && item1.answerOption.length > 0)) {
+                    (item1.type == 'integer' && item1.answerOption && item1.answerOption.length > 0))
+                {
                     $scope.dependencySources.push(item1)
                 }
 
 
             })
+            $scope.dependencySources.sort(function (a,b){
+                if (a.text > b.text) {
+                    return 1
+                } else {
+                    return -1
+                }
+            })
+
 
             //when a possible dependency source is selected. Will get the values from the source answerOption
             //needs to be at the top

@@ -69,6 +69,8 @@
     <script src="js/formsCtrl.js"></script>
     <script src="js/designerSvc.js"></script>
     <script src="js/exportSvc.js"></script>
+    <script src="js/vsEditorCtrl.js"></script>
+    <script src="js/terminologySvc.js"></script>
     <style>
         #graph {
             width: 100%;
@@ -242,10 +244,64 @@
         </div>
 
         <div ng-show="reviewState == 'model'">
-            <em>The complete data model</em>
 
 
-            <ng-include src="'includes/showModel.html'"></ng-include>
+            <uib-tabset>
+                <uib-tab heading="Tree">
+                    <div class="col-md-4">
+                        <div id="designTree"></div>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table">
+                            <tr><td>Text</td><td>{{selectedNode.data.item.text}}</td></tr>
+                            <tr><td>Description</td><td>{{selectedNode.data.item.description}}</td></tr>
+                            <tr><td>Type</td><td>{{selectedNode.data.item.type}}</td></tr>
+                            <tr ng-show="selectedNode.data.item.answerOption">
+                                <td>Options</td>
+                                <td>
+                                <div>
+                                    <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                        {{option.valueInteger}}{{option.valueString}}
+                                        {{option.valueCoding.display}},
+                                    </span>
+                                </div>
+                                </td>
+
+                            </tr>
+
+                            <tr ng-show="selectedNode.data.item.answerValueSet">
+                                <td>ValueSet</td>
+                                <td>
+                                    <div class="clickable"
+                                         ng-click="viewVS(selectedNode.data.item.answerValueSet)">
+                                    {{selectedNode.data.item.answerValueSet}}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-show="selectedNode.data.item.repeats">
+                                <td>Item can repeat</td>
+                            </tr>
+                            <tr ng-show="selectedNode.data.item.required">
+                                <td>Item is required</td>
+                            </tr>
+
+
+                        </table>
+                        <!--
+                        <pre>{{selectedNode.data.item | json}}</pre>
+                        -->
+                    </div>
+
+                </uib-tab>
+                <uib-tab heading="Form">
+                    <ng-include src="'includes/showModel.html'"></ng-include>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+
+
 
 
         </div>
