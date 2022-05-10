@@ -11,11 +11,12 @@ function setup(app,serverRoot) {
     //set DR.basedOn to the SR
     //create an update bundle:
     //PUT SR, POST DR & Obs
+    //app.post('/ds/fhir/Questionnaire/validate',function(req,res) {
+    app.post('/ds/fhir/:type/validate',function(req,res) {
 
-    app.post('/ds/fhir/Questionnaire/validate',function(req,res) {
         let resource = req.body
-        let url = serverRoot + "Questionnaire/$validate"
-
+        //let url = serverRoot + "Questionnaire/$validate"
+        let url = serverRoot + req.params.type +"/$validate"
         axios.post(url,resource)
             .then(function (response){
                 //console.log(response.data)
@@ -27,6 +28,7 @@ function setup(app,serverRoot) {
             })
 
     })
+
 
     app.post('/ds/fhir/:type/',function(req,res){
         let url = serverRoot + req.params.type

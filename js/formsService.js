@@ -29,7 +29,10 @@ angular.module("formsApp")
 
 
         //todo fsh doesn't underatnd expression extension...
-        extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
+        //extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
+
+        extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
+
         extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
         extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
         extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
@@ -287,7 +290,13 @@ angular.module("formsApp")
                                         break
                                     case "%patient.gender" :
                                         if (resource.gender) {
-                                            hashData[linkId] = resource.gender
+
+                                            //"patient-gender": "{\"valueCoding\":{\"system\":\"http://hl7.org/fhir/administrative-gender\",\"code\":\"male\",\"display\":\"Male\"}}"
+                                            // }
+                                            let coding = {system:"http://hl7.org/fhir/administrative-gender",code:resource.gender,display:resource.gender}
+
+
+                                            hashData[linkId] = coding
                                         }
                                         break
 

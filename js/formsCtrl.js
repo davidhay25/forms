@@ -117,7 +117,7 @@ angular.module("formsApp")
             $scope.showConditionalGroup = function(group) {
                 if (group) {
                     let show = formsSvc.checkConditional(group,$scope.form)
-                    console.log(">>>>>>>>>> " + group.linkId, show)
+                    //console.log(">>>>>>>>>> " + group.linkId, show)
                     return show
                 } else {
                     //if not a group then show. child elements will be individually assessed later...

@@ -44,7 +44,9 @@ angular.module("formsApp")
 
                             $scope.model = exportSvc.createJsonModel(Q)
 
+                            $scope.canMakeComments = true
 
+                            /* apparently comments can be at any time, so this is not needed. Keep the code though - it may be useful...
                             //now determine if this Q is in the ballot state (able to be commented on) or just viewed
                             formsSvc.getBallotList().then(
                                 function(ballotList) {
@@ -59,7 +61,7 @@ angular.module("formsApp")
                                     }
                                 }
                             )
-
+                            */
 
 
 
@@ -75,122 +77,12 @@ angular.module("formsApp")
 
 
 
-
-
-/*
-            //load all the questionnaires
-            //todo - just read the one passed in...
-            $http.get("/fm/fhir/Questionnaire").then(
-                function (data) {
-                    $scope.allQ = [];
-                    data.data.entry.forEach(function (entry){
-                        $scope.allQ.push(entry.resource)
-                    })
-
-                    //once we have all the Q, see if a Q name was passed in the call.
-                    //if it was, then hide all of the components except for the new form one
-
-                    let search = $window.location.search;
-                    if (search) {
-                        let QName = search.substr(1)
-
-                        let ar = $scope.allQ.filter(q => q.name == QName)
-                        if (ar.length > 0) {
-
-                            $scope.input.appTitle = "Review form design"
-                            //assume only 1
-                            $scope.reviewMode = true    //will hide most of the tabs...
-                            $scope.reviewState = "form"  //can be 'form','display','model'
-                            $scope.selectQ(ar[0])  //generates form template & $scope.hashItem
-
-                            $scope.model = designerSvc.makeLMObject(ar[0],$scope.hashItem)
-
-
-                            //need to allow from for the full page to load for the tree...
-                            $timeout(function(){
-                                let vo = formsSvc.makeTreeFromQ(ar[0])
-                                let treeData = vo.treeData
-                                treeData.forEach(function (item) {
-                                    item.state.opened = true
-                                    if (item.parent == 'root') {
-                                        item.state.opened = false;
-                                    }
-                                })
-
-                                drawTree(treeData)
-
-                            },1000)
-
-
-                        } else {
-                            console.log("There was no Questionnaire with the name " + QName)
-                        }
-                    }
-                }
-            )
-
-            */
             $scope.prepop = function () {
                 formsSvc.prepopForm($scope.hashItem,$scope.form,$scope.input.selectedPatient.resource)
                 $scope.makeQR()
 
             }
 
-
-
-            //when a DiagnosticReport is selected in the Path reports tab
-            $scope.selectDRDEP = function (dr) {
-                $scope.selectedDR = dr
-            }
-
-            //when a CarePlan is selected in the CP tab
-            $scope.selectCPDEP = function(cp) {
-                $scope.selectedCP = cp
-
-                delete $scope.input.selectedIncommingResource
-                //select the incoming resources
-                //http://localhost:9099/baseR4/CarePlan?_id=regimenPlan1&_revinclude=Observation:*
-                //let qry = "/ds/fhir/DiagnosticReport?based-on="+sr.id+"&_include=DiagnosticReport:result"
-                $scope.hashIncomming = {}
-                $scope.incommingCount = 0
-
-                let types = ['Observation','ServiceRequest','DiagnosticReport','CarePlan']
-                types.forEach(function(type){
-                    getResources(cp.id,type,function(ar){
-                        $scope.hashIncomming[type] = ar
-                        $scope.incommingCount += ar.length
-                        console.log($scope.hashIncomming)
-                    })
-
-                })
-
-                function getResources(cpId,type,cb) {
-
-                    let qry = `/ds/fhir/CarePlan?_id=${cpId}&_revinclude=${type}:*`
-                    console.log(qry)
-                    $http.get(qry).then(
-                        function(data) {
-                            let ar = []
-                            if (data.data && data.data.entry) {
-
-                                data.data.entry.forEach(function (entry){
-                                    if (entry.resource.id !== cpId){
-                                        ar.push(entry.resource)
-                                    }
-                                })
-                            }
-                            cb(ar)
-                        },
-                        function(err){
-
-                        }
-                    )
-//console.log(qry)
-                   // let qry = `/ds/fhir/`+type+"?__revinclude=DiagnosticReport:result"
-                }
-
-
-            }
 
 
 

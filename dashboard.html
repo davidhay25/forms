@@ -169,11 +169,11 @@
 
                     <div class="row">
                         <div class="col-md-4">
-                            Folder
+                            <div style="margin-top: 6px">Folder</div>
                         </div>
                         <div class="col-md-8">
                             <select class="form-control" ng-model="input.selectedFolderTag"
-                                    ng-change = "selectTag()"
+                                    ng-change = "selectTag(input.selectedFolderTag)"
                                     ng-options = "coding.code for coding in folderTags">
                             </select>
                         </div>
@@ -641,6 +641,9 @@
                                 <uib-tab heading = "Preview">
                                     <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
                                 </uib-tab>
+                                <uib-tab heading = "Raw form data">
+                                    <pre>{{form | json}}</pre>
+                                </uib-tab>
                                 <uib-tab heading = "QR">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -771,7 +774,7 @@
                                 </div>
                             </div>
 
-                            <br/>
+                           
                             <uib-tabset>
                                 <uib-tab heading="List">
                                     <table class="table table-bordered">

@@ -67,8 +67,18 @@ angular.module("formsApp")
                 $scope.input.dirty = true
             }
 
-            $scope.selectTag = function(){
+            //is there a saved tag
+           // $scope.input.selectedFolderTag = {code:"all"}
+          //  if ($localStorage.selectedFolderTag) {
+           //     $scope.input.selectedFolderTag = $localStorage.selectedFolderTag
+         //   }
+
+            //clear the currently selected Q when changing selected tag
+            $scope.selectTag = function(tag){
                 delete $scope.selectedQ
+                $localStorage.selectedFolderTag = tag.code  //only save the code
+
+
             }
 
 
@@ -528,7 +538,8 @@ angular.module("formsApp")
             }
 
             $scope.validateQR = function(QR){
-                let url = formsSvc.getServers().validationServer + "QuestionnaireResponse/$validate"
+                //let url = formsSvc.getServers().validationServer + "QuestionnaireResponse/$validate"
+                let url =  "/ds/fhir/QuestionnaireResponse/validate"
                 $http.post(url,QR).then(
                     function(data) {
                         $scope.qrValidationResult = data.data
@@ -1059,8 +1070,10 @@ angular.module("formsApp")
                 let t = {code:'all'}
                 $scope.folderTags = {} //
                 $scope.folderTags['all'] = t
+                $scope.input.selectedFolderTag = $scope.folderTags['all']
 
-                $scope.input.selectedFolderTag = {code:"all"}
+                //if (!)
+              //  $scope.input.selectedFolderTag = {code:"all"}
 
                 $http.get(url).then(
                     function (data) {
@@ -1080,6 +1093,12 @@ angular.module("formsApp")
                         })
 
                         $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
+
+
+                        //set any saved foldertag
+                        if ($localStorage.selectedFolderTag) {
+                            $scope.input.selectedFolderTag = $scope.folderTags[$localStorage.selectedFolderTag]
+                        }
 
                     }
                 )
