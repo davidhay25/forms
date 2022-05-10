@@ -745,6 +745,7 @@ angular.module("formsApp")
                                                     section.rows.push(row)
                                                     row = {}
                                                     row.meta = meta
+                                                    row.group = item        //need to group to be able to check show/hide for all rows in a group...
                                                     col = 1
 
                                                 } else {
