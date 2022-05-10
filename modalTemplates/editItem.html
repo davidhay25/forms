@@ -147,8 +147,6 @@
                         </td>
                     </tr>
 
-
-
                     <tr ng-show = "newItem.type == 'quantity'">
                         <td>Units</td>
                         <td>
@@ -169,14 +167,12 @@
                                            placeholder="ValueSet url"/>
                                 </div>
                                 <div class="col-md-2 col-sm-2">
-                                  <!--  <button class="btn btn-link" ng-click="newVS()">Select</button> -->
-
                                     <button class="btn btn-link" ng-click="editVS(newItem.answerValueSet)">Edit</button>
                                 </div>
                                 <div class="col-md-5 col-sm-5">
                                     <div style="padding-top: 6px"> Render:
-                                        <input type="radio" ng-model="input.vs.rendermode" value="radio"> Radio
-                                        <input type="radio" ng-model="input.vs.rendermode" value="dropdown"> Dropdown
+                                        <input type="radio" ng-model="input.vs.rendermode" value="radio-button"> Radio
+                                        <input type="radio" ng-model="input.vs.rendermode" value="drop-down"> Dropdown
                                         <input type="radio" ng-model="input.vs.rendermode" value="lookup"> Lookup
                                     </div>
 

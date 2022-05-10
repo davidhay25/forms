@@ -50,6 +50,7 @@
             <div ng-switch-when="group">
 
 
+
             </div>
 
             <div ng-switch-when="date">
@@ -59,6 +60,7 @@
                     <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
                            ng-model="form[cell.item.linkId]" is-open="datePopup[cell.item.linkId].opened"
                            ng-blur="makeQR(cell.item.linkId)"/>
+
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-click="openDate(cell.item.linkId)">
                             <i class="glyphicon glyphicon-calendar"></i>
@@ -105,7 +107,7 @@
 
                 <div ng-show = "cell.item.answerOption">
 
-                    <div ng-show="cell.displayHint == 'radio-button'">
+                    <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
 
                         <span ng-repeat="option in cell.item.answerOption">
 
@@ -118,7 +120,7 @@
 
                     </div>
 
-                    <div ng-hide="cell.displayHint == 'radio-button'">
+                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
 
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                                 ng-change="makeQR(cell.item.linkId)"
@@ -209,13 +211,13 @@
             <div ng-switch-when = "integer" >
 
                 <div ng-show = "cell.item.answerOption.length > 0">
-                    <div ng-hide="cell.displayHint == 'radio-button'">
+                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                             ng-change="makeQR(cell.item.linkId)"
                             ng-options = "value.valueInteger for value in cell.item.answerOption"/>
                     </div>
 
-                    <div ng-show="cell.displayHint == 'radio-button'">
+                    <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
 
                         <span ng-repeat="option in cell.item.answerOption">
 
@@ -229,6 +231,7 @@
                     </div>
 
                 </div>
+
                 <div ng-hide = "cell.item.answerOption.length > 0">
                     <input type="text"  ng-blur="makeQR(cell.item.linkId)"
                            ng-model="form[cell.item.linkId]" class="form-control"/>
@@ -241,13 +244,13 @@
 
                 <div ng-show = "cell.item.answerOption.length > 0">
 
-                    <div ng-hide="cell.displayHint == 'radio-button'">
+                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                             ng-change="makeQR(cell.item.linkId)"
                             ng-options = "value.valueString for value in cell.item.answerOption"/>
                     </div>
 
-                    <div ng-show="cell.displayHint == 'radio-button'">
+                    <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
 
                         <span ng-repeat="option in cell.item.answerOption">
 

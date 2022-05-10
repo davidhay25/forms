@@ -374,8 +374,6 @@ angular.module("formsApp")
                     updateExtension(item,extItemControl,"CodeableConcept",cc)
                 }
 
-                //updateExtension(item,extensionUrl.extRenderVS,"Code",meta.renderVS)
-
                 //hiso class
                 updateExtension(item,extHisoClass,"String",meta.hisoClass)
                 updateExtension(item,extHisoLength,"Integer",meta.hisoLength)
@@ -499,15 +497,7 @@ angular.module("formsApp")
                     meta.hidden = ar8[0].valueBoolean
                 }
 
-                //render VS. Note that this is stored using the FHIR extension http://hl7.org/fhir/valueset-questionnaire-item-control.html
-                //but converted to a string for ease of use
-                /*
-                let ar9 = this.findExtension(item,extensionUrl.extRenderVS)
-                if (ar9.length > 0) {
-                    meta.renderVS = ar9[0].valueCode
-                }
 
-                */
                 //hiso code
                 let ar10 = this.findExtension(item,extHisoClass)
                 if (ar10.length > 0) {
@@ -730,8 +720,9 @@ angular.module("formsApp")
 
                                     let row = {}    //will have multiple columns
 
-                                    row.meta = meta   //this is th emeta for the group item...
+                                    row.meta = meta   //this is the meta for the group item...
                                     row.text = item.text
+                                    row.group = item
 
                                     if (item.item) {    //these are the child items
                                         if (meta.columnCount) {
@@ -776,7 +767,6 @@ angular.module("formsApp")
                                                     hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
                                                     hiddenFields[sectionItem.linkId].push(item)
 
-                                                    //hiddenFields.push(child)
                                                 }
                                                 //ignore any item entries on the child - we don't go any deeper atm
 
@@ -1043,8 +1033,6 @@ console.log(expandedVS)
                                 case ">" :
                                     //Only supported by integer
 
-
-
                                     if (conditional.answerInteger !== undefined) {
                                         let targetValue = parseInt(conditional.answerInteger)
                                         let value = formValue.valueInteger
@@ -1262,46 +1250,13 @@ console.log(expandedVS)
 
                 if (reviewerEmail) {
                     PR.telecom = [{system:'email',value:reviewerEmail}]
-                    //display +=
+
                 }
                 PR.text = {status:'generated'}
                 PR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>"+display+"</div>"
 
                 QR.contained = [PR]
                 QR.author = {reference:'#pr1',display:display}
-
-/*
-                //default author
-                let practitionerName = "No practitioner supplied"
-                if (practitioner) {
-                    if (practitioner.name) {
-                        practitionerName = getHN(practitioner.name[0])
-                    }
-                    QR.author = {reference:"Practitioner/"+practitioner.id,display:practitionerName}
-                } else {
-                    QR.author = {display:practitionerName}
-                }
-
-
-                //make a PractitionerRole as a Contained resource. Allows for upgrades where full resources are included
-                //replace the author
-                if (reviewerName) {
-                    let PR = {resourceType:"PractitionerRole",id:"pr1"}
-                    PR.practitioner.display = reviewerName
-                    if (reviewOrganization) {
-                        PR.organization.display = reviewOrganization
-                    }
-
-                    PR.telecom = [{system:'email',value:reviewerEmail}]
-
-                    QR.contained = [PR]
-                    QR.author = {reference:'#pr1'}
-                }
-
-
-*/
-
-
 
 
 
@@ -1425,12 +1380,8 @@ console.log(expandedVS)
 
                                     }
 
-
-
                                 })
                             }
-
-
 
                         })
                 })
@@ -1480,22 +1431,18 @@ console.log(expandedVS)
                             break;
 
                         case "date":
-                            //remove the time component. value is a Date object
-
                             result = {valueDate: moment(value).format("YYYY-MM-DD")}
-                            //let dateStr = value.toISOString()
 
-
-                           // let ar = dateStr.split('T')
-
-
-                           // result = {valueDate : ar[0]}
 
                             break;
 
                         case "reference" :
                             result = {valueReference : value}
                             //itemToAdd.answer.push({valueReference : value})
+                            break
+
+                        case "integer" :
+                            result = {valueInteger : parseInt(value)}
                             break
 
                         default :

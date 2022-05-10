@@ -39,85 +39,93 @@
 
         <div ng-repeat="row in selectedSection.rows track by $index">
 
-            <strong>{{row.text}}</strong>
+            <!-- This is a check for group level showhide. If not a group then will be shown (but each item is checked as well)-->
+            <div ng-show="showConditionalGroup(row.group)">
 
-            <div class="row">
 
-                <!-- 2 columns -->
-                <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
-                    <div class="col-md-6">
-                        <div ng-repeat="cell in row.col1 track by $index">
-                            <div style="margin-bottom: 8px">
+                <strong>{{row.text}} </strong>
+
+                <div class="row">
+
+                    <!-- 2 columns -->
+                    <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+                        <div class="col-md-6">
+                            <div ng-repeat="cell in row.col1 track by $index">
+                                <div style="margin-bottom: 8px">
+                                    <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div ng-repeat="cell in row.col2 track by $index">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
-
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div ng-repeat="cell in row.col2 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
-                        </div>
-                    </div>
-                </div>
+                    <!-- 3 columns -->
+                    <div ng-if = "row.meta.columnCount == 3">
+                        <div class="col-md-4">
+                            <div ng-repeat="cell in row.col1  track by $index">
+                                <div style="margin-bottom: 8px">
+                                    <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                                </div>
 
-                <!-- 3 columns -->
-                <div ng-if = "row.meta.columnCount == 3">
-                    <div class="col-md-4">
-                        <div ng-repeat="cell in row.col1  track by $index">
-                            <div style="margin-bottom: 8px">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div ng-repeat="cell in row.col2 track by $index">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
-
                         </div>
-                    </div>
 
-                    <div class="col-md-4">
-                        <div ng-repeat="cell in row.col2 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div ng-repeat="cell in row.col3 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4 columns -->
-                <div ng-if = "row.meta.columnCount == 4">
-                    <div class="col-md-3">
-                        <div ng-repeat="cell in row.col1 track by $index">
-                            <div style="margin-bottom: 8px">
+                        <div class="col-md-4">
+                            <div ng-repeat="cell in row.col3 track by $index">
                                 <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
                             </div>
-
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div ng-repeat="cell in row.col2 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                    <!-- 4 columns -->
+                    <div ng-if = "row.meta.columnCount == 4">
+                        <div class="col-md-3">
+                            <div ng-repeat="cell in row.col1 track by $index">
+                                <div style="margin-bottom: 8px">
+                                    <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div ng-repeat="cell in row.col2 track by $index">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div ng-repeat="cell in row.col3 track by $index">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div ng-repeat="cell in row.col4 track by $index">
+                                <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div ng-repeat="cell in row.col3 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div ng-repeat="cell in row.col4 track by $index">
-                            <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
-                        </div>
-                    </div>
                 </div>
+
+                <hr style="margin: 2px"/>
 
             </div>
 
-            <hr style="margin: 2px"/>
+
 
         </div>
 

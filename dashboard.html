@@ -419,24 +419,14 @@
                                                     <div class="col-md-9">
                                                         <div ng-repeat = "entry in hashAllItems[selectedNode.data.item.linkId].dependencies">
                                                             <div class="row">
-                                                                <div class="col-md-6">
+                                                                <div class="col-md-12">
 
                                                                          {{hashAllItems[entry.item.linkId].item.text}}
                                                                     <span class="clickable" ng-click="editItemFromLinkId(entry.item.linkId)">
                                                                          ({{entry.item.linkId}})
                                                                      </span>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <!--
-                                                                    code = {{entry.ew.answerCoding.code}}
-                                                                    -->
-                                                                    <!--
-                                                                    <div ng-repeat="ew in entry.ew">
-                                                                        {{ew}}
-                                                                        {{ew.question}} = {{ew.answerCoding.code}}
-                                                                    </div>
-                                                                    -->
-                                                                </div>
+
                                                             </div>
                                                         </div>
 

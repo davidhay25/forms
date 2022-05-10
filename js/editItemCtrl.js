@@ -430,66 +430,12 @@ angular.module("formsApp")
 
             $scope.save = function() {
 
-                //todo - check for answerOption when type is not choice...
-
-                //console.log($scope.input.ewQuestion)
-                //console.log($scope.input.ewAnswer)
-
-                //rendering a valueset as answeroption
-
 
                 if ($scope.input.vs && $scope.input.vs.rendermode) {
-
-
                     $scope.meta.renderVS = $scope.input.vs.rendermode
-
-
                 }
 
-/*
-                //is there a conditional defined?
-                if ($scope.selectedSourceItem) {
-                    let ew
-                    switch ($scope.selectedSourceItem.type) {
-                        case "choice":
-                        case "open-choice":
-                            if ($scope.input.ewAnswer) {
-                                ew = {question:$scope.input.ewQuestion.linkId,operator:"=",answerCoding:$scope.input.ewAnswer.valueCoding}
-                            }
-                            break
-                        case "string" :
-                            if ($scope.input.ewAnswerString) {
-                                ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
-                                ew.answerString = $scope.input.ewAnswerString.valueString       //seems a bit convuluted...
-                            }
-                            break
-                        case "integer" :
-                            if ($scope.input.ewAnswerInteger) {
 
-                                let operator = '='
-                                if ($scope.input.conditionalOperator) {
-                                    operator = $scope.input.conditionalOperator
-                                }
-
-
-
-                                ew = {question:$scope.input.ewQuestion.linkId,operator:operator}
-                                ew.answerInteger = $scope.input.ewAnswerInteger.valueInteger       //seems a bit convuluted...
-                            }
-                            break
-                        case "boolean" :
-                            ew = {question:$scope.input.ewQuestion.linkId,operator:"="}
-                            ew.answerBoolean = $scope.input.ewAnswerBoolean == 'yes' ? true : false
-                            break
-                    }
-
-                    if (ew) {
-                        $scope.newItem.enableWhen = [ew]
-                    }
-
-                }
-
-*/
                 if (! $scope.newItem.linkId) {
                     alert("The linkId is mandatory...")
                     return
@@ -515,11 +461,8 @@ angular.module("formsApp")
                     $scope.newItem.extension = $scope.newItem.extension || []
                     $scope.newItem.extension.push({url:unitsExtension,valueCoding : coding})
 
-                    //delete $scope.newItem.tmp.units
 
                 }
-
-
 
                 if ($scope.newItem.tmp && $scope.newItem.tmp.codeCode) {
                     let code = {code:$scope.newItem.tmp.codeCode,
@@ -531,11 +474,6 @@ angular.module("formsApp")
                         }
 
                     $scope.newItem.code = [code]
-
-
-                    //explicetely set
-                    //$scope.newItem.extension = $scope.newItem.extension || []
-                    //$scope.newItem.extension.push({url:formsSvc.getObsExtension(),valueBoolean:true})
 
                 }
 

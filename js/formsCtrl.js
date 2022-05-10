@@ -93,19 +93,19 @@ angular.module("formsApp")
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
 
-                console.log('checking ' + cell.item.text)
+                //console.log('checking ' + cell.item.linkId)
 
                 if (! cell.meta) {
                     console.log(cell.item.text + " no meta")
                 }
 
-                //the group item doesn't have a meta directly
+                //If the item is hidden and the showHidden is not set then return false
                 if (! $scope.input.showHidden &&  cell.meta && cell.meta.hidden) {
                     return false
                 }
 
                 let show = formsSvc.checkConditional(cell.item,$scope.form)
-                console.log(cell.item.text, show)
+                //console.log(cell.item.text, show)
 
                 return show
 
@@ -114,8 +114,17 @@ angular.module("formsApp")
             }
 
             //code to show (or not) a conditional group - limited to Coding comparisons ATM
-            $scope.showConditionalGroupDEP = function(group) {
-                return formsSvc.checkConditional(group,$scope.form)
+            $scope.showConditionalGroup = function(group) {
+                if (group) {
+                    let show = formsSvc.checkConditional(group,$scope.form)
+                    console.log(">>>>>>>>>> " + group.linkId, show)
+                    return show
+                } else {
+                    //if not a group then show. child elements will be individually assessed later...
+                    return true
+                }
+
+
 
             }
 
