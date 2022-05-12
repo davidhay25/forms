@@ -136,12 +136,13 @@ angular.module("formsApp")
                 if (status == 'active') {
                     if ($scope.isQinBallot()) {
                         alert("An active Q should not also be in the ballot list")
+                    } else {
+                        $scope.input.dirty = true
                     }
                 } else {
                     $scope.input.dirty = true
                 }
-
-
+                
             }
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
@@ -330,6 +331,7 @@ angular.module("formsApp")
             }
 
 */
+
 
             $scope.expandAll = function() {
                 expandAll()

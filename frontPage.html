@@ -31,7 +31,6 @@
             background-color: #ebcccc;
         }
 
-
     </style>
 
     <script>
@@ -51,6 +50,9 @@
 
     <script src="js/frontPageCtrl.js"></script>
     <script src="js/formsService.js"></script>
+    <script src="js/vsEditorCtrl.js"></script>
+    <script src="js/terminologySvc.js"></script>
+    <script src="js/exportSvc.js"></script>
     <!--
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
@@ -128,23 +130,18 @@
                         <td>{{entry.item.Q.description}}</td>
                         <td>
                             <div ng-show="entry.item.Q">
+                                <div class="clickable" ng-click = "viewModel(entry.item.Q)">View dataset</div>
                                 <a target="_blank"
                                    ng-href="reviewForm.html?{{entry.item.Q.url}}">
                                     Load form
                                 </a>
+
                                 <div>
                                     <div class="clickable" ng-click="reviewComments()">Review comments</div>
-                                    <!--
-                                    <a target="_blank"
-                                       ng-href="reviewForm.html?{{entry.item.Q.url}}">
-                                        Review comments
-                                    </a>
-                                    -->
+
                                 </div>
                             </div>
                         </td>
-
-
                     </tr>
                 </table>
 
@@ -159,17 +156,107 @@
 
                         <td>{{Q.description}}</td>
                         <td>
+                            <div class="clickable" ng-click = "viewModel(Q)">View dataset</div>
+
                             <a target="_blank"
                                ng-href="reviewForm.html?{{Q.url}}">
                                 Load form
                             </a>
+
                         </td>
-
-
                     </tr>
                 </table>
             </div>
             <div class="col-md-6">
+                <div ng-show="selectedQ" class="banner">Dataset details
+                <br/>
+                    <em>{{selectedQ.title}}</em>
+
+                </div>
+
+                <uib-tabset  ng-show="selectedQ">
+                    <uib-tab heading="Tree">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div id="designTree"></div>
+                            </div>
+                            <div class="col-md-8">
+                                <table ng-show="selectedNode" class="table">
+                                    <tr><td>Text</td><td>{{selectedNode.data.item.text}}</td></tr>
+                                    <tr><td>Description</td><td>{{selectedNode.data.item.description}}</td></tr>
+                                    <tr><td>Type</td><td>{{selectedNode.data.item.type}}</td></tr>
+                                    <tr ng-show="selectedNode.data.item.answerOption">
+                                        <td>Options</td>
+                                        <td>
+                                            <div>
+                                    <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                        {{option.valueInteger}}{{option.valueString}}
+                                        {{option.valueCoding.display}},
+                                    </span>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr ng-show="selectedNode.data.item.answerValueSet">
+                                        <td>ValueSet</td>
+                                        <td>
+                                            <div class="clickable"
+                                                 ng-click="viewVS(selectedNode.data.item.answerValueSet)">
+                                                {{selectedNode.data.item.answerValueSet}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="selectedNode.data.item.repeats">
+                                        <td>Item can repeat</td>
+                                    </tr>
+                                    <tr ng-show="selectedNode.data.item.required">
+                                        <td>Item is required</td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </uib-tab>
+                    <uib-tab heading="Table">
+                        <ng-include src="'includes/showModel.html'"></ng-include>
+                    </uib-tab>
+                    <uib-tab heading="Comments">
+                        <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
+                            <tr><th>Comment</th><th>Disposition</th><th>Note</th></tr>
+                            <tr ng-repeat = "item in dispositionsForQ">
+
+                                <td>{{item.comment}}</td>
+
+                                <td>{{item.disposition.display}}</td>
+                                <td>{{item.note}}</td>
+                            </tr>
+                        </table>
+                    </uib-tab>
+                    <uib-tab heading="Questionnaire Json">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <a ng-show="downloadLinkJsonName" class="btn btn-link pull-right" download="{{downloadLinkJsonName}}"
+                                   href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                                    Download Json file
+                                </a>
+
+                                <i class="btn btn-link glyphicon glyphicon-download-alt clickable pull-right"
+                                   ng-click="download(selectedQ)"></i>
+
+                            </div>
+                        </div>
+                        <pre>{{selectedQ | json}}</pre>
+
+                    </uib-tab>
+                </uib-tabset>
+
+
+
+                <!--
 
                 <h4>Implementation Guides</h4>
 
@@ -238,6 +325,7 @@
 
                 </table>
 
+                -->
 
             </div>
 

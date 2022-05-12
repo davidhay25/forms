@@ -1,6 +1,6 @@
 angular.module("formsApp")
     .controller('frontPageCtrl',
-        function ($scope,$http,formsSvc) {
+        function ($scope,$http,formsSvc,$uibModal,exportSvc) {
 
 
             formsSvc.getBallotList().then(
@@ -22,16 +22,60 @@ angular.module("formsApp")
 
                         })
                     }
-
                 }
             )
 
-            $scope.reviewComments = function() {
-                alert("Todo. should this be all current comments or only those with dispositions? Sorta depends on the target audience...")
+            $scope.download = function(Q){
+
             }
 
-            let url = "/ds/fhir/Questionnaire?status=active"
+            $scope.reviewComments = function() {
+                alert("Todo. Intended for project team members and/or anyone who can review & create dispositions. Need login created.")
+            }
 
+            $scope.viewVS = function(url){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsEditor.html',
+                    backdrop: 'static',
+                    controller: 'vsEditorCtrl',
+                    size : 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        },
+                        modes: function () {
+                            return ['view']  //todo remove select
+                        }
+                    }
+                })
+            }
+
+            $scope.viewModel = function(Q) {
+                $scope.selectedQ = Q
+                $scope.model = exportSvc.createJsonModel(Q)
+
+                //create the download
+                let json = angular.toJson(Q,null,2)
+                $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([json],{type:"application/json"}))
+                var now = moment().format();
+                $scope.downloadLinkJsonName =  Q.name + '_' + now + '.json';
+
+                //make the tree
+                let vo = formsSvc.makeTreeFromQ(Q)
+                drawTree(vo.treeData)
+
+                //get the dispositions
+                formsSvc.loadDispositionsForQ(Q).then(
+                    function(data) {
+                        $scope.dispositionsForQ = data
+
+                    }
+                )
+
+            }
+
+            //retrieve all active Q for the 'approved' ds list
+            let url = "/ds/fhir/Questionnaire?status=active"
             $http.get(url).then(
                 function (data) {
                     $scope.activeQ = [];
@@ -42,6 +86,44 @@ angular.module("formsApp")
                     }
                 }
             )
+
+
+            let drawTree = function(treeData){
+                //console.log(treeData)
+
+                treeData.forEach(function (item) {
+                    item.state.opened = true
+                    if (item.parent == 'root') {
+                        item.state.opened = false;
+                    }
+                })
+
+                //expandAll(treeData)
+                //deSelectExcept()
+                $('#designTree').jstree('destroy');
+
+                let x = $('#designTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    //seems to be the node selection event...
+
+                    if (data.node) {
+                        $scope.selectedNode = data.node;
+                        //console.log(data.node)
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                })
+
+
+            }
+
+            let expandAll = function(treeData) {
+                treeData.forEach(function (item) {
+                    item.state.opened = true;
+                })
+            }
+
 
 
 /*
