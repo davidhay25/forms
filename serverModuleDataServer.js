@@ -46,6 +46,23 @@ function setup(app,serverRoot) {
             })
     })
 
+
+    app.get('/ds/fhir/ValueSet/\[$]expand',function(req,res){
+//console.log(req.query)
+        let url = serverRoot + "ValueSet/$expand?url=" + req.query.url
+
+        axios.get(url)
+            .then(function (response){
+                //console.log(response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                res.status(err.response.status).send(err.response.data)
+            })
+
+    })
+
     app.put('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
         let resource = req.body
@@ -62,9 +79,10 @@ function setup(app,serverRoot) {
             })
     })
 
+
     app.get('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
-
+console.log(url)
         axios.get(url)
             .then(function (response){
                 //console.log(response.data)

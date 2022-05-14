@@ -1,7 +1,6 @@
 <div>
 
-    <div>
-            <div class="row">
+    <div class="row">
                 <div class="col-md-3">
                     <div class="list-group">
                         <div ng-class="{'list-group-item':true,listItemSelected:selectedVSEntry == value}"
@@ -109,12 +108,17 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="Servers">
+                            <button class="btn btn-link" ng-click="checkTermServers()">Check terminology servers</button>
+
+                        </uib-tab>
+
                         <uib-tab heading="Json">
                             <pre>{{termVS | json}}</pre>
                         </uib-tab>
 
 
-                        <uib-tab heading="Edit contents">
+                        <uib-tab ng-show = "false" heading="Edit contents">
 
                             <br/>
 <!--
@@ -180,7 +184,7 @@
                 </div>
             </div>
 
-        </div>
+
 
 
 

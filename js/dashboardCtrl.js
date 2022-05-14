@@ -34,7 +34,7 @@ angular.module("formsApp")
 
             $scope.qStatus = ["draft","active","retired","unknown"]
 
-            $scope.viewVS = function(url){
+            $scope.viewVS = function(url,useRemote){
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
@@ -47,6 +47,14 @@ angular.module("formsApp")
                         },
                         modes: function () {
                             return ['view','edit']  //todo remove select
+                        },
+                        server : function() {
+                            if (useRemote) {
+                                return formsSvc.getServers().termServer
+                            } else {
+                                return null         //defaults to local
+                            }
+
                         }
                     }
                 })
@@ -142,7 +150,7 @@ angular.module("formsApp")
                 } else {
                     $scope.input.dirty = true
                 }
-                
+
             }
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"

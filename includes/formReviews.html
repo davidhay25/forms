@@ -3,7 +3,7 @@
     <div class="row">
         <!-- maybe remove this when debugging done-->
 
-        <div class="col-md-5">
+        <div class="col-md-3">
             <div class="row">
 
                 <uib-tabset>
@@ -20,7 +20,8 @@
                         <button class="btn btn-link" ng-click="refresh()">Refresh</button>
 
                     </uib-tab>
-                    <uib-tab heading="By Questionnaire">
+
+                    <uib-tab ng-show = "false" heading="By Questionnaire">
                         <div class="row">
                             <div class="col-md-6">
                                 <strong>Questionnaires</strong>
@@ -60,7 +61,7 @@
 
         </div>
 
-        <div class="col-md-7">
+        <div class="col-md-9">
             <div class="rounded-box-filled"><div style="text-align: center">{{selectedQ.name}}</div> </div>
             <div class="row">
 
@@ -124,6 +125,20 @@
                             <div ng-repeat="lne in arReviewRestrictions">
                                 {{lne}}
                             </div>
+                        </uib-tab>
+
+                        <uib-tab heading="All comments">
+                            <em>All comments (with dispositions) for this dataSet</em>
+                            <table class="table table-bordered table-condensed">
+                                <tr ng-repeat="disp in dispositionsForQ">
+                                    <td>{{disp.comment}}</td>
+                                    <td>{{disp.disposition.display}}</td>
+                                    <td>{{disp.note}}</td>
+                                    <td>{{disp.author}}</td>
+                                </tr>
+                            </table>
+
+
                         </uib-tab>
 
                         <uib-tab heading="QR Json">

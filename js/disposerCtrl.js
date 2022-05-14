@@ -1,5 +1,5 @@
 angular.module("formsApp")
-    .controller('frontPageCtrl',
+    .controller('disposerCtrl',
         function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService) {
 
 
@@ -40,7 +40,7 @@ angular.module("formsApp")
 
             //------------------------------
 
-
+/*
             formsSvc.getBallotList().then(
                 function (list) {
                     $scope.ballotList = list
@@ -62,36 +62,9 @@ angular.module("formsApp")
                     }
                 }
             )
+            */
 
-            $scope.download = function(Q){
 
-            }
-
-            //get the list of active ServiceRequests and get a count by Q
-            let qrySR = "/ds/fhir/ServiceRequest?status=active"
-            $scope.SRbyQ = {}
-            $http.get(qrySR).then(
-                function(data) {
-                    data.data.entry.forEach(function (entry) {
-                        let SR = entry.resource
-
-                        if (SR.supportingInfo) {
-                            SR.supportingInfo.forEach(function (si) {
-                                if (si.reference && si.reference.indexOf('Questionnaire/') > -1) {
-                                    //this is a reference to the Q
-                                    let qUrl = si.display
-                                    $scope.SRbyQ[qUrl] =  $scope.SRbyQ[qUrl] || 0
-                                    $scope.SRbyQ[qUrl] ++
-                                }
-
-                            })
-
-                        }
-
-                    })
-                    console.log($scope.SRbyQ)
-                }
-            )
 
             //get all the VS from the dev server
             //todo - need a more refined way - ?from all VS like we do in the dashboard pr some other tag
@@ -106,11 +79,11 @@ angular.module("formsApp")
             )
 
 
-            $scope.reviewCommentsDEP = function() {
+            $scope.reviewComments = function() {
                 alert("Todo. Intended for project team members and/or anyone who can review & create dispositions. Need login created.")
             }
 
-            $scope.viewVS = function(url){
+            $scope.viewVSDEP = function(url){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
                     backdrop: 'static',
@@ -130,7 +103,7 @@ angular.module("formsApp")
                 })
             }
 
-            $scope.viewModel = function(Q) {
+            $scope.viewModelDEP = function(Q) {
                 $scope.selectedQ = Q
                 $scope.model = exportSvc.createJsonModel(Q)
 
@@ -156,7 +129,7 @@ angular.module("formsApp")
                 $scope.vsForQ = terminologySvc.getValueSetsForQ(Q)
 
             }
-
+/*
             //retrieve all active Q for the 'approved' ds list
             let url = "/ds/fhir/Questionnaire?status=active"
             $http.get(url).then(
@@ -169,8 +142,9 @@ angular.module("formsApp")
                     }
                 }
             )
+*/
 
-
+            /*
             let drawTree = function(treeData){
                 //console.log(treeData)
 
@@ -207,9 +181,9 @@ angular.module("formsApp")
                 })
             }
 
+*/
 
 
-/*
                 //load all the disposition Observations for a Q
                 $scope.loadDispositionsForQ = function(Q) {
                         delete $scope.dispositionsForQ
@@ -222,23 +196,24 @@ angular.module("formsApp")
                         )
                 }
 
-                function loadAllQ() {
-                        let url = "/ds/fhir/Questionnaire"
-                        //let url = "/fm/fhir/Questionnaire"
-                        $http.get(url).then(
-                            function (data) {
-                                    $scope.allQ = [];
-                                    data.data.entry.forEach(function (entry){
+            /*
+                            function loadAllQ() {
+                                    let url = "/ds/fhir/Questionnaire"
+                                    //let url = "/fm/fhir/Questionnaire"
+                                    $http.get(url).then(
+                                        function (data) {
+                                                $scope.allQ = [];
+                                                data.data.entry.forEach(function (entry){
 
-                                            $scope.allQ.push(entry.resource)
+                                                        $scope.allQ.push(entry.resource)
 
-                                    })
-                                    //$scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
-                                    // console.log($scope.hashTerminology)
+                                                })
+                                                //$scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
+                                                // console.log($scope.hashTerminology)
+                                        }
+                                    )
                             }
-                        )
-                }
 
-                loadAllQ()
-*/
+                            loadAllQ()
+            */
         })

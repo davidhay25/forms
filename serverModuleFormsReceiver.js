@@ -148,7 +148,7 @@ async function extractResources(QR) {
         //could add other SR's as needed - or a task
 
 
-        let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request")      //todo refactor names of vo returned
+        let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request",Q)      //todo refactor names of vo returned
         //provenance.target = provenance.target || []
         provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...
@@ -165,7 +165,7 @@ async function extractResources(QR) {
             //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
             //let category = globals.labrefer
 
-            let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral")      //todo refactor names of vo returned
+            let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral",Q)      //todo refactor names of vo returned
             //provenance.target = provenance.target || []
             provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
             resources.obs.push(srMDM)          //not really all obs...
@@ -427,7 +427,7 @@ function createTask (QR,SR) {
 }
 
 //create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
-function createServiceRequest(QR,category,carePlan,description,arExtractedResources) {
+function createServiceRequest(QR,category,carePlan,description,Q) {
     let sr = {resourceType:"ServiceRequest"}
     sr.id = createUUID()   //will be ignored by fhir server
     //the subject might be a reference to a contained PR resource...
@@ -446,6 +446,8 @@ function createServiceRequest(QR,category,carePlan,description,arExtractedResour
     sr.supportingInfo = []
     //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
     sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
+
+    sr.supportingInfo.push({reference: "Questionnaire/"+Q.id,display: Q.url})
 
     //if there's a careplan \ then add the SR as an activity, and a reference from SR -> CP
     if (carePlan) {

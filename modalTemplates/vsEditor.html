@@ -174,9 +174,27 @@
 
         <div ng-show = "display == 'view'">
             <uib-tabset>
-                <uib-tab heading = "List from VS">
+                <uib-tab heading = "List from VS enumeration">
                     <br/>
+
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3">Code</div>
+                        <div class="col-md-3 col-sm-4">System</div>
+                        <div class="col-md-3 col-sm-4">Display</div>
+                    </div>
+                    <div ng-repeat = "inc in selectedValueSet.compose.include">
+                        <div class="row" ng-repeat="concept in inc.concept">
+                            <div class="col-md-3 col-sm-3">{{concept.code}}</div>
+                            <div class="col-md-3 col-sm-4">{{inc.system}}</div>
+                            <div class="col-md-3 col-sm-4">{{concept.display}}</div>
+                        </div>
+                    </div>
+
+
+                    <!--
                     <table class="table table-bordered table-condensed">
+                        <tr><th>Code</th><th>System</th><th>Display</th></tr>
+
                         <tr ng-repeat="concept in selectedValueSet.compose.include[0].concept">
                             <td>{{concept.code}}</td>
                             <td>{{concept.display}}</td>
@@ -184,9 +202,12 @@
                         </tr>
                     </table>
 
+                    -->
+
                 </uib-tab>
                 <uib-tab heading = "Expand">
                     <br/>
+
                     <div class="row">
                         <div class="col-md-4">
                             <input type="text" placeholder="Enter filter text" class="form-control" ng-model="input.filter"/>
@@ -210,15 +231,26 @@
 
                     <br/>
 
-                    <table class="table table-bordered table-condensed">
-                        <tr ng-repeat="concept in expandedVs.expansion.contains">
-                            <td>{{concept.code}}</td>
-                            <td>{{concept.display}}</td>
-                            <td>{{concept.system}}</td>
-                        </tr>
-                    </table>
+                    <uib-tabset ng-show="expandedVs">
+                        <uib-tab heading="Expansion">
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Code</th><th>System</th><th>Display</th></tr>
+                                <tr ng-repeat="concept in expandedVs.expansion.contains">
+                                    <td>{{concept.system}}</td>
+                                    <td>{{concept.code}}</td>
+                                    <td>{{concept.display}}</td>
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{expandedVs | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+
                 </uib-tab>
-                <uib-tab heading = "json">
+                <uib-tab heading = "VS Json">
                     <br/>
                     <pre>{{selectedValueSet | json}}</pre>
                 </uib-tab>
@@ -296,12 +328,16 @@
 
         <div class="row">
 
-            <div class="col-md-6 col-sm-6">
+            <div class="col-md-4 col-sm-4">
+                {{server}}
+            </div>
+
+            <div class="col-md-4 col-sm-4">
                 <div>{{selectedValueSet.title}}</div>
                 <em>{{selectedValueSet.url}}</em>
 
             </div>
-            <div class="col-md-6 col-sm-6">
+            <div class="col-md-4 col-sm-4">
                 <div>{{selectedValueSet.description}}</div>
             </div>
         </div>

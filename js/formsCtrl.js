@@ -80,12 +80,14 @@ angular.module("formsApp")
             }
 
             //invoked from ng-blur on for elements
-            $scope.makeQRDEP = function() {
+            $scope.makeQR = function() {
 
                 console.log('makeQR',$scope.form,$scope.hashItem)
 
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
                 console.log($scope.formQR)
+
+                $scope.$emit('qrCreated',$scope.formQR)
 
             }
 

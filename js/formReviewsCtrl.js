@@ -178,6 +178,15 @@ angular.module("formsApp")
                                                 $scope.selectedQR = QR
                                                 $scope.selectedQ = Q
                                                 processQR(QR)           //eg access extensions
+
+
+                                                //load all the dispositions made for this Q
+                                                formsSvc.loadDispositionsForQ(Q).then(
+                                                    function(data) {
+                                                        $scope.dispositionsForQ = data
+
+                                                    }
+                                                )
                                             }
 
                                         }

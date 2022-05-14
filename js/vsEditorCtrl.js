@@ -5,7 +5,10 @@
 
 angular.module("formsApp")
     .controller('vsEditorCtrl',
-        function ($scope,terminologySvc,vsUrl,$http,formsSvc, modes) {
+        function ($scope,terminologySvc,vsUrl,$http,formsSvc, modes,server) {
+
+            server = server || "/ds/fhir/"      //default to the local server
+            $scope.server = server
 
             //modes is allowed operations - select, view, edit
             //edit only supported when publisher = 'canshare'. assume a simple set of concepts in compose.include
@@ -24,8 +27,8 @@ angular.module("formsApp")
             if (modes.indexOf('select') > -1) {
                 $scope.allVS = []
                 //let termServer = formsSvc.getServers().termServer
-                let termServer = "/ds/fhir/"
-                let qry = termServer + "ValueSet?publisher="+$scope.publisher + "&_summary=false"  //otherwise the response is automatically summary only
+                //let termServer = "/ds/fhir/"
+                let qry = server + "ValueSet?publisher="+$scope.publisher + "&_summary=false"  //otherwise the response is automatically summary only
                 $http.get(qry).then(
                     function(data) {
                         if (data.data && data.data.entry) {
@@ -55,8 +58,8 @@ angular.module("formsApp")
             if (vsUrl) {
                //get the VS from the local server
                 //let termServer = formsSvc.getServers().termServer
-                let termServer = "/ds/fhir/"
-                let qry = termServer + "ValueSet?url=" + vsUrl
+                //let termServer = "/ds/fhir/"
+                let qry = server + "ValueSet?url=" + vsUrl
                  $http.get(qry).then(
                      function(data) {
                          let bundle = data.data
@@ -92,10 +95,10 @@ angular.module("formsApp")
 
             //set allowCreate if url is unique
             $scope.checkUniqueName = function(name) {
-                let termServer = "/ds/fhir/"
+                //let termServer = "/ds/fhir/"
                 //let termServer = formsSvc.getServers().termServer
                 let url = $scope.newVsRoot +  name
-                let qry = termServer + "ValueSet?url=" + url
+                let qry = server + "ValueSet?url=" + url
                 $http.get(qry).then(
                     function (data) {
                         let bundle = data.data
@@ -161,7 +164,38 @@ angular.module("formsApp")
 
             //when adding a new answer option which is a Coding
             $scope.addConcept = function(code,system,display){
-                code = code || '261665006'      //snomed code for unknown
+                //if there is no code, then make one up using the display and add to the 'unknown' system
+
+                if (! code || ! system) {
+                    //this has to go into the 'unknown' system
+                    if (! display) {
+                        alert("Display is required")
+                        return
+                    }
+                    system = "http://unknown.com"
+                    code =  display.replace(/\s+/g, '')
+                }
+
+                let found = false
+                if ($scope.selectedValueSet.compose.include) {
+                    //if there's already an include then see if it matches the system
+                    $scope.selectedValueSet.compose.include.forEach(function (inc) {
+                        if (inc.system == system) {
+                            inc.concept.push({code:code,display:display})
+                            found = true
+                        }
+                    })
+                }
+                if (! found) {
+                    //there wasn't an include with a matching system - insert it
+                    $scope.selectedValueSet.compose.include = $scope.selectedValueSet.compose.include || []
+                    let includeObj = {system:system,concept:[{code:code,display:display}]}
+                    $scope.selectedValueSet.compose.include.push(includeObj)
+
+                }
+                /*
+
+                //code = code || '261665006'      //snomed code for unknown
                 let includeObj = {system:system,concept:[]}
                 if ($scope.selectedValueSet.compose.include) {
                     includeObj = $scope.selectedValueSet.compose.include[0]
@@ -169,12 +203,10 @@ angular.module("formsApp")
                     $scope.selectedValueSet.compose.include = [includeObj]
                 }
                 includeObj.concept.push({code:code,display:display})
-
-
+                */
                 //let the selected system remain
                 delete $scope.input.newAnswerCode
                 delete $scope.input.newAnswerDisplay
-
 
                 $scope.dirty = true
 
@@ -184,12 +216,14 @@ angular.module("formsApp")
             $scope.save = function(){
                 console.log($scope.selectedValueSet)
                 //return
-                let termServer = "/ds/fhir/"
+                //let termServer = "/ds/fhir/"
 
-                let url = termServer + "ValueSet/" + $scope.selectedValueSet.id
+                let url = server + "ValueSet/" + $scope.selectedValueSet.id
                 $http.put(url,$scope.selectedValueSet).then(
                     function(data) {
-
+                        alert("ValueSet updated on local server")
+                        $scope.$close($scope.selectedValueSet)
+                        /* disable for the moment...
                         //save a copy to the term server
                         url = formsSvc.getServers().termServer + "ValueSet/" + $scope.selectedValueSet.id
                         $http.put(url,$scope.selectedValueSet).then(
@@ -202,6 +236,7 @@ angular.module("formsApp")
                                 $scope.$close($scope.selectedValueSet)
                             }
                         )
+                        */
                       //  $scope.$close($scope.selectedValueSet)
                         //$scope.hashTerminology[$scope.selectedValueSet.url] = $scope.selectedValueSet
                     },function(err) {
@@ -212,8 +247,8 @@ angular.module("formsApp")
 
             $scope.expandVS = function(url,filter) {
                 //let termServer = "/ds/fhir/"
-                let termServer = formsSvc.getServers().termServer
-                let qry =  termServer + "ValueSet/$expand?url=" + url
+                //let termServer = formsSvc.getServers().termServer
+                let qry =  server + "ValueSet/$expand?url=" + url
                 if (filter) {
                     qry += "&filter="+filter
                 }

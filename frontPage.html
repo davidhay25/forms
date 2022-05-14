@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>CanShare: Front page</title>
+    <title>Canshare DataSet Manager</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
@@ -34,7 +34,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase"]).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -53,11 +53,14 @@
     <script src="js/vsEditorCtrl.js"></script>
     <script src="js/terminologySvc.js"></script>
     <script src="js/exportSvc.js"></script>
+    <script src="js/loginCtrl.js"></script>
+    <script src="js/modalDialogSvc.js"></script>
     <!--
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 -->
-
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
 
     <style>
         #graph {
@@ -67,7 +70,21 @@
         }
     </style>
 
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+        authDomain: "canshare-730e6.firebaseapp.com",
+        projectId: "canshare-730e6",
+        storageBucket: "canshare-730e6.appspot.com",
+        messagingSenderId: "12147821347",
+        appId: "1:12147821347:web:5963d577cb050259475a96"
+    };
+    if (firebase) {
+        console.log('init firebase')
+        firebase.initializeApp(firebaseConfig);
 
+    }
+</script>
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
@@ -79,7 +96,8 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            CanShare project: front page
+                            <!--CanShare project: Publications front page -->
+                            Canshare DataSet Manager
                         </a>
                     </span>
             </div>
@@ -100,72 +118,126 @@
                 </form>
             </div>
 
-            <div class="col-md-1 col-sm-1">
+            <div class="col-md-3 col-sm-3">
+
+                    <div class="navbar-text pull-right">{{user.email}}</div>
+
 
             </div>
 
-            <div class="col-md-3 col-sm-3">
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
 
-                <div class="navbar-text">
-
+                <div class="navbar-text " class=" pull-right"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="Click to log out"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
                 </div>
 
             </div>
         </div>
     </nav>
 
-        >>> description of canshare here
 
 
         <div class="row">
 
             <div class="col-md-6">
-                <h4>Datasets open for review</h4>
 
-                <table class="table table-bordered">
-                    <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
-                    <tr ng-repeat = "entry in ballotList.entry">
-                        <td>{{entry.item.display}}</td>
-                        <td>{{entry.item.Q.version}}</td>
-                        <td>{{entry.item.Q.description}}</td>
-                        <td>
-                            <div ng-show="entry.item.Q">
-                                <div class="clickable" ng-click = "viewModel(entry.item.Q)">View dataset</div>
-                                <a target="_blank"
-                                   ng-href="reviewForm.html?{{entry.item.Q.url}}">
-                                    Load form
-                                </a>
+                <uib-tabset>
+                    <uib-tab heading = "Datasets open for review">
+                        <h4>Datasets open for review</h4>
 
-                                <div>
-                                    <div class="clickable" ng-click="reviewComments()">Review comments</div>
+                        <table class="table table-bordered">
+                            <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
+                            <tr ng-repeat = "entry in ballotList.entry">
+                                <td>{{entry.item.display}}</td>
+                                <td>{{entry.item.Q.version}}</td>
+                                <td>{{entry.item.Q.description}}</td>
+                                <td>
+                                    <div ng-show="entry.item.Q">
+                                        <div class="clickable" ng-click = "viewModel(entry.item.Q)">View dataset</div>
+                                        <a target="_blank"
+                                           ng-href="reviewForm.html?{{entry.item.Q.url}}">
+                                            Form display
+                                        </a>
 
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                                        <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
+
+                                            <a target="_blank" href="disposer.html">
+                                                Review comments <span class="badge">{{SRbyQ[entry.item.Q.url]}}</span>
+                                            </a>
 
 
-                <h4>Approved Datasets</h4>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-                <table class="table table-bordered">
-                    <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
-                    <tr ng-repeat = "Q in activeQ">
-                        <td>{{Q.title}}</td>
-                        <td>{{Q.version}}</td>
 
-                        <td>{{Q.description}}</td>
-                        <td>
-                            <div class="clickable" ng-click = "viewModel(Q)">View dataset</div>
+                    </uib-tab>
+                    <uib-tab heading = "Approved Datasets">
+                        <h4>Approved Datasets</h4>
 
-                            <a target="_blank"
-                               ng-href="reviewForm.html?{{Q.url}}">
-                                Load form
-                            </a>
+                        <table class="table table-bordered">
+                            <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
+                            <tr ng-repeat = "Q in activeQ">
+                                <td>{{Q.title}}</td>
+                                <td>{{Q.version}}</td>
 
-                        </td>
-                    </tr>
-                </table>
+                                <td>{{Q.description}}</td>
+                                <td>
+                                    <div class="clickable" ng-click = "viewModel(Q)">View dataset</div>
+
+                                    <a target="_blank"
+                                       ng-href="reviewForm.html?{{Q.url}}">
+                                        Form display
+                                    </a>
+
+                                    <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
+
+                                        <a target="_blank" href="disposer.html">
+                                            Review comments <span class="badge">{{SRbyQ[Q.url]}}</span>
+                                        </a>
+
+
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </table>
+
+                    </uib-tab>
+                    <uib-tab ng-show="false" heading = "ValueSets">
+                        <h4>ValueSets</h4>
+                        <table class="table table-bordered">
+                            <tr ng-repeat="vs in allVS">
+                                <td>{{vs.title}}</td>
+                                <td>{{vs.name}}</td>
+                                <td><div class="clickable" ng-click="viewVS(vs.url)">{{vs.url}}</div> </td>
+                            </tr>
+                        </table>
+                    </uib-tab>
+                </uib-tabset>
+
+
+
+
+
+
             </div>
             <div class="col-md-6">
                 <div ng-show="selectedQ" class="banner">Dataset details
@@ -224,16 +296,32 @@
                         <ng-include src="'includes/showModel.html'"></ng-include>
                     </uib-tab>
                     <uib-tab heading="Comments">
+                        <em>Should this be all comments, of only those with a disposition? Currently only
+                        those with a disposition (as it allows review of them first)</em>
                         <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
-                            <tr><th>Comment</th><th>Disposition</th><th>Note</th></tr>
+                            <tr><th>Type</th>Comment</thth><th>Disposition</th><th>Note</th></tr>
                             <tr ng-repeat = "item in dispositionsForQ">
 
+                                <td>{{item.linkId}}</td>
                                 <td>{{item.comment}}</td>
 
                                 <td>{{item.disposition.display}}</td>
                                 <td>{{item.note}}</td>
                             </tr>
                         </table>
+                    </uib-tab>
+                    <uib-tab heading="ValueSets">
+
+                        <table class="table">
+                            <tr><th>Url</th><th>LinkId</th></tr>
+                            <tr ng-repeat="item in vsForQ">
+                               <td><div class="clickable" ng-click="viewVS(item.vsUrl)">{{item.vsUrl}}</div> </td>
+                                <td>{{item.linkId}}</td>
+                            </tr>
+                        </table>
+
+                        <em>ValueSets for this dataSet. ?Instead of/ as well as all the ValueSets for all ds</em>
+
                     </uib-tab>
                     <uib-tab heading="Questionnaire Json">
                         <div class="row">
@@ -243,10 +331,10 @@
                                    href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
                                     Download Json file
                                 </a>
-
+<!--
                                 <i class="btn btn-link glyphicon glyphicon-download-alt clickable pull-right"
                                    ng-click="download(selectedQ)"></i>
-
+-->
                             </div>
                         </div>
                         <pre>{{selectedQ | json}}</pre>

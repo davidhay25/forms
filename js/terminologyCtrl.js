@@ -7,6 +7,22 @@ angular.module("formsApp")
 
             $scope.input.codeSystems = [{display:'snomed',url:'http://snomed.info/ct'}]
 
+            $scope.checkTermServers = function(){
+
+            }
+
+            $scope.copyFromRemote = function(vs) {
+
+            }
+
+
+
+            //called from dashboardVS
+            $scope.updateVS = function() {
+                $scope.arVS = terminologySvc.getValueSetsForQ($scope.selectedQ)  //selectedQ in parent scope
+                terminologySvc.makeTermServerSummary($scope.arVS)
+            }
+
             $scope.newVS = function() {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',

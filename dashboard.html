@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Forms designer</title>
+    <title>DataSet designer</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
@@ -114,7 +114,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Forms designer
+                            DataSet designer
                         </a>
                     </span>
             </div>
@@ -764,6 +764,67 @@
                                 </table>
                             </div>
 
+                        </uib-tab>
+
+                        <uib-tab heading="ValueSets">
+                            <br/>
+                            <div ng-controller="terminologyCtrl">
+                                <button class="btn-link btn pull-right" data-ng-click="updateVS()">Make summary</button>
+
+                                <table class="table table-bordered">
+                                    <tr><th>Url</th><th>LinkId</th><th>Local</th><th>Copy</th><th>Remote</th></tr>
+                                    <tr ng-repeat="item in arVS">
+                                        <td>{{item.vsUrl}}</td>
+                                        <td>
+                                            <span class="clickable" ng-click="editItemFromLinkId(item.linkId)">
+                                                 {{item.linkId}}
+                                             </span>
+                                           </td>
+                                        <td>
+                                            <div class="clickable" ng-click="viewVS(item.vsUrl)" >
+                                                <div ng-repeat="inc in item.local.compose.include">
+                                                    {{inc.system}}  {{inc.concept.length}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="clickable glyphicon glyphicon-arrow-right"></i>
+
+                                            <div>
+                                                <i class="clickable glyphicon glyphicon-arrow-left" ng-click="copyFromRemote()"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="clickable" ng-click="viewVS(item.vsUrl,true)" >
+                                                <div ng-repeat="inc in item.remote.compose.include">
+                                                    {{inc.system}}  {{inc.concept.length}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!--
+                                <div class="row" ng-repeat="item in arVS">
+                                    <div class="col-md-3">
+                                        {{item.vsUrl}}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div ng-repeat="inc in item.local.compose.include">
+                                            {{inc.system}}  {{inc.concept.length}}
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div ng-repeat="inc in item.remote.compose.include">
+                                            {{inc.system}}  {{inc.concept.length}}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+-->
+                            </div>
                         </uib-tab>
 
                         <uib-tab heading="Validate Q">

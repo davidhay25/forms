@@ -37,6 +37,9 @@ angular.module("formsApp")
                         },
                         modes : function() {
                             return ['select','view','edit']
+                        },
+                        server : function() {
+                            return null
                         }
                     }
                 }).result.then(
