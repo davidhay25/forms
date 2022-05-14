@@ -134,7 +134,7 @@ angular.module("formsApp")
                     return true
                 }
 
-                //console.log($scope.input.selectedFolderTag)
+
 
             }
 
@@ -221,7 +221,7 @@ angular.module("formsApp")
 
                     $http.post(url,bundle).then(
                         function(data) {
-                            console.log(data)
+
                             $scope.extractedResources = []
 
                             $scope.extractedResources.push({resource:$scope.selectedQR,OO:{},valid:true})
@@ -261,7 +261,7 @@ angular.module("formsApp")
                                     //$scope.selectedFromSingleGraph = node.resource;
 
 
-                                    console.log(obj)
+
                                     if (node.data && node.data.resource) {
                                         $scope.selectResource({resource:node.data.resource,OO:{}})
                                         $scope.$digest()
@@ -275,7 +275,7 @@ angular.module("formsApp")
                                     $scope.submitChart.setOptions( { physics: false } );
                                 });
 
-                                console.log(vo)
+
                             },2000)
 
                             //add other resources so they're visible in the display
@@ -358,10 +358,7 @@ angular.module("formsApp")
             }
 
 
-            $scope.makeCSVDEP = function() {
-                let csv = exportSvc.createDownloadCSV($scope.selectedQ)
-                console.log(csv)
-            }
+
 
             $scope.input.vsList = $localStorage.formsVS
 
@@ -430,7 +427,7 @@ angular.module("formsApp")
 
             $scope.importGroup = function(node){
                 //the node will be a section node
-                console.log(node)
+
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/importGroup.html',
@@ -443,7 +440,7 @@ angular.module("formsApp")
                     }
                 }).result.then(
                     function (group) {
-                        console.log(group)
+
                         $scope.selectedQ.item.forEach(function (section){
                             if (section.linkId == node.id) {  //node.id = linkId
                                 section.item = section.item || []
@@ -540,11 +537,10 @@ angular.module("formsApp")
             //invoked from ng-blur on for elements in renderSingleItem
 
             $scope.makeQR = function() {
-                //console.log('makeQR',$scope.form,$scope.hashItem)
-                //$scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
+
 
                 $scope.selectedQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-                //console.log($scope.formQR)
+
             }
 
             $scope.validateQR = function(QR){
@@ -633,15 +629,10 @@ angular.module("formsApp")
             }
 
             $scope.editItemFromReport = function (entry) {
-               // console.log(entry)
+
                 let item = entry.item
                 let node = findNodeById(item.linkId)
-                /*
-                let node = {data:{}}
-                node.data.item = item
-                node.data.level = "item"
-                node.id = entry.item.linkId     //needed to find node in tree...
-                */
+
                 $scope.editItem(node)
             }
 
@@ -649,10 +640,10 @@ angular.module("formsApp")
             //edit an existing item
             $scope.editItem = function(node) {
 
-               // let parentId = node.parent
+
 
                 let item = node.data.item
-                //console.log(node.data.level)    //child or parent
+
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editItem.html',
                     backdrop: 'static',
@@ -862,7 +853,7 @@ angular.module("formsApp")
 
                 return $http.get(qry).then(
                     function(data){
-                        //console.log(data.data)
+
                         let vs = data.data
                         if (vs.expansion) {
                             let ar = []
@@ -926,7 +917,7 @@ angular.module("formsApp")
                 var now = moment().format();
                 $scope.downloadLinkCsvName =  Q.name + '_' + now + '.csv';
 
-               // console.log(csv)
+
             }
 
             //perfroms a 'redraw' of the Q - called frequently
@@ -988,7 +979,7 @@ angular.module("formsApp")
                                         if (item && item.type == 'group') {
                                             //only set the drop target for a group
                                             $scope.dndTarget = item
-                                            //console.log('good')
+
                                             return false
                                         }
 
@@ -1020,7 +1011,7 @@ angular.module("formsApp")
                     if (data.node) {
                         $scope.selectedNode = data.node;
 
-                        //console.log(data.node)
+
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -1031,7 +1022,7 @@ angular.module("formsApp")
                         $("#designTree").jstree("select_node", "#" + $scope.treeIdToSelect);
                         delete $scope.treeIdToSelect
                     }
-                    //console.log($scope.treeData)
+
 
                 })
             }
@@ -1049,11 +1040,7 @@ angular.module("formsApp")
                 }
 
             })
-/*
-            $(document).on('dnd_start.vakata', function (e, data) {
-                console.log('Started');
-            });
-*/
+
             let expandAll = function() {
                 $scope.treeData.forEach(function (item) {
                     item.state.opened = true;

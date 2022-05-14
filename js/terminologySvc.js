@@ -7,6 +7,19 @@ angular.module("formsApp")
 
         return {
 
+            copyVStoServer : function(server,vs) {
+                //copy a valueset to a server. Check first for existing based on url / version
+                //if not exist then add
+                //if does exist then replace
+
+                let qry = server + "ValueSet?url="+vs.url
+                if (vs.version) {
+                    qry += "&version="+vs.version
+                }
+
+
+            },
+
             makeTermServerSummary : function(arVS){
                 //let deferred = $q.defer()
                 //take in an array of VS URL's, (from getValueSetsForQ) and retrieve the matching ValueSets (unexpanded) from both termserver and local server

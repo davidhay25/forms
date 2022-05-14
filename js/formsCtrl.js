@@ -24,7 +24,7 @@ angular.module("formsApp")
 
                 return $http.get(qry).then(
                     function(data){
-                        //console.log(data.data)
+
                         let vs = data.data
                         if (vs.expansion) {
                             let ar = []
@@ -52,7 +52,7 @@ angular.module("formsApp")
             $scope.observationExtract = function(item) {
                 let extUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
                 let ar = formsSvc.findExtension(item,extUrl)
-                //console.log(ar)
+
                 if (ar.length > 0) {
                     return true
                 }
@@ -67,7 +67,7 @@ angular.module("formsApp")
 
             //count the number of completed answers in each section - used by tabbed form...
             $scope.completedAnswersInSectionDEP = function(section) {
-                //console.log(section)
+
                 let cnt = 0
                 section.item.forEach(function (item){
                     if ($scope.form[item.linkId]) {
@@ -82,10 +82,10 @@ angular.module("formsApp")
             //invoked from ng-blur on for elements
             $scope.makeQR = function() {
 
-                console.log('makeQR',$scope.form,$scope.hashItem)
+
 
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-                console.log($scope.formQR)
+
 
                 $scope.$emit('qrCreated',$scope.formQR)
 
@@ -95,7 +95,7 @@ angular.module("formsApp")
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
 
-                //console.log('checking ' + cell.item.linkId)
+
 
                 if (! cell.meta) {
                     console.log(cell.item.text + " no meta")
@@ -107,7 +107,7 @@ angular.module("formsApp")
                 }
 
                 let show = formsSvc.checkConditional(cell.item,$scope.form)
-                //console.log(cell.item.text, show)
+
 
                 return show
 
@@ -119,7 +119,7 @@ angular.module("formsApp")
             $scope.showConditionalGroup = function(group) {
                 if (group) {
                     let show = formsSvc.checkConditional(group,$scope.form)
-                    //console.log(">>>>>>>>>> " + group.linkId, show)
+
                     return show
                 } else {
                     //if not a group then show. child elements will be individually assessed later...
@@ -140,14 +140,14 @@ angular.module("formsApp")
 
             //the type of this item is reference
             $scope.selectResourceFromService = function (item) {
-                console.log(item)
+
 
                 let ar = formsSvc.findExtension(item,"http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource")
 
-                console.log(ar)
+
                 if (ar.length > 0) {
                     let resourceType = ar[0].valueCode
-                    console.log(resourceType)
+
 
                     $uibModal.open({
                         templateUrl: 'modalTemplates/selectFromHPI.html',
@@ -184,7 +184,7 @@ angular.module("formsApp")
                     }).result.then(
                         function (resource) {
 
-                            console.log(resource)
+
                             //this is actually the scope from the parent...
 
                             if (resource.resourceType == "Practitioner") {

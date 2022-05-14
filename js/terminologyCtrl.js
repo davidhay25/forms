@@ -11,7 +11,17 @@ angular.module("formsApp")
 
             }
 
-            $scope.copyFromRemote = function(vs) {
+
+
+            $scope.downloadFromRemote = function(item) {
+                if (item.local) {
+                    //there is already a local copy
+                    if (confirm("Are you sure you wish to copy from the remote to the local? It will replace the local copy.")) {
+
+                    }
+                }
+
+
 
             }
 

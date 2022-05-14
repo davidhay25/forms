@@ -893,7 +893,7 @@ angular.module("formsApp")
                         cell.meta.expandedVSOptions = []
 
                         if (vsUrl.indexOf('canshare') > -1) {
-                            console.log("load by enumeration:" + vsUrl)
+
                             //this is a canshare created VS - enumerate the concepts from the local copy
                             let qry = "/ds/fhir/ValueSet?url=" + vsUrl
 
@@ -919,7 +919,7 @@ angular.module("formsApp")
 
                         } else {
 
-                            console.log("load by $expand:" + vsUrl)
+
                             //this is a VS produced by someone else - likely the spec - use $expand on the term server
                             //let vs = cell.item.answerValueSet
                             //maximum number to return is 50
@@ -929,7 +929,7 @@ angular.module("formsApp")
                                 function(data){
 
                                     let expandedVS = data.data
-console.log(expandedVS)
+
                                     if (expandedVS.expansion && expandedVS.expansion.contains) {
                                         expandedVS.expansion.contains.forEach(function (concept) {
                                             cell.meta.expandedVSOptions.push({system:concept.system,code:concept.code,display:concept.display})
@@ -1047,7 +1047,7 @@ console.log(expandedVS)
                                         let targetValue = parseInt(conditional.answerInteger)
                                         let value = formValue.valueInteger
 
-                                        console.log(item.linkId,value,targetValue)
+
 
                                         if (value > targetValue) {
                                             canShow = true
