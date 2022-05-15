@@ -134,9 +134,11 @@ angular.module("formsApp")
                 if ($scope.input.selectedFolderTag) {
                     //a folder has been selected - does this Q have the required tag?
                     if ($scope.input.selectedFolderTag.code == 'all') {
+
                         //changing a tag deletes the selected Q - this will select the first one
                         if (! $scope.selectedQ) {
-                            $scope.selectedQ = Q
+                            //$scope.selectedQ = Q
+                            $scope.selectQ(Q)
                         }
                         return true
                     } else {
@@ -144,8 +146,11 @@ angular.module("formsApp")
                             let rslt = false
                             Q.meta.tag.forEach(function (tag) {
                                 if (tag.system == $scope.tagFolderSystem && tag.code == $scope.input.selectedFolderTag.code) {
+
+                                    //selects the first in the list09
                                     if (! $scope.selectedQ) {
-                                        $scope.selectedQ = Q
+                                        $scope.selectQ(Q)
+                                        //$scope.selectedQ = Q
                                     }
                                     rslt = true
                                 }
@@ -929,7 +934,7 @@ angular.module("formsApp")
 
                     //the template for the forms preview
                     //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
-                    $scope.drawQ(Q,true)
+                    $scope.drawQ(Q,true)        //sets scope.selectedQ
                     $scope.treeIdToSelect = "root"
                 }
             }
@@ -1126,7 +1131,7 @@ angular.module("formsApp")
                                 $scope.input.togglePane()
                                 $scope.selectQ(ar[0])
                             }
-
+                        } else {
 
                         }
 
