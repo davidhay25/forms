@@ -1,7 +1,9 @@
 angular.module("formsApp")
     .controller('frontPageCtrl',
-        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService) {
+        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout) {
 
+            //system url for author tags
+            let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
             //-----------  login & user stuff....
 
@@ -25,15 +27,52 @@ angular.module("formsApp")
 
             };
 
+            function updateQEdit(email) {
+                //update whether the current user can edit the Q in the ballot list
+                //need to wait until the ballot list is available (it's all async)
+
+                //to keep it simple for now, we'll just wait a couple of seconds - todo a more sophisticated method needed...
+
+               // while (! $scope.ballotList) {
+                    console.log('checking author...')
+                    $timeout(function(){
+                        if ($scope.ballotList) {
+                            $scope.ballotList.entry.forEach(function (item) {
+                                if (item.item.Q && item.item.Q.meta && item.item.Q.meta.tag) {
+                                    item.item.Q.meta.tag.forEach(function (tag) {
+                                        if ( tag.system == tagAuthorSystem && tag.code == email) {
+                                            item.item.canAuthor = true
+
+                                        }
+                                    })
+
+                                }
+
+                            })
+                        } else {
+                            console.log("ballot list not available - increase wait time")
+                        }
+
+                    },2000)
+              //  }
+            }
+
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
             firebase.auth().onAuthStateChanged(function(user) {
 
                 if (user) {
                     console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
+                    updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
                     $scope.$digest()
                 } else {
                     delete $scope.user
+                    //need to remove any author permissions...
+                    if ($scope.ballotList) {
+                        $scope.ballotList.entry.forEach(function (item) {
+                            item.item.canAuthor = false
+                        })
+                    }
                 }
 
             });
@@ -48,11 +87,15 @@ angular.module("formsApp")
 
                     if ($scope.ballotList.entry) {
                         $scope.ballotList.entry.forEach(function (item) {
-                            let url = `/ds/fhir/${item.item.reference}`
+                            let url = `/ds/fhir/${item.item.reference}`   //a reference to the Q
                             $http.get(url).then(
                                 function (data) {
                                     console.log(data.data)
                                     item.item.Q = data.data
+
+
+
+
                                 }, function (err) {
                                     console.log(err)
                                 }
@@ -92,7 +135,7 @@ angular.module("formsApp")
                     console.log($scope.SRbyQ)
                 }
             )
-
+/*
             //get all the VS from the dev server
             //todo - need a more refined way - ?from all VS like we do in the dashboard pr some other tag
             let vsUrl = "/ds/fhir/ValueSet"
@@ -105,7 +148,7 @@ angular.module("formsApp")
                 }
             )
 
-
+*/
             $scope.reviewCommentsDEP = function() {
                 alert("Todo. Intended for project team members and/or anyone who can review & create dispositions. Need login created.")
             }

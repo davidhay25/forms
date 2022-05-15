@@ -39,6 +39,9 @@
              border: 1px solid lightgray;
          }
 
+         .hide {
+             display:none;
+         }
 
 
     </style>
@@ -111,10 +114,10 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-5 col-sm-5">
+            <div class="col-md-6 col-sm-6">
                     <span>
                         <a class="navbar-brand" href="#">
-                            DataSet designer
+                            DataSet designer<span ng-show="selectedQ">:</span> {{selectedQ.name}}
                         </a>
                     </span>
             </div>
@@ -122,9 +125,6 @@
             <div class="col-md-2 col-sm-2">
                 <div class="navbar-text">
                     {{thisUserId}}
-
-                    <!--
-                    <input type='text' class="form-control" ng-model="thisUserId"/>-->
                 </div>
 
             </div>
@@ -136,25 +136,21 @@
                 </form>
             </div>
 
-            <div class="col-md-3 col-sm-3">
+
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+                    <button class="btn btn-link" ng-click="input.togglePane()">Toggle dataset list</button>
+                </div>
 
             </div>
 
-            <div class="col-md-1 col-sm-3">
+            <div class="col-md-1 col-sm-1">
 
-
-<!--
-                    <a target="_blank"
-                       href="https://docs.google.com/document/d/e/2PACX-1vSFkjyfKuGvrvBHC8PBWJaV62u5gpvoLgwIINYDz0eCqas8SsAsqjD3vXWqtc3QCtnZnwja8-URsYah/pub">
-                        <i class="glyphicon glyphicon-question-sign navbar-text">  </i>
-                    </a>
--->
                 <a target="_blank"
                    href="https://docs.google.com/document/d/1ORjWXOCwrE8CqolB3rH3HC5J49DyphxG1q9hgjQcE2A/edit?usp=sharing">
                     <i class="glyphicon glyphicon-question-sign navbar-text">  </i>
                 </a>
-
-
 
             </div>
         </div>
@@ -165,7 +161,7 @@
         <uib-tab heading="Questionnaire resources">
             <br/>
             <div class="row">
-                <div class="col-md-2">
+                <div ng-class="input.leftPane">
 
                     <div class="row">
                         <div class="col-md-4">
@@ -203,11 +199,8 @@
                             Update Q
                         </button>
                     </div>
-
-
-
                 </div>
-                <div class="col-md-10">
+                <div ng-class="input.rightPane">
 
                     <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
 
@@ -217,11 +210,32 @@
 
                             <div class="row">
                                 <div class="col-md-5">
+
                                     <div class="pull-right">
                                         <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
                                         <button class="btn btn-link" ng-click="showSection()">Show sections</button>
                                     </div>
-                                    <div class="clearfix"></div>
+
+                                    <!--
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div style="padding-top: 8px" ng-show="input.rightPane == 'col-md-12'">
+                                                <strong >{{selectedQ.name}}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="pull-right">
+                                                <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
+                                                <button class="btn btn-link" ng-click="showSection()">Show sections</button>
+                                            </div>
+                                        </div>
+                                    </div>
+-->
+
+
+                                    <br/>
+
+
                                     <div class="myScroll">
                                         <div id="designTree"></div>
                                     </div>

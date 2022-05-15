@@ -169,6 +169,13 @@
                                 <td>
                                     <div ng-show="entry.item.Q">
                                         <div class="clickable" ng-click = "viewModel(entry.item.Q)">View dataset</div>
+
+                                        <div ng-show = "entry.item.canAuthor" class="clickable">
+                                            <a target="_blank" ng-href="dashBoard.html?{{entry.item.Q.url}}">
+                                                Edit dataset</a>
+                                        </div>
+
+
                                         <a target="_blank"
                                            ng-href="reviewForm.html?{{entry.item.Q.url}}">
                                             Form display
@@ -221,6 +228,7 @@
                         </table>
 
                     </uib-tab>
+                    <!--
                     <uib-tab ng-show="false" heading = "ValueSets">
                         <h4>ValueSets</h4>
                         <table class="table table-bordered">
@@ -231,6 +239,7 @@
                             </tr>
                         </table>
                     </uib-tab>
+                    -->
                 </uib-tabset>
 
 

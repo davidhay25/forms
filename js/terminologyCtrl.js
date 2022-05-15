@@ -17,12 +17,11 @@ angular.module("formsApp")
                 if (item.local) {
                     //there is already a local copy
                     if (confirm("Are you sure you wish to copy from the remote to the local? It will replace the local copy.")) {
-
+                        terminologySvc.copyVStoServer("/ds/fhir/",item.remote)
                     }
+                } else {
+                    terminologySvc.copyVStoServer("/ds/fhir/",item.remote)
                 }
-
-
-
             }
 
 

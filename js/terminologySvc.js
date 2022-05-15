@@ -8,6 +8,7 @@ angular.module("formsApp")
         return {
 
             copyVStoServer : function(server,vs) {
+                let deferred = $q.defer()
                 //copy a valueset to a server. Check first for existing based on url / version
                 //if not exist then add
                 //if does exist then replace
@@ -16,6 +17,52 @@ angular.module("formsApp")
                 if (vs.version) {
                     qry += "&version="+vs.version
                 }
+
+                $http.get(qry).then(
+                    function (data) {
+                        if (data.data.entry) {
+                           // if (data.data.entry) {
+                                if (data.data.entry.length > 1) {
+                                    let msg = "There are " + data.data.entry.length + "Valuesets with this url "
+                                    if (vs.version) { msg += "and version "}
+                                    msg += " on the target server"
+                                    deferred.reject({msg:msg})
+                                } else {
+                                    let vsFromServer = data.data.entry[0].resource
+                                    let updateQry = server + "ValueSet/"+vsFromServer.id
+                                    vs.id = vsFromServer.id //must be the same for a PUT
+                                    $http.put(updateQry,vs).then(
+                                        function (data) {
+                                            deferred.resolve()
+                                        },
+                                        function (err) {
+                                            deferred.reject(err.data)
+
+                                        }
+                                    )
+                                }
+                          //  }
+                        } else {
+                            //there were no matches found so can post
+                            let createQry = server + "ValueSet"
+                            $http.post(createQry,vs).then(
+                                function (data) {
+                                    deferred.resolve()
+                                },
+                                function (err) {
+                                    deferred.reject(err.data)
+                                }
+                            )
+
+                        }
+
+                    }, function (err) {
+                        deferred.reject(err.data)
+
+                    }
+                )
+
+                return deferred.promise
 
 
             },

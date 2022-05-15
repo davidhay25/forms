@@ -2,8 +2,14 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window) {
 
+
+            //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
+            let search = $window.location.search;
+            if (search) {
+                $scope.QfromUrl = search.substr(1)
+            }
 
             //load all the disposition Observations for a Q
             $scope.loadDispositionsForQ = function(Q) {
@@ -32,7 +38,27 @@ angular.module("formsApp")
             //system url for folder tags
             $scope.tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
 
+            //system url for author tags
+            $scope.tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
+
             $scope.qStatus = ["draft","active","retired","unknown"]
+
+
+            //toggle the left pane with the Q list
+            $scope.input.leftPane = "col-md-2"
+            $scope.input.rightPane = "col-md-10"
+
+            $scope.input.togglePane = function() {
+                if ($scope.input.rightPane == "col-md-10") {
+                    console.log('hide left pane')
+                    $scope.input.leftPane = "hide"
+                    $scope.input.rightPane = "col-md-12"
+                } else {
+                    console.log('show left pane')
+                    $scope.input.leftPane = "col-md-2"
+                    $scope.input.rightPane = "col-md-10"
+                }
+            }
 
             $scope.viewVS = function(url,useRemote){
 
@@ -1087,7 +1113,22 @@ angular.module("formsApp")
                                     }
                                 })
                             }
+
+
+
                         })
+                        if ($scope.QfromUrl) {
+                            // a Q was specified when the page was loaded...
+
+                            let ar = $scope.allQ.filter(item => item.url == decodeURIComponent($scope.QfromUrl))
+
+                            if (ar.length > 0) {
+                                $scope.input.togglePane()
+                                $scope.selectQ(ar[0])
+                            }
+
+
+                        }
 
                         $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
 

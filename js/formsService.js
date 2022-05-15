@@ -47,6 +47,8 @@ angular.module("formsApp")
         extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
         extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
+       // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
+
 
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
@@ -389,6 +391,7 @@ angular.module("formsApp")
                 updateExtension(item,extHisoDT,"String",meta.hisoDT)
                 updateExtension(item,extHisoLayout,"String",meta.hisoLayout)
 
+                //updateExtension(item,extAuthor,"String",meta.author)
 
                 //reference types
 /* todo - need to allow multiple extensions of same url...
@@ -527,8 +530,13 @@ angular.module("formsApp")
                 if (ar13.length > 0) {
                     meta.hisoLayout= ar13[0].valueString
                 }
+/*
+                let ar14 = this.findExtension(item,extAuthor)
+                if (ar14.length > 0) {
+                    meta.author = ar14[0].valueString
+                }
 
-
+*/
                 return meta
 
                 function getSingleExtValueTypeDEP(meta,item,url,type) {
