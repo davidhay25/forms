@@ -430,6 +430,8 @@ angular.module("formsApp")
                 var that = this
                 let meta = {}
 
+
+
                 //update the Observationextract
                 let ar = this.findExtension(item,extUrlObsExtract)
                 if (ar.length > 0 ) {
@@ -629,18 +631,18 @@ angular.module("formsApp")
                     //populate meta info - like resource extraction
                     entry.meta = that.getMetaInfoForItem(entry.item)
 
-
                 }
-// function updateSpecificArrays(sectionItem,report,child)
+
                 function updateSpecificArrays(sectionItem,report,child) {
                     //update the coded & reference
 
                     //because a dependency could be an item after the current one in the tree, there may be a hash entry that just has the dependencies
                     if (hashAllItems[child.linkId]) {
                         hashAllItems[child.linkId].item = child
+                        hashAllItems[child.linkId].section = sectionItem
 
                     } else {
-                        hashAllItems[child.linkId] = {item:child,dependencies:[]}
+                        hashAllItems[child.linkId] = {item:child,dependencies:[],section:sectionItem}
                     }
 
 

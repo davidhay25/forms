@@ -113,7 +113,7 @@
 
                                 <div class="col-sm-6">
 
-                                    <div ng-show="newItem.type == 'group'">
+                                    <div ng-show="newItem.type == 'group' && insertType !== 'section'">
                                         <div class="row">
                                             <div class="col-sm-6 col-md-6">
                                                 Column count
@@ -435,7 +435,7 @@
                             <br/>
                             <select ng-model="input.newEwQuestion" class="form-control"
                                     ng-change = "ewSelected(input.newEwQuestion)"
-                                    ng-options = "item.text for item in dependencySources"></select>
+                                    ng-options = "item.display for item in dependencySources"></select>
                             <br/>
                             <em>The question that this one depends on</em>
                         </div>

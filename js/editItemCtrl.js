@@ -128,6 +128,7 @@ angular.module("formsApp")
             //determine potentialdependency sources
             Object.keys(hashAllItems).forEach(function (key) {
                 let item1 = hashAllItems[key].item
+                let section =  hashAllItems[key].section;
 
                 //this item has a dependancy on the current one being edited
                 if (item1.enableWhen) {
@@ -143,13 +144,18 @@ angular.module("formsApp")
                     (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0) ||
                     (item1.type == 'integer' && item1.answerOption && item1.answerOption.length > 0))
                 {
+                    item1.display = item1.text
+                    if (section) {
+                        item1.display = "("+ section.linkId + ") " + item1.display
+                    }
                     $scope.dependencySources.push(item1)
                 }
-
-
             })
+
+
             $scope.dependencySources.sort(function (a,b){
-                if (a.text > b.text) {
+                //let key1 = a.section
+                if (a.display > b.display) {
                     return 1
                 } else {
                     return -1
