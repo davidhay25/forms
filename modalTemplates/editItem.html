@@ -37,10 +37,42 @@
 
                 <table class="table table-condensed">
                     <tr>
-                        <td>Parent</td>
-                        <td><input type="text" disabled = "disabled"
+                        <td>Section</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" disabled = "disabled"
 
-                                   ng-model="parent.item.text" class="form-control"/> </td>
+                                           ng-model="sectionItem.linkId" class="form-control"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" disabled = "disabled"
+
+                                           ng-model="sectionItem.text" class="form-control"/>
+                                </div>
+                            </div>
+
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td>Parent</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" disabled = "disabled"
+
+                                           ng-model="parent.item.linkId" class="form-control"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" disabled = "disabled"
+
+                                           ng-model="parent.item.text" class="form-control"/>
+                                </div>
+                            </div>
+                        </td>
 
                     </tr>
 

@@ -47,7 +47,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox',"firebase"]).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -105,7 +105,32 @@
     <script src="js/vsEditorCtrl.js"></script>
     <script src="js/libs/vis.min.js"></script>
     <script src="directive/noSpaces.js"></script>
+
+    <script src="js/qManagementCtrl.js"></script>
     <!--  <script src="js/dispositionCtrl.js"></script> -->
+
+    <script src="js/loginCtrl.js"></script>
+    <script src="js/modalDialogSvc.js"></script>
+
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
@@ -122,9 +147,9 @@
                     </span>
             </div>
 
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-1 col-sm-1">
                 <div class="navbar-text">
-                    {{thisUserId}}
+
                 </div>
 
             </div>
@@ -141,6 +166,29 @@
             <div class="col-md-2 col-sm-2">
                 <div class="navbar-text">
                     <button class="btn btn-link" ng-click="input.togglePane()">Toggle data standard list</button>
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="navbar-text " class=" pull-right"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
                 </div>
 
             </div>
@@ -362,8 +410,15 @@
                                                     </div>
                                                     <div class="col-md-9">
                                                         <div ng-repeat="ew in selectedNode.data.item.enableWhen">
-                                                           <span class="clickable" ng-click="editItemFromLinkId(ew.question)">
-                                                               {{ew.question}} </span>
+                                                           <span class="clickable" ng-click="editItemFromLinkId(ew.question)"
+
+                                                                 uib-popover="Section: {{hashAllItems[ew.question].section.text}}"
+                                                                 popover-placement="right"
+                                                                 popover-trigger="'mouseenter'"
+                                                           >
+                                                               {{ew.question}}
+
+                                                           </span>
                                                             {{ew.operator}}
 
                                                             <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
@@ -436,7 +491,14 @@
                                                                 <div class="col-md-12">
 
                                                                          {{hashAllItems[entry.item.linkId].item.text}}
-                                                                    <span class="clickable" ng-click="editItemFromLinkId(entry.item.linkId)">
+                                                                    <span class="clickable"
+                                                                          ng-click="editItemFromLinkId(entry.item.linkId)"
+
+                                                                          uib-popover="Section: {{hashAllItems[entry.item.linkId].section.text}}"
+                                                                          popover-placement="right"
+                                                                          popover-trigger="'mouseenter'"
+
+                                                                    >
                                                                          ({{entry.item.linkId}})
                                                                      </span>
                                                                 </div>
@@ -968,6 +1030,14 @@
             </div>
 
             </uib-tab>
+
+        <uib-tab ng-show="user.email == 'david.hay25@gmail.com'" heading = "Q Management">
+
+                <ng-include src = "'includes/qManagement.html'"></ng-include>
+
+
+
+        </uib-tab>
 
 
         </uib-tabset>

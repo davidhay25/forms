@@ -6,12 +6,20 @@ function setup(app,serverRoot) {
     //routes that are intended to be 'public' routes - ie that matches what the IG requires
 
 
-    //custom service for the lab to submit the report
-    //take a bundle containing DR, Obs & SR
-    //set DR.basedOn to the SR
-    //create an update bundle:
-    //PUT SR, POST DR & Obs
-    //app.post('/ds/fhir/Questionnaire/validate',function(req,res) {
+    app.delete('/ds/fhir/Questionnaire/:id',function(req,res){
+        let url = serverRoot + "Questionnaire/" + req.params.id
+
+        axios.delete(url)
+            .then(function (response){
+                //console.log(response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                res.status(err.response.status).send(err.response.data)
+            })
+    })
+
     app.post('/ds/fhir/:type/validate',function(req,res) {
 
         let resource = req.body
@@ -29,7 +37,6 @@ function setup(app,serverRoot) {
 
     })
 
-
     app.post('/ds/fhir/:type/',function(req,res){
         let url = serverRoot + req.params.type
         let resource = req.body
@@ -45,7 +52,6 @@ function setup(app,serverRoot) {
                 res.status(err.response.status).send(err.response.data)
             })
     })
-
 
     app.get('/ds/fhir/ValueSet/\[$]expand',function(req,res){
 //console.log(req.query)

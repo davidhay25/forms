@@ -1,0 +1,38 @@
+<div ng-controller="qManagementCtrl">
+
+
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == qmSelectedQ.id}"
+                     style="cursor: pointer"
+
+                     ng-click="qmSelectQ(Q)"
+                     ng-repeat="Q in allQ">
+                    {{Q.name}}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <uib-tabset>
+                <uib-tab heading="Json">
+                    <pre>{{qmSelectedQ | json}}</pre>
+                </uib-tab>
+                <uib-tab heading="Actions">
+                    <div>
+                        <button class="btn btn-danger" ng-click="deleteQ(qmSelectedQ)">Delete Q</button>
+                    </div>
+<br/>
+                    <div>
+                        <button class="btn btn-primary" ng-click="downloadQ(qmSelectedQ)">Download Q</button>
+                    </div>
+
+                </uib-tab>
+            </uib-tabset>
+        </div>
+
+
+
+    </div>
+</div>

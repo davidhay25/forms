@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window,modalService) {
 
 
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
@@ -59,6 +59,45 @@ angular.module("formsApp")
                     $scope.input.rightPane = "col-md-10"
                 }
             }
+
+            //--------- login stuff
+            //called whenever the auth state changes - eg login/out, initial load, create user etc.
+            firebase.auth().onAuthStateChanged(function(user) {
+
+                if (user) {
+                    console.log('logged in')
+                    $scope.user = {email:user.email,displayName : user.displayName}
+                    updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
+                    $scope.$digest()
+                } else {
+                    delete $scope.user
+
+                }
+
+            });
+
+            $scope.login=function(){
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    templateUrl: 'modalTemplates/login.html',
+                    controller: 'loginCtrl'
+                })
+            };
+
+            $scope.logout=function(){
+                firebase.auth().signOut().then(function() {
+                    delete $scope.user;
+                    modalService.showModal({}, {bodyText: 'You have been logged out'})
+
+                }, function(error) {
+                    modalService.showModal({}, {bodyText: 'Sorry, there was an error logging out - please try again'})
+                });
+
+            };
+
+
+            //--------
 
             $scope.viewVS = function(url,useRemote){
 
@@ -1092,16 +1131,13 @@ angular.module("formsApp")
 
             }
 
-            function loadAllQ() {
+            $scope.loadAllQ = function() {
                 let url = "/ds/fhir/Questionnaire"
 
                 let t = {code:'all'}
                 $scope.folderTags = {} //
                 $scope.folderTags['all'] = t
                 $scope.input.selectedFolderTag = $scope.folderTags['all']
-
-                //if (!)
-              //  $scope.input.selectedFolderTag = {code:"all"}
 
                 $http.get(url).then(
                     function (data) {
@@ -1118,8 +1154,6 @@ angular.module("formsApp")
                                     }
                                 })
                             }
-
-
 
                         })
                         if ($scope.QfromUrl) {
@@ -1147,5 +1181,5 @@ angular.module("formsApp")
                 )
             }
 
-            loadAllQ()
+            $scope.loadAllQ()
         })

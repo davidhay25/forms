@@ -15,7 +15,7 @@
                     <strong>linkId</strong>
                 </div>
                 <div class="col-md-3">
-                    <strong>Text</strong>
+                    <strong>Text / <em>Description</em></strong>
                 </div>
                 <div class="col-md-2">
                     <strong>Q code</strong>
@@ -71,6 +71,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     {{child.item.text}}
+                                    <div><em>{{child.meta.description}}</em></div>
                                 </div>
 
                                 <div class="col-md-2">
@@ -120,6 +121,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         {{grandchild.item.text}}
+                                        <div><em>{{grandchild.meta.description}}</em></div>
                                     </div>
                                     <div class="col-md-2">
 
