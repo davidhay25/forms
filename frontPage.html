@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Canshare DataSet Manager</title>
+    <title>Canshare Data Standard Manager</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
@@ -97,7 +97,7 @@
                     <span>
                         <a class="navbar-brand" href="#">
                             <!--CanShare project: Publications front page -->
-                            Canshare DataSet Manager
+                            Canshare Data Standard Manager
                         </a>
                     </span>
             </div>
@@ -157,8 +157,8 @@
             <div class="col-md-6">
 
                 <uib-tabset>
-                    <uib-tab heading = "Datasets open for review">
-                        <h4>Datasets open for review</h4>
+                    <uib-tab heading = "Data Standards open for review">
+                        <h4>Data Standards open for review</h4>
 
                         <table class="table table-bordered">
                             <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
@@ -168,11 +168,11 @@
                                 <td>{{entry.item.Q.description}}</td>
                                 <td>
                                     <div ng-show="entry.item.Q">
-                                        <div class="clickable" ng-click = "viewModel(entry.item.Q)">View dataset</div>
+                                        <div class="clickable" ng-click = "viewModel(entry.item.Q)">View data standard</div>
 
                                         <div ng-show = "entry.item.canAuthor" class="clickable">
                                             <a target="_blank" ng-href="dashboard.html?{{entry.item.Q.url}}">
-                                                Edit dataset</a>
+                                                Edit data standard</a>
                                         </div>
 
 
@@ -196,8 +196,8 @@
 
 
                     </uib-tab>
-                    <uib-tab heading = "Approved Datasets">
-                        <h4>Approved Datasets</h4>
+                    <uib-tab heading = "Approved Data Standards">
+                        <h4>Approved Data Standards</h4>
 
                         <table class="table table-bordered">
                             <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
@@ -207,7 +207,7 @@
 
                                 <td>{{Q.description}}</td>
                                 <td>
-                                    <div class="clickable" ng-click = "viewModel(Q)">View dataset</div>
+                                    <div class="clickable" ng-click = "viewModel(Q)">View data standard</div>
 
                                     <a target="_blank"
                                        ng-href="reviewForm.html?{{Q.url}}">
@@ -249,7 +249,7 @@
 
             </div>
             <div class="col-md-6">
-                <div ng-show="selectedQ" class="banner">Dataset details
+                <div ng-show="selectedQ" class="banner">Data Standard details
                 <br/>
                     <em>{{selectedQ.title}}</em>
 

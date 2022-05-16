@@ -365,13 +365,14 @@
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
                 <table class="table table-bordered table-condensed">
-                    <tr><th>Code</th><th>System</th><th>Display</th></tr>
+                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
                     <tr ng-repeat = "option in newItem.answerOption">
+                        <td>{{option.valueCoding.display}}</td>
                         <td>{{option.valueCoding.code}}</td>
                         <td>
                             {{option.valueCoding.system}}
                         </td>
-                        <td>{{option.valueCoding.display}}</td>
+
                         <td>
                             <i class=" clickable glyphicon glyphicon-remove"
                                ng-click = "removeAnswerOption($index)"></i>
@@ -385,6 +386,7 @@
                         </td>
                     </tr>
                     <tr>
+                        <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
                         <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
                         <td>
 
@@ -394,9 +396,9 @@
                             <input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/>
                         -->
                         </td>
-                        <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
+
                         <td>
-                            <i ng-show="input.newAnswerCode && input.newAnswerDisplay"
+                            <i ng-show="input.newAnswerDisplay"
                                class="clickable glyphicon glyphicon-plus-sign"
                                ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
 
