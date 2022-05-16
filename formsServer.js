@@ -29,7 +29,7 @@ MongoClient.connect(url, function(err, client) {
 });
 
 */
-app.use(bodyParser.json({type:['application/fhir+json','application/json']}))
+app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 
 let serverRoot = "http://localhost:9099/baseR4/"
 
