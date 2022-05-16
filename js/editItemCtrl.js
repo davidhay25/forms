@@ -12,9 +12,12 @@ angular.module("formsApp")
             $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
             $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
 
-            if (hashAllItems[item.linkId]) {
-                $scope.sectionItem = hashAllItems[item.linkId].section
+            if (item) {
+                if (hashAllItems && hashAllItems[item.linkId]) {
+                    $scope.sectionItem = hashAllItems[item.linkId].section
+                }
             }
+
 
 
             if (! item) {
