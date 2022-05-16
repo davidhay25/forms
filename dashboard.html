@@ -260,6 +260,13 @@
                                 <div class="col-md-5">
 
                                     <div class="pull-right">
+
+                                        <a ng-show="downloadLinkQName" class="btn btn-link pull-right" download="{{downloadLinkQName}}"
+                                           href="{{downloadLinkQ}}" title="{{downloadLinkQName}}" >
+                                            Download Q
+                                        </a>
+
+
                                         <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
                                         <button class="btn btn-link" ng-click="showSection()">Show sections</button>
                                     </div>

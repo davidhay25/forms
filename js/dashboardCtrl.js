@@ -849,11 +849,10 @@ angular.module("formsApp")
                 $scope.hashAllItems = vo.hashAllItems
 
                 makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
+                makeQDownload($scope.selectedQ)
             }
 
             //-----------  tree utility functions
-
-
 
             //return all the direct child elements of the node
             function findChildElements(inNode) {
@@ -963,14 +962,13 @@ angular.module("formsApp")
                     }
                 } else {
 
-
                     //for the summary tab...
                     let vo = formsSvc.generateQReport(Q)
                     $scope.report = vo.report
                     $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
 
                     makeCsvAndDownload(Q,vo.hashAllItems)
-
+                    makeQDownload(Q)
                     //the template for the forms preview
                     //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
                     $scope.drawQ(Q,true)        //sets scope.selectedQ
@@ -986,9 +984,14 @@ angular.module("formsApp")
                 $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
                 var now = moment().format();
                 $scope.downloadLinkCsvName =  Q.name + '_' + now + '.csv';
-
-
             }
+
+            function makeQDownload(Q) {
+                $scope.downloadLinkQ = window.URL.createObjectURL(new Blob([angular.toJson(Q,null,2)],{type:"application/json"}))
+                var now = moment().format();
+                $scope.downloadLinkQName =  Q.name + '_' + now + '.json';
+            }
+
 
             //perfroms a 'redraw' of the Q - called frequently
             $scope.drawQ = function(Q,resetToSection) {

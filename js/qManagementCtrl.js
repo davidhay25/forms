@@ -8,6 +8,7 @@ angular.module("formsApp")
 
 
             //if run on local machine, will create a copy with the same url & other metadata
+            //todo - k=just makes a copy!
             $scope.downloadQ = function(Q) {
                 if (confirm("Are you sure you want to download this Q: " + Q.name)) {
                     let clone = angular.copy(Q)
