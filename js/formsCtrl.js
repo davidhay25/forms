@@ -13,8 +13,6 @@ angular.module("formsApp")
                 $scope.datePopup[linkId] = {opened:true}
                // $scope.datePopup.opened = true
             }
-
-
             //used by the preview for coded elements - not sure it is actually used yet
             $scope.searchTermServerDEP = function(val,url) {
                 $scope.showWaiting = true
@@ -62,7 +60,6 @@ angular.module("formsApp")
             //when a top level item is selected in the tabbed interface
             $scope.selectSection = function(section) {
                 $scope.selectedSection = section
-
             }
 
             //count the number of completed answers in each section - used by tabbed form...

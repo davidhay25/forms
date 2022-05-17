@@ -5,6 +5,8 @@ angular.module("formsApp")
         function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window,modalService) {
 
 
+
+
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
             let search = $window.location.search;
             if (search) {
@@ -98,6 +100,20 @@ angular.module("formsApp")
 
 
             //--------
+
+            $scope.removeAttachment = function(url) {
+                formsSvc.removeQAttachment($scope.selectedQ,url)
+                $scope.allAttachments = formsSvc.getQAttachments($scope.selectedQ)
+                $scope.input.dirty = true
+            }
+
+            $scope.addAttachment = function(title,url) {
+                formsSvc.addQAttachment($scope.selectedQ,{title:title,url:url})
+                $scope.allAttachments = formsSvc.getQAttachments($scope.selectedQ)
+                $scope.input.dirty = true
+                delete $scope.input.newAttachmentTitle
+                delete $scope.input.newAttachmentUrl
+            }
 
             $scope.viewVS = function(url,useRemote){
 
@@ -969,8 +985,12 @@ angular.module("formsApp")
 
                     makeCsvAndDownload(Q,vo.hashAllItems)
                     makeQDownload(Q)
+
+                    $scope.allAttachments = formsSvc.getQAttachments(Q)
                     //the template for the forms preview
                     //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+
+
                     $scope.drawQ(Q,true)        //sets scope.selectedQ
                     $scope.treeIdToSelect = "root"
                 }

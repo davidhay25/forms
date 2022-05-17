@@ -28,6 +28,20 @@
             Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
         </div>
 
+
+
+        <div ng-show="objFormTemplate.attachments.length > 0">
+            <h4>Attachments</h4>
+
+            <div ng-repeat ="att in objFormTemplate.attachments">
+                <a ng-href="{{att.url}}" target="_blank">{{att.title}}</a>
+            </div>
+
+            <br/>
+            <em>Attachments open in a new tab</em>
+
+        </div>
+
     </div>
 
     <div class="col-md-9">

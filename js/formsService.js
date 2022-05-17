@@ -48,7 +48,7 @@ angular.module("formsApp")
         extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
-
+        extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
 
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
@@ -77,6 +77,39 @@ angular.module("formsApp")
         }
 
         return {
+
+            getQAttachments : function(Q) {
+                //return an array of attachments
+                let arExt = this.findExtension(Q,extQAttachment)
+                let ar = []
+                arExt.forEach(function (ext) {
+                    ar.push(ext.valueAttachment)
+
+                })
+
+                return ar
+
+            },
+            addQAttachment : function(Q,att) {
+                Q.extension = Q.extension || []
+                Q.extension.push({url:extQAttachment,valueAttachment : att})
+
+            },
+            removeQAttachment : function(Q,url) {
+                let pos = -1
+                if (Q.extension) {
+                    Q.extension.forEach(function (ext,inx) {
+                        if (ext.url == extQAttachment && ext.valueAttachment && ext.valueAttachment.url == url) {
+                            pos = inx
+                        }
+
+                    })
+                    if (pos > -1) {
+                        Q.extension.splice(pos,1)
+                    }
+                }
+
+            },
 
             removeQfromBallotList : function(Q) {
                 //remove the Q with the id from the ballot list
@@ -845,8 +878,13 @@ angular.module("formsApp")
                     })
                 }
 
+                let attachments = that.getQAttachments(Q)
 
-                return {template:template,hiddenFields:hiddenFields,hiddenSections: hiddenSections}
+                return {template:template,
+                    hiddenFields:hiddenFields,
+                    hiddenSections: hiddenSections,
+                    attachments: attachments
+                }
 
                 //looks for specific instructions from the Q about an item - eg render as radio
                 //todo - does this overlap with the meta stuff??
