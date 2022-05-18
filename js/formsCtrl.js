@@ -45,7 +45,6 @@ angular.module("formsApp")
                 )
             };
 
-
             //return true if the item will be extracted as an observation by the forms receiver
             $scope.observationExtract = function(item) {
                 let extUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"

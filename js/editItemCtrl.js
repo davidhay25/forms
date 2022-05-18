@@ -186,10 +186,13 @@ angular.module("formsApp")
             //add a new ew - when supporting multiple
             $scope.addNewEw = function() {
                 let source = $scope.input.newEwQuestion
-                let operator = "="
+                let operator = $scope.input.conditionalOperator || "="
                 let ew = {question:source.linkId,operator:operator}
 
                 switch ($scope.newEwSelectedSourceItem.type) {
+                    case "string" :
+                        ew.answerString = $scope.input.ewAnswerString.valueString
+                        break
                     case "boolean" :
                         if ($scope.input.ewAnswerBoolean == 'yes') {
                             ew.answerBoolean = true
@@ -372,7 +375,7 @@ angular.module("formsApp")
             }
 
             $scope.removeAnswerOption = function(inx){
-                $scope.newItem.answerOption.splice(inx)
+                $scope.newItem.answerOption.splice(inx,1)
             }
 
 

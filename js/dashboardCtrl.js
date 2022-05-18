@@ -104,12 +104,14 @@ angular.module("formsApp")
             $scope.removeAttachment = function(url) {
                 formsSvc.removeQAttachment($scope.selectedQ,url)
                 $scope.allAttachments = formsSvc.getQAttachments($scope.selectedQ)
+                $scope.objFormTemplate = formsSvc.makeFormTemplate($scope.selectedQ)
                 $scope.input.dirty = true
             }
 
             $scope.addAttachment = function(title,url) {
                 formsSvc.addQAttachment($scope.selectedQ,{title:title,url:url})
                 $scope.allAttachments = formsSvc.getQAttachments($scope.selectedQ)
+                $scope.objFormTemplate = formsSvc.makeFormTemplate($scope.selectedQ)
                 $scope.input.dirty = true
                 delete $scope.input.newAttachmentTitle
                 delete $scope.input.newAttachmentUrl

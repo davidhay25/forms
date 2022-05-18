@@ -440,14 +440,30 @@
 
                                                 <div class="row" ng-show="selectedNode.data.meta.usageNotes">
                                                     <div class="col-md-3">
-                                                        Usage Notes
+                                                        Usage guide
                                                     </div>
                                                     <div class="col-md-9">
                                                         {{selectedNode.data.meta.usageNotes}}
                                                     </div>
                                                 </div>
 
+                                                <div class="row" ng-show="selectedNode.data.meta.verification">
+                                                    <div class="col-md-3">
+                                                        Verification rules
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.verification}}
+                                                    </div>
+                                                </div>
 
+                                                <div class="row" ng-show="selectedNode.data.meta.notes">
+                                                    <div class="col-md-3">
+                                                        Notes
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.meta.notes}}
+                                                    </div>
+                                                </div>
 
                                                 <div class="row" ng-show="selectedNode.data.meta.extraction.notes || selectedNode.data.meta.extraction.extractObservation">
                                                     <div class="col-md-3">

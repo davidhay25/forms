@@ -35,6 +35,11 @@ angular.module("formsApp")
 
         extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
         extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
+
+        extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
+        extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
+
+
         extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
         extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
@@ -424,6 +429,13 @@ angular.module("formsApp")
                 updateExtension(item,extHisoDT,"String",meta.hisoDT)
                 updateExtension(item,extHisoLayout,"String",meta.hisoLayout)
 
+                updateExtension(item,extVerification,"String",meta.verification)
+                updateExtension(item,extNotes,"String",meta.notes)
+
+               //extVerification=
+                   // extNotes
+
+
                 //updateExtension(item,extAuthor,"String",meta.author)
 
                 //reference types
@@ -572,6 +584,22 @@ angular.module("formsApp")
                 }
 
 */
+
+                let ar14 = this.findExtension(item,extVerification)
+                if (ar14.length > 0) {
+                    meta.verification = ar14[0].valueString
+                }
+
+                let ar15 = this.findExtension(item,extNotes)
+                if (ar15.length > 0) {
+                    meta.notes= ar15[0].valueString
+                }
+
+
+
+
+
+
                 return meta
 
                 function getSingleExtValueTypeDEP(meta,item,url,type) {
@@ -1049,6 +1077,21 @@ angular.module("formsApp")
                         if (formValue !== undefined && formValue !== null) {        //note that value may be boolean false...
                             //if (formValue !== null) {
                             switch(conditional.operator) {
+
+                                case '!=' :
+                                    if (conditional.answerString) {
+                                        if (formValue.valueString !== conditional.answerString) {
+                                            canShow = true
+                                        }
+                                    }
+
+                                    if (conditional.answerCoding) {
+                                        if (! checkEqualCoding(formValue.valueCoding,conditional.answerCoding)) {
+                                            canShow = true
+                                        }
+                                    }
+
+                                    break
                                 case '=' :
                                     //all kinds of conditional support '='
                                     if (conditional.answerCoding) {

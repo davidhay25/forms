@@ -447,7 +447,7 @@
                         <td>{{ew.question}}</td>
                         <td>{{ew.operator}}</td>
                         <td>
-                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.display}} ({{ew.answerCoding.code}})</span>
                             <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
                             <span ng-show = "ew.answerString">{{ew.answerString}}</span>
                             <span ng-show = "ew.answerInteger !== undefined">{{ew.answerInteger}}</span>
@@ -472,12 +472,16 @@
                             <em>The question that this one depends on</em>
                         </div>
 
-                        <div class="col-sm-1">
+                        <div class="col-sm-2">
                             <div ng-show = "newEwSelectedSourceItem.type == 'integer'" style="padding-top: 8px">
                                 <input type="radio" ng-model="input.conditionalOperator" value="="/> =
                                 <div><input type="radio" ng-model="input.conditionalOperator" value=">"/> ></div>
                             </div>
 
+                            <div ng-hide = "newEwSelectedSourceItem.type == 'integer'" style="padding-top: 8px">
+                                <div><input type="radio" ng-model="input.conditionalOperator" value="="/> equal </div>
+                                <div><input type="radio" ng-model="input.conditionalOperator" value="!="/> not equal </div>
+                            </div>
                         </div>
 
                         <div class="col-sm-3">
@@ -516,7 +520,7 @@
 
 
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div  style="padding-top: 20px">
                                 <button class="btn btn-danger pull-right" ng-click="addNewEw()">Add</button>
                             </div>
@@ -524,7 +528,6 @@
                         </div>
                     </div>
                 </div>
-
 
             </uib-tab>
 
