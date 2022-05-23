@@ -308,7 +308,7 @@
                         <em>Should this be all comments, of only those with a disposition? Currently only
                         those with a disposition (as it allows review of them first)</em>
                         <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
-                            <tr><th>Type</th>Comment</thth><th>Disposition</th><th>Note</th></tr>
+                            <tr><th>Type</th>Comment</th><th><th>Disposition</th><th>Note</th></tr>
                             <tr ng-repeat = "item in dispositionsForQ">
 
                                 <td>{{item.linkId}}</td>
@@ -316,6 +316,13 @@
 
                                 <td>{{item.disposition.display}}</td>
                                 <td>{{item.note}}</td>
+                                <!--
+                                <td>
+                                    {{item.likes}}
+                                    <i style="color: green" class="glyphicon glyphicon-thumbs-up" ng-click="addLike(item)"></i>
+                                </td>
+                                -->
+
                             </tr>
                         </table>
                     </uib-tab>

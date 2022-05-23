@@ -4,14 +4,23 @@ angular.module("formsApp")
     .controller('dashboardCtrl',
         function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window,modalService) {
 
-
-
-
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
             let search = $window.location.search;
             if (search) {
                 $scope.QfromUrl = search.substr(1)
             }
+
+            //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
+            $scope.$on('termImported',function(){
+                $scope.drawQ($scope.selectedQ)  //in dashboard.js
+                $scope.input.dirty = true   //in dashboard.js
+                updateReport()
+            })
+
+            //When the QR is created in formCtrl it emits an event
+            $scope.$on('qrCreated',function(evt,qr){
+                $scope.selectedQR = qr
+            })
 
             //load all the disposition Observations for a Q
             $scope.loadDispositionsForQ = function(Q) {
@@ -20,7 +29,6 @@ angular.module("formsApp")
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {
                         $scope.dispositionsForQ = data
-
                     }
                 )
             }
@@ -100,6 +108,10 @@ angular.module("formsApp")
 
 
             //--------
+
+
+
+            //------
 
             $scope.removeAttachment = function(url) {
                 formsSvc.removeQAttachment($scope.selectedQ,url)
@@ -624,11 +636,8 @@ angular.module("formsApp")
             //------------ QR related functions
             //invoked from ng-blur on for elements in renderSingleItem
 
-            $scope.makeQR = function() {
-
-
+            $scope.makeQRDEP = function() {
                 $scope.selectedQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-
             }
 
             $scope.validateQR = function(QR){

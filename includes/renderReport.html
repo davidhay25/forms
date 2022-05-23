@@ -5,6 +5,16 @@
             border-color: #f8f8f8;
             border-width: 1px;
         }
+        .label {
+            cursor: pointer;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            padding: 5px 15px;
+            margin: 5px;
+            color: black;
+            background: #dddddd;
+            display: inline-block;
+        }
     </style>
 
     <uib-tabset>
@@ -170,7 +180,104 @@
 
         </uib-tab>
 
-        <uib-tab heading = "Terminology">
+        <uib-tab heading = "Coded items">
+            <div ng-controller="termIOCtrl">
+                <br/>
+
+                <div class="row">
+                    <div class="col-md-4">
+
+                    </div>
+                    <div class="col-md-8">
+                        <div class="clickable pull-right" ng-click="fullQExport()">Export whole Q to tsv</div>
+                    </div>
+                    <!--
+                    <div class="col-md-2">
+                        <div class="pull-right">Import from tsv:</div>
+                    </div>
+                    <div class="col-md-3">
+                        <span><input type="file" id="termUploadFileQ" /></span>
+                    </div>
+                    <div class="col-md-1">
+                        <span class="clickable" ng-click="termUploadQ(coded.item)">Upload</span>
+                    </div>
+                    -->
+
+                </div>
+
+                <table class="table table-bordered table-condensed">
+                    <tr><th>Section</th><th>Item linkId</th><th>Text</th><th>Type</th><th>Options</th><th>Details</th><th>Actions</th></tr>
+                    <tr ng-repeat="coded in report.coded">
+                        <td>{{coded.section.text}}</td>
+                        <td>
+                            <div class="clickable" ng-click="editItemFromReport(coded)">
+                                {{coded.item.linkId}}
+                            </div>
+
+                        </td>
+
+                        <td>{{coded.item.text}}</td>
+                        <td>{{coded.item.type}}</td>
+
+                        <td>
+                            <div ng-show="coded.item.answerValueSet">ValueSet</div>
+                            <div ng-show="coded.item.answerOption">Enumerated</div>
+                        </td>
+                        <td>
+
+                            <div ng-repeat = "(k,v) in coded.options">
+                                <div><em>{{k}}</em></div>
+                                <div ng-repeat="ans in v">
+                                    <div style="padding-left: 8px">
+                                        {{ans.code}} <em>{{ans.display}}</em>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class = 'clickable' ng-click="viewVS(coded.item.answerValueSet)">
+                                {{coded.item.answerValueSet}}</div>
+
+
+
+                        </td>
+
+                        <td style="width:10%">
+                            <div ng-show="coded.item.answerOption">
+                                <div class="clickable" ng-click="termExport(coded.item)">Export to tsv</div>
+
+<!--
+                                <input type="file" id="termUploadFile{{coded.item.linkId}}" />
+-->
+                                <div class="clickable" ng-click="termImport(coded.item)">Import from tsv</div>
+
+                              <!--  <div class="clickable" ng-click="termUpload(coded.item)">Upload</div>
+
+-->
+
+<!--
+                                <div class="clickable" ng-click="termEdit()">Edit directly</div>
+                                <div class="clickable" ng-click="termConvert()">Convert to VS</div>
+                                -->
+                            </div>
+                        </td>
+
+
+                    </tr>
+                </table>
+
+
+                <hr/>
+
+
+            </div>
+
+
+        </uib-tab>
+
+        <!-- data duplicate of coding tab-->
+        <uib-tab ng-show="false" heading = "Terminology">
             <br/>
             <table class="table table-bordered table-condensed">
                 <tr>
@@ -216,6 +323,109 @@
                     </td>
                 </tr>
             </table>
+        </uib-tab>
+
+
+
+
+        <uib-tab heading = "Conditionals by target">
+            <br/>
+            <em>These are the items whose visibility depends on another</em>
+            <br/>
+            <table class="table table-bordered table-condensed">
+                <tr><th>linkId of target item</th><th>Text</th><th>Type</th><th>Source trigger</th></tr>
+                <tr ng-repeat="conditional in report.conditional">
+                    <td>
+                        <div class="clickable" ng-click="editItemFromReport(conditional)">
+                            {{conditional.item.linkId}}
+                        </div>
+
+                    </td>
+                    <td>{{conditional.item.text}}</td>
+                    <td>{{conditional.item.type}}</td>
+                    <td>
+                        <div ng-repeat="ew in conditional.item.enableWhen">
+                            <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question])">
+                                {{ew.question}}
+                            </span> =
+
+                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                            <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
+                            <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+
+
+
+
+                        </div>
+                    </td>
+
+                </tr>
+            </table>
+
+
+        </uib-tab>
+
+        <uib-tab heading = "Conditionals by source">
+            <br/>
+            <em>These are the items that control the visibility of another</em>
+            <br/>
+            <table class="table table-condensed table-bordered">
+                <tr><th>Source Item</th><th>Type</th><th>
+                    <div class="row">
+                        <div class="col-md-4">
+                            Items dependant on this source
+                        </div>
+                        <div class="col-md-4">
+                            Conditional value
+                        </div>
+                    </div>
+
+
+                </th></tr>
+                <tr ng-repeat = "(k,v) in hashAllItems"
+                    ng-show="v.dependencies.length > 0">
+                    <td>
+                        <span class="clickable" ng-click="editItemFromReport(hashAllItems[k])">
+                              {{k}}
+                        </span>
+
+                    </td>
+                    <td>{{hashAllItems[k].item.type}}</td>
+                    <td>
+                        <div ng-repeat="entry in v.dependencies">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <span class="clickable" ng-click="editItemFromReport(entry)">
+                                    {{entry.item.linkId}} ({{entry.item.text}})
+                                </span>
+                                </div>
+                                <div class="col-md-4">
+
+
+                                    <span ng-show = "entry.ew.answerCoding"> {{entry.ew.answerCoding.code}} ({{entry.ew.answerCoding.display}})</span>
+                                    <span ng-show = "entry.ew.answerBoolean !== undefined"> {{entry.ew.answerBoolean}}</span>
+                                    <span ng-show = "entry.ew.answerString">{{entry.ew.answerString}}</span>
+
+
+
+
+                                </div>
+                                <div class="col-md-4">
+
+
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+
+                    </td>
+                </tr>
+            </table>
+
         </uib-tab>
 
         <uib-tab heading = "Resource extraction">
@@ -350,151 +560,6 @@
 
         </uib-tab>
 
-        <uib-tab heading = "Coded items">
-            <br/>
-            <table class="table table-bordered table-condensed">
-                <tr><th>Section</th><th>Item linkId</th><th>Text</th><th>Type</th><th>Options</th><th>Details</th></tr>
-                <tr ng-repeat="coded in report.coded">
-                    <td>{{coded.section.text}}</td>
-                    <td>
-                        <div class="clickable" ng-click="editItemFromReport(coded)">
-                            {{coded.item.linkId}}
-                        </div>
-
-                    </td>
-
-                    <td>{{coded.item.text}}</td>
-                    <td>{{coded.item.type}}</td>
-
-                    <td>
-                        <div ng-show="coded.item.answerValueSet">Valueset</div>
-                        <div ng-show="coded.item.answerOption">Enumerated</div>
-                    </td>
-                    <td>
-
-                        <div ng-repeat = "(k,v) in coded.options">
-                            <div><em>{{k}}</em></div>
-                            <div ng-repeat="ans in v">
-                                <div style="padding-left: 8px">
-                                    {{ans.code}} <em>{{ans.display}}</em>
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                        <div class = 'clickable' ng-click="viewVS(coded.item.answerValueSet)">
-                            {{coded.item.answerValueSet}}</div>
-
-
-
-                    </td>
-
-
-                </tr>
-            </table>
-
-        </uib-tab>
-        <uib-tab heading = "Conditionals by target">
-            <br/>
-            <em>These are the items whose visibility depends on another</em>
-            <br/>
-            <table class="table table-bordered table-condensed">
-                <tr><th>linkId of target item</th><th>Text</th><th>Type</th><th>Source trigger</th></tr>
-                <tr ng-repeat="conditional in report.conditional">
-                    <td>
-                        <div class="clickable" ng-click="editItemFromReport(conditional)">
-                            {{conditional.item.linkId}}
-                        </div>
-
-                    </td>
-                    <td>{{conditional.item.text}}</td>
-                    <td>{{conditional.item.type}}</td>
-                    <td>
-                        <div ng-repeat="ew in conditional.item.enableWhen">
-                            <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question])">
-                                {{ew.question}}
-                            </span> =
-
-                            <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
-                            <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
-                            <span ng-show = "ew.answerString">{{ew.answerString}}</span>
-
-
-
-
-                        </div>
-                    </td>
-
-                </tr>
-            </table>
-
-
-        </uib-tab>
-
-        <uib-tab heading = "Conditionals by source">
-            <br/>
-            <em>These are the items that control the visibility of another</em>
-            <br/>
-            <table class="table table-condensed table-bordered">
-                <tr><th>Source Item</th><th>Type</th><th>
-                    <div class="row">
-                        <div class="col-md-4">
-                            Items dependant on this source
-                        </div>
-                        <div class="col-md-4">
-                            Conditional value
-                        </div>
-                    </div>
-
-
-                </th></tr>
-                <tr ng-repeat = "(k,v) in hashAllItems"
-                    ng-show="v.dependencies.length > 0">
-                    <td>
-                        <span class="clickable" ng-click="editItemFromReport(hashAllItems[k])">
-                              {{k}}
-                        </span>
-
-                    </td>
-                    <td>{{hashAllItems[k].item.type}}</td>
-                    <td>
-                        <div ng-repeat="entry in v.dependencies">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <span class="clickable" ng-click="editItemFromReport(entry)">
-                                    {{entry.item.linkId}} ({{entry.item.text}})
-                                </span>
-                                </div>
-                                <div class="col-md-4">
-
-
-                                    <span ng-show = "entry.ew.answerCoding"> {{entry.ew.answerCoding.code}} ({{entry.ew.answerCoding.display}})</span>
-                                    <span ng-show = "entry.ew.answerBoolean !== undefined"> {{entry.ew.answerBoolean}}</span>
-                                    <span ng-show = "entry.ew.answerString">{{entry.ew.answerString}}</span>
-
-
-
-
-                                </div>
-                                <div class="col-md-4">
-
-
-                                </div>
-                            </div>
-
-
-
-
-
-                        </div>
-
-                    </td>
-                </tr>
-            </table>
-
-        </uib-tab>
-
 
         <uib-tab heading = "References">
             <br/>
@@ -524,7 +589,7 @@
 
 
 
-        <uib-tab heading = "Textual">
+        <uib-tab ng-show="false" heading = "Textual">
         </uib-tab>
 
 

@@ -24,8 +24,6 @@ angular.module("formsApp")
                 }
             }
 
-
-
             //called from dashboardVS
             $scope.updateVS = function() {
                 $scope.arVS = terminologySvc.getValueSetsForQ($scope.selectedQ)  //selectedQ in parent scope

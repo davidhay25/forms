@@ -109,6 +109,9 @@
     <script src="js/qManagementCtrl.js"></script>
     <!--  <script src="js/dispositionCtrl.js"></script> -->
 
+    <script src="js/termIOCtrl.js"></script>
+    <script src="js/termIOSvc.js"></script>
+    <script src="js/importTerminologyCtrl.js"></script>
     <script src="js/loginCtrl.js"></script>
     <script src="js/modalDialogSvc.js"></script>
 
@@ -687,7 +690,9 @@
 
                         <uib-tab heading="Summaries">
                             <br/>
+
                             <ng-include src = "'includes/renderReport.html'"></ng-include>
+
                             <br/>
                         </uib-tab>
 
@@ -737,6 +742,7 @@
                                     <div ng-controller="formsCtrl">
                                         <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                     </div>
+
                                 </uib-tab>
 
                                 <uib-tab heading = "Preview">

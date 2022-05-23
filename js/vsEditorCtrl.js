@@ -58,8 +58,9 @@ angular.module("formsApp")
             if (vsUrl) {
                //get the VS from the local server
                 //let termServer = formsSvc.getServers().termServer
-                //let termServer = "/ds/fhir/"
-                let qry = server + "ValueSet?url=" + vsUrl
+                let termServer = "/ds/fhir/"
+                //let qry = server + "ValueSet?url=" + vsUrl
+                let qry = termServer + "ValueSet?url=" + vsUrl
                  $http.get(qry).then(
                      function(data) {
                          let bundle = data.data
@@ -221,7 +222,7 @@ angular.module("formsApp")
                 let url = server + "ValueSet/" + $scope.selectedValueSet.id
                 $http.put(url,$scope.selectedValueSet).then(
                     function(data) {
-                        alert("ValueSet updated on local server")
+                        alert("ValueSet NOT updated on local server")
                         $scope.$close($scope.selectedValueSet)
                         /* disable for the moment...
                         //save a copy to the term server
@@ -247,8 +248,9 @@ angular.module("formsApp")
 
             $scope.expandVS = function(url,filter) {
                 //let termServer = "/ds/fhir/"
-                //let termServer = formsSvc.getServers().termServer
-                let qry =  server + "ValueSet/$expand?url=" + url
+                let termServer = formsSvc.getServers().termServer
+                let qry =  termServer + "ValueSet/$expand?url=" + url
+                //let qry =  server + "ValueSet/$expand?url=" + url
                 if (filter) {
                     qry += "&filter="+filter
                 }

@@ -6,7 +6,6 @@ angular.module("formsApp")
         let globals
         $http.get("globals.json").then(
             function(data) {
-
                 globals = data.data
             }
         )
@@ -233,40 +232,64 @@ angular.module("formsApp")
                 $http.get(qry).then(
                     function(data){
                         if (data.data.entry) {
+                            let hashLike = {}       //trach likes
                             data.data.entry.forEach(function(entry){
                                 let obs = entry.resource
-                                let result = {}
-                                result.disposition = {code:'unknown',display:'unknown'}
+                                if (false && obs.derivedFrom) {
+                                    //this is a 'like' from another user - set the likes in the
+                                    hashLike[obs.id] = hashLike[obs.id] || 0
+                                    hashLike[obs.id] = hashLike[obs.id] + 1
+                                } else {
+                                    let result = {}
 
-                                if (obs.valueCodeableConcept) {
-                                    result.disposition = obs.valueCodeableConcept.coding[0]
+                                    result.id = obs.id
+                                    result.disposition = {code:'unknown',display:'unknown'}
+
+                                    if (obs.valueCodeableConcept) {
+                                        result.disposition = obs.valueCodeableConcept.coding[0]
+                                    }
+
+
+                                    result.dispositionDate = obs.effectiveDateTime
+                                    result.QR_url = obs.derivedFrom[0].reference //the QR that had the initial comment
+
+                                    obs.component.forEach(function (comp){
+                                        let code = comp.code.coding[0].code
+                                        switch (code) {
+                                            case "comment" :
+                                                result.comment = comp.valueString
+                                                break
+                                            case "note" :
+                                                result.note = comp.valueString
+                                                break
+                                            case "reviewer" :
+                                                result.author = comp.valueString
+                                                break
+                                            case "linkId" :
+                                                result.linkId = comp.valueString
+                                                break
+                                            case "authored" :
+                                                result.authored = comp.valueDateTime
+                                                break
+                                        }
+                                    })
+                                    arResult.push(result)
                                 }
 
-
-                                result.dispositionDate = obs.effectiveDateTime
-                                result.QR_url = obs.derivedFrom[0].reference //the QR that had the initial comment
-                                obs.component.forEach(function (comp){
-                                    let code = comp.code.coding[0].code
-                                    switch (code) {
-                                        case "comment" :
-                                            result.comment = comp.valueString
-                                            break
-                                        case "note" :
-                                            result.note = comp.valueString
-                                            break
-                                        case "reviewer" :
-                                            result.author = comp.valueString
-                                            break
-                                        case "linkId" :
-                                            result.linkId = comp.valueString
-                                            break
-                                        case "authored" :
-                                            result.authored = comp.valueDateTime
-                                            break
-                                    }
-                                })
-                                arResult.push(result)
                             })
+
+                            //now, update the result with any likes
+                            arResult.forEach(function (result) {
+                                if (hashLike[result.id]) {
+                                    result.likes = hashLike[result.id]
+                                }
+                            })
+
+
+
+
+
+
                             deferred.resolve(arResult)
                         }
 
@@ -1378,6 +1401,7 @@ angular.module("formsApp")
                 Q.item.forEach(function (section) {
                         let parentItem = null
 
+                    if (section.item) {
                         section.item.forEach(function (child) {
                             //items off the section. they will either be data elements, or groups
 
@@ -1485,6 +1509,8 @@ angular.module("formsApp")
                             }
 
                         })
+                    }
+
                 })
 
                 return QR

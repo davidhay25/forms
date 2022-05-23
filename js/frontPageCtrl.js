@@ -187,6 +187,12 @@ angular.module("formsApp")
                 let vo = formsSvc.makeTreeFromQ(Q)
                 drawTree(vo.treeData)
 
+                $scope.addLike = function(report){
+                    //need to collect the user email
+                    report.likes = report.likes || 0
+                    report.likes++
+                }
+
                 //get the dispositions
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {

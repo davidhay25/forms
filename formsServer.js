@@ -7,6 +7,29 @@ const bodyParser = require('body-parser')
 var express = require('express');
 var app = express();
 
+//email client
+//const sgMail = require('@sendgrid/mail')
+//const key = "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"     //todo move to file
+//sgMail.setApiKey(key)
+
+/* - one time test
+const msg = {
+    to: 'david.hay25@gmail.com', // Change to your recipient
+    from: 'david.hay25@gmail.com', // Change to your verified sender
+    subject: 'Sending with SendGrid is Fun',
+    text: 'and easy to do anywhere, even with Node.js',
+    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+}
+sgMail
+    .send(msg)
+    .then(() => {
+        console.log('Email sent')
+    })
+    .catch((error) => {
+        console.error(error)
+    })
+
+*/
 //const MongoClient = require('mongodb').MongoClient;
 
 //const url = 'mongodb://localhost:27017';

@@ -1,0 +1,112 @@
+
+<div>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                <h3 class="modal-title">Import coded options</h3>
+
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <button class="btn btn-link pull-right" ng-click="$close()">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <br/>
+                <div>1. Choose the file that has the terminology to import <input type="file" id="termUploadFileRef" /></div>
+
+                <br/>
+                <div>2. <span class="clickable" ng-click="upload(item)">Upload </span> the file </div>
+
+
+            </div>
+            <div class="col-md-8 col-sm-8">
+                <table class="table table-bordered">
+                    <tr><th></th><th>From selected Item</th><th>From import file</th></tr>
+                    <tr>
+                        <td>Questionnaire</td>
+                        <td>{{Q.name}}</td>
+                        <td>{{displayHash.Q}}</td>
+                    </tr>
+                    <tr>
+                        <td>Item text</td>
+                        <td>{{item.text}}</td>
+                        <td>{{displayHash.text}}</td>
+                    </tr>
+                    <tr>
+                        <td>Item linkId</td>
+                        <td>{{item.linkId}}</td>
+                        <td>{{displayHash.linkId}}</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+        <strong ng-show="input">Options in source file:</strong>
+        <table style="margin-left: 8px" ng-show="input" class="table table-bordered table-condensed">
+            <tr><th>Display</th><th>New system</th><th>New code</th><th>Old system</th><th>Old code</th></tr>
+            <tr ng-repeat = "row in input.lines">
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td>{{row[2]}}</td>
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
+
+            </tr>
+        </table>
+
+        <br/>
+        <!--
+        <div ng-show="input.lines">3. <span class="clickable" ng-click="doImport(item)">Update</span> the item </div>
+-->
+        <button ng-show="input.lines && errMsg.length == 0" class="btn btn-danger" ng-click="doImport(item)">Perform update</button>
+
+        <div ng-show="errMsg.length > 0">
+            <div class="alert alert-danger">
+                <strong>There were errors and the file could not be imported</strong>
+                <ul>
+                    <li ng-repeat="err in errMsg">
+                        {{err}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!--
+        <div ng-show="options">
+            <table  class="table table-bordered table-condensed">
+                <tr ng-repeat = "option in options">
+                    <td>{{option.valueCoding.display}}</td>
+                    <td>{{option.valueCoding.system}}</td>
+                    <td>{{option.valueCoding.code}}</td>
+                </tr>
+            </table>
+        </div>
+        -->
+
+
+
+    </div>
+
+    <div class="modal-header">
+
+        <div class="row">
+
+            <div class="col-md-6 col-sm-6">
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+
+            </div>
+        </div>
+    </div>
+</div>
