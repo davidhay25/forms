@@ -5,6 +5,7 @@ angular.module("formsApp")
 
             $scope.input = {allItems:{}}
             $scope.$on("selectedQ",function(ev,Q){
+                /*
                 $scope.itemCodeList = termUpdateSvc.makeItemCodeList(Q)
                 $scope.itemCodeList.forEach(function (section) {
                     section.items.forEach(function (thing) {
@@ -14,6 +15,7 @@ angular.module("formsApp")
 
 
                 console.log($scope.itemCodeList)
+                */
             })
 
         }
