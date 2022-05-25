@@ -1004,6 +1004,9 @@ angular.module("formsApp")
 
                     $scope.drawQ(Q,true)        //sets scope.selectedQ
                     $scope.treeIdToSelect = "root"
+
+                    //let any other controller that might be interested about the new Q
+                    $scope.$broadcast("selectedQ",Q)
                 }
             }
 

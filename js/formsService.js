@@ -707,9 +707,19 @@ angular.module("formsApp")
                     })
                 }
 
+                //there's a issue when importing a section if there is a dependency on a non-existant item
+                //this creates an entry ion hashAllItems for that non-existont item.
+                //for now, we'll remove any entry in hashAllItems that hasn't got an ite, property...
+                let tempHash = {}
+                Object.keys(hashAllItems).forEach(function (key) {
+                    let i = hashAllItems[key]
+                    if (i.item && i.section) {
+                        tempHash[key] = i
+                    }
+                })
 
-
-                return {report:report,hashAllItems:hashAllItems}
+                return {report:report,hashAllItems:tempHash}
+                //return {report:report,hashAllItems:hashAllItems}
 
                 function populateMeta(entry) {
                     //populate meta info - like resource extraction

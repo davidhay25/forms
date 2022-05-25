@@ -114,6 +114,8 @@
     <script src="js/importTerminologyCtrl.js"></script>
     <script src="js/loginCtrl.js"></script>
     <script src="js/modalDialogSvc.js"></script>
+    <script src="js/termUpdateCtrl.js"></script>
+    <script src="js/termUpdateSvc.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -871,6 +873,13 @@
                                 </table>
                             </div>
 
+                        </uib-tab>
+
+                        <uib-tab ng-show = "false" heading="Terminology Update">
+                            <div ng-controller="termUpdateCtrl">
+                                <ng-include src = "'includes/termUpdate.html'"></ng-include>
+
+                            </div>
                         </uib-tab>
 
                         <uib-tab heading="ValueSets">

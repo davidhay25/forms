@@ -1,0 +1,22 @@
+<div>
+
+  <div ng-repeat = "row in itemCodeList">
+    <strong>{{row.section.text}}</strong>
+
+    <div class="row" ng-repeat="thing in row.items">
+      <div class="col-md-3">
+        {{thing.group.text}}
+      </div>
+      <div class="col-md-3">
+        {{thing.item.text}}
+        <div><em>{{thing.item.description}}</em></div>
+      </div>
+      <div class="col-md-3">
+        <input class="form-control" ng-model="input.allItems[thing.item.linkId]"/>
+      </div>
+    </div>
+
+  </div>
+
+
+</div>
