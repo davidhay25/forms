@@ -185,7 +185,10 @@ angular.module("formsApp")
             }
 
 
+            //perform validation functions
+
             $scope.validateQ = function() {
+                $scope.dependencyReport
                 let url = "/ds/fhir/Questionnaire/validate"
                 $http.post(url,$scope.selectedQ).then(
                     function(data) {
@@ -195,20 +198,16 @@ angular.module("formsApp")
                         $scope.QValidation = err.data
                     }
                 )
-
             }
 
             //determines if an individual Q can be shown in the list - folder support
+            //note: can't select Q from here as loading Q is now async
             $scope.canShowQ = function(Q) {
                 if ($scope.input.selectedFolderTag) {
                     //a folder has been selected - does this Q have the required tag?
                     if ($scope.input.selectedFolderTag.code == 'all') {
 
-                        //changing a tag deletes the selected Q - this will select the first one
-                        if (! $scope.selectedQ) {
-                            //$scope.selectedQ = Q
-                            $scope.selectQ(Q)
-                        }
+
                         return true
                     } else {
                         if (Q.meta && Q.meta.tag) {
@@ -216,11 +215,7 @@ angular.module("formsApp")
                             Q.meta.tag.forEach(function (tag) {
                                 if (tag.system == $scope.tagFolderSystem && tag.code == $scope.input.selectedFolderTag.code) {
 
-                                    //selects the first in the list09
-                                    if (! $scope.selectedQ) {
-                                        $scope.selectQ(Q)
-                                        //$scope.selectedQ = Q
-                                    }
+
                                     rslt = true
                                 }
                             })
@@ -602,11 +597,7 @@ angular.module("formsApp")
                         })
                     }
                 )
-
             }
-
-
-
 
             //update the selctedQ on the forms manager server
             $scope.updateQ = function(cb) {
@@ -703,16 +694,62 @@ angular.module("formsApp")
             //note that when the Q is build, the structure comes from the tree - not the item.items element.
             $scope.removeElement = function(node) {
 
-                let linkId = node.data.item.linkId
+                //need to check that this item is not a dependency source
+                let hash = $scope.hashAllItems[node.id]
+                if (hash && hash.dependencies && hash.dependencies.length > 0) {
+                    let msg = ""
+                    hash.dependencies.forEach(function (dep) {
+                        msg += dep.item.linkId + " "
+                    })
+                    alert("There are items with a dependency on this one: "+ msg)
+                } else {
+                    $scope.selectedQ = qSvc.removeItem($scope.selectedQ,node.data.item.linkId)
 
-                $scope.selectedQ = qSvc.removeItem($scope.selectedQ,node.data.item.linkId)
+                    $scope.treeIdToSelect = node.id
+                    $scope.drawQ($scope.selectedQ,false)
+                    $scope.input.dirty = true;
+
+                    updateReport()
+                }
+                /*
+
+                let item = hash.item    //there must be an entre in hashallitems
 
 
-                $scope.treeIdToSelect = node.id
-                $scope.drawQ($scope.selectedQ,false)
-                $scope.input.dirty = true;
 
-                updateReport()
+                if (item.de)
+
+                //if ()
+                let isaSource = ""
+                Object.keys($scope.hashAllItems).forEach(function (key) {
+                    if (key !== node.id) {
+                        let item = $scope.hashAllItems[key].item
+                        if (item.enableWhen) {
+                            item.enableWhen.forEach(function (ew) {
+                                if (ew.question == node.id) {isaSource += key + " "}
+                            })
+                        }
+                    }
+                })
+
+                if () {
+                   // if (isaSource) {
+
+                    alert("There are items with a dependency on this one: "+ isaSource)
+                } else {
+                    $scope.selectedQ = qSvc.removeItem($scope.selectedQ,node.data.item.linkId)
+
+
+                    $scope.treeIdToSelect = node.id
+                    $scope.drawQ($scope.selectedQ,false)
+                    $scope.input.dirty = true;
+
+                    updateReport()
+                }
+
+                //let linkId = node.data.item.linkId
+
+*/
 
 
             }
@@ -726,11 +763,14 @@ angular.module("formsApp")
             }
 
             $scope.editItemFromReport = function (entry) {
+                if (entry) {
+                    let item = entry.item
+                    let node = findNodeById(item.linkId)
 
-                let item = entry.item
-                let node = findNodeById(item.linkId)
-
-                $scope.editItem(node)
+                    $scope.editItem(node)
+                } else {
+                    alert("There is no item with this linkId in the Q")
+                }
             }
 
 
@@ -917,7 +957,8 @@ angular.module("formsApp")
 
 
 
-            $scope.selectVS = function(vsItem) {
+            //todo - this is from the terminology tabthe
+            $scope.selectVSDEP = function(vsItem) {
                 clearWorkArea()
                 $scope.selectedVsItem = vsItem
                 let qry =  termServer + "ValueSet?url=" + vsItem.url
@@ -974,20 +1015,62 @@ angular.module("formsApp")
 
             clearWorkArea = function() {
                 delete $scope.selectedVs;
-                delete $scope.selectedQ
+                //delete $scope.selectedQ
                 delete $scope.expandedVs
                 delete $scope.selectedVsItem
             }
 
-            //when called from Q list
-            $scope.selectQ = function(Q) {
-                if ($scope.input.dirty) {
-                    if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
-                        $scope.drawQ(Q,true)
+
+
+            //load a single Q
+            function loadQ(QtoSelect) {
+                let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
+                $http.get(qry).then(
+                    function(data) {
+                        let Q = data.data
+                        $scope.selectedQ = Q
+                        let vo = formsSvc.generateQReport(Q)
+                        $scope.report = vo.report
+                        $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
+
+                        makeCsvAndDownload(Q,vo.hashAllItems)
+                        makeQDownload(Q)
+
+                        $scope.allAttachments = formsSvc.getQAttachments(Q)
+                        //the template for the forms preview
+                        //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+
                         $scope.treeIdToSelect = "root"
                         $scope.input.dirty = false
+
+                        $scope.drawQ(Q,true)        //sets scope.selectedQ
+                        $scope.treeIdToSelect = "root"
+
+                        //let any other controller that might be interested about the new Q
+                        $scope.$broadcast("selectedQ",Q)
+                    },
+                    function(err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+            //when called from Q list
+            $scope.selectQ = function(QtoSelect) {
+                console.log("selecting ",QtoSelect)
+                if ($scope.input.dirty) {
+                    if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
+                        loadQ(QtoSelect)
+                        //$scope.drawQ(Q,true)
+                       // $scope.treeIdToSelect = "root"
+                        //$scope.input.dirty = false
                     }
                 } else {
+
+                    //the Q that was passed in is only a minimal Q. load the complete one first
+                    loadQ(QtoSelect)
+
+
+                    /*
 
                     //for the summary tab...
                     let vo = formsSvc.generateQReport(Q)
@@ -1007,6 +1090,8 @@ angular.module("formsApp")
 
                     //let any other controller that might be interested about the new Q
                     $scope.$broadcast("selectedQ",Q)
+
+                    */
                 }
             }
 
@@ -1042,7 +1127,7 @@ angular.module("formsApp")
                 }
 
                 clearWorkArea()
-                $scope.selectedQ = Q
+                //$scope.selectedQ = Q
 
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
@@ -1169,8 +1254,8 @@ angular.module("formsApp")
             }
 
             $scope.loadAllQ = function() {
-                let url = "/ds/fhir/Questionnaire"
-
+               // let url = "/ds/fhir/Questionnaire"
+                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
                 let t = {code:'all'}
                 $scope.folderTags = {} //
                 $scope.folderTags['all'] = t
@@ -1195,9 +1280,7 @@ angular.module("formsApp")
                         })
                         if ($scope.QfromUrl) {
                             // a Q was specified when the page was loaded...
-
                             let ar = $scope.allQ.filter(item => item.url == decodeURIComponent($scope.QfromUrl))
-
                             if (ar.length > 0) {
                                 $scope.input.togglePane()
                                 $scope.selectQ(ar[0])
@@ -1206,14 +1289,16 @@ angular.module("formsApp")
 
                         }
 
-                        $scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
-
+                        //this is used in the 'ValueSets used' top level tab. Think I drop that anyway...
+                        //$scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
 
                         //set any saved foldertag
                         if ($localStorage.selectedFolderTag) {
                             $scope.input.selectedFolderTag = $scope.folderTags[$localStorage.selectedFolderTag]
-                        }
 
+                        } else {
+                            //select the first one
+                        }
                     }
                 )
             }

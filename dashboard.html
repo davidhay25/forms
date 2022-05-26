@@ -658,7 +658,7 @@
                                                     </div>
 -->
                                                     <div class="col-md-2">
-                                                        <div ng-show="selectedNode">
+                                                        <div ng-show="selectedNode && selectedNode.id !== 'root'">
                                                             <button class="btn btn-link"
                                                                     ng-click="removeElement(selectedNode)">
                                                                 Remove element
@@ -1058,9 +1058,7 @@
 
         </uib-tab>
 
-        <uib-tab  heading="ValueSets used">
-
-
+        <uib-tab ng-show="false" heading="ValueSets used">
 
             <div ng-controller="terminologyCtrl">
                 <br/>
@@ -1074,8 +1072,6 @@
         <uib-tab ng-show="user.email == 'david.hay25@gmail.com'" heading = "Q Management">
 
                 <ng-include src = "'includes/qManagement.html'"></ng-include>
-
-
 
         </uib-tab>
 

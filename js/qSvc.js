@@ -71,6 +71,73 @@ angular.module("formsApp")
 
             },
 
+
+            checkDependencyTargets : function(Q,arSection){
+                if (! arSection) {
+                    return []
+                }
+                //check that any dependency targets in the section (to be imported) are in the Q or the section itself
+                //used when importing a section to make sure it doesn't reference anything outside of the section
+                let hashAllLinkIds = {}         //hash of all linkIds in Q & sectiond
+                let hashAllSourceLinkIds = {}   //hash of all the sources in any dependencies
+                //add all the linkIds in the Q to the hash
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        getAllLinkIdsInSection(section)
+                    })
+                }
+                //now add the linkids from the sections to import
+
+                arSection.forEach(function (section) {
+                    getAllLinkIdsInSection(section)
+                })
+
+                //now we have the hash of all items in the Q and the has of all dependency sources in the s
+                //hashAllSourceLinkIds is keyed by the source linkid - ie it contains all the items that have a dependency on this one
+                let result = []
+                Object.key(hashAllSourceLinkIds).forEach(function (linkId) {
+                    if (!hashAllLinkIds[linkId]) {
+                        //this is a situation where there is an item with a dependency on a non existant item
+                        let source = hashAllSourceLinkIds[linkId]   //this will be an array of the items with a dependence on this one
+                        source.forEach(function (targ) {
+                            result.push({target:targ,sourceId:linkId})
+                        })
+                    }
+                })
+                return result
+
+
+
+                function getDependencySources(item) {
+                    //update the hash of dependency sources
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ew) {
+                            //want a list of all items that have a dependency on this question
+                            hashAllSourceLinkIds[ew.question] = hashAllSourceLinkIds[ew.question] || []
+                            hashAllSourceLinkIds[ew.question].push(item)
+                        })
+                    }
+                }
+
+                //go through the section and pull put all the linkIds
+                function getAllLinkIdsInSection(section) {
+                    if (section.item) {
+                        section.item.forEach(function (child) {
+                            if (child.item) {
+                                child.item.forEach(function (grandChild) {
+                                    hashAllLinkIds[grandChild.linkId] = true
+                                })
+
+                            } else {
+                                hashAllLinkIds[child.linkId] = true
+                            }
+                        })
+                    }
+
+                }
+
+            },
+
             checkUniqueLinkId : function (Q,arSection) {
                 //check that linkId's are unique in a Q. If a section is passed in, include that in the check (when importing sections)
                 let hash = {}
@@ -102,7 +169,6 @@ angular.module("formsApp")
 
                         })
                     }
-
                 }
 
                 function checkLinkId(linkId) {
@@ -142,7 +208,7 @@ angular.module("formsApp")
 
             editItem : function(Q,item,originalLinkId) {
                 //edit an item - called after the item editor
-
+                //todo - what is this doing?
                 //if the originalLinkId is passed in, then the linkId was changed (we assume that any dependencies were checked)
                 //in this case we need to search based on the original linkId
                 let linkId = originalLinkId || item.linkId

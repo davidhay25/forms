@@ -2,7 +2,7 @@ angular.module("formsApp")
     .controller('importSectionCtrl',
         function ($scope,$http,allQ,Q,qSvc) {
 
-            $scope.allQ = allQ
+            $scope.allQ = allQ      //note that allQ is a minimal set of data...
             $scope.input = {}
             $scope.input.section = {}
 
@@ -25,7 +25,17 @@ angular.module("formsApp")
             }
 
             $scope.selectExistingQ = function (eQ) {
-                $scope.eQ = eQ
+
+                $http.get(`/ds/fhir/Questionnaire/${eQ.id}`).then(
+                    function(data) {
+                        $scope.eQ = data.data
+                    }, function(err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+
+
             }
 
 
@@ -53,6 +63,14 @@ angular.module("formsApp")
                 if (duplicates) {
                     alert("Duplicate linkId/s found: \n" + duplicates + "\n Section/s cannot be inserted.")
                     return
+                }
+
+                //check dependency sources missing
+                let ar = qSvc.checkDependencyTargets(Q,arSection)
+                if (ar.length > 0) {
+
+                    console.log(ar)
+                   // let msg = ""
                 }
 
                 $scope.$close(arSection)

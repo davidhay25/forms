@@ -15,6 +15,9 @@
             background: #dddddd;
             display: inline-block;
         }
+        .warning {
+            color: red;
+        }
     </style>
 
     <uib-tabset>
@@ -98,15 +101,15 @@
 
                                     {{child.item | cardinality}}
 
-
                                 </div>
-
-
-
 
                                 <div class="col-md-3">
                                     <div ng-repeat="ew in child.item.enableWhen">
-                                        C: {{ew.question}} = {{ew.answerCoding.code}}
+                                        C: {{ew.question}} =
+                                        <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                                        <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
+                                        <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+
                                     </div>
 
                                     <div>{{child.meta.usageNotes}}</div>
@@ -344,6 +347,7 @@
                     <td>{{conditional.item.text}}</td>
                     <td>{{conditional.item.type}}</td>
                     <td>
+
                         <div ng-repeat="ew in conditional.item.enableWhen">
                             <span class="clickable" ng-click="editItemFromReport(hashAllItems[ew.question])">
                                 {{ew.question}}
@@ -354,10 +358,15 @@
                             <span ng-show = "ew.answerString">{{ew.answerString}}</span>
 
 
-
+                            <span class="warning" ng-hide="hashAllItems[ew.question]">
+                                 Warning! this item is not in the Q
+                                </span>
 
                         </div>
+
                     </td>
+
+
 
                 </tr>
             </table>
@@ -382,6 +391,7 @@
 
 
                 </th></tr>
+
                 <tr ng-repeat = "(k,v) in hashAllItems"
                     ng-show="v.dependencies.length > 0">
                     <td>

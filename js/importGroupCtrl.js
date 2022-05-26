@@ -27,27 +27,39 @@ angular.module("formsApp")
             $scope.selectExistingQ = function (eQ) {
                 //get all the groups in this section
                 $scope.arGroups = []
-                if (eQ.item) {
-                    eQ.item.forEach(function (sect){
-                        if (sect.item) {
-                            let sectionGroups = {section:sect,groups:[]}
+
+                $http.get(`/ds/fhir/Questionnaire/${eQ.id}`).then(
+                    function(data) {
+                        $scope.eQ = data.data
+
+                        if ($scope.eQ.item) {
+                            $scope.eQ.item.forEach(function (sect){
+                                if (sect.item) {
+                                    let sectionGroups = {section:sect,groups:[]}
 
 
-                            sect.item.forEach(function (child){
-                                if (child.type == 'group' && child.item) {
-                                    sectionGroups.groups.push(child)
+                                    sect.item.forEach(function (child){
+                                        if (child.type == 'group' && child.item) {
+                                            sectionGroups.groups.push(child)
+                                        }
+                                    })
+
+                                    $scope.arGroups.push(sectionGroups)
                                 }
                             })
 
-                            $scope.arGroups.push(sectionGroups)
                         }
-                    })
+                    }, function(err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
 
-                }
 
 
 
-                $scope.eQ = eQ
+
+
+                //$scope.eQ = eQ
             }
 
 

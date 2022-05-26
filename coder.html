@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Coder</title>
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+    <script src="js/libs/moment.min.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+    <script src="js/libs/angular-sanitize.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+    <style>
+        .myScroll {
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+
+
+    </style>
+
+    <script>
+        angular.module("formsApp",['ui.bootstrap']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("formsApp").constant("moment", moment);
+        angular.module("formsApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+        }]);
+
+    </script>
+
+    <script src="js/coderCtrl.js"></script>
+    <script src="js/formsService.js"></script>
+    <script src="js/termUpdateSvc.js"></script>
+
+
+    <script src="js/modalDialogSvc.js"></script>
+
+    <style>
+        #graph {
+            width: 100%;
+            height: 550px;
+            border: 1px solid lightgray;
+        }
+    </style>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="formsApp" ng-controller="coderCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5 col-sm-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Canshare Coder
+                        </a>
+                    </span>
+            </div>
+
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+
+
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+
+
+            </div>
+        </div>
+    </nav>
+
+
+        <div class="row">
+            <div class="col-md-3">
+               <uib-tabset>
+                   <uib-tab heading = "Questionnaire">
+                       <br/>
+                       <select ng-model="input.selectedQ" ng-change="loadQ(input.selectedQ)" class="form-control"
+                               ng-options = "Q.name for Q in allQ">
+
+                       </select>
+                       <br/>
+                       <div class="myScroll">
+                           <div id="designTree"></div>
+                       </div>
+                   </uib-tab>
+                   <uib-tab heading = "Other thing">
+                       <em>Some other thing that has data to be coded - eg act now condition codes
+                       (though these come from the source system - don't we just show them?</em>
+                   </uib-tab>
+               </uib-tabset>
+
+
+
+            </div>
+            <div class="col-md-2">
+                {{selectedItem.description}}
+                <div ng-repeat = "concept in selectedItem.code">
+                    {{concept.code}} ({{concept.system}})
+                    <div><em>{{concept.display}}</em></div>
+                </div>
+                <hr/>
+
+                <strong>ValueSet</strong>
+                <select class="form-control" ng-model="input.vs" ng-options="vs.display for vs in input.valueSets">
+
+                </select>
+                <br/><br/>
+
+                <label>Filter string</label>
+                <input type="text" class="form-control" ng-model="input.filter"/>
+                <button class="btn btn-link pull-right" ng-click="findByFilter(input.filter)">Query</button>
+            </div>
+
+            <div class="col-md-7">
+                <uib-tabset>
+                    <uib-tab heading="Matching codes">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <br/>
+
+                                <div ng-hide="! expandedVS || expandedVS.expansion.contains.length > 0">
+                                    No matches found
+                                </div>
+
+
+                                <div class="myScroll">
+                                    <div class="list-group">
+                                        <div ng-class="{'list-group-item':true,listItemSelected:concept.code == selectedConcept.code}"
+                                             ng-click="selectConcept(concept)"
+                                             style="cursor: pointer"
+                                             ng-repeat="concept in expandedVS.expansion.contains">
+                                            {{concept.display}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+
+                                <div  ng-show="selectedConcept.code">
+                                <h4>
+                                    {{selectedConcept.display}}
+
+                                    (<span class="clickable" ng-click="setCode(selectedConcept)">{{selectedConcept.code}})</span>
+
+
+                                </h4>
+
+                                <uib-tabset >
+                                    <uib-tab heading="Details">
+
+                                        <strong>Parents</strong>
+                                        <div class="list-group">
+                                            <div class="list-group-item" ng-repeat ="parent in parents">
+                                                {{parent.display}}
+                                                <span class="clickable" ng-click="selectConcept({code:parent.sctId})">({{parent.sctId}})</span>
+                                            </div>
+                                        </div>
+
+                                        <strong>children</strong>
+                                        <div class="list-group">
+                                            <div class="list-group-item" ng-repeat ="child in children">
+                                                {{child.display}}
+                                                <span class="clickable" ng-click="selectConcept({code:child.sctId})">({{child.sctId}})</span>
+                                            </div>
+                                        </div>
+
+                                    </uib-tab>
+                                    <uib-tab heading="Parameters">
+                                        <div ng-repeat="param in selectedConceptLookup.parameter">
+                                            <pre>{{param | json}}</pre>
+                                        </div>
+                                    </uib-tab>
+                                    <uib-tab heading="Json">
+                                        <pre>{{selectedConceptLookup | json}}</pre>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </uib-tab>
+                    <uib-tab heading="Json">
+                        <pre>{{expandedVS | json}}</pre>
+                    </uib-tab>
+                </uib-tabset>
+
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
