@@ -1,4 +1,4 @@
-
+//manage the reviews of a form
 angular.module("formsApp")
     .controller('formReviewsCtrl',
         function ($scope,$http,formsSvc,$uibModal) {

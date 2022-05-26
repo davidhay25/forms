@@ -177,6 +177,12 @@ angular.module("formsApp")
                 $scope.selectedQ = Q
                 $scope.model = exportSvc.createJsonModel(Q)
 
+                //for the HISO table display
+                let voHiso = formsSvc.generateQReport($scope.selectedQ)
+                //$scope.report = voHiso.report
+                let hashAllItems = voHiso.hashAllItems
+                $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
+
                 //create the download
                 let json = angular.toJson(Q,null,2)
                 $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([json],{type:"application/json"}))

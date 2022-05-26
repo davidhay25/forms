@@ -1,0 +1,35 @@
+<div>
+
+    <div ng-repeat = "section in exportJsonList">
+        <h4>{{section.display}}</h4>
+        <table class="table table-bordered">
+            <tr><th>Name</th><th>Description</th><th>Card.</th><th>Obligation</th><th>HISO specific</th><th>Data Domain</th></tr>
+            <tr ng-repeat = "line in section.lines">
+                <td width="10%">
+
+
+                    <div class="clickable" ng-click="editItemFromReport({item:line.item})">
+                        {{line.name}}
+                    </div>
+
+
+                </td>
+                <!-- <td>{{line.category}}</td> -->
+                <td width="15%">{{line.description}}</td>
+                <td width="5%">{{line.cardinality}}</td>
+                <td width="7%">{{line.obligation}}</td>
+                <td width="35%">
+
+                    <strong ng-show="line.hisoDT">DT:</strong> {{line.hisoDT}}
+                    <strong ng-show="line.hisoClass">Class:</strong> {{line.hisoClass}}
+                    <strong ng-show="line.hisoLength">Length:</strong> {{line.hisoLength}}
+                    <strong ng-show="line.hisoLayout">Layout:</strong> {{line.hisoLayout}}
+
+                    <div>{{line.usageNotes}}</div>
+                </td>
+                <td>{{line.dataDomain}}</td>
+            </tr>
+        </table>
+    </div>
+
+</div>

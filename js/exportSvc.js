@@ -118,6 +118,8 @@ angular.module("formsApp")
                         entry.hisoDT = meta.hisoDT
                         entry.hisoLayout = meta.hisoLayout
 
+                        entry.verification = meta.verification
+
                         /*
 
                         //hiso datatype. D
@@ -177,6 +179,7 @@ angular.module("formsApp")
                     ar.push("Representational Class")
                     ar.push("Field Size")
                     ar.push("Representational Layout")
+                    ar.push("Verification")
                     arRows.push(ar.join(","))
 
                     arJson.forEach(function (section) {
@@ -185,6 +188,7 @@ angular.module("formsApp")
                             line.push(makeSafe(row.category))
                             line.push(makeSafe(row.name))
                             line.push(makeSafe(row.description))
+
                             line.push(makeSafe(row.cardinality))
                             line.push(makeSafe(row.usageNotes))
                             line.push(makeSafe(row.obligation))
@@ -194,7 +198,7 @@ angular.module("formsApp")
                             line.push(makeSafe(row.hisoClass))
                             line.push(makeSafe(row.hisoLength))
                             line.push(makeSafe(row.hisoLayout))
-
+                            line.push(makeSafe(row.verification))
                             arRows.push(line.join(","))
 
                         })

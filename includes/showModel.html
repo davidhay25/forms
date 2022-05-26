@@ -16,13 +16,13 @@
     <div ng-repeat = "section in model">
         <h4>{{section.display}}</h4>
         <table class="table table-bordered">
-            <tr><th>Name</th><th>Description</th><th>Card.</th><th>Obligation</th><th>Conditional display</th><th>Data Domain</th></tr>
+            <tr><th>Name</th><th>Description</th><th>Card.</th><th>Verification</th><th>Conditional display</th><th>Data Domain</th></tr>
             <tr ng-repeat = "line in section.lines">
                 <td width="10%">{{line.name}} </td>
                 <!-- <td>{{line.category}}</td> -->
                 <td width="20%">{{line.description}}</td>
                 <td width="10%">{{line.cardinality}}</td>
-                <td width="10%">{{line.obligation}}</td>
+                <td width="10%">{{line.verification}}</td>
                 <td width="20%">{{line.conditionalNotes}}</td>
                 <td>{{line.dataDomain}}</td>
             </tr>

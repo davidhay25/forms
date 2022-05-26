@@ -34,13 +34,24 @@
                 <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
 
-                <span ng-show = "cell.meta.description || cell.meta.usageNotes || cell.meta.verification || cell.meta.notes">
+                <span ng-show = "cell.meta.description || cell.meta.usageNotes || cell.meta.notes">
 
                     <i class="glyphicon glyphicon-info-sign"
-                       uib-popover="{{cell.meta.description}} {{cell.meta.usageNotes}} {{cell.meta.verification}} {{cell.meta.notes}}"
+                       uib-popover="{{cell.meta.description}} {{cell.meta.usageNotes}} {{cell.meta.notes}}"
                        popover-placement="right"
                        popover-trigger="'mouseenter'"></i>
                 </span>
+
+                <span ng-show = "cell.meta.verification">
+
+                    <i class="glyphicon glyphicon-chevron-down"
+                       uib-popover="{{cell.meta.verification}}"
+                       popover-placement="right"
+                       popover-trigger="'mouseenter'"></i>
+                </span>
+
+
+
             </div>
 
 

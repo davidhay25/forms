@@ -840,7 +840,8 @@
                                 Download CSV file
                             </a>
 
-
+                            <ng-include src="'includes/hisoTable.html'"></ng-include>
+<!--
                             <div ng-repeat = "section in exportJsonList">
                                 <h4>{{section.display}}</h4>
                                 <table class="table table-bordered">
@@ -855,7 +856,7 @@
 
 
                                         </td>
-                                       <!-- <td>{{line.category}}</td> -->
+
                                         <td width="15%">{{line.description}}</td>
                                         <td width="5%">{{line.cardinality}}</td>
                                         <td width="7%">{{line.obligation}}</td>
@@ -872,7 +873,7 @@
                                     </tr>
                                 </table>
                             </div>
-
+-->
                         </uib-tab>
 
                         <uib-tab ng-show = "false" heading="Terminology Update">

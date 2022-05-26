@@ -25,7 +25,7 @@ angular.module("formsApp")
                 clearSelection()
                 $http.get(`/ds/fhir/Questionnaire/${miniQ.id}`).then(
                     function(data) {
-                        $scope.selectedQDetail = data.data
+                        $scope.selectedQDetail = data.data   //the full Q
                         let vo = formsSvc.makeTreeFromQ($scope.selectedQDetail)
 
                         //show sections
