@@ -64,7 +64,7 @@ angular.module("formsApp")
                     alert("Duplicate linkId/s found: \n" + duplicates + "\n Section/s cannot be inserted.")
                     return
                 }
-
+/* temp - need to be checked
                 //check dependency sources missing
                 let ar = qSvc.checkDependencyTargets(Q,arSection)
                 if (ar.length > 0) {
@@ -72,7 +72,7 @@ angular.module("formsApp")
                     console.log(ar)
                    // let msg = ""
                 }
-
+*/
                 $scope.$close(arSection)
 
 
