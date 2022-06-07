@@ -54,6 +54,19 @@
 
                 <strong>{{row.text}} </strong>
 
+                <!-- US code -->
+
+                <span ng-show = "row.meta.description || row.meta.usageNotes || row.meta.notes">
+
+                    <i class="glyphicon glyphicon-info-sign"
+                       uib-popover="{{row.meta.description}} {{row.meta.usageNotes}} {{row.meta.notes}}"
+                       popover-placement="right"
+                       popover-trigger="'mouseenter'"></i>
+                </span>
+
+                <!-- -->
+
+
                 <div class="row">
 
                     <!-- 2 columns -->
