@@ -326,7 +326,20 @@
                 <textarea class="form-control" ng-model="meta.sourceStandard"> </textarea>
 
                 <strong>Verification rules</strong>
-                <textarea class="form-control" ng-model="meta.verification"> </textarea>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <textarea class="form-control" ng-model="meta.verification"> </textarea>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="clickable" ng-click="meta.verification = meta.verification + ' Must be a valid SNOMED code'">SNOMED</div>
+                        <div class="clickable" ng-click="meta.verification = meta.verification + ' Should be more than one'">  > 1</div>
+                    </div>
+                </div>
+
+
+
+
 
                 <strong>General Notes</strong>
                 <textarea class="form-control" ng-model="meta.notes"> </textarea>

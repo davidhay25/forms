@@ -406,7 +406,7 @@ angular.module("formsApp")
                     $http.post(url,bundle).then(
                         function(data) {
                             //console.log(data.data)
-                            alert("Form has been saved, and any Observations or other resources extracted and saved")
+                            //don't want the alert alert("Form has been saved, and any Observations or other resources extracted and saved")
                             window.location = "afterReview.html"
 
                             $scope.selectPatient()  //to read the new data

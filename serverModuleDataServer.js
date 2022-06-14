@@ -85,7 +85,6 @@ function setup(app,serverRoot) {
             })
     })
 
-
     app.get('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
 console.log(url)
@@ -103,6 +102,12 @@ console.log(url)
     app.get('/ds/fhir/:type',async function(req,res){
         let url = serverRoot + req.params.type
 
+        //Anyone can get all the Questionnaires...
+        if (req.params.type !== 'Questionnaire' &&  ! checkAuth(req)) {
+            res.status(403).json()
+            return
+        }
+
         //console.log(req.query)
         let delimiter = '?'
         Object.keys(req.query).forEach(function(key,inx){
@@ -118,10 +123,6 @@ console.log(url)
             }
 
         })
-
-        //console.log(req.query)
-        //console.log(url)
-
 
 
         let results = await axios.get(url)      //get the first
@@ -188,9 +189,6 @@ console.log(url)
         let url = serverRoot
         let bundle = req.body
 
-        //console.log(bundle)
-
-
         axios.post(url,bundle)
             .then(function (response){
                 //console.log(response.data)
@@ -201,8 +199,16 @@ console.log(url)
                 res.status(err.response.status).send(err.response.data)
             })
 
-
     })
+
+}
+
+
+//check that the call is authorized. very basic ATM!
+function checkAuth(req) {
+    if (req.headers.authorization == 'dhay') {
+        return true
+    }
 
 }
 

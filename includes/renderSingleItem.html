@@ -27,18 +27,15 @@
 
             <div ng-hide = "cell.item.type == 'boolean'">
                 <span>{{cell.item.prefix}}. </span>
-
                     <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
-
-
                 <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> (Mult.) </span>
 
-                <span ng-show = "cell.meta.description || cell.meta.usageNotes || cell.meta.notes">
+                <span ng-show = "cell.meta.description">
 
                     <i class="glyphicon glyphicon-info-sign"
-                       uib-popover="{{cell.meta.description}} {{cell.meta.usageNotes}} {{cell.meta.notes}}"
-                       popover-placement="right"
+                       uib-popover="{{cell.meta.description}}"
+                       popover-placement="top"
                        popover-trigger="'mouseenter'"></i>
                 </span>
 
@@ -46,7 +43,7 @@
 
                     <i class="glyphicon glyphicon-chevron-down"
                        uib-popover="{{cell.meta.verification}}"
-                       popover-placement="right"
+                       popover-placement="top"
                        popover-trigger="'mouseenter'"></i>
                 </span>
 
@@ -67,6 +64,10 @@
 
             </div>
 
+            <div ng-switch-when="dateTime">
+                <input class="form-control" type="datetime-local" ng-model="form[cell.item.linkId]">
+            </div>
+
             <div ng-switch-when="date">
 
                 <p class="input-group">
@@ -85,6 +86,8 @@
 
 
             </div>
+
+
 
             <div ng-switch-when="display">
                 <em>{{cell.item.text}}</em>

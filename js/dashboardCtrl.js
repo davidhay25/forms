@@ -34,7 +34,7 @@ angular.module("formsApp")
             }
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','choice','open-choice','display','group','reference','display']
+            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','display','group','reference','display']
 
             $scope.input.codeSystems = []
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
@@ -180,15 +180,13 @@ angular.module("formsApp")
             $scope.selectTag = function(tag){
                 delete $scope.selectedQ
                 $localStorage.selectedFolderTag = tag.code  //only save the code
-
-
             }
 
 
             //perform validation functions
 
             $scope.validateQ = function() {
-                $scope.dependencyReport
+                //$scope.dependencyReport
                 let url = "/ds/fhir/Questionnaire/validate"
                 $http.post(url,$scope.selectedQ).then(
                     function(data) {
@@ -1254,7 +1252,7 @@ angular.module("formsApp")
             }
 
             $scope.loadAllQ = function() {
-               // let url = "/ds/fhir/Questionnaire"
+
                 let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
                 let t = {code:'all'}
                 $scope.folderTags = {} //

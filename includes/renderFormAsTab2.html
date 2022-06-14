@@ -1,4 +1,11 @@
 
+<style>
+    .required {
+        color: red;
+        background-color: white;
+    }
+
+</style>
 
 <div class="row">
     <div class="col-md-3">
@@ -51,20 +58,23 @@
             so that it can be checked -->
             <div ng-show="showConditionalGroup(row.group)">
 
+               
+                <span ng-class="{bold:true,required:row.group.required}">{{row.text}}</span>
 
-                <strong>{{row.text}} </strong>
+                <!--
+                <strong> {{row.text}} </strong>
+                -->
 
-                <!-- US code -->
-
+<!--  This seems to be duplicating the info sign - ?why was it here in the first place? ? for group level
+June 14
                 <span ng-show = "row.meta.description || row.meta.usageNotes || row.meta.notes">
-
                     <i class="glyphicon glyphicon-info-sign"
                        uib-popover="{{row.meta.description}} {{row.meta.usageNotes}} {{row.meta.notes}}"
                        popover-placement="right"
                        popover-trigger="'mouseenter'"></i>
                 </span>
+-->
 
-                <!-- -->
 
 
                 <div class="row">

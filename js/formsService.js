@@ -688,8 +688,6 @@ angular.module("formsApp")
                                         })
                                     }
 
-
-
                                 } else {
                                     //this is a single question with no grandchildren.
 
@@ -739,8 +737,6 @@ angular.module("formsApp")
                         hashAllItems[child.linkId] = {item:child,dependencies:[],section:sectionItem}
                     }
 
-
-
                     //update specific summary arrays - coded & reference
                     switch (child.type) {
                         case 'choice' :
@@ -784,10 +780,7 @@ angular.module("formsApp")
                         child.enableWhen.forEach(function (ew) {
                             hashAllItems[ew.question] = hashAllItems[ew.question] || {dependencies : []}
                             hashAllItems[ew.question].dependencies.push({item:child,ew:ew})
-
                         })
-
-
 
                     }
 
@@ -1572,6 +1565,13 @@ angular.module("formsApp")
 
 
                             break;
+                        case "dateTime":
+
+                            result = {valueDateTime: moment(value).format("YYYY-MM-DDThh:mm:ssZ")}
+
+
+                            break;
+
 
                         case "reference" :
                             result = {valueReference : value}
