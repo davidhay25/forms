@@ -30,8 +30,20 @@ angular.module("formsApp")
             //functions to support form submission
 
             //the QR is created in formsCtrl, but we need it in this scope. todo - once the dev dust settles, ?remove from formsCtrl???
-           $scope.$on("qrCreated",function(ev,qr){
-               $scope.formQR = qr
+            //actually, call it again so we can add the reviewer details. todo: definately need to tidy this up!!! - just need to add to dashboard.js & remove from formsCtrl
+
+            $scope.$on("qrCreated",function(ev,qr){
+
+               let patient = null
+               let practitioner = null
+               $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
+                   $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
+
+
+               //Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail
+
+
+
                console.log($scope.formQR)
            })
 
