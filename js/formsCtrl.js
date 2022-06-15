@@ -13,6 +13,7 @@ angular.module("formsApp")
                 $scope.datePopup[linkId] = {opened:true}
                // $scope.datePopup.opened = true
             }
+
             //used by the preview for coded elements - not sure it is actually used yet
             $scope.searchTermServerDEP = function(val,url) {
                 $scope.showWaiting = true
@@ -61,27 +62,13 @@ angular.module("formsApp")
                 $scope.selectedSection = section
             }
 
-            //count the number of completed answers in each section - used by tabbed form...
-            $scope.completedAnswersInSectionDEP = function(section) {
 
-                let cnt = 0
-                section.item.forEach(function (item){
-                    if ($scope.form[item.linkId]) {
-                        cnt ++
-                    }
-                })
-
-                return cnt
-
-            }
 
             //invoked from ng-blur on for elements
             $scope.makeQR = function() {
-
-
-
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
 
+                //console.log($scope.formQR)
 
                 $scope.$emit('qrCreated',$scope.formQR)
 
@@ -126,18 +113,10 @@ angular.module("formsApp")
 
             }
 
-            //a function to check whether 2 codings are equal
-            function checkEqualCodingDEP(source,target) {
-                if ((source.system == target.system) && (source.code == target.code)) {
-                    return true
-                }
 
-            }
 
             //the type of this item is reference
             $scope.selectResourceFromService = function (item) {
-
-
                 let ar = formsSvc.findExtension(item,"http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource")
 
 

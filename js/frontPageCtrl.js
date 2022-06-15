@@ -5,6 +5,75 @@ angular.module("formsApp")
             //system url for author tags
             let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
+            $scope.input = {}
+
+            //defaults for the form
+            $scope.form = {}        //for the form
+            $scope.input.canPublish = true
+            $scope.input.includeOIA = true
+
+            $scope.input.leftPane = "col-md-2"
+            $scope.input.rightPane = "col-md-10"
+
+            $scope.input.togglePane = function() {
+                if ($scope.input.rightPane == "col-md-10") {
+                    console.log('hide left pane')
+                    $scope.input.leftPane = "hide"
+                    $scope.input.rightPane = "col-md-12"
+                } else {
+                    console.log('show left pane')
+                    $scope.input.leftPane = "col-md-2"
+                    $scope.input.rightPane = "col-md-10"
+                }
+            }
+
+            //functions to support form submission
+
+            //the QR is created in formsCtrl, but we need it in this scope. todo - once the dev dust settles, ?remove from formsCtrl???
+           $scope.$on("qrCreated",function(ev,qr){
+               $scope.formQR = qr
+               console.log($scope.formQR)
+           })
+
+            $scope.submitForm = function() {
+                //$scope.makeQR()  //updates $scope.QR
+                //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
+
+                if ($scope.formQR.item.length == 0) {
+                    alert("You must enter some data first!")
+                    return
+                }
+
+                if (confirm("Are you sure you're ready to submit this form")){
+                    let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+
+                    if (! $scope.input.canPublish) {
+                        $scope.formQR.extension = $scope.formQR.extension || []
+                        $scope.formQR.extension.push({url:formsSvc.getExtUrl('extCanPublish'),valueBoolean:false})
+                    }
+
+                    if (! $scope.input.includeOIA) {
+                        $scope.formQR.extension = $scope.formQR.extension || []
+                        $scope.formQR.extension.push({url:formsSvc.getExtUrl('extPublishOia'),valueBoolean:false})
+                    }
+
+                    bundle.entry.push({resource:$scope.formQR})
+
+                    let url = "/fr/fhir/receiveQR"
+                    $http.post(url,bundle).then(
+                        function(data) {
+                            //console.log(data.data)
+                            alert("Form has been saved.")
+                            //window.location = "afterReview.html"
+
+                            //$scope.selectPatient()  //to read the new data
+                        }, function(err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
+            }
             //-----------  login & user stuff....
 
             $scope.login=function(){
@@ -90,7 +159,7 @@ angular.module("formsApp")
                             let url = `/ds/fhir/${item.item.reference}`   //a reference to the Q
                             $http.get(url).then(
                                 function (data) {
-                                    console.log(data.data)
+
                                     item.item.Q = data.data
 
 
@@ -174,14 +243,32 @@ angular.module("formsApp")
             }
 
             $scope.viewModel = function(Q) {
+
+
                 $scope.selectedQ = Q
                 $scope.model = exportSvc.createJsonModel(Q)
 
+                delete $scope.selectedSection       //the form section
+
+                //for the form ui
+                $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+                $scope.formTemplate = $scope.objFormTemplate.template
+
                 //for the HISO table display
                 let voHiso = formsSvc.generateQReport($scope.selectedQ)
-                //$scope.report = voHiso.report
+
                 let hashAllItems = voHiso.hashAllItems
                 $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
+                //convert the object into a single level for the table
+                $scope.arHisoAllRows = []
+                $scope.exportJsonList.forEach(function (sect) {
+                    $scope.arHisoAllRows.push({type:'section',display:sect.display})
+                    sect.lines.forEach(function (line) {
+                        $scope.arHisoAllRows.push(line)
+                    })
+
+                })
+
 
                 //create the download
                 let json = angular.toJson(Q,null,2)

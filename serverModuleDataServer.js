@@ -102,12 +102,22 @@ console.log(url)
     app.get('/ds/fhir/:type',async function(req,res){
         let url = serverRoot + req.params.type
 
-        //Anyone can get all the Questionnaires...
-        if (req.params.type !== 'Questionnaire' &&  ! checkAuth(req)) {
+        if (Object.keys(req.query).length ==0 &&  ! checkAuth(req)) {
             res.status(403).json()
             return
         }
 
+/*
+        //resources that anyone can access without auth
+        let allowedResources = ['Questionnaire','ServiceRequest']
+
+        //Anyone can get all the Questionnaires...
+        //if (req.params.type !== 'Questionnaire' &&  ! checkAuth(req)) {
+        if ( allowedResources.indexOf(req.params.type) == -1  &&  ! checkAuth(req)) {
+            res.status(403).json()
+            return
+        }
+*/
         //console.log(req.query)
         let delimiter = '?'
         Object.keys(req.query).forEach(function(key,inx){
@@ -152,20 +162,12 @@ console.log(url)
            }
        }
 
+       delete bundle.link       //this is the link from the first query
+
 
         res.json(bundle)
 
-/*
-        axios.get(url)
-            .then(function (response){
-                //console.log(response.data)
-                res.status(response.status).json(response.data)
-            })
-            .catch(function (err){
-                //console.log(err)
-                res.status(err.response.status).send(err.response.data)
-            })
-*/
+
 
     })
 

@@ -1028,15 +1028,19 @@
         <uib-tab heading="Form review dispositions">
             <br/>
             <div class="row">
+
                 <div class="col-md-2">
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
-                             style="cursor: pointer"
-                             ng-click="loadDispositionsForQ(Q)"
-                             ng-repeat="Q in allQ">
-                            {{Q.name}}
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                                 style="cursor: pointer"
+                                 ng-click="loadDispositionsForQ(Q)"
+                                 ng-repeat="Q in allQ">
+                                {{Q.name}}
+                            </div>
                         </div>
                     </div>
+
 
                 </div>
                 <div class="col-md-10">

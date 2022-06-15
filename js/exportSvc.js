@@ -66,6 +66,8 @@ angular.module("formsApp")
                         }
 
                         let entry = {}
+
+                        entry.type = item.type
                         entry.item = item       //for the edit option
                         entry.linkId = item.linkId
                         entry.name = item.text
@@ -84,7 +86,26 @@ angular.module("formsApp")
                                 let master = hashAllItems[ew.question]
                                 if (master) {
                                     entry.usageNotes = entry.usageNotes || ""
-                                    entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerCoding.code
+
+                                    if (ew.answerCoding) {
+                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerCoding.code
+                                    } else if (ew.answerBoolean) {
+                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerBoolean
+                                    } else if (ew.answerString) {
+                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerString
+                                    } else if (ew.answerInteger !== undefined) {
+                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerInteger
+                                    }
+/*
+                                        <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
+                                    <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
+                                    <span ng-show = "ew.answerString">{{ew.answerString}}</span>
+                                    <span ng-show = "ew.answerInteger !== undefined">{{ew.answerInteger}}</span>
+*/
+
+
+
+
                                 }
 
                             } else {
@@ -155,6 +176,8 @@ angular.module("formsApp")
                         }
 */
                         //create the
+
+                        //set the type of entry - section, group or plain item
 
 
                         ar.push(entry)

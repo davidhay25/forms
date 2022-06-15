@@ -34,7 +34,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase"]).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase",'ui.checkbox']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -55,6 +55,12 @@
     <script src="js/exportSvc.js"></script>
     <script src="js/loginCtrl.js"></script>
     <script src="js/modalDialogSvc.js"></script>
+
+    <script src="js/formsCtrl.js"></script>
+    <script src="js/formReviewsCtrl.js"></script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
     <!--
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
@@ -90,9 +96,9 @@
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="formsApp" ng-controller="frontPageCtrl" class="container-fluid">
 
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
-        <div class="container-fluid">
+            <div class="container-fluid">
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
@@ -104,9 +110,8 @@
 
 
             <div class="col-md-2 col-sm-2">
-                <div class="navbar-text">
-
-
+                <div ng-show="selectedQ" class="navbar-text">
+                    <button class="btn btn-link" ng-click="input.togglePane()">Toggle data standard list</button>
                 </div>
 
             </div>
@@ -148,19 +153,49 @@
 
             </div>
         </div>
-    </nav>
-
+        </nav>
 
 
         <div class="row">
 
-            <div class="col-md-6">
+            <div ng-class="input.leftPane">
 
-                <uib-tabset>
+                <h4>Open for review</h4>
+
+                <div class="list-group">
+                    <div ng-repeat="entry in ballotList.entry"
+                         ng-class="{'list-group-item':true,listItemSelected:entry.item.Q.id == selectedQ.id}" style="cursor: pointer">
+                        <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}} {{}}</div>
+
+                    </div>
+                </div>
+
+                <h4>Approved</h4>
+
+                <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true}"  style="cursor: pointer">
+                    <div ng-click = "viewModel(Q)">{{Q.title}}</div>
+
+                </div>
+
+                <uib-tabset ng-show="false">
                     <uib-tab heading = "Data Standards open for review">
                         <h4>Data Standards open for review</h4>
 
-                        <table class="table table-bordered">
+                        <div class="list-group">
+                            <div ng-repeat="entry in ballotList.entry" ng-class="{'list-group-item':true}">
+                                <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}}</div>
+
+                            </div>
+                        </div>
+
+                        <h4>Approved</h4>
+
+                        <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true}">
+                            <div ng-click = "viewModel(Q)">{{entry.item.display}}</div>
+
+                        </div>
+
+                        <table ng-show = "false" class="table table-bordered">
                             <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
                             <tr ng-repeat = "entry in ballotList.entry">
                                 <td>{{entry.item.display}}</td>
@@ -243,25 +278,28 @@
                 </uib-tabset>
 
 
-
-
-
-
             </div>
-            <div class="col-md-6">
-                <div ng-show="selectedQ" class="banner">Data Standard details
+            <div ng-class="input.rightPane">
+
+                <div ng-show = "showHelp || ! selectedQ">
+
+                    <p>All data standards published (or in the process of being published) by CanShare</p>
+
+                </div>
+
+                <div ng-show="selectedQ" class="banner">Data Standard details: {{selectedQ.title}}
                 <br/>
-                    <em>{{selectedQ.title}}</em>
+                    <em>{{selectedQ.description}}</em>
 
                 </div>
 
                 <uib-tabset  ng-show="selectedQ">
                     <uib-tab heading="Tree">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div id="designTree"></div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <table ng-show="selectedNode" class="table">
                                     <tr><td>Text</td><td>{{selectedNode.data.item.text}}</td></tr>
                                     <tr><td>Description</td><td>{{selectedNode.data.item.description}}</td></tr>
@@ -301,13 +339,79 @@
                         </div>
 
                     </uib-tab>
+
+
+                    <uib-tab heading="Form">
+
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
+                                a form. It can be used to make comments by entering them in the comments
+                                elements on the form. You need to enter (at least) your name in the Reviewer details
+                                to the right.
+                                Click <span class="clickable" ng-click="input.togglePane()">here</span> to hide/show the
+                                    list of standards. <span style="color: red; font-weight: bold">Don't include any real data in this form!</span>
+                                </div>
+                                <div ng-controller="formsCtrl">
+                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-2" style="background-color: #eeeeee">
+
+                                <h4>Reviewer details</h4>
+                                <input type = text ng-model = "input.reviewerName"
+                                       placeholder = "Reviewer name"
+                                       class="form-control"/>
+                                <div>
+                                    <input type = text ng-model = "input.reviewerOrganization"
+                                           placeholder = "Organisation"
+                                           class="form-control"/>
+                                </div>
+                                <div>
+                                    <input type = text ng-model = "input.reviewerEmail"
+                                           placeholder = "Email"
+                                           class="form-control"/>
+                                </div>
+
+                                <h4>Permissions</h4>
+
+                                <div><checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
+                                <div><checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request</div>
+
+                                <button ng-show = "formQR && input.reviewerName"
+                                        class="btn btn-danger pull-right"
+                                        ng-click="submitForm()">Submit form</button>
+                                <br/>
+
+                            </div>
+                        </div>
+
+
+
+                    </uib-tab>
+
                     <uib-tab heading="Table">
                         <ng-include src="'includes/showModel.html'"></ng-include>
                     </uib-tab>
 
                     <uib-tab heading="HISO metadata">
-                        <ng-include src="'includes/hisoTable.html'"></ng-include>
+                        <ng-include src="'includes/hisoTable2.html'"></ng-include>
                     </uib-tab>
+
+
+                    <uib-tab heading="New Comments" ng-show="user">
+                        <em>Comments awaiting review</em>
+
+                        <div ng-controller="formReviewsCtrl">
+                            <ng-include src = "'includes/formReviews.html'"></ng-include>
+                        </div>
+
+
+                    </uib-tab>
+
+
 
                     <uib-tab heading="Comments">
                         <em>Should this be all comments, of only those with a disposition? Currently only
