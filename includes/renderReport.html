@@ -15,9 +15,37 @@
             background: #dddddd;
             display: inline-block;
         }
+        .obrXXX {
+            background: #dddddd;
+        }
         .warning {
             color: red;
         }
+
+
+         .tableFixHead {
+             overflow-y: auto;
+             height: 800px;
+         }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background: #eee;
+        }
+
+
+
     </style>
 
     <uib-tabset>
@@ -328,9 +356,6 @@
             </table>
         </uib-tab>
 
-
-
-
         <uib-tab heading = "Conditionals by target">
             <br/>
             <em>These are the items whose visibility depends on another</em>
@@ -570,7 +595,6 @@
 
         </uib-tab>
 
-
         <uib-tab heading = "References">
             <br/>
             <table class="table table-bordered table-condensed">
@@ -597,7 +621,12 @@
 
         </uib-tab>
 
+        <uib-tab heading = "HL7 v2 (report)">
+            <br/>
 
+            <ng-include src = "'includes/v2Report.html'"></ng-include>
+
+        </uib-tab>
 
         <uib-tab ng-show="false" heading = "Textual">
         </uib-tab>

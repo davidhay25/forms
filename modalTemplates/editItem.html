@@ -251,7 +251,7 @@
                         <td>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <input class="form-control" type="text" ng-model="newItem.tmp.codeCode"
                                            placeholder="Code"/>
                                 </div>
@@ -262,6 +262,9 @@
                                 <div class="col-md-4">
                                     <input class="form-control" type="text" ng-model="newItem.tmp.codeDisplay"
                                            placeholder="Display"/>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="clickable" ng-click="fillConcept(newItem.tmp.codeCode,newItem.tmp.codeSystem)">Fill</div>
                                 </div>
                             </div>
 
@@ -337,10 +340,6 @@
                     </div>
                 </div>
 
-
-
-
-
                 <strong>General Notes</strong>
                 <textarea class="form-control" ng-model="meta.notes"> </textarea>
 
@@ -405,12 +404,11 @@
 
             </uib-tab>
 
-
             <uib-tab ng-show="! newItem.answerValueSet && (newItem.type == 'choice' || newItem.type == 'open-choice')" >
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
                 <table class="table table-bordered table-condensed">
-                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                    <tr><th>Display</th><th>Code</th><th>System</th><th></th><th></th><th></th></tr>
                     <tr ng-repeat = "option in newItem.answerOption">
                         <td>{{option.valueCoding.display}}</td>
                         <td>{{option.valueCoding.code}}</td>
@@ -427,6 +425,16 @@
                                 ng-click = "moveAnswerUp($index)"></i>
                             <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < newItem.answerOption.length -1"
                                 ng-click = "moveAnswerDown($index)"></i>
+
+                        </td>
+                        <td>
+                            <div ng-show = "newItem.initial[0].valueCoding.display == option.valueCoding.display">
+                                Is default
+                            </div>
+
+                            <div class="clickable" ng-hide = "newItem.initial[0].valueCoding.display == option.valueCoding.display"
+                                 ng-click="setDefault(option.valueCoding)">Default</div>
+
 
                         </td>
                     </tr>
@@ -446,6 +454,9 @@
                             <i ng-show="input.newAnswerDisplay"
                                class="clickable glyphicon glyphicon-plus-sign"
                                ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
+                        </td>
+                        <td></td>
+                        <td></td>
 
 
                     </tr>
@@ -563,18 +574,20 @@
 
             </uib-tab>
 
-            <uib-tab ng-show="false" heading = "HISO elements">
-                <br/>
-                <div class="row">
-                    <div class="col-md-3 col-sm-3">
-                        HISO DataType
-                    </div>
-                    <div class="col-md-9 col-sm-9">
-                        <select class="form-control" ng-model="meta.HisoDt">
+            <uib-tab ng-show = "false" heading = "Default">
+                <em>Set a default value</em>
 
-                        </select>
-                    </div>
+                <!-- Only for choice ATM-->
+                <div ng-show = "newItem.type == 'choice' && newItem.answerOption.length > 0">
+                    <table class="table">
+                        <tr ng-repeat = "ao in newItem.answerOption">
+                            <td>{{ao.valueCoding.display}}</td>
+                        </tr>
+                    </table>
+
                 </div>
+
+
 
             </uib-tab>
 

@@ -6,6 +6,87 @@ angular.module("formsApp")
 
             return {
 
+                createV2Report : function(Q) {
+                    let commentSystemUrl = "http://clinfhir.com/fhir/CodeSystem/review-comment"
+                    //generate a report for a v2 definition. Only suitable for 'data' sections - not admin or demographics
+                    let arModel = []
+
+                    if (Q.item) {
+                        Q.item.forEach(function (section){
+                            if (includeSection(section)) {
+                                // the section itself doesn't have any output into the v2 message, but is useful in the display
+                                let item = {type:'section',item:section}
+                                arModel.push(item)
+                                if (section.item) {
+                                    section.item.forEach(function(child){
+
+                                        if (child.item) {
+                                            //create an OBR entry
+                                            let item = {type:'OBR',item:child}
+                                            arModel.push(item)
+                                            child.item.forEach(function (grandchild) {
+                                                //An OBX for each child item
+                                                let item = {type:'OBX',item:grandchild}
+                                                addOBX(arModel,item)
+                                                //arModel.push(item)
+                                            })
+                                        } else {
+                                            // an OBX only
+                                            let item = {type:'OBX',item:child}
+                                            addOBX(arModel,item)
+                                            //arModel.push(item)
+                                        }
+                                    })
+                                }
+
+                            }
+
+
+                        })
+                    }
+
+
+                    return arModel
+
+                    function includeSection(section) {
+                        if (section.linkId == 'demog' || section.linkId == 'admin') {
+                            return false
+                        }
+                        return true
+
+                    }
+
+                    function addOBX(arModel,item) {
+                        let canAdd = true
+                        if (item.item.code) {
+                            item.item.code.forEach(function (code) {
+                                if (code.system == commentSystemUrl) {
+                                    canAdd = false
+                                }
+                            })
+                        }
+
+                        if (item.item.answerOption) {
+                            item.optionsHash = {}
+                            item.item.answerOption.forEach(function (opt) {
+                                if (opt.valueCoding) {
+                                    let system = opt.valueCoding.system || "unknown"
+                                    item.optionsHash[system] = item.optionsHash[system] || []
+                                    item.optionsHash[system].push(opt.valueCoding)
+                                }
+
+                            })
+                        }
+
+
+
+                        if (canAdd) {
+                            arModel.push(item)
+                        }
+
+                    }
+                },
+
                 createJsonModel : function(Q) {
                     let hashAllItems = formsSvc.makeHashAllItems(Q)
 

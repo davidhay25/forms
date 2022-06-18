@@ -62,6 +62,10 @@ angular.module("formsApp")
                 $scope.selectedSection = section
             }
 
+            //when a new template is selected in the parent controller, need to clear details of any previousle selected section
+            $scope.$on('newQSelected',function(ev){
+                delete $scope.selectedSection
+            })
 
 
             //invoked from ng-blur on for elements

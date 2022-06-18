@@ -118,10 +118,8 @@ angular.module("formsApp")
                                     let p = $scope.selectedConceptLookup.parameter[i]
                                     if (p.name == "display") {
                                         $scope.selectedConcept.display = p.valueString
-
                                         break
                                     }
-
                                 }
                             }
 

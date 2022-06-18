@@ -14,12 +14,6 @@ function createUUID() {
     });
 }
 
-//generate a random id as we want to assign the id's here (needed to copy between servers preserving the id)
-function createId() {
-    let id = 'id-' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000)
-    return id
-}
-
 function setup(app,sr) {
     serverRoot = sr
     //routes that are intended to be 'public' routes - ie that matches what the IG requires
@@ -27,10 +21,14 @@ function setup(app,sr) {
     //Receive a QR resource. Process and save.
     app.post('/fr/fhir/receiveQR',async function(req,res){
 
+
+
+        //let QR = req.body
+
         let QR = extractQRFromBundle(req.body)
         //console.log(QR)
         if (QR) {
-            QR.id = createId()  // createUUID();
+            QR.id = createUUID();
             try {
                 let result = await extractResources(QR)
                 let arResources = result.obs     //An array of created observations todo - and others, rename
@@ -66,12 +64,10 @@ function setup(app,sr) {
 
         function createEntry(resource) {
             //assume that these are all POST with uuid as id...
-            //not any more! - id's are all assigned by the client to support moving resources to another server
             let entry = {}
-            entry.fullUrl = serverRoot + resource.resourceType + "/" + resource.id // "urn:uuid:" + resource.id
+            entry.fullUrl = "urn:uuid:" + resource.id
             entry.resource = resource
-            //entry.request = {method:'POST',url:resource.resourceType}
-            entry.request = {method:'PUT',url:resource.resourceType + "/" + resource.id}
+            entry.request = {method:'POST',url:resource.resourceType}
             return entry
         }
 
@@ -141,30 +137,40 @@ async function extractResources(QR) {
         let provenance = resources.provenance
 
         let cp = null
+        /* this is really specific  to act now...
+        //create 'disease level' CP
+        let cp = createCarePlan(QR)
+        provenance.target.push({reference: "urn:uuid:"+ cp.id})
+        resources.obs.push(cp)
 
+        */
         //the service request for a revire request - always added ATM as being used for forms development
         //could add other SR's as needed - or a task
 
+
         let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request",Q)      //todo refactor names of vo returned
         //provenance.target = provenance.target || []
-        //provenance.target.push({reference: "urn:uuid:"+ sr.id})
-        provenance.target.push({reference: "ServiceRequest/"+ sr.id})
+        provenance.target.push({reference: "urn:uuid:"+ sr.id})
         resources.obs.push(sr)          //not really all obs...
 
         //to support more sophisticated workflow
         let task = createTask(QR,sr)
-        //provenance.target.push({reference: "urn:uuid:"+ task.id})
-        provenance.target.push({reference: "Task/"+ task.id})
+        provenance.target.push({reference: "urn:uuid:"+ task.id})
         resources.obs.push(task)          //not really all obs...
 
-/* not used now, but keep...
+
         //generate MDM referral (servicerequest) if requested by QR
         if (resources.QRHash['mdmreferral']) {
+            //the service request for a path request - always added ATM
+            //let category = {coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}
+            //let category = globals.labrefer
+
             let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral",Q)      //todo refactor names of vo returned
+            //provenance.target = provenance.target || []
             provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
             resources.obs.push(srMDM)          //not really all obs...
         }
-*/
+
 
 
         return resources
@@ -190,6 +196,7 @@ function performObservationExtraction(Q,QR) {
     let hashQR = {}     //hash of items in QR with an answer
     let hashQDefinition = {}    //hash of items that have the definition extraction set. {item: resourceType:}
 
+    //QR.id = createUUID()    //needed so provenance works
 
     //recursive algorithm to create hash of items that are Observation extraction
     function parseQ(hashQ,item) {
@@ -251,7 +258,7 @@ function performObservationExtraction(Q,QR) {
 
     //the provenance resource for this action
     let provenance = {resourceType:"Provenance"}
-    provenance.id = createId()  // createUUID()   //will be ignored by fhir server
+    provenance.id = createUUID()   //will be ignored by fhir server
     //the subject might be a reference to a contained PR resource...
     if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
         provenance.contained = QR.contained
@@ -263,8 +270,8 @@ function performObservationExtraction(Q,QR) {
     provenance.agent = []
     provenance.target = []
 
-    //provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
-    provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
+    provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
+
     //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
     provenance.agent.push({who:QR.author})
 
@@ -286,7 +293,7 @@ function performObservationExtraction(Q,QR) {
                     observation.contained = QR.contained
                 }
 
-                observation.id = createId() // createUUID()
+                observation.id = createUUID()
                 observation.text = {status:'generated'}
                 let text = ""
                 observation.status = "final"
@@ -308,9 +315,7 @@ function performObservationExtraction(Q,QR) {
                 }
 
                 observation.code = oCode
-                //observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
-                observation.derivedFrom = [{reference:"QuestionnaireResponse/" + QR.id}]
-
+                observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
 
                 //console.log(theAnswer)
                 //todo - the dtatypes for Observation and Questionnaire aren't the same!
@@ -343,8 +348,7 @@ function performObservationExtraction(Q,QR) {
                 arObservations.push(observation)
                 //provenance.target = provenance.target || []
 
-                //provenance.target.push({reference: "urn:uuid:"+ observation.id})
-                provenance.target.push({reference: "Observation/"+ observation.id})
+                provenance.target.push({reference: "urn:uuid:"+ observation.id})
 
             })
         }
@@ -360,7 +364,7 @@ function performObservationExtraction(Q,QR) {
 
         if (item.item){     //assume that any contents of the resource are child elements
             let resource = {resourceType:resourceType}
-            resource.id = createId()  // createUUID()
+            resource.id = createUUID()
             resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Specimen from Pathology request form</div>",status:"additional"}
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
             let canBeAdded = false      //only add if there is at least one child element entry
@@ -392,8 +396,7 @@ function performObservationExtraction(Q,QR) {
             if (canBeAdded) {
                 arObservations.push(resource)
                 provenance.target = provenance.target || []
-                //provenance.target.push({reference: "urn:uuid:"+ resource.id})
-                provenance.target.push({reference: resource.resourceType +  "/"+ resource.id})
+                provenance.target.push({reference: "urn:uuid:"+ resource.id})
             }
 
         }
@@ -409,17 +412,15 @@ function performObservationExtraction(Q,QR) {
 
 function createTask (QR,SR) {
     let task = {resourceType:"Task"}
-    task.id = createId() // createUUID()   //will be ignored by fhir server
+    task.id = createUUID()   //will be ignored by fhir server
     let description = "Task"
     task.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>"+description+"</div>",status:"additional"}
     task.authoredOn = new Date().toISOString()
     task.status = "requested"
     task.intent = 'plan'
     task.basedOn = []
-    //task.basedOn.push({reference: "urn:uuid:"+QR.id})
-    //task.focus = {reference: "urn:uuid:"+SR.id}
-    task.basedOn.push({reference: "QuestionnaireResponse/"+QR.id})
-    task.focus = {reference: "ServiceRequest/"+SR.id}
+    task.basedOn.push({reference: "urn:uuid:"+QR.id})
+    task.focus = {reference: "urn:uuid:"+SR.id}
     return task
 
 
@@ -428,7 +429,7 @@ function createTask (QR,SR) {
 //create a ServiceRequest resource. For now, just do it - eventually may get info from the QR
 function createServiceRequest(QR,category,carePlan,description,Q) {
     let sr = {resourceType:"ServiceRequest"}
-    sr.id = createId() // createUUID()   //will be ignored by fhir server
+    sr.id = createUUID()   //will be ignored by fhir server
     //the subject might be a reference to a contained PR resource...
     if (QR.author && QR.author.reference && QR.author.reference.substring(0,1)== '#') {
         sr.contained = QR.contained
@@ -443,8 +444,8 @@ function createServiceRequest(QR,category,carePlan,description,Q) {
     sr.category = [category]
     //sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
     sr.supportingInfo = []
-    sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
-    //sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
+    //sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})
+    sr.supportingInfo.push({reference: "urn:uuid:"+QR.id})
 
     sr.supportingInfo.push({reference: "Questionnaire/"+Q.id,display: Q.url})
 
@@ -452,13 +453,11 @@ function createServiceRequest(QR,category,carePlan,description,Q) {
     if (carePlan) {
         carePlan.activity = carePlan.activity || []
         let activity = {}
-        //activity.reference = {reference : "urn:uuid:"+ sr.id}
-        activity.reference = {reference : "ServiceRequest/"+ sr.id}
+        activity.reference = {reference : "urn:uuid:"+ sr.id}
         carePlan.activity =  carePlan.activity || []
         carePlan.activity.push(activity)
         //a reference from SR back to the CP
-        //sr.basedOn = [{reference : "urn:uuid:"+ carePlan.id}]
-        sr.basedOn = [{reference : "CarePlan/"+ carePlan.id}]
+        sr.basedOn = [{reference : "urn:uuid:"+ carePlan.id}]
     }
 /*
     //?? not actually using this ATM
@@ -472,7 +471,6 @@ function createServiceRequest(QR,category,carePlan,description,Q) {
     return sr
 }
 
-/*
 function createCarePlan(QR) {
     //what about the Condition it addresses?
     let cpTreat = {resourceType: "CarePlan", id: createUUID()}
@@ -487,8 +485,6 @@ function createCarePlan(QR) {
 
     return cpTreat
 }
-
-*/
 
 //find all extensions in this item with the given url. Return an array of extensions...
 function findExtension(item,url) {

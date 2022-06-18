@@ -82,6 +82,48 @@ angular.module("formsApp")
 
         return {
 
+            prepop : function(Q) {
+                let formData = {}
+                if (Q.item) {
+                    Q.item.forEach(function (sectionItem) {
+                        if (sectionItem.item) {
+                            sectionItem.item.forEach(function(child){
+                                if (child.item) {
+                                    //a group
+                                    child.item.forEach(function (grandChild) {
+                                        getValue(formData,grandChild)
+                                    })
+                                } else {
+                                    //a leaf
+                                    getValue(formData,child)
+                                }
+                            })
+                        }
+                    })
+                }
+                return formData
+
+                function getValue(form,child) {
+                    //assume only a single initial of type coding
+                    let initial = child.initial
+                    if (initial && initial.length > 0) {
+                        let coding = initial[0].valueCoding
+                        if (coding && child.answerOption) {
+                            //have to find the value from the list of options - angular needs it
+                            child.answerOption.forEach(function (opt) {
+                                if (opt.valueCoding.display == coding.display) {
+                                    form[child.linkId] = opt
+                                }
+                            })
+
+
+                        }
+                    }
+
+                }
+
+            },
+
             getQAttachments : function(Q) {
                 //return an array of attachments
                 let arExt = this.findExtension(Q,extQAttachment)

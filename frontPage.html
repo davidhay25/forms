@@ -123,12 +123,18 @@
                 </form>
             </div>
 
-            <div class="col-md-3 col-sm-3">
+            <div class="col-md-4 col-sm-4">
+                <div class="navbar-text" ng-show="selectedQ">
+                    <checkbox ng-model = "input.showTechnical"></checkbox> Technical
+                </div>
+            </div>
+<!--
+            <div class="col-md-2 col-sm-2">
 
                     <div class="navbar-text pull-right">{{user.email}}</div>
 
-
             </div>
+
 
             <div class="col-md-1 col-sm-1">
                 <div class="navbar-text " ng-hide="user">
@@ -152,6 +158,8 @@
                 </div>
 
             </div>
+                   -->
+
         </div>
         </nav>
 
@@ -160,20 +168,24 @@
 
             <div ng-class="input.leftPane">
 
-                <h4>Open for review</h4>
+                <div class="myScroll">
 
-                <div class="list-group">
-                    <div ng-repeat="entry in ballotList.entry"
-                         ng-class="{'list-group-item':true,listItemSelected:entry.item.Q.id == selectedQ.id}" style="cursor: pointer">
-                        <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}} {{}}</div>
+                    <h4>Draft Data Standard</h4>
 
+                    <div class="list-group">
+                        <div ng-repeat="entry in ballotList.entry"
+                             ng-class="{'list-group-item':true,listItemSelected:entry.item.Q.id == selectedQ.id}" style="cursor: pointer">
+                            <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}} {{}}</div>
+
+                        </div>
                     </div>
+
+                    <h4>Data Standard</h4>
+
+                    <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"  style="cursor: pointer">
+                    <div ng-click = "viewModel(Q)">{{Q.name}}</div>
+
                 </div>
-
-                <h4>Approved</h4>
-
-                <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true}"  style="cursor: pointer">
-                    <div ng-click = "viewModel(Q)">{{Q.title}}</div>
 
                 </div>
 
@@ -294,6 +306,62 @@
                 </div>
 
                 <uib-tabset  ng-show="selectedQ">
+
+                    <uib-tab heading="Form">
+
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
+                                a form. It can be used to make comments by entering them in the comments
+                                elements on the form. You need to enter (at least) your name in the Reviewer details
+                                to the right to submit comments.
+                                Click <span class="clickable" ng-click="input.togglePane()">here</span> to hide/show the
+                                    list of standards at the right. <br/>
+
+                                <div class="text-center" style="color: red; font-weight: bold">
+                                    Previous forms are saved as anonymous examples. Don't include any real data in this form!
+                                </div>
+                                </div>
+                                <div ng-controller="formsCtrl">
+                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-2" style="background-color: #eeeeee">
+
+                                <h4>Reviewer details</h4>
+                                <input type = text ng-model = "input.reviewerName"
+                                       placeholder = "Reviewer name"
+                                       class="form-control"/>
+                                <div>
+                                    <input type = text ng-model = "input.reviewerOrganization"
+                                           placeholder = "Organisation"
+                                           class="form-control"/>
+                                </div>
+                                <div>
+                                    <input type = text ng-model = "input.reviewerEmail"
+                                           placeholder = "Email"
+                                           class="form-control"/>
+                                </div>
+
+                                <h4>Permissions</h4>
+
+                                <div><checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
+                                <div><checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request</div>
+
+                                <button ng-show = "formQR && input.reviewerName"
+                                        class="btn btn-danger pull-right"
+                                        ng-click="submitForm()">Submit form</button>
+                                <br/>
+
+                            </div>
+                        </div>
+
+
+
+                    </uib-tab>
+
                     <uib-tab heading="Tree">
                         <div class="row">
                             <div class="col-md-6">
@@ -340,77 +408,14 @@
 
                     </uib-tab>
 
-
-                    <uib-tab heading="Form">
-
-                        <div class="row">
-                            <div class="col-md-10">
-                                <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
-                                a form. It can be used to make comments by entering them in the comments
-                                elements on the form. You need to enter (at least) your name in the Reviewer details
-                                to the right.
-                                Click <span class="clickable" ng-click="input.togglePane()">here</span> to hide/show the
-                                    list of standards. <span style="color: red; font-weight: bold">Don't include any real data in this form!</span>
-                                </div>
-                                <div ng-controller="formsCtrl">
-                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
-
-                                </div>
-                            </div>
-
-                            <div class="col-md-2" style="background-color: #eeeeee">
-
-                                <h4>Reviewer details</h4>
-                                <input type = text ng-model = "input.reviewerName"
-                                       placeholder = "Reviewer name"
-                                       class="form-control"/>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerOrganization"
-                                           placeholder = "Organisation"
-                                           class="form-control"/>
-                                </div>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerEmail"
-                                           placeholder = "Email"
-                                           class="form-control"/>
-                                </div>
-
-                                <h4>Permissions</h4>
-
-                                <div><checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
-                                <div><checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request</div>
-
-                                <button ng-show = "formQR && input.reviewerName"
-                                        class="btn btn-danger pull-right"
-                                        ng-click="submitForm()">Submit form</button>
-                                <br/>
-
-                            </div>
-                        </div>
-
-
-
-                    </uib-tab>
-
                     <uib-tab heading="Table">
                         <ng-include src="'includes/showModel.html'"></ng-include>
                     </uib-tab>
 
                     <uib-tab heading="HISO metadata">
+                        <br/>
                         <ng-include src="'includes/hisoTable2.html'"></ng-include>
                     </uib-tab>
-
-
-                    <uib-tab heading="New Comments" ng-show="user">
-                        <em>Comments awaiting review</em>
-
-                        <div ng-controller="formReviewsCtrl">
-                            <ng-include src = "'includes/formReviews.html'"></ng-include>
-                        </div>
-
-
-                    </uib-tab>
-
 
 
                     <uib-tab heading="Comments">
@@ -435,12 +440,62 @@
                             </tr>
                         </table>
                     </uib-tab>
-                    <uib-tab heading="ValueSets">
+
+
+                    <uib-tab >
+                        <uib-tab-heading>
+                            Previous examples <span ng-show="allQRforQ.entry.length > 0" class="badge">{{allQRforQ.entry.length}}</span>
+                        </uib-tab-heading>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-2">
+
+                                <div class="myScroll">
+                                    <div class="list-group">
+                                        <div ng-class="{'list-group-item':true,listItemSelected:entry.resource.id == selectedQR.id}"
+                                             style="cursor: pointer"
+                                             ng-click = "selectQR(entry.resource)"
+                                             ng-repeat="entry in allQRforQ.entry">
+
+                                            {{entry.resource.authored | date : "d MMM  HH:mm"}}
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-10">
+
+                                <uib-tabset>
+                                    <uib-tab heading = "Form">
+                                        <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                                    </uib-tab>
+                                    <uib-tab ng-show="input.showTechnical" heading="Json">
+                                        <pre>{{selectedQR | json}}</pre>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                            </div>
+                        </div>
+                    </uib-tab>
+
+
+                    <uib-tab ng-show="input.showTechnical" heading="HL7 v2 segments">
+                       <br/>
+
+
+                        <ng-include src = "'includes/v2Report.html'"></ng-include>
+
+
+                    </uib-tab>
+
+                    <uib-tab ng-show="input.showTechnical" heading="ValueSets">
+                        <br/>
 
                         <table class="table">
                             <tr><th>Url</th><th>LinkId</th></tr>
                             <tr ng-repeat="item in vsForQ">
-                               <td><div class="clickable" ng-click="viewVS(item.vsUrl)">{{item.vsUrl}}</div> </td>
+                                <td><div class="clickable" ng-click="viewVS(item.vsUrl)">{{item.vsUrl}}</div> </td>
                                 <td>{{item.linkId}}</td>
                             </tr>
                         </table>
@@ -448,7 +503,10 @@
                         <em>ValueSets for this dataSet. ?Instead of/ as well as all the ValueSets for all ds</em>
 
                     </uib-tab>
-                    <uib-tab heading="Questionnaire Json">
+
+
+
+                    <uib-tab ng-show="input.showTechnical" heading="Questionnaire Json">
                         <div class="row">
                             <div class="col-md-12">
 
@@ -465,6 +523,21 @@
                         <pre>{{selectedQ | json}}</pre>
 
                     </uib-tab>
+
+                    <uib-tab ng-show="false && user">
+                        <uib-tab-heading>
+                            All New Comments
+                        </uib-tab-heading>
+
+                        <div class="alert alert-warning">Comments awaiting review. Note that this is for ALL Data Standards - not just the selected one</div>
+
+                        <div ng-controller="formReviewsCtrl">
+                            <ng-include src = "'includes/formReviews.html'"></ng-include>
+                        </div>
+
+
+                    </uib-tab>
+
                 </uib-tabset>
 
 

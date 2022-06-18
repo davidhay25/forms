@@ -233,6 +233,7 @@ angular.module("formsApp")
 
                         $scope.saveDisposition = function(){
                             let obs = {resourceType:'Observation'}
+                            obs.id = "disp-" + new Date().getTime()
                             obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
                             obs.derivedFrom = {reference:`QuestionnaireResponse/${QR.id}`}
                             obs.status = "final"
@@ -255,7 +256,9 @@ angular.module("formsApp")
                             }
 
                             console.log(obs)
-                            $http.post('/ds/fhir/Observation',obs).then(
+                            //$http.post('/ds/fhir/Observation',obs).then(
+                            //need to assign the id so we can copy resources to another server and preserve the id
+                            $http.put('/ds/fhir/Observation/' + obs.id,obs).then(
                                 function(data) {
                                     $scope.$close(obs)
                                 }, function(err) {

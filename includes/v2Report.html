@@ -1,0 +1,65 @@
+<div>
+
+    <style>
+        .obr {
+            background: #dddddd;
+        }
+    </style>
+
+
+    <div class="tableFixHead">
+        <table class="table table-bordered table-condensed">
+            <thead>
+            <tr><th>Segment</th><th>Type</th><th>Text</th><th>Description</th><th>Code</th><th>Options</th></tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "item in v2List" ng-class="{obr:item.type == 'OBR'}">
+
+                <td colspan="6" ng-if = "item.type == 'section'"><strong>{{item.item.text}}</strong></td>
+
+                <td ng-if = "item.type !== 'section'">{{item.type}}</td>
+                <td ng-if = "item.type !== 'section'">{{item.item.type}}</td>
+                <td ng-if = "item.type !== 'section'">
+                    <div class="clickable" ng-click="editItemFromReport({item:item.item})">
+                        {{item.item.text}}
+                    </div>
+
+                </td>
+                <td ng-if = "item.type !== 'section'">{{item.item.description}}</td>
+                <td ng-if = "item.type !== 'section'">
+
+                    <div ng-repeat = "code in item.item.code">
+                        {{code.code}} ({{code.display}}) <em ng-hide="code.system == 'http://snomed.info/sct'">{{code.system}}</em>
+                    </div>
+
+                </td>
+                <td ng-if = "item.type !== 'section'">
+                    {{item.item.answerValueSet}}
+
+                    <div ng-repeat = "(k,v) in item.optionsHash">
+                        <div><em>{{k}}</em></div>
+
+                        <div ng-repeat="ans in v">
+                            <div style="padding-left: 8px">
+                                {{ans.code}} <em>{{ans.display}}</em>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div ng-repeat = "option in item.item.answerOption">
+                        {{option.valueInteger}}{{option.valueString}}
+                        <!--
+                        {{option.valueCoding.code}} {{option.valueCoding.display}} {{option.valueCoding.system}}
+                        -->
+                    </div>
+
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

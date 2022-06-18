@@ -1,32 +1,60 @@
 <div>
 
+    <!-- https://www.w3docs.com/snippets/html/how-to-create-a-table-with-a-fixed-header-and-scrollable-body.html-->
+    <style>
+        .tableFixHead {
+            overflow-y: auto;
+            height: 800px;
+        }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background: #eee;
+        }
+    </style>
 
 
-    <table class="table table-bordered">
+    <div class="tableFixHead">
+        <table class="table table-bordered">
+            <thead>
+            <tr><th>Name</th><th>Definition</th><th>Source Standards</th><th>Value domain</th><th>Data type</th><th>Unit of Measure</th>
+                <th>Layout</th><th>Obligation</th><th>Guide for use</th></tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "line in arHisoAllRows">
 
-        <tr><th>Name</th><th>Definition</th><th>Source Standards</th><th>Value domain</th><th>Data type</th><th>Unit of Measure</th>
-            <th>Layout</th><th>Obligation</th><th>Guide for use</th></tr>
+                <td style="background-color:#c0c0c0" colspan="9" ng-if = "line.type == 'section'"><strong>{{line.display}}</strong></td>
 
-        <tr ng-repeat = "line in arHisoAllRows">
+                <td  style="background-color: #f4f0ec" colspan="1" ng-if = "line.type == 'group'"><em>{{line.name}}</em></td>
+                <td  style="background-color: #f4f0ec" colspan="8" ng-if = "line.type == 'group'">{{line.description}}</td>
 
-            <td style="background-color:#c0c0c0" colspan="9" ng-if = "line.type == 'section'"><strong>{{line.display}}</strong></td>
-
-            <td  style="background-color: #f4f0ec" colspan="1" ng-if = "line.type == 'group'"><em>{{line.name}}</em></td>
-            <td  style="background-color: #f4f0ec" colspan="8" ng-if = "line.type == 'group'">{{line.description}}</td>
-
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.name}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.description}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.sourceStandard}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.dataDomain}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.hisoDT}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'"></td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.hisoLayout}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.obligation}}</td>
-            <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.usageNotes}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.name}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.description}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.sourceStandard}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.dataDomain}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.hisoDT}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'"></td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.hisoLayout}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.obligation}}</td>
+                <td ng-hide="line.type == 'section' || line.type == 'group'">{{line.usageNotes}}</td>
 
 
-        </tr>
-    </table>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 
 
 </div>

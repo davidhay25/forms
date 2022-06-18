@@ -165,16 +165,43 @@ angular.module("formsApp")
                 $scope.input.dirty = true
             }
 
+            //removing a tag means using the meta-delete operation
             $scope.removeTag = function(inx) {
-                $scope.selectedQ.meta.tag.splice(inx,1)
-                $scope.input.dirty = true
+                let tags = $scope.selectedQ.meta.tag.splice(inx,1)
+                let url = `/ds/removeqtag/${$scope.selectedQ.id}`
+                $http.post(url,tags[0]).then(
+                    function (data) {
+                       // alert('Folder tag')
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+console.log(tags)
+                let params = {resourceType: "Parameters",parameter:[]}
+                let param = {name:'meta'}
+                param.valueMeta = {tag:tags[0]}
+                params.parameter.push(param)
+
+
+                /*<Parameters xmlns="http://hl7.org/fhir">
+  <parameter>
+    <name value="meta"/>
+    <valueMeta>
+      <tag>
+        <system value="http://example.org/codes/tags"/>
+        <code value="current"/>
+        <display value="Current Inpatient"/>
+      </tag>
+    </valueMeta>
+  </parameter>
+</Parameters>*/
+
+                //$scope.input.dirty = true
+
             }
 
-            //is there a saved tag
-           // $scope.input.selectedFolderTag = {code:"all"}
-          //  if ($localStorage.selectedFolderTag) {
-           //     $scope.input.selectedFolderTag = $localStorage.selectedFolderTag
-         //   }
+
 
             //clear the currently selected Q when changing selected tag
             $scope.selectTag = function(tag){
@@ -1110,6 +1137,11 @@ angular.module("formsApp")
             }
 
 
+            $scope.setDefaults = function(){
+                //need to wait for the form to be rendered before checking the defaults
+                $scope.form = formsSvc.prepop($scope.selectedQ)
+            }
+
             //perfroms a 'redraw' of the Q - called frequently
             $scope.drawQ = function(Q,resetToSection) {
                 //save the current state of node expansion from the jstree - not the treedata!!!
@@ -1145,6 +1177,9 @@ angular.module("formsApp")
                 //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
                 $scope.formTemplate = $scope.objFormTemplate.template
+
+                $scope.v2List = exportSvc.createV2Report(Q)
+
               //  $scope.input.dirty = false
             }
 

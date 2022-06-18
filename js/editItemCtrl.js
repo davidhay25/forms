@@ -1,6 +1,7 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
-        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,insertType,hashAllItems,parent,$uibModal) {
+        function ($scope,formsSvc,item,itemTypes,editType,codeSystems,
+                  $http,insertType,hashAllItems,parent,$uibModal) {
 
 
             $scope.parent = parent
@@ -18,8 +19,54 @@ angular.module("formsApp")
                 }
             }
 
+            //for a choice option, set the ())single) default
+            $scope.setDefault = function(coding){
+                $scope.newItem.initial = []         //remove any existing
+                $scope.newItem.initial[0] = {valueCoding : coding}
+            }
 
+            $scope.fillConcept = function(code,system) {
+                console.log(system,code)
 
+                let codeSystem = codeSystems[0].url   // default to the first (snomed)
+
+                if (system && system.url) {
+                    codeSystem = system.url
+                }
+
+                let server = formsSvc.getServers().termServer //  "https://r4.ontoserver.csiro.au/fhir/"
+
+                let qry = `${server}CodeSystem/$lookup?system=${codeSystem}&code=${code}&includeDefinition=true`
+                $scope.showWaiting = true
+                $http.get(qry).then(
+                    function (data) {
+                        console.log(data.data)
+                        let parameters = data.data
+
+                        if (parameters.parameter) {
+                            for (var i = 0; i < parameters.parameter.length; i++) {
+                                let p = parameters.parameter[i]
+                                if (p.name == "display") {
+                                   // $scope.selectedConcept.display = p.valueString
+                                    $scope.newItem.tmp.codeDisplay = p.valueString
+                                    if (!system) {
+                                        //need to set the system dropdown also
+                                        //Note: assume that
+                                        $scope.newItem.tmp.codeSystem = codeSystems[0]
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    },
+                    function(err) {
+                        alert("No concept found: " + code + " (" + codeSystem + ")")
+                    }
+
+                    )
+                }
+
+            //Is this ever the case?
             if (! item) {
                 item = {}
                 item.tmp = {codeSystem: codeSystems[0] } //default to snomed
@@ -31,9 +78,11 @@ angular.module("formsApp")
                 $scope.newItem = angular.copy(item)
             }
 
+            //set the code system to default to snomed (the forst in the list)
+            //if (! $scope.newItem.)
+
             //create a new VS for this item - or edit the existing
             $scope.editVS = function(url){
-
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
                     backdrop: 'static',
@@ -133,7 +182,7 @@ angular.module("formsApp")
             $scope.dependantOnThis = []         //those items dependant on this one...
 
 
-            //determine potentialdependency sources
+            //determine potential dependency sources
             Object.keys(hashAllItems).forEach(function (key) {
                 let item1 = hashAllItems[key].item
                 let section =  hashAllItems[key].section;
@@ -374,6 +423,11 @@ angular.module("formsApp")
                 })
             }
 
+            //default to the first codesystem
+          //  if (! $scope.newItem.tmp.codeSystem) {
+            //    $scope.newItem.tmp.codeSystem = $scope.input.codeSystems[0]
+         //   }
+
             $scope.removeAnswerOption = function(inx){
                 $scope.newItem.answerOption.splice(inx,1)
             }
@@ -489,13 +543,10 @@ angular.module("formsApp")
 
                     $scope.newItem.extension = $scope.newItem.extension || []
                     $scope.newItem.extension.push({url:unitsExtension,valueCoding : coding})
-
-
                 }
 
                 if ($scope.newItem.tmp && $scope.newItem.tmp.codeCode) {
                     let code = {code:$scope.newItem.tmp.codeCode,
-                        //system:$scope.newItem.tmp.codeSystem.url,
                         display:$scope.newItem.tmp.codeDisplay}
 
                         if ($scope.newItem.tmp.codeSystem) {

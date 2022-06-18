@@ -15,9 +15,9 @@ let sourceServer = "http://canshare.clinfhir.com/ds/fhir/"
 //the server to copy resources to
 let targetServer = "http://localhost:9099/baseR4/"
 
-//syncResources("Questionnaire")
+syncResources("Questionnaire")
 //syncResources("Observation")
-syncResources("ServiceRequest")
+//syncResources("ServiceRequest")
 
 function syncResources(type) {
     let qry = sourceServer +  type

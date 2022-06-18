@@ -47,6 +47,10 @@ angular.module("formsApp")
                console.log($scope.formQR)
            })
 
+            $scope.selectQR = function (QR) {
+                $scope.selectedQR = QR
+            }
+
             $scope.submitForm = function() {
                 //$scope.makeQR()  //updates $scope.QR
                 //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
@@ -256,15 +260,32 @@ angular.module("formsApp")
 
             $scope.viewModel = function(Q) {
 
+                delete $scope.dispositionsForQ
+                delete $scope.selectedQR
+                delete $scope.selectedSection       //the form section
+
+                //lets the child controllers (eg formsCtrl) know that a new Q has been selected so it can clear the display...
+                $scope.$broadcast('newQSelected')
+
 
                 $scope.selectedQ = Q
                 $scope.model = exportSvc.createJsonModel(Q)
 
-                delete $scope.selectedSection       //the form section
+
 
                 //for the form ui
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
                 $scope.formTemplate = $scope.objFormTemplate.template
+
+                //need to wait for the form to be rendered before checking the defaults
+                $timeout(function(){
+                    //returns any initial values
+                    $scope.form = formsSvc.prepop(Q)
+
+                    //lets the child controllers (eg formsCtrl) know that a new Q has been selected...
+                    //$scope.$broadcast('newQSelected')
+                },1000)
+
 
                 //for the HISO table display
                 let voHiso = formsSvc.generateQReport($scope.selectedQ)
@@ -303,11 +324,29 @@ angular.module("formsApp")
                     function(data) {
                         $scope.dispositionsForQ = data
 
+                    }, function (err) {
+                        console.log(err)
                     }
                 )
 
                 //get the vs
                 $scope.vsForQ = terminologySvc.getValueSetsForQ(Q)
+
+
+                //The v2 report
+                $scope.v2List = exportSvc.createV2Report(Q)
+
+                //The list of QRs for example display
+                formsSvc.getQRforQ(Q.url).then(
+                    function (bundle) {
+                        $scope.allQRforQ = bundle
+                        if (bundle.entry && bundle.entry.length > 0) {
+                            $scope.selectedQR = bundle.entry[0].resource
+                        }
+
+                    }
+                )
+
 
             }
 

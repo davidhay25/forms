@@ -2,9 +2,32 @@
 const axios = require('axios').default;
 
 function setup(app,serverRoot) {
+    
+    app.post('/ds/removeqtag/:qid',async function(req,res){
+        //delete a questionnaire tag
+        let tag = req.body
+        if (tag) {
+            //console.log(tag)
 
-    //routes that are intended to be 'public' routes - ie that matches what the IG requires
+            let params = {resourceType: "Parameters",parameter:[]}
+            let param = {name:'meta'}
+            param.valueMeta = {tag:tag}
+            params.parameter.push(param)
 
+            //console.log("param %j",params)
+            let url = serverRoot + "Questionnaire/" + req.params.qid + "/$meta-delete"
+            try {
+                let results = await axios.post(url,params)      //get the first
+                res.json()
+            } catch (ex) {
+                console.log(ex)
+                res.status(500).json({err:ex})
+            }
+
+        } else {
+            res.status(400).json({msg:'Tag missing'})
+        }
+    })
 
     app.delete('/ds/fhir/Questionnaire/:id',function(req,res){
         let url = serverRoot + "Questionnaire/" + req.params.id
@@ -162,7 +185,7 @@ console.log(url)
            }
        }
 
-       delete bundle.link       //this is the link from the first query
+        delete bundle.link       //this is the link from the first query
 
 
         res.json(bundle)
@@ -185,6 +208,8 @@ console.log(url)
         return url
 
     }
+
+
 
     //this is to the root of the server - ie a transaction. The route must be the last of the POSRs!
     app.post('/ds/fhir',function(req,res){

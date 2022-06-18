@@ -6,6 +6,18 @@
         <div class="col-md-3">
             <div class="row">
 
+
+                <div class="list-group">
+                    <div ng-class = "{'list-group-item':true,'listItemSelected' : selectedSR.id == entry.resource.id}"
+                         style="cursor: pointer"
+                         ng-click = "selectSR(entry.resource)"
+                         ng-repeat = "entry in serviceRequestsBundle.entry">
+                        {{entry.resource.requester.display}}
+                    </div>
+                </div>
+
+                <button class="btn btn-link" ng-click="refresh()">Refresh</button>
+                <!--
                 <uib-tabset>
                     <uib-tab heading="Outstanding">
                         <div class="list-group">
@@ -55,6 +67,7 @@
 
                     </uib-tab>
                 </uib-tabset>
+                -->
 
 
             </div>

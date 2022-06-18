@@ -58,30 +58,6 @@
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
         }]);
 
-        /*
-               angular.module("formsApp")
-                   .factory("$exceptionHandler",  function() {
-                       return function (exception, cause) {
-                           //exception handling here
-                           alert(exception + ".details in the console.")
-                       };
-                   });
-
-               angular.module('formsApp').factory('$exceptionHandler', [function() {
-                   return function myExceptionHandler(exception, cause) {
-
-                       console.log(cause)
-                       console.log(exception)
-                       //$log.warn(exception, cause);
-                       alert(exception)
-                   };
-               }]);
-
-        window.onerror = function(message, url, linenumber) {
-            alert("An unexpected error occurred: " + message + " on line " + linenumber + " for " + url);
-        }
- */
-
     </script>
     <script src="js/libs/ngStorage.min.js"></script>
 
@@ -213,6 +189,7 @@
 
         <uib-tab heading="Questionnaire resources">
             <br/>
+
             <div class="row">
                 <div ng-class="input.leftPane">
 
@@ -417,6 +394,16 @@
 
                                                     </div>
                                                 </div>
+
+                                                <div class="row" ng-show="selectedNode.data.item.initial">
+                                                    <div class="col-md-3">
+                                                        Default option
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{selectedNode.data.item.initial[0].valueCoding.display}}
+                                                    </div>
+                                                </div>
+
 
                                                 <div class="row" ng-show="selectedNode.data.item.enableWhen">
                                                     <div class="col-md-3">
@@ -711,36 +698,12 @@
                             <uib-tabset>
 
                                 <uib-tab heading = "Edit">
-<!--
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>Patient</label>
-                                            <select class="form-control"></select>
-                                        </div>
-                                    </div>
--->
+                                    <div class="clickable pull-right" ng-click="setDefaults()">Set defaults</div>
+
 
                                     <br/>
 
-                                    <!--
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                        </div>
-                                        <div class="col-md-1">
-                                            Patient
-                                        </div>
-                                        <div class="col-md-2">
-                                            <select class="form-control" ng-model="input.patient"></select>
-                                        </div>
-                                        <div class="col-md-1">
-                                            Practitioner
-                                        </div>
-                                        <div class="col-md-2">
-                                            <select class="form-control" ng-model="input.practitioner"></select>
-                                        </div>
-                                    </div>
-                                    <hr/>
--->
+
                                     <div ng-controller="formsCtrl">
                                         <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                     </div>
@@ -750,6 +713,7 @@
                                 <uib-tab heading = "Preview">
                                     <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
                                 </uib-tab>
+
                                 <uib-tab heading = "Raw form data">
                                     <pre>{{form | json}}</pre>
                                 </uib-tab>
@@ -987,7 +951,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Form reviews">
+        <uib-tab ng-show="false" heading="Form reviews">
             <br/>
 
             <div ng-controller="formReviewsCtrl">
@@ -996,36 +960,8 @@
 
         </uib-tab>
 
-        <uib-tab ng-show="false" heading="Provenance">
-            <br/>
 
-
-           <div class="row">
-               <div class="col-md-3">
-                   <uib-tabset>
-                       <uib-tab heading="All Provenance">
-                           <div class="list-group">
-                               <div ng-class="{'list-group-item':true}"
-                                    ng-click="selectProvenance(prov)"
-                                    ng-repeat="prov in allProvenance">
-                                   {{prov.id}}
-                                   <div>{{prov.recorded | prettyDate}}
-                                       <span class="pull-right">{{prov.recorded| age}}</span> </div>
-                               </div>
-                           </div>
-                       </uib-tab>
-                   </uib-tabset>
-
-
-               </div>
-               <div class="col-md-6">
-                   <pre>{{selectedProvenance | json}}</pre>
-               </div>
-           </div>
-
-       </uib-tab>
-
-        <uib-tab heading="Form review dispositions">
+        <uib-tab ng-show="false" heading="Form review dispositions">
             <br/>
             <div class="row">
 

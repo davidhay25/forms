@@ -30,28 +30,57 @@ sgMail
     })
 
 */
+
 //const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
+const uri = 'mongodb://localhost:27017/';
 
-//const url = 'mongodb://localhost:27017';
+const dbName = 'canshare';
+/*
+const client = new MongoClient(uri);
+async function run() {
+    try {
+        // Connect the client to the server
+        await client.connect();
+        // Establish and verify connection
+        db = client.db(dbName);
 
-/* - no longer using mongo...
-const designerModule = require("./serverModuleDesigner.js")
+        await client.db(dbName).command({ ping: 1 });
+        //await client.db("admin").command({ ping: 1 });
+        console.log("Connected successfully to server");
+
+        const backupModule = require("./serverModuleBackup")
+        backupModule.setup(app,serverRoot,db)
+
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
+}
+run().catch(console.dir);
+*/
+
+
 
 // Database Name
-const dbName = 'canshare';
+//const dbName = 'canshare';
 let db
 // Use connect method to connect to the server
-MongoClient.connect(url, function(err, client) {
-
-    console.log("Connected successfully to Mongodbserver");
-
-    db = client.db(dbName);
-    designerModule.setup(app,db)
+//Note there seems to be a timeout of around 30 secs that I can't change....
+MongoClient.connect(uri, function(err, client) {
+    if (err) {
+        console.log('Unable to connect to the MongoDb server. Backups not enabled.')
+    } else {
+        console.log("Connected successfully to Mongodb server");
+        db = client.db(dbName);
+        const backupModule = require("./serverModuleBackup")
+        backupModule.setup(app,serverRoot,db)
+    }
 
     //client.close();
 });
 
-*/
+
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 
 let serverRoot = "http://localhost:9099/baseR4/"
@@ -60,12 +89,14 @@ let serverRoot = "http://localhost:9099/baseR4/"
 const formsReceiverModule = require("./serverModuleFormsReceiver.js")
 const formsManagerModule = require("./serverModuleFormsManager.js")
 const dataServerModule = require("./serverModuleDataServer.js")
+const backupModule = require("./serverModuleBackup");
 
 
 
 formsReceiverModule.setup(app,serverRoot)
 formsManagerModule.setup(app,serverRoot)
 dataServerModule.setup(app,serverRoot)
+
 
 //var db;
 var port = process.env.port;
@@ -75,8 +106,6 @@ if (! port) {
 
 server = http.createServer(app).listen(port);
 
-app.use('/', express.static(__dirname,{index:'/dashboard.html'}));
-
-
+app.use('/', express.static(__dirname,{index:'/frontPage.html'}));
 
 console.log('server listening on port ' + port)
