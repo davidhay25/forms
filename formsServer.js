@@ -31,37 +31,17 @@ sgMail
 
 */
 
-//const MongoClient = require('mongodb').MongoClient;
+
+
+
+
+/* temp - need to update node on server
+
 const { MongoClient } = require('mongodb');
 const uri = 'mongodb://localhost:27017/';
 
 const dbName = 'canshare';
-/*
-const client = new MongoClient(uri);
-async function run() {
-    try {
-        // Connect the client to the server
-        await client.connect();
-        // Establish and verify connection
-        db = client.db(dbName);
 
-        await client.db(dbName).command({ ping: 1 });
-        //await client.db("admin").command({ ping: 1 });
-        console.log("Connected successfully to server");
-
-        const backupModule = require("./serverModuleBackup")
-        backupModule.setup(app,serverRoot,db)
-
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
-}
-run().catch(console.dir);
-*/
-
-
-/* temp - need to update node on server
 // Database Name
 //const dbName = 'canshare';
 let db
