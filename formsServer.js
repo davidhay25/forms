@@ -61,7 +61,7 @@ run().catch(console.dir);
 */
 
 
-
+/* temp - need to update node on server
 // Database Name
 //const dbName = 'canshare';
 let db
@@ -80,6 +80,7 @@ MongoClient.connect(uri, function(err, client) {
     //client.close();
 });
 
+*/
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 

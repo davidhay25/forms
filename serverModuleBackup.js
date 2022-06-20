@@ -85,17 +85,9 @@ function processBundle(transactionBundle,logEntry,bundle,issues) {
             //need to test for a numeric id - these can't be backed up.
             //do this by pareseInt - if not a NNnumber, then is NaN so !n is teh check...
 
-            let n = parseInt(entry.resource.id)
-            /*
-            console.log(entry.resource.id,n)
+            //let n = parseInt(entry.resource.id)
 
-            if (n) {
-                console.log(n,'is not NaN')
-            } else {
-                console.log(n,'is  NaN')
-            }
-*/
-            if ( !n) {
+            if ( !parseInt(entry.resource.id)) {
                 //is Nan (which is what we want
                 tEntry.request = {method:'PUT',url:entry.resource.resourceType + "/" + entry.resource.id}
                 transactionBundle.entry.push(tEntry)

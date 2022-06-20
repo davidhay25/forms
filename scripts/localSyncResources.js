@@ -16,10 +16,14 @@ let sourceServer = "http://canshare.clinfhir.com/ds/fhir/"
 let targetServer = "http://localhost:9099/baseR4/"
 
 syncResources("Questionnaire")
-//syncResources("Observation")
-//syncResources("ServiceRequest")
+syncResources("Observation")
+syncResources("QuestionnaireResponse")
 
-function syncResources(type) {
+
+
+
+
+async function syncResources(type) {
     let qry = sourceServer +  type
     console.log(qry)
 
@@ -27,6 +31,8 @@ function syncResources(type) {
     axios.get(qry,config).then(
         function(response) {
             let bundle = response.data;
+
+            let newBundle = {'resourceType':"Bundle",type:'transaction',entry:[]}
 
             //now convert the response bundle into a transaction
             bundle.type = "transaction"
@@ -38,12 +44,22 @@ function syncResources(type) {
                 let resource = entry.resource
                 entry.request = {method:'PUT'}
                 entry.request.url = resource.resourceType + "/" + resource.id
+
+                let id = entry.resource.id
+                if (! parseInt(id)) {
+                    newBundle.entry.push(entry)
+                } else {
+                    console.log(`Ignoring ${resource.resourceType}/${resource.id} ` )
+                }
             })
+
+
             //now post to the target server
 
-            axios.post(targetServer,bundle).then(
+            axios.post(targetServer,newBundle).then(
                 function(response) {
-                    console.log("Target server updated")
+                    console.log(type)
+                    console.log("Target server updated - " + newBundle.entry.length + " entries")
                 }
             ).catch(function (ex) {
                 console.log("error POSTing transaction to target server",ex.response.data)
