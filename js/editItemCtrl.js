@@ -36,6 +36,8 @@ angular.module("formsApp")
 
                 let server = formsSvc.getServers().termServer //  "https://r4.ontoserver.csiro.au/fhir/"
 
+                //let server = "https://snomednz.digital.health.nz/fhir/"
+
                 let qry = `${server}CodeSystem/$lookup?system=${codeSystem}&code=${code}&includeDefinition=true`
                 $scope.showWaiting = true
                 $http.get(qry).then(
@@ -158,7 +160,14 @@ angular.module("formsApp")
 
                     case "date" :
                         $scope.meta.hisoDT = "Date"
-                        $scope.meta.hisoLength = 14
+                        $scope.meta.hisoLength = 8
+                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
+                        $scope.meta.hisoClass = "full date"
+                        break
+
+                    case "dateTimeXX" :
+                        $scope.meta.hisoDT = "Date"
+                        $scope.meta.hisoLength = 12
                         $scope.meta.hisoLayout = "CCYY[MM[DD]]"
                         $scope.meta.hisoClass = "full date"
                         break

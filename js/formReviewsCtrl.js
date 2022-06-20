@@ -183,7 +183,7 @@ angular.module("formsApp")
                                                 //load all the dispositions made for this Q
                                                 formsSvc.loadDispositionsForQ(Q).then(
                                                     function(data) {
-                                                        $scope.dispositionsForQ = data
+                                                        $scope.dispositionsForQ = data.result
 
                                                     }
                                                 )

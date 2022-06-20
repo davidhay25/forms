@@ -271,6 +271,7 @@ angular.module("formsApp")
                 let deferred = $q.defer()
                 let arResult = []
                 let qry = `/ds/fhir/Observation?focus=${Q.url}`  //add category
+                let hashLinkId = {}
                 $http.get(qry).then(
                     function(data){
                         if (data.data.entry) {
@@ -316,8 +317,11 @@ angular.module("formsApp")
                                         }
                                     })
                                     arResult.push(result)
-                                }
 
+                                    let linkId = result.linkId || 'unknown'
+                                    hashLinkId[linkId] = hashLinkId[linkId] || []
+                                    hashLinkId[linkId].push(result)
+                                }
                             })
 
                             //now, update the result with any likes
@@ -328,11 +332,7 @@ angular.module("formsApp")
                             })
 
 
-
-
-
-
-                            deferred.resolve(arResult)
+                            deferred.resolve({result:arResult,hashLinkId:hashLinkId})
                         }
 
 
@@ -1758,7 +1758,7 @@ angular.module("formsApp")
 
                                 hash[item.id] = item.data;
                                 treeData.push(item)
-                                checkEnableWhen(child)
+                                // not sure what this was checkEnableWhen(child)
 
                                 //third level - the contents of a group...
                                 if (child.item) {
@@ -1776,7 +1776,7 @@ angular.module("formsApp")
 
                                         hash[grandchild.id] = grandchild.data;
                                         treeData.push(item)
-                                        checkEnableWhen(grandchild)
+                                        // not sure why this wascheckEnableWhen(grandchild)
                                     })
                                 }
 
@@ -1801,7 +1801,7 @@ angular.module("formsApp")
                 return {treeData : treeData,hash:hash}
 
 
-                function checkEnableWhen(item) {
+                function checkEnableWhenDEP(item) {
                     if (item.enableWhen) {
                         hashEnableWhen[item.linkId] = item.enableWhen[0].question
                     }

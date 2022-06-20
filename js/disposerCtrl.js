@@ -120,7 +120,7 @@ angular.module("formsApp")
                 //get the dispositions
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {
-                        $scope.dispositionsForQ = data
+                        $scope.dispositionsForQ = data.result
 
                     }
                 )
@@ -190,7 +190,7 @@ angular.module("formsApp")
                         $scope.selectedQ = Q
                         formsSvc.loadDispositionsForQ(Q).then(
                             function(data) {
-                                    $scope.dispositionsForQ = data
+                                    $scope.dispositionsForQ = data.result
 
                             }
                         )

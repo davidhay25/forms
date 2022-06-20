@@ -1,4 +1,5 @@
 // data server API
+//
 const axios = require('axios').default;
 
 function setup(app,serverRoot) {
@@ -39,7 +40,18 @@ function setup(app,serverRoot) {
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                //todo - err.response only available when the server responded
+                // err.request if the request was made
+                // neither if there was an error making the request in the first place
+
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
+
+
+              //  res.status(err.response.status).send(err.response.data)
             })
     })
 
@@ -55,7 +67,11 @@ function setup(app,serverRoot) {
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
 
     })
@@ -72,7 +88,11 @@ function setup(app,serverRoot) {
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
     })
 
@@ -87,7 +107,11 @@ function setup(app,serverRoot) {
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
 
     })
@@ -104,13 +128,19 @@ function setup(app,serverRoot) {
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
     })
 
-    app.get('/ds/fhir/:type/:id',function(req,res){
-        let url = serverRoot + req.params.type + "/" + req.params.id
-console.log(url)
+
+    //get specific version
+    app.get('/ds/fhir/:type/:id/:version',function(req,res){
+        let url = serverRoot + req.params.type + "/" + req.params.id + "/_history/" + req.params.version
+        console.log(url)
         axios.get(url)
             .then(function (response){
                 //console.log(response.data)
@@ -118,7 +148,29 @@ console.log(url)
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
+            })
+    })
+
+    app.get('/ds/fhir/:type/:id',function(req,res){
+        let url = serverRoot + req.params.type + "/" + req.params.id
+        console.log(url)
+        axios.get(url)
+            .then(function (response){
+                //console.log(response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
     })
 
@@ -187,10 +239,7 @@ console.log(url)
 
         delete bundle.link       //this is the link from the first query
 
-
         res.json(bundle)
-
-
 
     })
 
@@ -223,9 +272,12 @@ console.log(url)
             })
             .catch(function (err){
                 //console.log(err)
-                res.status(err.response.status).send(err.response.data)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err.response.data)
+                }
             })
-
     })
 
 }

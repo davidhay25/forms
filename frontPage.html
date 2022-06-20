@@ -309,14 +309,23 @@
 
                     <uib-tab heading="Form">
 
-                        <div class="row">
+                        <br/>
+                        <div ng-show = "formState == 'complete'">
+                            <div class="alert alert-success">
+                                Thanks for your input. Your form and comments have been submitted.
+                            </div>
+                        </div>
+
+
+
+                        <div ng-hide = "formState == 'complete' " class="row">
                             <div class="col-md-10">
                                 <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
                                 a form. It can be used to make comments by entering them in the comments
                                 elements on the form. You need to enter (at least) your name in the Reviewer details
                                 to the right to submit comments.
                                 Click <span class="clickable" ng-click="input.togglePane()">here</span> to hide/show the
-                                    list of standards at the right. <br/>
+                                    list of standards at the right. <br/> Submit form when complete.
 
                                 <div class="text-center" style="color: red; font-weight: bold">
                                     Previous forms are saved as anonymous examples. Don't include any real data in this form!
@@ -349,10 +358,13 @@
 
                                 <div><checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
                                 <div><checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request</div>
+                                <br/>
+                                <div>
+                                    <button ng-show = "formQR"
+                                            class="btn btn-danger center-block"
+                                            ng-click="submitForm()">Submit feedback</button>
+                                </div>
 
-                                <button ng-show = "formQR && input.reviewerName"
-                                        class="btn btn-danger pull-right"
-                                        ng-click="submitForm()">Submit form</button>
                                 <br/>
 
                             </div>
@@ -419,9 +431,48 @@
 
 
                     <uib-tab heading="Comments">
-                        <em>Should this be all comments, of only those with a disposition? Currently only
-                        those with a disposition (as it allows review of them first)</em>
-                        <table ng-show="dispositionsForQ" class="table table-condensed table-bordered">
+
+                        <br/>
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <strong>Type of comment</strong>
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:v==input.selectedCommentType}"
+                                         ng-click = "input.selectedCommentType = v"
+                                         style="cursor: pointer"
+                                         ng-repeat = "(k,v) in hashDispositionsByLinkId">
+                                        {{k}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-9">
+
+                                <table ng-show="input.selectedCommentType" class="table table-condensed table-bordered">
+                                    <tr><th>Comment</th><th>Disposition</th><th>Note</th></tr>
+                                    <tr ng-repeat = "item in input.selectedCommentType">
+
+
+                                        <td>{{item.comment}}</td>
+
+                                        <td>{{item.disposition.display}}</td>
+                                        <td>{{item.note}}</td>
+                                        <!--
+                                        <td>
+                                            {{item.likes}}
+                                            <i style="color: green" class="glyphicon glyphicon-thumbs-up" ng-click="addLike(item)"></i>
+                                        </td>
+                                        -->
+
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+
+
+                        <table ng-show="false && dispositionsForQ" class="table table-condensed table-bordered">
                             <tr><th>Type</th>Comment</th><th><th>Disposition</th><th>Note</th></tr>
                             <tr ng-repeat = "item in dispositionsForQ">
 

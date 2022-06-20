@@ -60,7 +60,12 @@ angular.module("formsApp")
                     return
                 }
 
-                if (confirm("Are you sure you're ready to submit this form")){
+                if (! $scope.input.reviewerName) {
+                    alert("Please enter your name in the review name box at the upper right")
+                    return
+                }
+
+                if (confirm("Are you sure you're ready to submit this form? You should only do this once the form is complete.")){
                     let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
 
                     if (! $scope.input.canPublish) {
@@ -79,8 +84,9 @@ angular.module("formsApp")
                     $http.post(url,bundle).then(
                         function(data) {
                             //console.log(data.data)
-                            alert("Form has been saved.")
+                            //alert("Form has been saved.")
                             //window.location = "afterReview.html"
+                            $scope.formState = "complete"
 
                             //$scope.selectPatient()  //to read the new data
                         }, function(err) {
@@ -260,7 +266,9 @@ angular.module("formsApp")
 
             $scope.viewModel = function(Q) {
 
+                delete $scope.formState
                 delete $scope.dispositionsForQ
+                delete $scope.hashDispositionsByLinkId
                 delete $scope.selectedQR
                 delete $scope.selectedSection       //the form section
 
@@ -322,7 +330,12 @@ angular.module("formsApp")
                 //get the dispositions
                 formsSvc.loadDispositionsForQ(Q).then(
                     function(data) {
-                        $scope.dispositionsForQ = data
+                        $scope.dispositionsForQ = data.result
+                        $scope.hashDispositionsByLinkId = data.hashLinkId
+
+                        //create hash by element linkId
+
+
 
                     }, function (err) {
                         console.log(err)
