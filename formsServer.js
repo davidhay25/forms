@@ -85,8 +85,47 @@ if (! port) {
     port=80;
 }
 
-server = http.createServer(app).listen(port);
+let server;
+
+try {
+    // Certificate - https://itnext.io/node-express-letsencrypt-generate-a-free-ssl-certificate-and-run-an-https-server-in-5-minutes-a730fbe528ca
+    const privateKey = fs.readFileSync('/etc/letsencrypt/live/canshare.co.nz/privkey.pem', 'utf8');
+    const certificate = fs.readFileSync('/etc/letsencrypt/live/canshare.co.nz/cert.pem', 'utf8');
+    const ca = fs.readFileSync('/etc/letsencrypt/live/canshare.co.nz/chain.pem', 'utf8');
+
+    const credentials = {
+        key: privateKey,
+        cert: certificate,
+        ca: ca
+    };
+
+    //const httpsServer = https.createServer(credentials, app);
+    server = https.createServer(credentials, app);
+    server.listen(443, () => {
+        console.log('HTTPS Server running on port 443');
+
+        //redirect for http
+        http.createServer(function (req, res) {
+            res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+            res.end();
+        }).listen(80);
+
+    });
+
+} catch (ex) {
+    console.log("SSL not enabled, starting HTTP server (temp for developing)")
+
+    server = http.createServer(app).listen(port);
+    console.log('server listening on port ' + port)
+
+}
+
+
+//let server = http.createServer(app).listen(port);
+
+console.log(`listening on port ${port}`);
+
+// wedserver = http.createServer(app).listen(port);
 
 app.use('/', express.static(__dirname,{index:'/frontPage.html'}));
 
-console.log('server listening on port ' + port)

@@ -181,11 +181,7 @@ angular.module("formsApp")
                             let url = `/ds/fhir/${item.item.reference}`   //a reference to the Q
                             $http.get(url).then(
                                 function (data) {
-
                                     item.item.Q = data.data
-
-
-
 
                                 }, function (err) {
                                     console.log(err)
@@ -242,9 +238,7 @@ angular.module("formsApp")
             )
 
 */
-            $scope.reviewCommentsDEP = function() {
-                alert("Todo. Intended for project team members and/or anyone who can review & create dispositions. Need login created.")
-            }
+
 
             $scope.viewVS = function(url){
                 $uibModal.open({
