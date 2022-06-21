@@ -13,7 +13,8 @@ let sourceServer = "http://canshare.clinfhir.com/ds/fhir/"
 //let sourceServer = "http://localhost:9090/ds/fhir/"
 
 //the server to copy resources to
-let targetServer = "http://localhost:9099/baseR4/"
+//let targetServer = "http://localhost:9099/baseR4/"
+let targetServer = "http://canshare.co.nz:9099/baseR4/"
 
 syncResources("Questionnaire")
 syncResources("Observation")

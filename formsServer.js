@@ -121,11 +121,5 @@ try {
 }
 
 
-//let server = http.createServer(app).listen(port);
-
-console.log(`listening on port ${port}`);
-
-// wedserver = http.createServer(app).listen(port);
-
 app.use('/', express.static(__dirname,{index:'/frontPage.html'}));
 

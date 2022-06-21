@@ -3,23 +3,22 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Canshare Data Standard Manager</title>
+    <title>Coder</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
 
     <script src="js/libs/moment.min.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
 
     <script src="js/libs/angular-sanitize.js"></script>
-    <script src="js/libs/jstree.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
 
     <style>
         .myScroll {
@@ -27,14 +26,12 @@
             overflow-y: scroll;
         }
 
-        .obsExtract {
-            background-color: #ebcccc;
-        }
+
 
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase",'ui.checkbox']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -46,27 +43,13 @@
         }]);
 
     </script>
-    <script src="js/libs/ngStorage.min.js"></script>
 
-    <script src="js/frontPageCtrl.js"></script>
+    <script src="js/coderCtrl.js"></script>
     <script src="js/formsService.js"></script>
-    <script src="js/vsEditorCtrl.js"></script>
-    <script src="js/terminologySvc.js"></script>
-    <script src="js/exportSvc.js"></script>
-    <script src="js/loginCtrl.js"></script>
+    <script src="js/termUpdateSvc.js"></script>
+
+
     <script src="js/modalDialogSvc.js"></script>
-
-    <script src="js/formsCtrl.js"></script>
-    <script src="js/formReviewsCtrl.js"></script>
-
-    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
-
-    <!--
-    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
-    <script src="js/filters.js"></script>
--->
-    <script src="js/libs/firebase.js"></script>
-    <script src="js/libs/angularfire.min.js"></script>
 
     <style>
         #graph {
@@ -76,42 +59,28 @@
         }
     </style>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
-        authDomain: "canshare-730e6.firebaseapp.com",
-        projectId: "canshare-730e6",
-        storageBucket: "canshare-730e6.appspot.com",
-        messagingSenderId: "12147821347",
-        appId: "1:12147821347:web:5963d577cb050259475a96"
-    };
-    if (firebase) {
-        console.log('init firebase')
-        firebase.initializeApp(firebaseConfig);
 
-    }
-</script>
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-    <div ng-app="formsApp" ng-controller="frontPageCtrl" class="container-fluid">
+    <div ng-app="formsApp" ng-controller="coderCtrl" class="container-fluid">
 
-        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
-            <div class="container-fluid">
+        <div class="container-fluid">
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            <!--CanShare project: Publications front page -->
-                            Canshare Data Standard Manager
+                            Canshare Coder
                         </a>
                     </span>
             </div>
 
 
             <div class="col-md-2 col-sm-2">
-                <div ng-show="selectedQ" class="navbar-text">
-                    <button class="btn btn-link" ng-click="input.togglePane()">Toggle data standard list</button>
+                <div class="navbar-text">
+
+
                 </div>
 
             </div>
@@ -123,552 +92,141 @@
                 </form>
             </div>
 
-            <div class="col-md-4 col-sm-4">
-                <div class="navbar-text" ng-show="selectedQ">
-                    <checkbox ng-model = "input.showTechnical"></checkbox> Technical
-                </div>
-            </div>
-<!--
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-3 col-sm-3">
 
-                    <div class="navbar-text pull-right">{{user.email}}</div>
+
 
             </div>
-
 
             <div class="col-md-1 col-sm-1">
-                <div class="navbar-text " ng-hide="user">
-                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
-                          popover-placement="left"
-                          popover-trigger="'mouseenter'">
-                        <div ng-click="login()">
-                            <i class="glyphicon glyphicon-log-in"></i>
-                        </div>
-                    </span>
-                </div>
 
-                <div class="navbar-text " class=" pull-right"  ng-show="user">
-                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="Click to log out"
-                          popover-placement="left"
-                          popover-trigger="'mouseenter'">
-                        <div ng-click="logout()">
-                            <i class="glyphicon glyphicon-log-out"></i>
-                        </div>
-                    </span>
-                </div>
 
             </div>
-                   -->
-
         </div>
-        </nav>
+    </nav>
 
 
         <div class="row">
+            <div class="col-md-3">
+               <uib-tabset>
+                   <uib-tab heading = "Questionnaire">
+                       <br/>
+                       <select ng-model="input.selectedQ" ng-change="loadQ(input.selectedQ)" class="form-control"
+                               ng-options = "Q.name for Q in allQ">
 
-            <div ng-class="input.leftPane">
+                       </select>
+                       <br/>
+                       <div class="myScroll">
+                           <div id="designTree"></div>
+                       </div>
+                   </uib-tab>
+                   <uib-tab heading = "Other thing">
+                       <em>Some other thing that has data to be coded - eg act now condition codes
+                       (though these come from the source system - don't we just show them?</em>
+                   </uib-tab>
+               </uib-tabset>
 
-                <div class="myScroll">
-
-                    <h4>Draft Data Standard</h4>
-
-                    <div class="list-group">
-                        <div ng-repeat="entry in ballotList.entry"
-                             ng-class="{'list-group-item':true,listItemSelected:entry.item.Q.id == selectedQ.id}" style="cursor: pointer">
-                            <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}} {{}}</div>
-
-                        </div>
-                    </div>
-
-                    <h4>Data Standard</h4>
-
-                    <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"  style="cursor: pointer">
-                    <div ng-click = "viewModel(Q)">{{Q.name}}</div>
-
-                </div>
-
-                </div>
-
-                <uib-tabset ng-show="false">
-                    <uib-tab heading = "Data Standards open for review">
-                        <h4>Data Standards open for review</h4>
-
-                        <div class="list-group">
-                            <div ng-repeat="entry in ballotList.entry" ng-class="{'list-group-item':true}">
-                                <div ng-click = "viewModel(entry.item.Q)">{{entry.item.display}}</div>
-
-                            </div>
-                        </div>
-
-                        <h4>Approved</h4>
-
-                        <div ng-repeat="Q in activeQ" ng-class="{'list-group-item':true}">
-                            <div ng-click = "viewModel(Q)">{{entry.item.display}}</div>
-
-                        </div>
-
-                        <table ng-show = "false" class="table table-bordered">
-                            <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
-                            <tr ng-repeat = "entry in ballotList.entry">
-                                <td>{{entry.item.display}}</td>
-                                <td>{{entry.item.Q.version}}</td>
-                                <td>{{entry.item.Q.description}}</td>
-                                <td>
-                                    <div ng-show="entry.item.Q">
-                                        <div class="clickable" ng-click = "viewModel(entry.item.Q)">View data standard</div>
-
-                                        <div ng-show = "entry.item.canAuthor" class="clickable">
-                                            <a target="_blank" ng-href="dashboard.html?{{entry.item.Q.url}}">
-                                                Edit data standard</a>
-                                        </div>
-
-
-                                        <a target="_blank"
-                                           ng-href="reviewForm.html?{{entry.item.Q.url}}">
-                                            Form display
-                                        </a>
-
-                                        <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
-
-                                            <a target="_blank" href="disposer.html">
-                                                Review comments <span class="badge">{{SRbyQ[entry.item.Q.url]}}</span>
-                                            </a>
-
-
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-
-                    </uib-tab>
-                    <uib-tab heading = "Approved Data Standards">
-                        <h4>Approved Data Standards</h4>
-
-                        <table class="table table-bordered">
-                            <tr><th width="30%">Title</th><th width="10%">Version</th><th  width="40%">Description</th><th></th></tr>
-                            <tr ng-repeat = "Q in activeQ">
-                                <td>{{Q.title}}</td>
-                                <td>{{Q.version}}</td>
-
-                                <td>{{Q.description}}</td>
-                                <td>
-                                    <div class="clickable" ng-click = "viewModel(Q)">View data standard</div>
-
-                                    <a target="_blank"
-                                       ng-href="reviewForm.html?{{Q.url}}">
-                                        Form display
-                                    </a>
-
-                                    <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
-
-                                        <a target="_blank" href="disposer.html">
-                                            Review comments <span class="badge">{{SRbyQ[Q.url]}}</span>
-                                        </a>
-
-
-                                    </div>
-
-                                </td>
-                            </tr>
-                        </table>
-
-                    </uib-tab>
-                    <!--
-                    <uib-tab ng-show="false" heading = "ValueSets">
-                        <h4>ValueSets</h4>
-                        <table class="table table-bordered">
-                            <tr ng-repeat="vs in allVS">
-                                <td>{{vs.title}}</td>
-                                <td>{{vs.name}}</td>
-                                <td><div class="clickable" ng-click="viewVS(vs.url)">{{vs.url}}</div> </td>
-                            </tr>
-                        </table>
-                    </uib-tab>
-                    -->
-                </uib-tabset>
 
 
             </div>
-            <div ng-class="input.rightPane">
-
-                <div ng-show = "showHelp || ! selectedQ">
-
-                    <p>All data standards published (or in the process of being published) by CanShare</p>
-
+            <div class="col-md-2">
+                {{selectedItem.description}}
+                <div ng-repeat = "concept in selectedItem.code">
+                    {{concept.code}} ({{concept.system}})
+                    <div><em>{{concept.display}}</em></div>
                 </div>
+                <hr/>
 
-                <div ng-show="selectedQ" class="banner">Data Standard details: {{selectedQ.title}}
-                <br/>
-                    <em>{{selectedQ.description}}</em>
+                <strong>ValueSet</strong>
+                <select class="form-control" ng-model="input.vs" ng-options="vs.display for vs in input.valueSets">
 
-                </div>
+                </select>
+                <br/><br/>
 
-                <uib-tabset  ng-show="selectedQ">
+                <label>Filter string</label>
+                <input type="text" class="form-control" ng-model="input.filter"/>
+                <button class="btn btn-link pull-right" ng-click="findByFilter(input.filter)">Query</button>
+            </div>
 
-                    <uib-tab heading="Form">
-
-                        <br/>
-                        <div ng-show = "formState == 'complete'">
-                            <div class="alert alert-success">
-                                Thanks for your input. Your form and comments have been submitted.
-                            </div>
-                        </div>
-
-
-
-                        <div ng-hide = "formState == 'complete' " class="row">
-                            <div class="col-md-10">
-                                <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
-                                a form. It can be used to make comments by entering them in the comments
-                                elements on the form. You need to enter (at least) your name in the Reviewer details
-                                to the right to submit comments.
-                                Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
-                                    list of standards at the right.  Submit form when complete.
-                                    <br/>
-                                <div class="text-center" style="color: red; font-weight: bold">
-                                    Previous forms and comments are shown as anonymous examples. Don't include any real data in this form!
-                                </div>
-                                </div>
-                                <div ng-controller="formsCtrl">
-                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
-
-                                </div>
-                            </div>
-
-                            <div class="col-md-2" style="background-color: #eeeeee">
-
-                                <h4>Reviewer details</h4>
-                                <input type = text ng-model = "input.reviewerName"
-                                       placeholder = "Reviewer name"
-                                       class="form-control"/>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerOrganization"
-                                           placeholder = "Organisation"
-                                           class="form-control"/>
-                                </div>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerEmail"
-                                           placeholder = "Email"
-                                           class="form-control"/>
-                                </div>
-
-                                <h4>Permissions</h4>
-
-                                <div><checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
-                                <div><checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request</div>
-                                <br/>
-                                <div>
-                                    <button ng-show = "formQR"
-                                            class="btn btn-danger center-block"
-                                            ng-click="submitForm()">Submit feedback</button>
-                                </div>
-
-                                <br/>
-
-                            </div>
-                        </div>
-
-
-
-                    </uib-tab>
-
-                    <uib-tab heading="Tree">
+            <div class="col-md-7">
+                <uib-tabset>
+                    <uib-tab heading="Matching codes">
                         <div class="row">
                             <div class="col-md-6">
-                                <div id="designTree"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <table ng-show="selectedNode" class="table">
-                                    <tr><td>Text</td><td>{{selectedNode.data.item.text}}</td></tr>
-                                    <tr><td>Description</td><td>{{selectedNode.data.item.description}}</td></tr>
-                                    <tr><td>Type</td><td>{{selectedNode.data.item.type}}</td></tr>
-                                    <tr ng-show="selectedNode.data.item.answerOption">
-                                        <td>Options</td>
-                                        <td>
-                                            <div>
-                                    <span ng-repeat = "option in selectedNode.data.item.answerOption">
-                                        {{option.valueInteger}}{{option.valueString}}
-                                        {{option.valueCoding.display}},
-                                    </span>
-                                            </div>
-                                        </td>
+                                <br/>
 
-                                    </tr>
-
-                                    <tr ng-show="selectedNode.data.item.answerValueSet">
-                                        <td>ValueSet</td>
-                                        <td>
-                                            <div class="clickable"
-                                                 ng-click="viewVS(selectedNode.data.item.answerValueSet)">
-                                                {{selectedNode.data.item.answerValueSet}}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr ng-show="selectedNode.data.item.repeats">
-                                        <td>Item can repeat</td>
-                                    </tr>
-                                    <tr ng-show="selectedNode.data.item.required">
-                                        <td>Item is required</td>
-                                    </tr>
-
-
-                                </table>
-                            </div>
-                        </div>
-
-                    </uib-tab>
-
-                    <uib-tab heading="Table">
-                        <ng-include src="'includes/showModel.html'"></ng-include>
-                    </uib-tab>
-
-                    <uib-tab heading="HISO metadata">
-                        <br/>
-                        <ng-include src="'includes/hisoTable2.html'"></ng-include>
-                    </uib-tab>
-
-
-                    <uib-tab heading="Comments">
-
-                        <br/>
-                        <div class="row">
-
-                            <div class="col-md-3">
-                                <strong>Type of comment</strong>
-                                <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,listItemSelected:v==input.selectedCommentType}"
-                                         ng-click = "input.selectedCommentType = v"
-                                         style="cursor: pointer"
-                                         ng-repeat = "(k,v) in hashDispositionsByLinkId">
-                                        {{k}}
-                                    </div>
+                                <div ng-hide="! expandedVS || expandedVS.expansion.contains.length > 0">
+                                    No matches found
                                 </div>
-                            </div>
 
-                            <div class="col-md-9">
-
-                                <table ng-show="input.selectedCommentType" class="table table-condensed table-bordered">
-                                    <tr><th>Comment</th><th>Disposition</th><th>Note</th></tr>
-                                    <tr ng-repeat = "item in input.selectedCommentType">
-
-
-                                        <td>{{item.comment}}</td>
-
-                                        <td>{{item.disposition.display}}</td>
-                                        <td>{{item.note}}</td>
-                                        <!--
-                                        <td>
-                                            {{item.likes}}
-                                            <i style="color: green" class="glyphicon glyphicon-thumbs-up" ng-click="addLike(item)"></i>
-                                        </td>
-                                        -->
-
-                                    </tr>
-                                </table>
-
-                            </div>
-                        </div>
-
-
-                        <table ng-show="false && dispositionsForQ" class="table table-condensed table-bordered">
-                            <tr><th>Type</th>Comment</th><th><th>Disposition</th><th>Note</th></tr>
-                            <tr ng-repeat = "item in dispositionsForQ">
-
-                                <td>{{item.linkId}}</td>
-                                <td>{{item.comment}}</td>
-
-                                <td>{{item.disposition.display}}</td>
-                                <td>{{item.note}}</td>
-                                <!--
-                                <td>
-                                    {{item.likes}}
-                                    <i style="color: green" class="glyphicon glyphicon-thumbs-up" ng-click="addLike(item)"></i>
-                                </td>
-                                -->
-
-                            </tr>
-                        </table>
-                    </uib-tab>
-
-
-                    <uib-tab >
-                        <uib-tab-heading>
-                            Previous examples <span ng-show="allQRforQ.entry.length > 0" class="badge">{{allQRforQ.entry.length}}</span>
-                        </uib-tab-heading>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-2">
 
                                 <div class="myScroll">
                                     <div class="list-group">
-                                        <div ng-class="{'list-group-item':true,listItemSelected:entry.resource.id == selectedQR.id}"
+                                        <div ng-class="{'list-group-item':true,listItemSelected:concept.code == selectedConcept.code}"
+                                             ng-click="selectConcept(concept)"
                                              style="cursor: pointer"
-                                             ng-click = "selectQR(entry.resource)"
-                                             ng-repeat="entry in allQRforQ.entry">
-
-                                            {{entry.resource.authored | date : "d MMM  HH:mm"}}
-
+                                             ng-repeat="concept in expandedVS.expansion.contains">
+                                            {{concept.display}}
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-                            <div class="col-md-10">
+                            <div class="col-md-6">
 
-                                <uib-tabset>
-                                    <uib-tab heading = "Form">
-                                        <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                                <div  ng-show="selectedConcept.code">
+                                <h4>
+                                    {{selectedConcept.display}}
+
+                                    (<span class="clickable" ng-click="setCode(selectedConcept)">{{selectedConcept.code}})</span>
+
+
+                                </h4>
+
+                                <uib-tabset >
+                                    <uib-tab heading="Details">
+
+                                        <strong>Parents</strong>
+                                        <div class="list-group">
+                                            <div class="list-group-item" ng-repeat ="parent in parents">
+                                                {{parent.display}}
+                                                <span class="clickable" ng-click="selectConcept({code:parent.sctId})">({{parent.sctId}})</span>
+                                            </div>
+                                        </div>
+
+                                        <strong>children</strong>
+                                        <div class="list-group">
+                                            <div class="list-group-item" ng-repeat ="child in children">
+                                                {{child.display}}
+                                                <span class="clickable" ng-click="selectConcept({code:child.sctId})">({{child.sctId}})</span>
+                                            </div>
+                                        </div>
+
                                     </uib-tab>
-                                    <uib-tab ng-show="input.showTechnical" heading="Json">
-                                        <pre>{{selectedQR | json}}</pre>
+                                    <uib-tab heading="Parameters">
+                                        <div ng-repeat="param in selectedConceptLookup.parameter">
+                                            <pre>{{param | json}}</pre>
+                                        </div>
+                                    </uib-tab>
+                                    <uib-tab heading="Json">
+                                        <pre>{{selectedConceptLookup | json}}</pre>
                                     </uib-tab>
                                 </uib-tabset>
 
+                                </div>
                             </div>
                         </div>
-                    </uib-tab>
 
-
-                    <uib-tab ng-show="input.showTechnical" heading="HL7 v2 segments">
-                       <br/>
-
-
-                        <ng-include src = "'includes/v2Report.html'"></ng-include>
 
 
                     </uib-tab>
-
-                    <uib-tab ng-show="input.showTechnical" heading="ValueSets">
-                        <br/>
-
-                        <table class="table">
-                            <tr><th>Url</th><th>LinkId</th></tr>
-                            <tr ng-repeat="item in vsForQ">
-                                <td><div class="clickable" ng-click="viewVS(item.vsUrl)">{{item.vsUrl}}</div> </td>
-                                <td>{{item.linkId}}</td>
-                            </tr>
-                        </table>
-
-                        <em>ValueSets for this dataSet. ?Instead of/ as well as all the ValueSets for all ds</em>
-
+                    <uib-tab heading="Json">
+                        <pre>{{expandedVS | json}}</pre>
                     </uib-tab>
-
-
-
-                    <uib-tab ng-show="input.showTechnical" heading="Questionnaire Json">
-                        <div class="row">
-                            <div class="col-md-12">
-
-                                <a ng-show="downloadLinkJsonName" class="btn btn-link pull-right" download="{{downloadLinkJsonName}}"
-                                   href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
-                                    Download Json file
-                                </a>
-<!--
-                                <i class="btn btn-link glyphicon glyphicon-download-alt clickable pull-right"
-                                   ng-click="download(selectedQ)"></i>
--->
-                            </div>
-                        </div>
-                        <pre>{{selectedQ | json}}</pre>
-
-                    </uib-tab>
-
-                    <uib-tab ng-show="false && user">
-                        <uib-tab-heading>
-                            All New Comments
-                        </uib-tab-heading>
-
-                        <div class="alert alert-warning">Comments awaiting review. Note that this is for ALL Data Standards - not just the selected one</div>
-
-                        <div ng-controller="formReviewsCtrl">
-                            <ng-include src = "'includes/formReviews.html'"></ng-include>
-                        </div>
-
-
-                    </uib-tab>
-
                 </uib-tabset>
 
 
-
-                <!--
-
-                <h4>Implementation Guides</h4>
-
-
-                <table class="table table-bordered">
-                    <tr><th width="20%">Link to IG</th><th width="40%">Description</th><th>Notes and todo</th></tr>
-                    <tr>
-                        <td><a href="http://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">ACT-NOW</a></td>
-                        <td>The ACT-NOW Implementation Guide describes how to record chemotherapy data.
-                        </td>
-                        <td>
-
-                            <p>Todo: Add examples</p>
-                            <p>Todo: Describe API - input and query</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="http://build.fhir.org/ig/davidhay25/canshare/branches/main/index.html" target="_blank">CanShare</a></td>
-                        <td>The CanShare Implementation Guide describes the information held in the main Canshare repository
-                            and the query API.
-                        </td>
-                        <td>
-
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="http://build.fhir.org/ig/HL7NZ/structured-path/branches/main/index.html" target="_blank">Models</a></td>
-                        <td>The approved models. Has the Logical model, descriptive text, mappings to FHIR resources etc.
-                        </td>
-                        <td>
-                            Is there a single IG for all models, one per model or some other grouping of models?
-                            <p>Who is the audience for the IG? Generally they are for implementers</p>
-
-                        </td>
-                    </tr>
-                </table>
-
-
-                <h4>Applications</h4>
-                <em>These are modules from the Reference Implementation. Is this needed on this page?</em>
-
-                <table class="table table-bordered">
-                    <tr><th width="20%">Application</th><th width="40%">Description</th><th>Notes and todo</th></tr>
-                    <tr>
-                        <td><a href="viewFormReviews.html" target="_blank">View comment dispositions</a></td>
-                        <td>All comments that are made against any data model are formally reviewed by
-                            the Working Group responsible for that model, and the disposition of the
-                            comment is recorded.
-
-                        </td>
-                        <td>
-                            <p>Should there be some way to specify the model here, or is the selection in the app
-                                enough?</p>
-                            <p>todo: hide the responses where the commenter has requested that their comment not
-                                be displayed - or just hide their name?</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="dashboard.html" target="_blank">Forms designer</a></td>
-                        <td>The application that allows models and forms to be created and edited</td>
-                        <td>Some user authentication needed
-                            <p>?hide entry unless user has logged in</p>
-                        </td>
-                    </tr>
-
-                </table>
-
-                -->
-
             </div>
-
         </div>
-
-
 
     </div>
 

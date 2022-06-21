@@ -1,7 +1,7 @@
 //Dashboard controller
 
 angular.module("formsApp")
-    .controller('dashboardCtrl',
+    .controller('designerCtrl',
         function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window,modalService) {
 
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
