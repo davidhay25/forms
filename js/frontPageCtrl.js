@@ -200,7 +200,7 @@ angular.module("formsApp")
             $scope.download = function(Q){
 
             }
-
+/*
             //get the list of active ServiceRequests and get a count by Q
             let qrySR = "/ds/fhir/ServiceRequest?status=active"
             $scope.SRbyQ = {}
@@ -226,6 +226,8 @@ angular.module("formsApp")
                     console.log($scope.SRbyQ)
                 }
             )
+
+            */
 /*
             //get all the VS from the dev server
             //todo - need a more refined way - ?from all VS like we do in the dashboard pr some other tag
