@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Coder</title>
+    <title>CanShare</title>
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
@@ -44,9 +44,9 @@
 
     </script>
 
-    <script src="js/coderCtrl.js"></script>
+    <script src="js/frontPageCtrl.js"></script>
     <script src="js/formsService.js"></script>
-    <script src="js/termUpdateSvc.js"></script>
+
 
 
     <script src="js/modalDialogSvc.js"></script>
@@ -71,7 +71,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Canshare Coder
+                            Canshare Front Page
                         </a>
                     </span>
             </div>
@@ -86,10 +86,7 @@
             </div>
 
             <div class="col-md-1 col-sm-1">
-                <form class="navbar-form navbar-left">
-                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
 
-                </form>
             </div>
 
             <div class="col-md-3 col-sm-3">
@@ -106,127 +103,102 @@
     </nav>
 
 
-        <div class="row">
-            <div class="col-md-3">
-               <uib-tabset>
-                   <uib-tab heading = "Questionnaire">
-                       <br/>
-                       <select ng-model="input.selectedQ" ng-change="loadQ(input.selectedQ)" class="form-control"
-                               ng-options = "Q.name for Q in allQ">
+        This is the front page for the FHIR artifacts and applications developed to support the CanShare programme of work.
 
-                       </select>
-                       <br/>
-                       <div class="myScroll">
-                           <div id="designTree"></div>
-                       </div>
-                   </uib-tab>
-                   <uib-tab heading = "Other thing">
-                       <em>Some other thing that has data to be coded - eg act now condition codes
-                       (though these come from the source system - don't we just show them?</em>
-                   </uib-tab>
-               </uib-tabset>
+        It is not intended as the 'front facing' url for the programme - it is anticipated that there will be links from
+        existing websites (eg the <a href="https://teaho.govt.nz/">Te Aho</a> web sites to the specific modules which are
+        described below. Rather, this page serves as an index for members of the project team to the different artifacts.
+
+        <h3>Modules</h3>
 
 
 
-            </div>
-            <div class="col-md-2">
-                {{selectedItem.description}}
-                <div ng-repeat = "concept in selectedItem.code">
-                    {{concept.code}} ({{concept.system}})
-                    <div><em>{{concept.display}}</em></div>
-                </div>
-                <hr/>
+        <table class="table">
+            <tr><th>Module</th><th>Description</th><th>Audience</th><th>Notes</th></tr>
+            <tr>
+                <td style="width:15%"><a target="_blank" href="https://canshare.co.nz/dataStandards.html">Data standards display</a></td>
+                <td>Has a list of data standards created to support the Structured Pathology project</td>
+                <td>General access by Clinicians, Implementers and business users</td>
+                <td>There are 2 sets of standard available from this module:
+                    <ul>
+                        <li>Draft standards that are currently being reviewed</li>
+                        <li>Standards that have been approved by HISO</li>
+                    </ul>
+                    Has functions to display each standard in a number of different renderings, including a sample form. Also allows comments
+                    to be made by users, which are included as elements within the form.
 
-                <strong>ValueSet</strong>
-                <select class="form-control" ng-model="input.vs" ng-options="vs.display for vs in input.valueSets">
-
-                </select>
-                <br/><br/>
-
-                <label>Filter string</label>
-                <input type="text" class="form-control" ng-model="input.filter"/>
-                <button class="btn btn-link pull-right" ng-click="findByFilter(input.filter)">Query</button>
-            </div>
-
-            <div class="col-md-7">
-                <uib-tabset>
-                    <uib-tab heading="Matching codes">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <br/>
-
-                                <div ng-hide="! expandedVS || expandedVS.expansion.contains.length > 0">
-                                    No matches found
-                                </div>
-
-
-                                <div class="myScroll">
-                                    <div class="list-group">
-                                        <div ng-class="{'list-group-item':true,listItemSelected:concept.code == selectedConcept.code}"
-                                             ng-click="selectConcept(concept)"
-                                             style="cursor: pointer"
-                                             ng-repeat="concept in expandedVS.expansion.contains">
-                                            {{concept.display}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-
-                                <div  ng-show="selectedConcept.code">
-                                <h4>
-                                    {{selectedConcept.display}}
-
-                                    (<span class="clickable" ng-click="setCode(selectedConcept)">{{selectedConcept.code}})</span>
-
-
-                                </h4>
-
-                                <uib-tabset >
-                                    <uib-tab heading="Details">
-
-                                        <strong>Parents</strong>
-                                        <div class="list-group">
-                                            <div class="list-group-item" ng-repeat ="parent in parents">
-                                                {{parent.display}}
-                                                <span class="clickable" ng-click="selectConcept({code:parent.sctId})">({{parent.sctId}})</span>
-                                            </div>
-                                        </div>
-
-                                        <strong>children</strong>
-                                        <div class="list-group">
-                                            <div class="list-group-item" ng-repeat ="child in children">
-                                                {{child.display}}
-                                                <span class="clickable" ng-click="selectConcept({code:child.sctId})">({{child.sctId}})</span>
-                                            </div>
-                                        </div>
-
-                                    </uib-tab>
-                                    <uib-tab heading="Parameters">
-                                        <div ng-repeat="param in selectedConceptLookup.parameter">
-                                            <pre>{{param | json}}</pre>
-                                        </div>
-                                    </uib-tab>
-                                    <uib-tab heading="Json">
-                                        <pre>{{selectedConceptLookup | json}}</pre>
-                                    </uib-tab>
-                                </uib-tabset>
-
-                                </div>
-                            </div>
-                        </div>
+                </td>
 
 
 
-                    </uib-tab>
-                    <uib-tab heading="Json">
-                        <pre>{{expandedVS | json}}</pre>
-                    </uib-tab>
-                </uib-tabset>
+            </tr>
+
+            <tr>
+                <td><a target="_blank" href="https://canshare.co.nz/designer.html">Data standard designer</a></td>
+                <td>Supports the creation and editing of a Data Standard</td>
+                <td>Standard builders. Login required. </td>
+                <td>Uses a FHIR Questionnaire resource as the underlying representation of the model. </td>
+            </tr>
+
+            <tr>
+                <td><a target="_blank" href="https://canshare.co.nz/disposer.html">Comment disposition</a></td>
+                <td>Displays comments entered by users, and tracks their disposition</td>
+                <td>Standard maintainers (business). Login required. </td>
+                <td>Uses a FHIR QuestionnaireResponse resource to represent the form instance and comments. Dispositions are recorded as Observations </td>
+            </tr>
+
+        </table>
+
+        <h3>Implementation Guides</h3>
+
+        <table class="table">
+            <tr><th>Guide</th><th>Purpose</th><th>Notes</th></tr>
 
 
-            </div>
-        </div>
+            <tr>
+                <td><a target="_blank" href="http://build.fhir.org/ig/HL7NZ/data-standard-designer/branches/main/index.html">Data Standard Designer</a></td>
+                <td>Documents the Data standard designer, developed to support the Structured pathology workstream
+                </td>
+
+                <td>This guide describes the internal design of the tooling - the use of Questionnaire, profiles and extensions, terminology
+                and suchlike. Implementers really don't need access to this IG unless they are using the Questionnaire to generate
+                a User interface directly. Note that this quide does not contain the Questionnaire resources that define each standard. These
+                can be downloaded through the <a target="_blank" href="https://canshare.co.nz/dataStandards.html">Data standards display</a> module
+                    if needed.
+
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td><a target="_blank" href="">Structured Pathology</a></td>
+                <td>Documents the implementation of structures requests and reports defined by the Structured Pathology workstream
+                </td>
+
+                <td>
+                    This guide describes how structured pathology requests and reports are generated and shared between actors.
+                    The contents of the request and report are defined in the <a target="_blank" href="https://canshare.co.nz/designer.html">Data standard designer</a>
+                    and can be downloaded from the <a target="_blank" href="https://canshare.co.nz/dataStandards.html">Data standards display</a> module.
+
+                </td>
+            </tr>
+
+            <tr>
+                <td><a target="_blank" href="http://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html">ACT NOW</a></td>
+                <td>Describes the acquisition, storage and API for chemotherapy data as specified by the
+                <a href="https://teaho.govt.nz/about/our-work/act-now-programme">ACT-NOW</a> standard
+                </td>
+
+                <td>Uses a hierarchy of CarePlan resources to represent the Regimen / Cycle structure of medication administration
+                with the MedicationAdministration resource representing the actual drug administrations.</td>
+            </tr>
+        </table>
+
+
+        <h3>Miscellaneous </h3>
+
+
 
     </div>
 

@@ -53,6 +53,7 @@ angular.module("formsApp")
 
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
         extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
+        extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
 
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
@@ -497,6 +498,10 @@ angular.module("formsApp")
                 updateExtension(item,extVerification,"String",meta.verification)
                 updateExtension(item,extNotes,"String",meta.notes)
 
+                updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
+
+
+
                //extVerification=
                    // extNotes
 
@@ -642,13 +647,7 @@ angular.module("formsApp")
                 if (ar13.length > 0) {
                     meta.hisoLayout= ar13[0].valueString
                 }
-/*
-                let ar14 = this.findExtension(item,extAuthor)
-                if (ar14.length > 0) {
-                    meta.author = ar14[0].valueString
-                }
 
-*/
 
                 let ar14 = this.findExtension(item,extVerification)
                 if (ar14.length > 0) {
@@ -660,9 +659,12 @@ angular.module("formsApp")
                     meta.notes= ar15[0].valueString
                 }
 
+                let ar16 = this.findExtension(item,extHL7v2Mapping)
+                if (ar16.length > 0) {
+                    meta.v2mapping= ar16[0].valueString
+                }
 
-
-
+                //updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
 
 
                 return meta
