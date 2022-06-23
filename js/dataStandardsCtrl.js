@@ -5,6 +5,10 @@ angular.module("formsApp")
             //system url for author tags
             let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
+            //system url for folder tags
+            let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
+
+
             $scope.input = {}
 
             //defaults for the form
@@ -14,6 +18,8 @@ angular.module("formsApp")
 
             $scope.input.leftPane = "col-md-2"
             $scope.input.rightPane = "col-md-10"
+
+
 
             $scope.input.togglePane = function() {
                 if ($scope.input.rightPane == "col-md-10") {
@@ -38,12 +44,6 @@ angular.module("formsApp")
                let practitioner = null
                $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
                    $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
-
-
-               //Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail
-
-
-
                console.log($scope.formQR)
            })
 
@@ -96,81 +96,64 @@ angular.module("formsApp")
                 }
 
             }
-            //-----------  login & user stuff....
 
-            $scope.login=function(){
-                $uibModal.open({
-                    backdrop: 'static',      //means can't close by clicking on the backdrop.
-                    keyboard: false,       //same as above.
-                    templateUrl: 'modalTemplates/login.html',
-                    controller: 'loginCtrl'
-                })
-            };
 
-            $scope.logout=function(){
-                firebase.auth().signOut().then(function() {
-                    delete $scope.user;
-                    modalService.showModal({}, {bodyText: 'You have been logged out'})
+            //retrieve all Q to determine their status and populate the selectors
+            let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension"
+            $scope.allQ = []
+            $scope.tags = []
+            $scope.hisoStatuses = []
+            $http.get(qry).then(
+                function (data) {
+                    if (data.data && data.data.entry) {
+                        data.data.entry.forEach(function (entry) {
+                            let Q = entry.resource
+                            $scope.allQ.push(Q)         //note that this is a minimal Q
 
-                }, function(error) {
-                    modalService.showModal({}, {bodyText: 'Sorry, there was an error logging out - please try again'})
-                });
-
-            };
-
-            function updateQEdit(email) {
-                //update whether the current user can edit the Q in the ballot list
-                //need to wait until the ballot list is available (it's all async)
-
-                //to keep it simple for now, we'll just wait a couple of seconds - todo a more sophisticated method needed...
-
-               // while (! $scope.ballotList) {
-                    console.log('checking author...')
-                    $timeout(function(){
-                        if ($scope.ballotList) {
-                            $scope.ballotList.entry.forEach(function (item) {
-                                if (item.item.Q && item.item.Q.meta && item.item.Q.meta.tag) {
-                                    item.item.Q.meta.tag.forEach(function (tag) {
-                                        if ( tag.system == tagAuthorSystem && tag.code == email) {
-                                            item.item.canAuthor = true
-
-                                        }
-                                    })
-
+                            Q.hisoStatus = 'development'      //default
+                            if (Q.extension) {
+                                let hs = formsSvc.getHisoStatus(Q)
+                                if (hs) {
+                                    Q.hisoStatus = hs
                                 }
+                            }
 
-                            })
-                        } else {
-                            console.log("ballot list not available - increase wait time")
-                        }
+                           // Q.hisoStatus = hisoStatus
+                            if ($scope.hisoStatuses.indexOf(Q.hisoStatus) == -1) {
+                                $scope.hisoStatuses.push(Q.hisoStatus)
+                            }
 
-                    },2000)
-              //  }
-            }
 
-            //called whenever the auth state changes - eg login/out, initial load, create user etc.
-            firebase.auth().onAuthStateChanged(function(user) {
+                            //the folder tag
+                            Q.tags = []      //make it easier to access
+                            if (Q.meta && Q.meta.tag) {
+                                let rslt = false
+                                Q.meta.tag.forEach(function (tag) {
+                                    if (tag.system == tagFolderSystem) {
+                                        let code = tag.code
+                                        Q.tags.push(code)
+                                        if ($scope.tags.indexOf(code) == -1) {
+                                            $scope.tags.push(code)
+                                        }
 
-                if (user) {
-                    console.log('logged in')
-                    $scope.user = {email:user.email,displayName : user.displayName}
-                    updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
-                    $scope.$digest()
-                } else {
-                    delete $scope.user
-                    //need to remove any author permissions...
-                    if ($scope.ballotList) {
-                        $scope.ballotList.entry.forEach(function (item) {
-                            item.item.canAuthor = false
+                                    }
+                                })
+
+                            }
+
+                           // console.log(Q.extension)
+                            $scope.input.selectedTag = $scope.tags[0]
+                            $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
+
                         })
                     }
+                }, function (err) {
+                    console.log(err)
                 }
 
-            });
+            )
 
-            //------------------------------
-
-
+/*
             formsSvc.getBallotList().then(
                 function (list) {
                     $scope.ballotList = list
@@ -193,53 +176,7 @@ angular.module("formsApp")
                 }
             )
 
-            $scope.download = function(Q){
-
-            }
-/*
-            //get the list of active ServiceRequests and get a count by Q
-            let qrySR = "/ds/fhir/ServiceRequest?status=active"
-            $scope.SRbyQ = {}
-            $http.get(qrySR).then(
-                function(data) {
-                    data.data.entry.forEach(function (entry) {
-                        let SR = entry.resource
-
-                        if (SR.supportingInfo) {
-                            SR.supportingInfo.forEach(function (si) {
-                                if (si.reference && si.reference.indexOf('Questionnaire/') > -1) {
-                                    //this is a reference to the Q
-                                    let qUrl = si.display
-                                    $scope.SRbyQ[qUrl] =  $scope.SRbyQ[qUrl] || 0
-                                    $scope.SRbyQ[qUrl] ++
-                                }
-
-                            })
-
-                        }
-
-                    })
-                    console.log($scope.SRbyQ)
-                }
-            )
-
-            */
-/*
-            //get all the VS from the dev server
-            //todo - need a more refined way - ?from all VS like we do in the dashboard pr some other tag
-            let vsUrl = "/ds/fhir/ValueSet"
-            $scope.allVS = []
-            $http.get(vsUrl).then(
-                function(data) {
-                    data.data.entry.forEach(function (entry) {
-                        $scope.allVS.push(entry.resource)
-                    })
-                }
-            )
-
 */
-
-
             $scope.viewVS = function(url){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
@@ -260,6 +197,27 @@ angular.module("formsApp")
                 })
             }
 
+            $scope.loadQ = function(Q) {
+                //The Q passed in is a minimal Q so we need to load the full one...
+                delete $scope.hisoNumber
+                let qry = `/ds/fhir/Questionnaire/${Q.id}`
+                $scope.showWaiting = true
+                $http.get(qry).then(
+                    function(data) {
+                        $scope.hisoNumber = formsSvc.getHisoNumber(data.data)
+                        $scope.viewModel(data.data)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(
+                    function() {
+                        $scope.showWaiting = false
+                    }
+                )
+
+
+            }
+
             $scope.viewModel = function(Q) {
 
                 delete $scope.formState
@@ -271,11 +229,8 @@ angular.module("formsApp")
                 //lets the child controllers (eg formsCtrl) know that a new Q has been selected so it can clear the display...
                 $scope.$broadcast('newQSelected')
 
-
                 $scope.selectedQ = Q
                 $scope.model = exportSvc.createJsonModel(Q)
-
-
 
                 //for the form ui
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
@@ -339,6 +294,7 @@ angular.module("formsApp")
                 )
 
                 //get the vs
+
                 $scope.vsForQ = terminologySvc.getValueSetsForQ(Q)
 
 
@@ -358,7 +314,7 @@ angular.module("formsApp")
 
 
             }
-
+/*
             //retrieve all active Q for the 'approved' ds list
             let url = "/ds/fhir/Questionnaire?status=active"
             $http.get(url).then(
@@ -371,7 +327,7 @@ angular.module("formsApp")
                     }
                 }
             )
-
+*/
 
             let drawTree = function(treeData){
                 //console.log(treeData)
@@ -383,8 +339,7 @@ angular.module("formsApp")
                     }
                 })
 
-                //expandAll(treeData)
-                //deSelectExcept()
+
                 $('#designTree').jstree('destroy');
 
                 let x = $('#designTree').jstree(

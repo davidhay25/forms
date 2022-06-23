@@ -110,8 +110,14 @@
 
 
             <div class="col-md-2 col-sm-2">
-                <div ng-show="selectedQ" class="navbar-text">
-                    <button class="btn btn-link" ng-click="input.togglePane()">Toggle data standard list</button>
+                <div ng-show="selectedQ && input.leftPane == 'col-md-2'" class="navbar-text">
+                    <button class="btn btn-link"
+                            ng-click="input.togglePane()">Full screen</button>
+                </div>
+
+                <div ng-show="selectedQ && input.leftPane == 'hide'" class="navbar-text">
+                    <button class="btn btn-link"
+                            ng-click="input.togglePane()">Show standards list</button>
                 </div>
 
             </div>
@@ -167,6 +173,43 @@
         <div class="row">
 
             <div ng-class="input.leftPane">
+                <strong>Select Standard</strong>
+                <uib-tabset>
+                    <uib-tab heading="By Tag">
+                        <select class="form-control" ng-model="input.selectedTag"
+                                ng-options = "tag for tag in tags"></select>
+
+                        <br/>
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
+                                 style="cursor: pointer"
+                                 ng-repeat="Q in allQ" ng-show=" Q.tags.indexOf(input.selectedTag) > -1">
+                                <div ng-click = "loadQ(Q)">{{Q.name}}</div>
+                            </div>
+                        </div>
+
+                        <hr/>
+                    </uib-tab>
+
+                    <uib-tab heading="By Maturity">
+                        <select class="form-control" ng-model="input.selectedHisoStatus"
+                                ng-options = "hisoStatus for hisoStatus in hisoStatuses"></select>
+
+                        <br/>
+                        <div class="list-group">
+                            <div  ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
+                                  style="cursor: pointer"
+                                  ng-repeat="Q in allQ" ng-show=" Q.hisoStatus == input.selectedHisoStatus">
+                                <div ng-click = "loadQ(Q)">{{Q.name}}</div>
+                            </div>
+                        </div>
+
+
+                    </uib-tab>
+
+                </uib-tabset>
+
+<!--
 
                 <div class="myScroll">
 
@@ -228,7 +271,7 @@
                                             Form display
                                         </a>
 
-                                        <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
+                                        <div ng-show="user">
 
                                             <a target="_blank" href="disposer.html">
                                                 Review comments <span class="badge">{{SRbyQ[entry.item.Q.url]}}</span>
@@ -261,7 +304,7 @@
                                         Form display
                                     </a>
 
-                                    <div ng-show="user">  <!-- Assumed any logged in user is allowed to review comments-->
+                                    <div ng-show="user">
 
                                         <a target="_blank" href="disposer.html">
                                             Review comments <span class="badge">{{SRbyQ[Q.url]}}</span>
@@ -275,20 +318,9 @@
                         </table>
 
                     </uib-tab>
-                    <!--
-                    <uib-tab ng-show="false" heading = "ValueSets">
-                        <h4>ValueSets</h4>
-                        <table class="table table-bordered">
-                            <tr ng-repeat="vs in allVS">
-                                <td>{{vs.title}}</td>
-                                <td>{{vs.name}}</td>
-                                <td><div class="clickable" ng-click="viewVS(vs.url)">{{vs.url}}</div> </td>
-                            </tr>
-                        </table>
-                    </uib-tab>
-                    -->
-                </uib-tabset>
 
+                </uib-tabset>
+-->
 
             </div>
             <div ng-class="input.rightPane">
@@ -299,8 +331,10 @@
 
                 </div>
 
-                <div ng-show="selectedQ" class="banner">Data Standard details: {{selectedQ.title}}
-                <br/>
+                <div ng-show="selectedQ" class="banner">
+                    <div ng-show = "hisoNumber" class="pull-right">HISO: {{hisoNumber}}</div>
+                    Data Standard details: {{selectedQ.title}}
+                    <br/>
                     <em>{{selectedQ.description}}</em>
 
                 </div>

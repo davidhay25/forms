@@ -53,6 +53,16 @@ angular.module("formsApp")
 
             $scope.qStatus = ["draft","active","retired","unknown"]
 
+            $scope.arHisoStatus = ['development','draft','standard']
+/*
+            $scope.getHisoStatus = function(Q) {
+                return formsSvc.getHisoStatus(Q)
+            }
+
+            $scope.setHisoStatus = function(Q) {
+                return formsSvc.setHisoStatus(Q,status)
+            }
+            */
 
             //toggle the left pane with the Q list
             $scope.input.leftPane = "col-md-2"
@@ -77,7 +87,7 @@ angular.module("formsApp")
                 if (user) {
                     console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
-                    updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
+                  //???   updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
                     $scope.$digest()
                 } else {
                     delete $scope.user
@@ -258,7 +268,7 @@ console.log(tags)
 
             }
 
-            $scope.checkStatus = function (status) {
+            $scope.checkStatusDEP = function (status) {
                 //todo check status state machine
                 //if the status is active then remove from the ballot list
                 if (status == 'active') {
@@ -274,14 +284,15 @@ console.log(tags)
             }
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
-
+/*
             $localStorage.formsVS = $localStorage.formsVS || []
             if ($localStorage.formsVS.length == 0) {
 
                 $localStorage.formsVS.push({display:"Yes, No, Don't know",description:"Standard VS to replace boolean",url:"http://hl7.org/fhir/ValueSet/yesnodontknow"})
                 $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
             }
-
+            */
+/*
             //retrieve the list of Qs to be balloted
             formsSvc.getBallotList().then(
                 function (list) {
@@ -326,6 +337,8 @@ console.log(tags)
                     }
                 )
             }
+
+            */
 
             //see what resources are generated on a submit (and any errors)
             $scope.testSubmit = function () {
@@ -480,7 +493,7 @@ console.log(tags)
 
 
 
-            $scope.input.vsList = $localStorage.formsVS
+            //$scope.input.vsList = $localStorage.formsVS
 
             if (!  $scope.input.vsList)  {
 
@@ -629,10 +642,18 @@ console.log(tags)
                 qSvc.updatePrefix($scope.selectedQ)     //update the item.prefix
                 let duplicates = qSvc.checkUniqueLinkId($scope.selectedQ)
                 if (duplicates) {
-
                     alert("Duplicate linkId found:\n " + duplicates + "\n Q not saved.")
                     return
                 }
+
+                if ($scope.input.hisoStatus) {
+                    formsSvc.setHisoStatus($scope.selectedQ,$scope.input.hisoStatus)
+                }
+
+                if ($scope.input.hisoNumber) {
+                    formsSvc.setHisoNumber($scope.selectedQ,$scope.input.hisoNumber)
+                }
+
 
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
@@ -1007,7 +1028,7 @@ console.log(tags)
             }
 
             //used by the preview for coded elements
-            $scope.getConcepts = function(val,url) {
+            $scope.getConceptsDEP = function(val,url) {
                 $scope.showWaiting = true
                 let qry =  termServer + "ValueSet/$expand?url=" + url
                 //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
@@ -1049,11 +1070,15 @@ console.log(tags)
 
             //load a single Q
             function loadQ(QtoSelect) {
+                delete $scope.input.hisoStatus
                 let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
                 $http.get(qry).then(
                     function(data) {
                         let Q = data.data
                         $scope.selectedQ = Q
+                        $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
+                        $scope.input.hisoNumber = formsSvc.getHisoNumber(Q)
+
                         let vo = formsSvc.generateQReport(Q)
                         $scope.report = vo.report
                         $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
@@ -1079,6 +1104,7 @@ console.log(tags)
                     }
                 )
             }
+
             //when called from Q list
             $scope.selectQ = function(QtoSelect) {
                 console.log("selecting ",QtoSelect)
@@ -1298,7 +1324,6 @@ console.log(tags)
                     function (data) {
                         $scope.allQ = [];
                         data.data.entry.forEach(function (entry){
-
                             $scope.allQ.push(entry.resource)
 
                             //populate tag list
@@ -1311,6 +1336,7 @@ console.log(tags)
                             }
 
                         })
+
                         if ($scope.QfromUrl) {
                             // a Q was specified when the page was loaded...
                             let ar = $scope.allQ.filter(item => item.url == decodeURIComponent($scope.QfromUrl))

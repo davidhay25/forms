@@ -15,11 +15,9 @@ angular.module("formsApp")
         termServer = "https://r4.ontoserver.csiro.au/fhir/"
         validationServer = "http://localhost:9099/baseR4/"
 
-        // let validationServer = "http://localhost:9099/baseR4/"
-        //             let termServer = "https://r4.ontoserver.csiro.au/fhir/"vali
-
-        //HPIRoot = "http://localhost:9099/baseR4/"
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
+
+        csHisoNumber = "https://standards.digital.health.nz/ns/hiso-number"
 
         extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
@@ -38,14 +36,12 @@ angular.module("formsApp")
         extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
         extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
 
-
         extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
         extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
         extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
         extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
         extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
-
 
         extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
         extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
@@ -54,6 +50,8 @@ angular.module("formsApp")
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
         extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
         extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
+
+        extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
 
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
@@ -83,6 +81,53 @@ angular.module("formsApp")
 
         return {
 
+            getHisoNumber : function(Q,number) {
+                let hisoNumber = ""
+                if (Q.identifier) {
+                    Q.identifier.forEach(function (ident) {
+                        if (ident.system == csHisoNumber) {
+                            hisoNumber = ident.value
+                        }
+
+                    })
+                }
+                return hisoNumber
+            },
+            setHisoNumber : function(Q,number) {
+                let arIdentifiers = []
+                if (Q.identifier) {
+                    Q.identifier.forEach(function (ident) {
+                        if (ident.system !== csHisoNumber) {
+                            arIdentifiers.push(ident)
+                        }
+
+                    })
+                }
+                Q.identifier = arIdentifiers
+                Q.identifier.push({system:csHisoNumber,value:number})
+
+
+            },
+
+            getHisoStatus : function(Q) {
+                let arExt = this.findExtension(Q,extHisoStatus)
+                if (arExt.length > 0) {
+                    return arExt[0].valueCode
+                }
+            },
+            setHisoStatus : function(Q,status) {
+                Q.extension = Q.extension || []
+
+                let ar = []
+                Q.extension.forEach(function (ext) {
+                    if (ext.url !== extHisoStatus) {
+                        ar.push(ext)
+                    }
+                })
+                Q.extension = ar
+                Q.extension.push({url:extHisoStatus,valueCode : status})
+
+            },
             prepop : function(Q) {
                 let formData = {}
                 if (Q.item) {
@@ -131,7 +176,6 @@ angular.module("formsApp")
                 let ar = []
                 arExt.forEach(function (ext) {
                     ar.push(ext.valueAttachment)
-
                 })
 
                 return ar
@@ -158,7 +202,7 @@ angular.module("formsApp")
 
             },
 
-            removeQfromBallotList : function(Q) {
+            removeQfromBallotListDEP : function(Q) {
                 //remove the Q with the id from the ballot list
                 let deferred = $q.defer()
                 this.getBallotList().then(
@@ -500,7 +544,7 @@ angular.module("formsApp")
 
                 updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
 
-
+               // updateExtension(item,extHISOStatus,"Code",meta.HISOStatus)
 
                //extVerification=
                    // extNotes
@@ -663,7 +707,12 @@ angular.module("formsApp")
                 if (ar16.length > 0) {
                     meta.v2mapping= ar16[0].valueString
                 }
-
+/*
+                let ar17 = this.findExtension(item,extHISOStatus)
+                if (ar17.length > 0) {
+                    meta.HISOStatus = ar17[0].valueString
+                }
+*/
                 //updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
 
 
