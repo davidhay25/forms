@@ -35,11 +35,7 @@ angular.module("formsApp")
                     termIOSvc.updateFromQFile($scope.selectedQ,data)
 
                 }
-
                 r.readAsBinaryString(fileList[0]);
-
-
-
             }
 
             $scope.fullQExport = function() {

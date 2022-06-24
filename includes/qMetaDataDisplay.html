@@ -1,0 +1,172 @@
+<div>
+
+    <br/>
+    <div class="row">
+        <div class="col-md-6">
+
+            <div class="row">
+
+                <div class="col-md-2">
+                    Id
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    Url
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    Title
+                </div>
+                <div class="col-md-9">
+                   <textarea class="form-control" ng-model="selectedQ.title"   disabled = 'disabled'>
+
+                   </textarea>
+
+                </div>
+            </div>
+
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    Description
+                </div>
+                <div class="col-md-9">
+                       <textarea class="form-control" ng-model="selectedQ.description"
+                                 disabled = 'disabled' >
+                       </textarea>
+
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    Folders
+                </div>
+                <div class="col-md-9">
+                    <table class="table table-bordered">
+                        <tr><th>Code (folder)</th><th>Display</th></tr>
+                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem">
+                            <td>{{tag.code}}</td>
+                            <!--<td>{{tag.system}}</td> todo maybe as a popover-->
+                            <td>{{tag.display}}</td>
+
+                        </tr>
+
+                    </table>
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="col-md-6">
+
+
+            <div class="row">
+                <div class="col-md-3">
+                    Q Status
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" disabled = "disabled" ng-model="selectedQ.status"/>
+
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    HISO Status
+                </div>
+                <div class="col-md-9">
+
+                    <input type="text" class="form-control" disabled = "disabled" ng-model="selectedQ.hisoSstatus"/>
+
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    HISO number
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"  disabled = "disabled  ng-model="input.hisoNumber"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    Name
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    Version
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.version"/>
+                </div>
+            </div>
+            <br/>
+            <div class="row" >
+                <div class="col-md-3">
+                    Authors
+                </div>
+                <div class="col-md-9">
+
+                    <table class="table table-bordered">
+                        <tr><th>Email</th><th>Name</th></tr>
+                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagAuthorSystem">
+                            <td>{{tag.code}}</td>
+                            <!--<td>{{tag.system}}</td> todo maybe as a popover-->
+                            <td>{{tag.display}}</td>
+
+                        </tr>
+
+                    </table>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row" ng-show="allAttachments.length > 0">
+        <div class="col-md-1">
+            Attachments
+        </div>
+        <div class="col-md-10">
+            <table class="table table-bordered">
+                <tr ng-repeat="att in allAttachments">
+                    <td>{{att.title}}</td>
+                    <td>{{att.url}}</td>
+                    <td>Select</td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>

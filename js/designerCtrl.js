@@ -23,7 +23,7 @@ angular.module("formsApp")
             })
 
             //load all the disposition Observations for a Q
-            $scope.loadDispositionsForQ = function(Q) {
+            $scope.loadDispositionsForQDEP = function(Q) {
                 delete $scope.dispositionsForQ
                 $scope.selectedQ = Q
                 formsSvc.loadDispositionsForQ(Q).then(
@@ -36,7 +36,7 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','display','group','reference','display']
 
-            $scope.input.codeSystems = []
+            $scope.input.codeSystems = []   //used by the editItem function
             $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
             $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
             $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
@@ -79,6 +79,87 @@ angular.module("formsApp")
                     $scope.input.rightPane = "col-md-10"
                 }
             }
+
+            //uploading a document (Used to upload docs and attach to a Q)
+            $scope.uploadDocument = function(){
+                let id = "#fileUploadFileRef"    //in qMetadata
+                let file = $(id)
+                let fileList = file[0].files
+                if (fileList.length == 0) {
+                    alert("Please select a file first")
+                    return;
+                }
+                let fileObject = fileList[0]  //is a complex object
+                //console.log(fileList)
+
+                let r = new FileReader();
+
+                r.onloadend = function(e) {
+                    let data = e.target.result;
+
+                    let arKnownFileTypes = [{key:'.pdf',mime:'application/pdf'}]
+                    arKnownFileTypes.push({key:'.docx',mime:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
+
+
+                    //save the uploaded data as a binary, then create an attachment extension from the Q
+                    let dr = {resourceType:"DocumentReference",id:'id-' + new Date().getTime(),status:"current",content:[]}
+                    let att = {}
+
+
+
+                    //works with the readAsArrayBuffer but runs out of stack...const base64String = btoa(String.fromCharCode(...new Uint8Array(data)));
+
+                    att.data =  btoa(data)
+                    //works as aboveatt.data = base64String // btoa(data)
+                    att.title = fileObject.name         //the name of the file
+                    console.log(att.data.length)
+
+                    att.contentType = "application/octet-stream"
+                    arKnownFileTypes.forEach(function (typ) {
+                        if (fileObject.name.indexOf(typ.key) > -1) {
+                            att.contentType = typ.mime
+                        }
+                    })
+                    dr.content.push({attachment:att})
+                    let qry = `/ds/fhir/DocumentReference/${dr.id}`
+
+/*
+                    let binary = {resourceType:'Binary'}
+                    binary.id = 'id-' + new Date().getTime()
+                    binary.data = data  //  btoa(data)
+                    binary.contentType = "application/octet-stream"
+                    arKnownFileTypes.forEach(function (typ) {
+                        if (fileObject.name.indexOf(typ.key) > -1) {
+                            binary.contentType = typ.mime
+                        }
+                    })
+                    let qry = `/ds/fhir/Binary/${binary.id}`
+
+*/
+                    $http.put(qry,dr).then(
+                        function (data) {
+                            //now add the attachment
+                            //let url = `/ds/fhir/Binary/${}`
+                            //think it's best to use the dataserver endpoint (rather than the native fhir endpoint)
+                            $scope.addAttachment(fileObject.name,qry)
+
+                           // $scope.$digest()
+
+                        },function (err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+
+
+
+                }
+
+                //perform the read...
+                r.readAsBinaryString(fileObject);
+                //r.readAsDataURL(fileObject);
+                //r.readAsArrayBuffer(fileObject)  //this was working
+            }
+
 
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
@@ -140,7 +221,6 @@ angular.module("formsApp")
             }
 
             $scope.viewVS = function(url,useRemote){
-
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
                     backdrop: 'static',
@@ -186,28 +266,14 @@ angular.module("formsApp")
                         alert(angular.toJson(err.data))
                     }
                 )
-
+/*
 console.log(tags)
                 let params = {resourceType: "Parameters",parameter:[]}
                 let param = {name:'meta'}
                 param.valueMeta = {tag:tags[0]}
                 params.parameter.push(param)
 
-
-                /*<Parameters xmlns="http://hl7.org/fhir">
-  <parameter>
-    <name value="meta"/>
-    <valueMeta>
-      <tag>
-        <system value="http://example.org/codes/tags"/>
-        <code value="current"/>
-        <display value="Current Inpatient"/>
-      </tag>
-    </valueMeta>
-  </parameter>
-</Parameters>*/
-
-                //$scope.input.dirty = true
+*/
 
             }
 
@@ -439,7 +505,7 @@ console.log(tags)
             }
 
             //count the number of completed answers in each section - used by tabbed form...
-            $scope.completedAnswersInSection = function(section) {
+            $scope.completedAnswersInSectionDEP = function(section) {
 
                 let cnt = 0
                 section.item.forEach(function (item){
@@ -451,27 +517,6 @@ console.log(tags)
                 return cnt
             }
 
-
-            // --------- provenance stuff
-/*
-            $http.get("/ds/fhir/Provenance").then(
-                function(data){
-                    $scope.allProvenance = []
-                    if (data.data.entry) {
-                        data.data.entry.forEach(function (entry){
-                            $scope.allProvenance.push(entry.resource)
-                        })
-                    }
-                }, function(err) {
-
-                }
-            )
-
-            $scope.selectProvenance = function(prov) {
-                $scope.selectedProvenance = prov
-            }
-
-*/
 
 
             $scope.expandAll = function() {
@@ -490,10 +535,7 @@ console.log(tags)
                 drawTree()
             }
 
-
-
-
-            //$scope.input.vsList = $localStorage.formsVS
+/*
 
             if (!  $scope.input.vsList)  {
 
@@ -504,7 +546,7 @@ console.log(tags)
 
             }
 
-
+*/
             //create a new Q
             $scope.newQ = function() {
                 $uibModal.open({
@@ -536,27 +578,7 @@ console.log(tags)
                 )
             }
 
-            $scope.editQDEP = function(Q) {
 
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/editQ.html',
-                    backdrop: 'static',
-                    controller: 'editQCtrl',
-                    resolve: {
-                        Q: function () {
-                            return Q
-                        }
-                    }
-                }).result.then(
-                    function (Q) {
-                        if (Q) {
-
-                            $scope.drawQ(Q)
-                        }
-                    }
-                )
-
-            }
 
             $scope.importGroup = function(node){
                 //the node will be a section node
@@ -690,21 +712,7 @@ console.log(tags)
                 )
             }
 
-            //--------------------
 
-/*
-            let updateAfterEditDEP = function(){
-                let items = formsSvc.makeQItemsFromTree($scope.treeData)
-                $scope.selectedQ.item = items;
-                $scope.drawQ($scope.selectedQ)
-            }
-
-
-            let sectionHash = {}
-            let makeSectionHash = function(treeData){
-
-            }
-*/
             $scope.moveUp = function(node) {
                 if (! $scope.editingQ) {
                     $scope.editingQ = true
@@ -968,7 +976,7 @@ console.log(tags)
             //-----------  tree utility functions
 
             //return all the direct child elements of the node
-            function findChildElements(inNode) {
+            function findChildElementsDEP(inNode) {
                 let ar=[]
                 $scope.treeData.forEach(function(node,inx) {
                     if (node.parent == inNode.id) {
@@ -980,7 +988,7 @@ console.log(tags)
             }
 
             //find the position of the indicated node in the treeData
-            function findPositionInTree(inNode) {
+            function findPositionInTreeDEP(inNode) {
                 let index = -1
                 $scope.treeData.forEach(function(node,inx) {
                     if (node.id == inNode.id) {
@@ -1002,62 +1010,6 @@ console.log(tags)
             }
 
 
-
-            //todo - this is from the terminology tabthe
-            $scope.selectVSDEP = function(vsItem) {
-                clearWorkArea()
-                $scope.selectedVsItem = vsItem
-                let qry =  termServer + "ValueSet?url=" + vsItem.url
-
-                //get the ValueSet resource
-                $scope.showWaiting = true;
-                $http.get(qry).then(
-                    function(data){
-                        let bundle = data.data
-                        if (bundle.entry && bundle.entry.length > 0) {
-                            //todo think about multiple VS with the same url... ? get most recent version
-                            $scope.selectedVs = bundle.entry[0].resource
-                        }
-
-                    }, function(err) {
-
-                    }
-                ).finally(function(){
-                    $scope.showWaiting = false;
-                })
-            }
-
-            //used by the preview for coded elements
-            $scope.getConceptsDEP = function(val,url) {
-                $scope.showWaiting = true
-                let qry =  termServer + "ValueSet/$expand?url=" + url
-                //let qry = "https://r4.ontoserver.csiro.au/fhir/ValueSet/$expand?url=" + url
-                qry += "&filter=" + val
-
-                return $http.get(qry).then(
-                    function(data){
-
-                        let vs = data.data
-                        if (vs.expansion) {
-                            let ar = []
-                            return vs.expansion.contains
-
-                        } else {
-                            return [{display:"no matching values"}]
-                        }
-
-                        //return [{display:"aaa"},{display:'bbbb'}]
-                    },
-                    function(err){
-                        console.log(err)
-                        return [{display:"no matching values"}]
-                    }
-                ).finally(
-                    function(){
-                        $scope.showWaiting = false
-                    }
-                )
-            };
 
             clearWorkArea = function() {
                 delete $scope.selectedVs;
@@ -1111,9 +1063,7 @@ console.log(tags)
                 if ($scope.input.dirty) {
                     if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
                         loadQ(QtoSelect)
-                        //$scope.drawQ(Q,true)
-                       // $scope.treeIdToSelect = "root"
-                        //$scope.input.dirty = false
+
                     }
                 } else {
 
@@ -1199,7 +1149,7 @@ console.log(tags)
                 }
 
                 drawTree()
-                makeFormDef()
+                //makeFormDef()
                 //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
                 $scope.formTemplate = $scope.objFormTemplate.template
@@ -1300,7 +1250,7 @@ console.log(tags)
             }
 
             //used in the preview
-            function makeFormDef() {
+            function makeFormDefDEP() {
                 return  //todo - think this is no longer used...
 
 

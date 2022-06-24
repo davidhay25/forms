@@ -79,6 +79,8 @@ angular.module("formsApp")
             return name
         }
 
+        let arExpandedVsCache = {}      //cache of expanded VS
+
         return {
 
             getHisoNumber : function(Q,number) {
@@ -309,7 +311,6 @@ angular.module("formsApp")
 
             },
             getExtUrl : function(key) {
-
                 return extensionUrl[key]
             },
             loadDispositionsForQ : function(Q) {
@@ -1118,27 +1119,36 @@ angular.module("formsApp")
                             //this is a VS produced by someone else - likely the spec - use $expand on the term server
                             //let vs = cell.item.answerValueSet
                             //maximum number to return is 50
-                            let qry =  termServer + "ValueSet/$expand?url=" + vsUrl + "&count=50"
 
-                            $http.get(qry).then(
-                                function(data){
+                            if (arExpandedVsCache[vsUrl]) {
+                                //present in the cache
+                                cell.meta.expandedVSOptions = arExpandedVsCache[vsUrl]
+                                console.log('cache hit')
+                            } else {
+                                let qry =  termServer + "ValueSet/$expand?url=" + vsUrl + "&count=50"
 
-                                    let expandedVS = data.data
+                                $http.get(qry).then(
+                                    function(data){
 
-                                    if (expandedVS.expansion && expandedVS.expansion.contains) {
-                                        expandedVS.expansion.contains.forEach(function (concept) {
-                                            cell.meta.expandedVSOptions.push({system:concept.system,code:concept.code,display:concept.display})
-                                        })
-
+                                        let expandedVS = data.data
+                                        arExpandedVsCache[vsUrl] = []
+                                        if (expandedVS.expansion && expandedVS.expansion.contains) {
+                                            expandedVS.expansion.contains.forEach(function (concept) {
+                                                let coding = {system:concept.system,code:concept.code,display:concept.display}
+                                                cell.meta.expandedVSOptions.push(coding)
+                                                arExpandedVsCache[vsUrl].push(coding)
+                                            })
+                                        }
+                                    },
+                                    function(err){
+                                        console.log(err)
+                                        alert("There was an error expanding the VS with the url: "+ vsUrl + " " + angular.toJson(err.data))
+                                        return [{display:"no matching values"}]
                                     }
+                                )
+                            }
 
-                                },
-                                function(err){
-                                    console.log(err)
-                                    alert("There was an error expanding the VS with the url: "+ vsUrl + " " + angular.toJson(err.data))
-                                    return [{display:"no matching values"}]
-                                }
-                            )
+
                         }
 
 

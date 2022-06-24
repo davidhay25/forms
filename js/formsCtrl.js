@@ -67,13 +67,9 @@ angular.module("formsApp")
                 delete $scope.selectedSection
             })
 
-
             //invoked from ng-blur on for elements
             $scope.makeQR = function() {
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-
-                //console.log($scope.formQR)
-
                 $scope.$emit('qrCreated',$scope.formQR)
 
             }

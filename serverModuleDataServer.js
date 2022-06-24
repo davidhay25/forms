@@ -3,7 +3,87 @@
 const axios = require('axios').default;
 
 function setup(app,serverRoot) {
-    
+
+    //returns an uploaded document.
+    app.get('/ds/api/document/:id',function(req,res){
+        let id = req.params.id
+        let url = `${serverRoot}DocumentReference/${id}`
+        
+        axios.get(url)
+            .then(function (response){
+
+                if (response.data) {
+                    //must be a DocumentReference resource
+                    let DocumentReference = response.data
+                    //assume a single attachment containing the document
+                    if (DocumentReference.content && DocumentReference.content.length > 0) {
+                        let buff = Buffer.from(DocumentReference.content[0].attachment.data, 'base64')
+                        let mimetype = DocumentReference.content[0].attachment.contentType
+                        res.setHeader("Content-Type", mimetype)
+                        res.status(200).send(buff)
+                    } else {
+                        res.status(500).send("No attachment")
+                    }
+
+                } else {
+                    res.status(500).send()
+                }
+
+            })
+            .catch(function (err){
+
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send("Unknown error")
+                }
+            })
+    })
+
+
+    app.get('/ds/api/documentDEP/:id',function(req,res){
+        let id = req.params.id
+        let url = `${serverRoot}DocumentReference/${id}`
+
+        console.log(url)
+
+        axios.get(url)
+            .then(function (response){
+                //console.log(response.data)
+
+                if (response.data) {
+                    //assume a binary resource
+                    let Binary = response.data
+
+                    //console.log('d',Binary.data)
+                    let buff = new Buffer(Binary.data, 'base64')
+
+                    let data = buff.toString('ascii')
+
+                    //let data = atob(Binary.data)
+                    //console.log('b',data)
+                    let mimetype = Binary.contentType
+                    res.setHeader("Content-Type", 'application/pdf')
+                    res.status(200).send(data)
+                } else {
+                    res.status(500).send()
+                }
+
+
+
+            })
+            .catch(function (err){
+                //console.log(err)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send()
+                }
+            })
+
+
+    })
+
     app.post('/ds/removeqtag/:qid',async function(req,res){
         //delete a questionnaire tag
         let tag = req.body
@@ -120,10 +200,12 @@ function setup(app,serverRoot) {
         let url = serverRoot + req.params.type + "/" + req.params.id
         let resource = req.body
 
+        console.log(resource.id)
 
-        axios.put(url,resource)
+        //uploading a file requires more than the default size...
+        axios.put(url,resource,{maxBodyLength:Infinity,maxContentLength:Infinity})
             .then(function (response){
-                //console.log(response.data)
+                //console.log('r',response.data)
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
@@ -131,7 +213,7 @@ function setup(app,serverRoot) {
                 if (err.response) {
                     res.status(err.response.status).send(err.response.data)
                 } else {
-                    res.status(500).send(err.response.data)
+                    res.status(500).send(err)
                 }
             })
     })

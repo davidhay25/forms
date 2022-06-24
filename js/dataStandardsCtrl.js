@@ -118,11 +118,9 @@ angular.module("formsApp")
                                 }
                             }
 
-                           // Q.hisoStatus = hisoStatus
                             if ($scope.hisoStatuses.indexOf(Q.hisoStatus) == -1) {
                                 $scope.hisoStatuses.push(Q.hisoStatus)
                             }
-
 
                             //the folder tag
                             Q.tags = []      //make it easier to access
@@ -135,22 +133,16 @@ angular.module("formsApp")
                                         if ($scope.tags.indexOf(code) == -1) {
                                             $scope.tags.push(code)
                                         }
-
                                     }
                                 })
-
                             }
-
-                           // console.log(Q.extension)
                             $scope.input.selectedTag = $scope.tags[0]
                             $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
-
                         })
                     }
                 }, function (err) {
                     console.log(err)
                 }
-
             )
 
 /*
@@ -200,12 +192,18 @@ angular.module("formsApp")
             $scope.loadQ = function(Q) {
                 //The Q passed in is a minimal Q so we need to load the full one...
                 delete $scope.hisoNumber
+                delete $scope.selectedNode
                 let qry = `/ds/fhir/Questionnaire/${Q.id}`
                 $scope.showWaiting = true
                 $http.get(qry).then(
                     function(data) {
                         $scope.hisoNumber = formsSvc.getHisoNumber(data.data)
                         $scope.viewModel(data.data)
+
+                        //needed for showing the source items in dependencies
+                        let vo = formsSvc.generateQReport(data.data)
+                        $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
+
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     }
@@ -349,7 +347,7 @@ angular.module("formsApp")
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
-                        //console.log(data.node)
+                        console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
