@@ -123,27 +123,16 @@ angular.module("formsApp")
                     dr.content.push({attachment:att})
                     let qry = `/ds/fhir/DocumentReference/${dr.id}`
 
-/*
-                    let binary = {resourceType:'Binary'}
-                    binary.id = 'id-' + new Date().getTime()
-                    binary.data = data  //  btoa(data)
-                    binary.contentType = "application/octet-stream"
-                    arKnownFileTypes.forEach(function (typ) {
-                        if (fileObject.name.indexOf(typ.key) > -1) {
-                            binary.contentType = typ.mime
-                        }
-                    })
-                    let qry = `/ds/fhir/Binary/${binary.id}`
 
-*/
                     $http.put(qry,dr).then(
                         function (data) {
                             //now add the attachment
                             //let url = `/ds/fhir/Binary/${}`
                             //think it's best to use the dataserver endpoint (rather than the native fhir endpoint)
-                            $scope.addAttachment(fileObject.name,qry)
+                            let pathToDoc = `/ds/api/document/${dr.id}`
+                            $scope.addAttachment(fileObject.name,pathToDoc)
+                            $scope.updateQ()   //update the Q immediately (or the user might forget!)
 
-                           // $scope.$digest()
 
                         },function (err) {
                             alert(angular.toJson(err))
@@ -156,8 +145,6 @@ angular.module("formsApp")
 
                 //perform the read...
                 r.readAsBinaryString(fileObject);
-                //r.readAsDataURL(fileObject);
-                //r.readAsArrayBuffer(fileObject)  //this was working
             }
 
 
@@ -168,11 +155,10 @@ angular.module("formsApp")
                 if (user) {
                     console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
-                  //???   updateQEdit(user.email)       //update whether the current user can edit the Q in the ballot list
                     $scope.$digest()
                 } else {
                     delete $scope.user
-
+                    $scope.$digest()
                 }
 
             });

@@ -32,18 +32,10 @@ sgMail
 */
 
 
+const { MongoClient } = require('mongodb')
+const uri = 'mongodb://localhost:27017/'
 
-
-
-/* temp - need to update node on server
-
-const { MongoClient } = require('mongodb');
-const uri = 'mongodb://localhost:27017/';
-
-const dbName = 'canshare';
-
-// Database Name
-//const dbName = 'canshare';
+const dbName = 'canshare'
 let db
 // Use connect method to connect to the server
 //Note there seems to be a timeout of around 30 secs that I can't change....
@@ -60,7 +52,7 @@ MongoClient.connect(uri, function(err, client) {
     //client.close();
 });
 
-*/
+
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 

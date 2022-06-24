@@ -8,7 +8,7 @@ function setup(app,serverRoot) {
     app.get('/ds/api/document/:id',function(req,res){
         let id = req.params.id
         let url = `${serverRoot}DocumentReference/${id}`
-        
+
         axios.get(url)
             .then(function (response){
 
@@ -41,48 +41,7 @@ function setup(app,serverRoot) {
     })
 
 
-    app.get('/ds/api/documentDEP/:id',function(req,res){
-        let id = req.params.id
-        let url = `${serverRoot}DocumentReference/${id}`
 
-        console.log(url)
-
-        axios.get(url)
-            .then(function (response){
-                //console.log(response.data)
-
-                if (response.data) {
-                    //assume a binary resource
-                    let Binary = response.data
-
-                    //console.log('d',Binary.data)
-                    let buff = new Buffer(Binary.data, 'base64')
-
-                    let data = buff.toString('ascii')
-
-                    //let data = atob(Binary.data)
-                    //console.log('b',data)
-                    let mimetype = Binary.contentType
-                    res.setHeader("Content-Type", 'application/pdf')
-                    res.status(200).send(data)
-                } else {
-                    res.status(500).send()
-                }
-
-
-
-            })
-            .catch(function (err){
-                //console.log(err)
-                if (err.response) {
-                    res.status(err.response.status).send(err.response.data)
-                } else {
-                    res.status(500).send()
-                }
-            })
-
-
-    })
 
     app.post('/ds/removeqtag/:qid',async function(req,res){
         //delete a questionnaire tag
@@ -200,7 +159,7 @@ function setup(app,serverRoot) {
         let url = serverRoot + req.params.type + "/" + req.params.id
         let resource = req.body
 
-        console.log(resource.id)
+        //console.log(resource.id)
 
         //uploading a file requires more than the default size...
         axios.put(url,resource,{maxBodyLength:Infinity,maxContentLength:Infinity})
