@@ -1,46 +1,27 @@
 <div>
     <!-- Assume in dashBoard controller-->
-<!--
-    <div class="row">
-        <div class="col-md-12">
 
-            <div ng-switch="isQinBallot()">
-                <div ng-switch-when = true>
-                    <button class="btn btn-danger pull-right"
-                            ng-click="removeFromBallotList()">Remove from Ballot</button>
-                </div>
-
-                <div ng-switch-default>
-                    <button ng-hide="selectedQ.status !== 'draft'" class="btn btn-primary pull-right"
-                            ng-click="addToBallotList()">Add to Ballot</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    -->
 
     <br/>
     <div class="row">
         <div class="col-md-6">
 
-            <div class="row">
 
+            <div class="row">
                 <div class="col-md-2">
-                    Id
+                    Name
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
+                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-2">
-                    Url
+                    Version
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
+                    <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
                 </div>
             </div>
 
@@ -137,23 +118,27 @@
                 </div>
             </div>
 
+
+
             <div class="row">
+
                 <div class="col-md-3">
-                    Name
+                    Id
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.name"/>
+                    <input type="text" class="form-control" disabled = 'disabled' ng-model="selectedQ.id"/>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-3">
-                    Version
+                    Url
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
+                    <input type="text" class="form-control"  disabled = 'disabled' ng-model="selectedQ.url"/>
                 </div>
             </div>
+
 
             <div class="row">
                 <div class="col-md-3">

@@ -119,6 +119,14 @@
                             <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)" class=" btn btn-primary">Mark as review completed</button>
                         </div>
                     </div>
+                    <br/>
+                    <div class="row" ng-show="selectedSR">
+                        <div class="col-md-12">
+                            <button ng-show="selectedQR" ng-click="deleteForm(selectedSR)"
+                                    class="btn btn-danger">Remove form</button>
+                        </div>
+                    </div>
+
 
                 </div>
 

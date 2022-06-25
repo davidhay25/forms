@@ -34,7 +34,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase",'ui.checkbox']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase",'ui.checkbox','ngSanitize']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -42,7 +42,7 @@
         });
         angular.module("formsApp").constant("moment", moment);
         angular.module("formsApp").config(['$compileProvider', function ($compileProvider) {
-            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
         }]);
 
     </script>
@@ -57,11 +57,17 @@
     <script src="js/modalDialogSvc.js"></script>
 
     <script src="js/formsCtrl.js"></script>
-    <script src="js/formReviewsCtrl.js"></script>
+
+    <script src="js/viewQRCtrl.js"></script>
+
+
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/filters.js"></script>
 
     <!--
+      <script src="js/formReviewsCtrl.js"></script>
+
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 -->
@@ -135,49 +141,19 @@
                 </form>
             </div>
 
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-2">
                 <div class="navbar-text" ng-show="selectedQ"
                      uib-popover="When checked, displays tabs with tecnnical information suitable for implementers"
                      popover-placement="left"
-                     popover-trigger="'mouseenter'"
-                >
-                    <checkbox ng-model = "input.showTechnical"
-
-
-                    ></checkbox> Technical
+                     popover-trigger="'mouseenter'">
+                    <checkbox ng-model = "input.showTechnical"></checkbox> Technical
                 </div>
             </div>
-<!--
-            <div class="col-md-2 col-sm-2">
 
-                    <div class="navbar-text pull-right">{{user.email}}</div>
+            <div class="col-md-2">
 
             </div>
 
-
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text " ng-hide="user">
-                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
-                          popover-placement="left"
-                          popover-trigger="'mouseenter'">
-                        <div ng-click="login()">
-                            <i class="glyphicon glyphicon-log-in"></i>
-                        </div>
-                    </span>
-                </div>
-
-                <div class="navbar-text " class=" pull-right"  ng-show="user">
-                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="Click to log out"
-                          popover-placement="left"
-                          popover-trigger="'mouseenter'">
-                        <div ng-click="logout()">
-                            <i class="glyphicon glyphicon-log-out"></i>
-                        </div>
-                    </span>
-                </div>
-
-            </div>
-                   -->
 
         </div>
         </nav>
@@ -342,7 +318,7 @@
 
                 <div ng-show = "showHelp || ! selectedQ">
 
-                    <p>All data standards published (or in the process of being published) by CanShare</p>
+                    <iframe width="100%" height = "800px" ng-src="{{'/ds/api/document/preface'}}"></iframe>
 
                 </div>
 
@@ -386,7 +362,20 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2" style="background-color: #eeeeee">
+                            <div class="col-md-2">
+
+                                <div ng-show="input.showTechnical" >
+                                    <div  style="padding:8px; background-color: #eeeeee">
+                                        <h4>Technical functions</h4>
+
+                                        <div><button class="btn btn-link" ng-click="viewQR(formQR)">Show QR</button> </div>
+
+                                    </div>
+
+                                    <br/>
+                                </div>
+
+                                <div style="padding:8px; background-color: #eeeeee">
 
                                 <h4>Reviewer details</h4>
                                 <input type = text ng-model = "input.reviewerName"
@@ -403,7 +392,7 @@
                                            class="form-control"/>
                                 </div>
 
-                                <h4>Permissions</h4>
+                                <h5>Permissions</h5>
 
                                 <div
                                         uib-popover="When checked, indicates that the persons name can be included in public summaries"
@@ -416,6 +405,11 @@
                                       popover-trigger="'mouseenter'">
                                     <checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request
                                 </div>
+
+                                <br/>
+                                <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
+
+
                                 <br/>
                                 <div>
                                     <button ng-show = "formQR"
@@ -426,6 +420,8 @@
                                 <br/>
 
                             </div>
+                            </div>
+
                         </div>
 
 
@@ -443,6 +439,7 @@
                                 <uib-tabset>
                                     <uib-tab heading="Details">
                                         <table ng-show="selectedNode" class="table">
+                                            <tr><td colspan="2"><strong>Structure</strong></td> </tr>
                                             <tr><td>Text</td><td>{{selectedNode.data.item.text}}</td></tr>
                                             <tr><td>LinkId</td><td>{{selectedNode.data.item.linkId}}</td></tr>
                                             <tr><td>Description</td><td>{{selectedNode.data.item.description}}</td></tr>
@@ -460,10 +457,10 @@
                                                 <td>Options</td>
                                                 <td>
                                                     <div>
-                                    <span ng-repeat = "option in selectedNode.data.item.answerOption">
-                                        {{option.valueInteger}}{{option.valueString}}
-                                        {{option.valueCoding.display}},
-                                    </span>
+                                                        <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                                            {{option.valueInteger}}{{option.valueString}}
+                                                            {{option.valueCoding.display}},
+                                                        </span>
                                                     </div>
                                                 </td>
 
@@ -479,6 +476,31 @@
                                                     <em>Viewer may not work until national terminology server available</em>
                                                 </td>
                                             </tr>
+
+                                            <tr ng-show="selectedNode.data.meta.usageNotes">
+                                                <td>Usage notes</td>
+                                                <td>{{selectedNode.data.meta.usageNotes}}</td>
+                                            </tr>
+
+                                            <tr ng-show="selectedNode.data.meta.verification">
+                                                <td>Verification</td>
+                                                <td>{{selectedNode.data.meta.verification}}</td>
+                                            </tr>
+
+                                            <tr ng-show="input.showTechnical && ( selectedNode.data.meta.extraction.notes || selectedNode.data.meta.extraction.extractObservation)">
+                                                <td>Extraction Notes</td>
+
+                                                <td>
+                                                    <div ng-show="selectedNode.data.meta.extraction.extractObservation">
+                                                        Extract as Observation
+                                                    </div>
+
+                                                    {{selectedNode.data.meta.extraction.notes}}
+                                                </td>
+                                            </tr>
+
+                                            <tr><td colspan="2"><strong>Behaviour</strong></td> </tr>
+
                                             <tr ng-show="selectedNode.data.item.repeats">
                                                 <td>Item can repeat</td>
                                             </tr>
@@ -506,27 +528,8 @@
                                                 </td>
                                             </tr>
 
-                                            <tr ng-show="selectedNode.data.meta.usageNotes">
-                                                <td>Usage notes</td>
-                                                <td>{{selectedNode.data.meta.usageNotes}}</td>
-                                            </tr>
 
-                                            <tr ng-show="selectedNode.data.meta.verification">
-                                                <td>Verification</td>
-                                                <td>{{selectedNode.data.meta.verification}}</td>
-                                            </tr>
 
-                                            <tr ng-show="input.showTechnical && ( selectedNode.data.meta.extraction.notes || selectedNode.data.meta.extraction.extractObservation)">
-                                                <td>Extraction Notes</td>
-
-                                                <td>
-                                                    <div ng-show="selectedNode.data.meta.extraction.extractObservation">
-                                                        Extract as Observation
-                                                    </div>
-
-                                                    {{selectedNode.data.meta.extraction.notes}}
-                                                </td>
-                                            </tr>
                                         </table>
 
                                     </uib-tab>
@@ -540,8 +543,6 @@
                             </div>
                         </div>
                     </uib-tab>
-
-
 
                     <uib-tab heading="Table">
                         <ng-include src="'includes/showModel.html'"></ng-include>
@@ -655,6 +656,14 @@
                                         <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
                                     </uib-tab>
                                     <uib-tab ng-show="input.showTechnical" heading="Json">
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button class="btn btn-link pull-right"
+                                                        ng-click="viewQR(selectedQR)">Extended view</button>
+                                            </div>
+                                        </div>
+
                                         <pre>{{selectedQR | json}}</pre>
                                     </uib-tab>
                                 </uib-tabset>
@@ -663,6 +672,32 @@
                         </div>
                     </uib-tab>
 
+                    <uib-tab heading="Documents">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="list-group">
+                                    <div class="list-group-item">
+                                        <div ng-click="showDocument('preface')">Preface</div>
+                                    </div>
+
+                                    <div ng-class="{'list-group-item':true}"
+                                            ng-repeat = "att in objFormTemplate.attachments"
+                                            ng-click="showDocumentByUrl(att.url)">
+                                        {{att.title}}
+                                    </div>
+
+                                </div>
+
+
+
+
+                            </div>
+                            <div class="col-md-10">
+                                <iframe width="100%" height = "800px" ng-src="{{selectedDocumentLocation | trustUrl}}"></iframe>
+
+                            </div>
+                        </div>
+                    </uib-tab>
 
                     <uib-tab ng-show="input.showTechnical" heading="HL7 v2 segments">
                        <br/>

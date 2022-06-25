@@ -102,12 +102,10 @@ angular.module("formsApp")
                         if (ident.system !== csHisoNumber) {
                             arIdentifiers.push(ident)
                         }
-
                     })
                 }
                 Q.identifier = arIdentifiers
                 Q.identifier.push({system:csHisoNumber,value:number})
-
 
             },
 
@@ -130,7 +128,63 @@ angular.module("formsApp")
                 Q.extension.push({url:extHisoStatus,valueCode : status})
 
             },
+
+            ehrPrepop : function(Q,form) {
+                //demo the pre-population from an ehr
+
+                $http.get("/ds/api/prepop").then(
+                    function(data) {
+                        form = form || {}
+                        let hashPrepop = data.data
+
+
+
+                       // Object.keys(hashPrepop).forEach(function (key){
+                         //   form[key] = hashPrepop[key]
+                       // })
+
+                        if (Q.item) {
+                            Q.item.forEach(function (sectionItem) {
+                                if (sectionItem.item) {
+                                    sectionItem.item.forEach(function(child){
+                                        if (child.item) {
+                                            //a group
+
+                                        } else {
+                                            //a leaf
+                                            setValue(hashPrepop,form,child)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+
+
+
+
+                    }
+                )
+
+                function setValue(hash,form,item){
+                    if (hash[item.linkId]) {
+                        let prepop = hash[item.linkId]
+                        if (prepop.valueCoding && item.answerOption) {
+                            item.answerOption.forEach(function (opt) {
+                                if (opt.valueCoding.display == prepop.valueCoding.display) {
+                                    form[item.linkId] = opt
+                                }
+                            })
+                        } else {
+                            form[item.linkId] = hash[item.linkId]
+                        }
+
+
+                    }
+                }
+            },
+
             prepop : function(Q) {
+                //where the Q has an 'initial' element set
                 let formData = {}
                 if (Q.item) {
                     Q.item.forEach(function (sectionItem) {
@@ -157,6 +211,7 @@ angular.module("formsApp")
                     if (initial && initial.length > 0) {
                         let coding = initial[0].valueCoding
                         if (coding && child.answerOption) {
+
                             //have to find the value from the list of options - angular needs it
                             child.answerOption.forEach(function (opt) {
                                 if (opt.valueCoding.display == coding.display) {

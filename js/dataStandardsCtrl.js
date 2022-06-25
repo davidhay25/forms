@@ -1,6 +1,6 @@
 angular.module("formsApp")
     .controller('dataStandardsCtrl',
-        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout) {
+        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout,$sce) {
 
             //system url for author tags
             let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
@@ -44,11 +44,24 @@ angular.module("formsApp")
                let practitioner = null
                $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
                    $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
-               console.log($scope.formQR)
+               //console.log($scope.formQR)
+
            })
 
             $scope.selectQR = function (QR) {
                 $scope.selectedQR = QR
+            }
+
+            $scope.prepopFromEhr = function(){
+                //a place holder for getting data from an EHR. Right now, just set some data
+                //so form fillers get the idea. Need a more robust approach
+
+                formsSvc.ehrPrepop($scope.selectedQ, $scope.form)
+
+                //any dropdowns need to be 'set'...
+
+
+
             }
 
             $scope.submitForm = function() {
@@ -97,6 +110,32 @@ angular.module("formsApp")
 
             }
 
+            //display the QR
+            $scope.viewQR = function(QR){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewQR.html',
+                    backdrop: 'static',
+                    controller: 'viewQRCtrl',
+                    size : 'lg',
+                    resolve: {
+                        QR: function () {
+                            return QR
+                        }
+                    }
+                })
+            }
+
+            //set the document to show based on the documentrefaerence id
+            $scope.showDocument = function(drId) {
+                $scope.selectedDocumentLocation = `/ds/api/document/${drId}`
+            }
+
+            //set the document to show based on the url
+            $scope.showDocumentByUrl = function(url) {
+                let qry = "/ds/api/proxy?url="+url
+               // $scope.selectedDocumentLocation = qry
+                $scope.selectedDocumentLocation = url
+            }
 
             //retrieve all Q to determine their status and populate the selectors
             let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension"
@@ -145,30 +184,6 @@ angular.module("formsApp")
                 }
             )
 
-/*
-            formsSvc.getBallotList().then(
-                function (list) {
-                    $scope.ballotList = list
-                    //load the questionnaires so the details can be displayed. Just add the Q to the item - it isn't being saved back so no-one will know...
-
-                    if ($scope.ballotList.entry) {
-                        $scope.ballotList.entry.forEach(function (item) {
-                            let url = `/ds/fhir/${item.item.reference}`   //a reference to the Q
-                            $http.get(url).then(
-                                function (data) {
-                                    item.item.Q = data.data
-
-                                }, function (err) {
-                                    console.log(err)
-                                }
-                            )
-
-                        })
-                    }
-                }
-            )
-
-*/
             $scope.viewVS = function(url){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
@@ -237,7 +252,11 @@ angular.module("formsApp")
                 //need to wait for the form to be rendered before checking the defaults
                 $timeout(function(){
                     //returns any initial values
+
                     $scope.form = formsSvc.prepop(Q)
+
+
+                    //console.log($scope.form)
 
                     //lets the child controllers (eg formsCtrl) know that a new Q has been selected...
                     //$scope.$broadcast('newQSelected')

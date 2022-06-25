@@ -1,5 +1,10 @@
 angular.module("formsApp")
 
+    .filter('trustUrl', function ($sce) {
+        return function(url) {
+            return $sce.trustAsResourceUrl(url);
+        }})
+
     .filter('cardinality',function(){
         return function(item) {
             let display = false

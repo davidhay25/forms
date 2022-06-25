@@ -4,6 +4,40 @@ const axios = require('axios').default;
 
 function setup(app,serverRoot) {
 
+
+    app.get('/ds/api/prepop',async function(req,res) {
+        //get prepop data. currently fixed, but will enhance ? possible set by management app
+        //based on linkId at present, as item codes not fully established
+        let prePop = {}
+        prePop['NHI'] = "WER4568"
+        prePop['patient-family'] = "Doe"
+        prePop['patient-given'] = "John"
+        prePop['patient-gender'] = {valueCoding:{system:"http://hl7.org/fhir/administrative-gender",code:'male',display:"Male"}}
+        //prePop['patient-ethnicity'] = {valueCoding:{system:"https://standards.digital.health.nz/ns/ethnic-group-level-4-code",code:'11111',display:"New Zealand European"}}
+        prePop['patient-dob'] = "1975-02-15"
+
+
+
+        res.json(prePop)
+
+
+    })
+
+    app.get('/ds/api/proxyDEP',async function(req,res) {
+
+        let url = req.query.url
+        console.log(url)
+        try {
+            let results = await axios.get(url)      //get the first
+            console.log(results.data)
+
+            res.send(results.data)
+        } catch (ex) {
+            res.status(404).send("The url could not be loaded")
+        }
+
+    })
+
     //returns an uploaded document.
     app.get('/ds/api/document/:id',function(req,res){
         let id = req.params.id

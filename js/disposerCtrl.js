@@ -38,6 +38,10 @@ angular.module("formsApp")
 
             });
 
+            $scope.deleteForm = function(){
+                alert("Delete QR instance - eg if personal data or inappropriate language")
+            }
+
             //------------------------------
 
 /*

@@ -142,6 +142,7 @@
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                                 ng-change="makeQR(cell.item.linkId)"
                                 ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
+                            <option value=""></option>
 
                         </select>
                     </div>
@@ -180,7 +181,7 @@
                             <select class="form-control" ng-model="form[cell.item.linkId]"
                                     ng-change="makeQR(cell.item.linkId)"
                                     ng-options = "concept.display for concept in cell.meta.expandedVSOptions">
-
+                                <option value=""></option>
                             </select>
                         </div>
 
@@ -203,9 +204,11 @@
 
 
                     </div>
+                    <!--
                     <div class="col-md-2">
                         <button class="btn btn-link" ng-click=""></button>
                     </div>
+                    -->
                 </div>
 
                 <!-- todo - is this better as a 'click to select'-->
