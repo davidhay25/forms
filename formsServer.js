@@ -4,6 +4,8 @@ const https = require('https');
 
 const bodyParser = require('body-parser')
 
+let serverRoot = "http://localhost:9099/baseR4/"
+
 var express = require('express');
 var app = express();
 
@@ -56,7 +58,7 @@ MongoClient.connect(uri, function(err, client) {
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 
-let serverRoot = "http://localhost:9099/baseR4/"
+
 
 
 const formsReceiverModule = require("./serverModuleFormsReceiver.js")

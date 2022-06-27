@@ -1,6 +1,7 @@
 // data server API
 //
 const axios = require('axios').default;
+let prepopData = require("./prePopData.json")
 
 function setup(app,serverRoot) {
 
@@ -8,6 +9,7 @@ function setup(app,serverRoot) {
     app.get('/ds/api/prepop',async function(req,res) {
         //get prepop data. currently fixed, but will enhance ? possible set by management app
         //based on linkId at present, as item codes not fully established
+        /*
         let prePop = {}
         prePop['NHI'] = "WER4568"
         prePop['patient-family'] = "Doe"
@@ -16,9 +18,10 @@ function setup(app,serverRoot) {
         //prePop['patient-ethnicity'] = {valueCoding:{system:"https://standards.digital.health.nz/ns/ethnic-group-level-4-code",code:'11111',display:"New Zealand European"}}
         prePop['patient-dob'] = "1975-02-15"
 
+*/
 
 
-        res.json(prePop)
+        res.json(prepopData)
 
 
     })

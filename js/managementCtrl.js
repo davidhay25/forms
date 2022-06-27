@@ -1,9 +1,11 @@
 
 angular.module("formsApp")
     .controller('monitorCtrl',
-        function ($scope,$http) {
+        function ($scope,$http,moment) {
 
             $scope.input = {}
+            $scope.moment = moment
+            $scope.now = moment()
 
             $scope.preface = "/ds/api/document/id-1656094903114"
 

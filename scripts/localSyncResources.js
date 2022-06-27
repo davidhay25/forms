@@ -21,9 +21,6 @@ syncResources("Observation")
 syncResources("QuestionnaireResponse")
 
 
-
-
-
 async function syncResources(type) {
     let qry = sourceServer +  type
     console.log(qry)

@@ -1,0 +1,9 @@
+{
+  "NHI": "WER4568",
+  "patient-family" : "Doe",
+  "patient-given" : "John",
+  "patient-gender" : {"valueCoding":{"system":"http://hl7.org/fhir/administrative-gender","code":"male","display":"Male"}},
+  "patient-dob" : "1975-02-15"
+}
+
+

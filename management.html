@@ -48,18 +48,6 @@
 
 
 
-    <style>
-        #graph {
-            width: 100%;
-            height: 550px;
-            border: 1px solid lightgray;
-        }
-
-
-    </style>
-
-
-
 </head>
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="formsApp" ng-controller="monitorCtrl" class="container-fluid">
@@ -104,6 +92,83 @@
     </nav>
 
         <uib-tabset>
+
+            <uib-tab heading="Backup Logs">
+                <h4>Current server time: {{serverTime | date : 'MMM d H:mm' }}</h4>
+                <br/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:logItem._id == input.logItem._id}" ng-repeat="logItem in log"
+                                 ng-click="selectLogItem(logItem)">
+                                {{logItem.time | date : 'MMM d H:mm' }}
+                                &nbsp;&nbsp;&nbsp;
+                                ({{now.diff(logItem.time,'hours')}} hrs)
+
+
+                                <span class="badge pull-right"
+                                      ng-hide="logItem.status == 'fail'"
+                                      style="background-color: #00A000">
+                                    {{logItem.item.length}}
+                                </span>
+
+                                <span class="badge pull-right"
+                                      ng-show="logItem.status == 'fail'"
+                                      style="background-color: #c9302c">
+                                    Fail
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <button class="btn btn-danger">Execute backup</button>
+                    </div>
+
+                    <div class="col-md-9">
+                        <uib-tabset>
+
+
+                            <uib-tab heading="Log details">
+
+                                Status:
+
+
+                                <div class="row">
+                                    <div class="col-md-6">
+
+                                        <table class="table table-bordered">
+                                            <tr><th>Type</th><th>Id</th><th>Version</th></tr>
+                                            <tr ng-repeat = "item in input.logItem.item">
+                                                <td>{{item.type}}</td>
+                                                <td><div class="clickable" ng-click="getResource(item)">{{item.id}}</div> </td>
+                                                <td>{{item.version}}</td>
+                                            </tr>
+                                        </table>
+
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <pre>{{currentResource | json}}</pre>
+
+
+
+                                    </div>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Log Json">
+
+                                <pre>{{input.logItem | json}}</pre>
+                            </uib-tab>
+                        </uib-tabset>
+                    </div>
+
+
+
+                </div>
+
+            </uib-tab>
+
+
             <uib-tab heading="Site documents">
                 <div class="row">
                     <div class="col-md-2">
@@ -133,40 +198,6 @@
                     </div>
                 </div>
 
-
-            </uib-tab>
-
-            <uib-tab heading="Backup Logs">
-                <div>Current server time: {{serverTime | date : 'MMM d H:mm' }}</div>
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="list-group">
-                            <div class="list-group-item" ng-repeat="logItem in log"
-                                 ng-click="selectLogItem(logItem)">
-                                {{logItem.time | date : 'MMM d H:mm' }}
-                                <span class="badge pull-right">{{logItem.item.length}}</span>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-danger">Execute backup</button>
-                    </div>
-                    <div class="col-md-6">
-
-                        <table class="table table-bordered">
-                            <tr><th>Type</th><th>Id</th><th>Version</th></tr>
-                            <tr ng-repeat = "item in input.logItem.item">
-                                <td>{{item.type}}</td>
-                                <td><div class="clickable" ng-click="getResource(item)">{{item.id}}</div> </td>
-                                <td>{{item.version}}</td>
-                            </tr>
-                        </table>
-
-
-                    </div>
-                    <div class="col-md-4">
-                        <pre>{{currentResource | json}}</pre>
-                    </div>
-                </div>
 
             </uib-tab>
 
