@@ -94,10 +94,28 @@
         <uib-tabset>
 
             <uib-tab heading="Backup Logs">
-                <h4>Current server time: {{serverTime | date : 'MMM d H:mm' }}</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Current server time: {{serverTime | date : 'MMM d H:mm' }}</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div>Backup server Url: {{config.backup.targetServer}}</div>
+                        <div>Backup interval: {{config.backup.interval/(60*60*1000)}} hour/s </div>
+                    </div>
+                </div>
+
                 <br/>
                 <div class="row">
                     <div class="col-md-3">
+
+                        <input type="radio" ng-change="updateLog()" ng-model="input.logfilter"
+                               value="last20"/> Last 20 entries
+                        &nbsp; &nbsp;
+                        <input type="radio" ng-change="updateLog()" ng-model="input.logfilter"
+                               value="last20gt0"/> Last 20 entries > 0
+
+                        <br/><br/>
+
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,listItemSelected:logItem._id == input.logItem._id}" ng-repeat="logItem in log"
                                  ng-click="selectLogItem(logItem)">
@@ -125,13 +143,17 @@
                     </div>
 
                     <div class="col-md-9">
+
+                        <div class="alert alert-danger" ng-show="backupInProgress">
+                            The backup is currently in progress. Please wait until it is finished.
+                        </div>
+
                         <uib-tabset>
 
 
                             <uib-tab heading="Log details">
 
-                                Status:
-
+                              
 
                                 <div class="row">
                                     <div class="col-md-6">
@@ -147,8 +169,12 @@
 
 
                                     </div>
-                                    <div class="col-md-4">
-                                        <pre>{{currentResource | json}}</pre>
+                                    <div class="col-md-6">
+                                        <div ng-show="currentResource">
+                                            <em>Retrieved from main server</em>
+                                            <pre>{{currentResource | json}}</pre>
+                                        </div>
+
 
 
 

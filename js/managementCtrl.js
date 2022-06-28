@@ -7,10 +7,21 @@ angular.module("formsApp")
             $scope.moment = moment
             $scope.now = moment()
 
-
+            $scope.input.logfilter = "last20gt0"
+            $scope.updateLog = function(){
+                updateLog()
+                console.log($scope.input.logfilter)
+            }
 
             $scope.selectedDocumentId =  "preface"
             $scope.selectedDocumentLocation = "/ds/api/document/" + $scope.selectedDocumentId
+
+            //get the config
+            $http.get("backup/config").then(
+                function (data) {
+                    $scope.config = data.data
+                }
+            )
 
             //uploading a document (Used to upload docs and attach to a Q)
             $scope.uploadDocument = function(drId){
@@ -73,7 +84,8 @@ angular.module("formsApp")
             }
 
             $scope.executeBackup = function() {
-                if (confirm("Are you sure you wish to perfrom a backup now?")){
+                if (confirm("Are you sure you wish to perform a backup now?")){
+                    $scope.backupInProgress = true
                     $http.post("/backup/doit").then(
                         function(data){
                             alert(angular.toJson(data.data))
@@ -81,13 +93,19 @@ angular.module("formsApp")
                         }, function(err) {
                             alert(angular.toJson(err.data))
                         }
-                    )
+                    ).finally(function () {
+                        $scope.backupInProgress = false
+                    })
                 }
             }
 
             updateLog = function(){
                 //get the most recent log entries
                 let qry = "/backup/log"
+                if ($scope.input.logfilter == 'last20gt0') {
+                    qry += "?filter=gt0"
+                }
+
                 $http.get(qry).then(
                     function (data) {
                         $scope.log = data.data.log
