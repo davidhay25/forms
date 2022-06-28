@@ -33,6 +33,11 @@ sgMail
 
 */
 
+const formsReceiverModule = require("./serverModuleFormsReceiver.js")
+const formsManagerModule = require("./serverModuleFormsManager.js")
+const dataServerModule = require("./serverModuleDataServer.js")
+const backupModule = require("./serverModuleBackup");
+
 
 const { MongoClient } = require('mongodb')
 const uri = 'mongodb://localhost:27017/'
@@ -49,6 +54,7 @@ MongoClient.connect(uri, function(err, client) {
         db = client.db(dbName);
         const backupModule = require("./serverModuleBackup")
         backupModule.setup(app,serverRoot,db)
+        formsReceiverModule.setDb(db)
     }
 
     //client.close();
@@ -61,14 +67,11 @@ app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application
 
 
 
-const formsReceiverModule = require("./serverModuleFormsReceiver.js")
-const formsManagerModule = require("./serverModuleFormsManager.js")
-const dataServerModule = require("./serverModuleDataServer.js")
-const backupModule = require("./serverModuleBackup");
 
 
 
-formsReceiverModule.setup(app,serverRoot)
+
+formsReceiverModule.setup(app,serverRoot,db)   //the module needs access to the app so that any processing errors can be logged
 formsManagerModule.setup(app,serverRoot)
 dataServerModule.setup(app,serverRoot)
 

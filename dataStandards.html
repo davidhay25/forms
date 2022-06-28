@@ -369,6 +369,26 @@
                     <uib-tab heading="Form">
 
                         <br/>
+
+
+                        <div ng-show="errorOO">
+                            <div class="alert alert-danger">
+                                <div>I'm sorry, but there was an error saving this form. The error was:</div>
+                                <br/>
+                                <ul>
+                                    <li ng-repeat="iss in errorOO.issue">
+                                        {{iss.diagnostics}}
+                                    </li>
+                                </ul>
+                                <br/>
+                                <div>Please contact support for assistance</div>
+
+                            </div>
+                        </div>
+
+
+
+
                         <div ng-show = "formState == 'complete'">
                             <div class="alert alert-success">
                                 Thanks for your input. Your form and comments have been submitted.

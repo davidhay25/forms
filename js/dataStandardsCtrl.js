@@ -35,16 +35,21 @@ angular.module("formsApp")
 
             //functions to support form submission
 
-            //the QR is created in formsCtrl, but we need it in this scope. todo - once the dev dust settles, ?remove from formsCtrl???
-            //actually, call it again so we can add the reviewer details. todo: definately need to tidy this up!!! - just need to add to dashboard.js & remove from formsCtrl
+            //the QR is created in formsCtrl, but we need it in this scope and using the reviewer details
+            //todo: definately need to tidy this up!!! - just need to add call to designer.js & remove from formsCtrl
+            //todo formsctrl could just raise the event...
 
             $scope.$on("qrCreated",function(ev,qr){
 
+                console.log(qr)
+
                let patient = null
                let practitioner = null
+                //Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail
                $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
                    $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
-               //console.log($scope.formQR)
+
+               console.log($scope.formQR)
 
            })
 
@@ -103,7 +108,9 @@ angular.module("formsApp")
 
                             //$scope.selectPatient()  //to read the new data
                         }, function(err) {
-                            alert(angular.toJson(err.data))
+                            //if there's an error processing, then an OO will be retirned.
+                            $scope.errorOO = err.data
+                            //alert(angular.toJson(err.data))
                         }
                     )
                 }
@@ -244,6 +251,7 @@ angular.module("formsApp")
 
             $scope.viewModel = function(Q) {
 
+                delete $scope.errorOO
                 delete $scope.formState
                 delete $scope.dispositionsForQ
                 delete $scope.hashDispositionsByLinkId

@@ -6,6 +6,15 @@ let serverRoot
 let globals = require("./globals.json")
 //console.log(globals.hello)
 
+let debug = true
+let db
+
+function logError(OO,QR,msg) {
+    if (db) {
+        let error = {OO:OO,QR:QR,msg:msg,date:new Date().toISOString(),source:'QRProcessing'}
+        db.collection('processingErrors').insertOne(error);
+    }
+}
 
 function createUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -20,7 +29,13 @@ function createId() {
     return id
 }
 
+function setDb(inDb) {
+    db = inDb
+}
+
 function setup(app,sr) {
+
+
     serverRoot = sr
     //routes that are intended to be 'public' routes - ie that matches what the IG requires
 
@@ -33,8 +48,20 @@ function setup(app,sr) {
             QR.id = createId()  // createUUID();
             try {
                 let result = await extractResources(QR)
-                let arResources = result.obs     //An array of created observations todo - and others, rename
 
+
+                if (result.resourceType == "OperationOutcome") {
+                    //this indicates an error extracting resources. Return the OO and exit..
+                    logError(result,QR)
+                    res.status(400).json(result)
+                    return
+                }
+
+
+
+
+                let arResources = result.obs     //An array of created observations todo - and others, rename
+if (debug) {console.log('arResources',arResources)}
                 //need to add other resources to provenance
                 //let provenance = resources.provenance
 
@@ -128,8 +155,9 @@ async function extractResources(QR) {
     //retrieve the Q
     let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
     let response = await axios.get(url)
-    let bundle = response.data
 
+    let bundle = response.data
+    //if (debug) {console.log('arResources',arResources)}
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
@@ -171,7 +199,7 @@ async function extractResources(QR) {
 
 
     } else {
-        return makeOO("There needs to be a single Q with the url: " + qUrl )
+        return makeOO("There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found.")
     }
 
 }
@@ -224,9 +252,13 @@ function performObservationExtraction(Q,QR) {
         }
     }
 
-    Q.item.forEach(function(topLevel){
-        parseQ(hashQ,topLevel)
-    })
+    if (Q.item) {
+        //should never be missing the top level item array...
+        Q.item.forEach(function(topLevel){
+            parseQ(hashQ,topLevel)
+        })
+    }
+
 
 
     //go through the QR and generate a hash or response items keyed by linkId
@@ -243,9 +275,12 @@ function performObservationExtraction(Q,QR) {
         }
     }
 
-    QR.item.forEach(function(topLevel){
-        parseQR(hashQR,topLevel)
-    })
+    if (QR.item) {
+        QR.item.forEach(function(topLevel){
+            parseQR(hashQR,topLevel)
+        })
+    }
+
 
 
 
@@ -269,6 +304,7 @@ function performObservationExtraction(Q,QR) {
     provenance.agent.push({who:QR.author})
 
     //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
+    if (debug) {console.log('hashQ',hashQ)}
     Object.keys(hashQ).forEach(function (key){
         let QItem = hashQ[key]  //the Q item that this QR item is an answer to
         //is there a QR item with a matching linkId?
@@ -276,18 +312,18 @@ function performObservationExtraction(Q,QR) {
         if (hashQR[key]) {
             // yes there is. Create an observation for each answer.
             let QRItem = hashQR[key]    //the item from the QR
-
-            QRItem.answer.forEach(function (theAnswer){  //there can be multiple answers for an item
+            if (QRItem.answer){
+                QRItem.answer.forEach(function (theAnswer) {  //there can be multiple answers for an item
                 //theAnswer is a single answer value...
-                let observation = {resourceType:'Observation'}
+                let observation = {resourceType: 'Observation'}
 
                 //the subject might be a reference to a contained PR resource...
-                if (QR.author && QR.author.reference && QR.author.reference.substring(0,1)== '#') {
+                if (QR.author && QR.author.reference && QR.author.reference.substring(0, 1) == '#') {
                     observation.contained = QR.contained
                 }
 
                 observation.id = createId() // createUUID()
-                observation.text = {status:'generated'}
+                observation.text = {status: 'generated'}
                 let text = ""
                 observation.status = "final"
                 observation.effectiveDateTime = QR.authored
@@ -296,9 +332,9 @@ function performObservationExtraction(Q,QR) {
                 observation.performer = [QR.author]
                 //the code comes from the Q
                 //The Q.code is an array of coding. Add them all to Observation.code as per the IG
-                let oCode = {coding:[]}
+                let oCode = {coding: []}
                 if (QItem.code) {
-                    QItem.code.forEach(function (coding){
+                    QItem.code.forEach(function (coding) {
                         oCode.coding.push(coding)
                         if (oCode.display) {
                             text += oCode.display + ": "
@@ -309,18 +345,18 @@ function performObservationExtraction(Q,QR) {
 
                 observation.code = oCode
                 //observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
-                observation.derivedFrom = [{reference:"QuestionnaireResponse/" + QR.id}]
+                observation.derivedFrom = [{reference: "QuestionnaireResponse/" + QR.id}]
 
 
                 //console.log(theAnswer)
                 //todo - the dtatypes for Observation and Questionnaire aren't the same!
                 if (theAnswer.valueDecimal) {
                     //if a decimal, then look for the unit extension to create a Quantity
-                    let ar = findExtension(QItem,unitsUrl)
+                    let ar = findExtension(QItem, unitsUrl)
                     if (ar.length > 0) {
                         let coding = ar[0].valueCoding
                         //Can create a Quantity. should only be 1 really...
-                        let qty = {value:theAnswer.valueDecimal,system:coding.system,code:coding.code}
+                        let qty = {value: theAnswer.valueDecimal, system: coding.system, code: coding.code}
                         observation.valueQuantity = qty
                         text += theAnswer.valueDecimal + " " + coding.display
                     } else {
@@ -334,19 +370,20 @@ function performObservationExtraction(Q,QR) {
                 }
 
                 if (theAnswer.valueCoding) {
-                    observation.valueCodeableConcept = {coding:[theAnswer.valueCoding]}
+                    observation.valueCodeableConcept = {coding: [theAnswer.valueCoding]}
                     text += theAnswer.valueCoding.code + " (" + theAnswer.valueCoding.system + ")"
                 }
 
-                observation.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>" + text + "</div>"
+                observation.text.div = "<div xmlns='http://www.w3.org/1999/xhtml'>" + text + "</div>"
 
                 arObservations.push(observation)
                 //provenance.target = provenance.target || []
 
                 //provenance.target.push({reference: "urn:uuid:"+ observation.id})
-                provenance.target.push({reference: "Observation/"+ observation.id})
+                provenance.target.push({reference: "Observation/" + observation.id})
 
             })
+        }
         }
     })
 
@@ -516,5 +553,6 @@ function makeOO(text) {
 }
 
 module.exports = {
-    setup : setup
+    setup : setup,
+    setDb : setDb
 };

@@ -194,7 +194,6 @@
 
             </uib-tab>
 
-
             <uib-tab heading="Site documents">
                 <div class="row">
                     <div class="col-md-2">
@@ -227,8 +226,6 @@
 
             </uib-tab>
 
-
-
             <uib-tab heading="Pre-pop data">
                 <em>Set the sample ehr pre-pop data. Perhaps multiple sets that the user can select from?</em>
                 <div><em>Perhaps complete a form, then save the data in a prepop format (hash)</em></div>
@@ -236,6 +233,34 @@
                 <pre>{{prepop | json}}</pre>
             </uib-tab>
 
+            <uib-tab heading="Processing errors">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-condensed table-bordered">
+                            <tr><th>Date</th><th>Source</th><th>Error</th><th>Detail</th></tr>
+                            <tr ng-repeat = "row in errors">
+                                <td>{{row.date}}</td>
+                                <td>{{row.source}}</td>
+                                <td>
+                                    <div ng-repeat="iss in row.OO.issue">
+                                        {{iss.diagnostics}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="clickable" ng-click="input.errorQR = row.QR"
+                                         ng-show="row.QR">Show QR</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <pre ng-show="input.errorQR">{{input.errorQR | json}}</pre>
+
+                    </div>
+                </div>
+
+            </uib-tab>
             <uib-tab heading="Unreviewed comments">
                 <br/>
                 <div class="row">

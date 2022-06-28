@@ -3,6 +3,9 @@ angular.module("formsApp")
     .controller('formReviewsCtrl',
         function ($scope,$http,formsSvc,$uibModal) {
 
+            let reviewCommentsSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
+
+
             //load outstanding SR's
             function loadActiveSR() {
                 let qry = "/ds/fhir/ServiceRequest?category=reviewRefer&status=active"
@@ -137,6 +140,10 @@ angular.module("formsApp")
             //when a service request (indicating a review is needed) is selected
             $scope.selectSR = function(sr){
                 $scope.selectedSR = sr
+                delete $scope.selectedReview
+                delete $scope.selectedSR
+                delete $scope.selectedQR
+
                 //get the QR from the 'supportinginfo in the SR
 
                 if (sr.supportingInfo) {
@@ -204,7 +211,7 @@ angular.module("formsApp")
             }
 
             //let reviewCommentsSystem = "http://canshare.com/cs/review-comment"      //todo move to service
-            let reviewCommentsSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
+
 
 
             //passes in a single review to update

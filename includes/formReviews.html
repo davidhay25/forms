@@ -12,69 +12,18 @@
                          style="cursor: pointer"
                          ng-click = "selectSR(entry.resource)"
                          ng-repeat = "entry in serviceRequestsBundle.entry">
-                        {{entry.resource.requester.display}}
+                        {{entry.resource.requester.display}} ({{entry.resource.id}})
                     </div>
                 </div>
 
                 <button class="btn btn-link" ng-click="refresh()">Refresh</button>
-                <!--
-                <uib-tabset>
-                    <uib-tab heading="Outstanding">
-                        <div class="list-group">
-                            <div ng-class = "{'list-group-item':true,'listItemSelected' : selectedSR.id == entry.resource.id}"
-                                 style="cursor: pointer"
-                                 ng-click = "selectSR(entry.resource)"
-                                 ng-repeat = "entry in serviceRequestsBundle.entry">
-                                {{entry.resource.requester.display}}
-                            </div>
-                        </div>
-
-                        <button class="btn btn-link" ng-click="refresh()">Refresh</button>
-
-                    </uib-tab>
-
-                    <uib-tab ng-show = "false" heading="By Questionnaire">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Questionnaires</strong>
-                                <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedReviewQ.id}"
-                                         style="cursor: pointer"
-                                         ng-click="selectQReviews(Q)"
-                                         ng-repeat="Q in allQ">
-                                        {{Q.name}}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Reviews</strong>
-                                <div class="myScroll">
-                                    <div class="list-group">
-                                        <div ng-class="{'list-group-item':true,'listItemSelected':review.QR.id == selectedReview.QR.id}"
-                                             style="cursor: pointer"
-                                             ng-click="selectReview(review)"
-                                             ng-repeat="review in reviewQRs">
-                                            {{review.QR.author.display}}
-                                            <div><em>{{review.QR.authored | date}}</em></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-                    </uib-tab>
-                </uib-tabset>
-                -->
-
 
             </div>
 
         </div>
 
         <div class="col-md-9">
+
             <div class="rounded-box-filled"><div style="text-align: center">{{selectedQ.name}}</div> </div>
             <div class="row">
 

@@ -16,6 +16,13 @@ angular.module("formsApp")
             $scope.selectedDocumentId =  "preface"
             $scope.selectedDocumentLocation = "/ds/api/document/" + $scope.selectedDocumentId
 
+            //get the errors
+            $http.get("management/errors").then(
+                function (data) {
+                    $scope.errors = data.data
+                }
+            )
+
             //get the config
             $http.get("backup/config").then(
                 function (data) {

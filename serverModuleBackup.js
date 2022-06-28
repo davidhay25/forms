@@ -20,6 +20,8 @@
 * The backup server is configured not to check for referential integrity (references to resources not on the server) though
 * that shouldn't happen
 *
+* Also contains management endpoints
+*
 * */
 
 
@@ -324,6 +326,20 @@ function setup(app,inSourceServer,inDb) {
         config.backup.interval = backupInterval
         res.json(config)
 
+    })
+
+    app.get('/management/errors', async function(req,res){
+        let collection = db.collection('processingErrors')
+        let filter = {}
+
+        if (req.query.filter == 'gt0') {
+            filter = {count:{$gt:0}}
+        }
+
+        //no limit for now
+        const cursor = collection.find(filter).sort({ time: -1 })  //.limit(20);
+        const allValues = await cursor.toArray();
+        res.json(allValues)
     })
 }
 
