@@ -58,7 +58,7 @@
             <div class="col-md-5 col-sm-5">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Canshare: Monitor
+                            Canshare: Management screen
                         </a>
                     </span>
             </div>
@@ -153,7 +153,7 @@
 
                             <uib-tab heading="Log details">
 
-                              
+
 
                                 <div class="row">
                                     <div class="col-md-6">
@@ -232,7 +232,51 @@
             <uib-tab heading="Pre-pop data">
                 <em>Set the sample ehr pre-pop data. Perhaps multiple sets that the user can select from?</em>
                 <div><em>Perhaps complete a form, then save the data in a prepop format (hash)</em></div>
+
+                <pre>{{prepop | json}}</pre>
             </uib-tab>
+
+            <uib-tab heading="Unreviewed comments">
+                <br/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="myScroll">
+                            <table class="table table-bordered table-condensed">
+                                <tr>
+                                    <th>Date</th><th>Questionnaire</th><th>Status</th>
+                                </tr>
+                                <tr ng-repeat="row in reviewRequests">
+                                    <td>
+                                        <div class="clickable" ng-click="showQR(row.QR)"> {{row.date | date : 'MMM d'}}</div>
+                                    </td>
+                                    <td>{{row.Q}}</td>
+                                    <td>{{row.status}}</td>
+
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <uib-tabset>
+                            <uib-tab heading="Form">
+                                <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                            </uib-tab>
+                            <uib-tab heading="Json">
+                                <pre>{{selectedQR | json}}</pre>
+                            </uib-tab>
+                        </uib-tabset>
+
+
+
+                    </div>
+                </div>
+
+
+
+
+            </uib-tab>
+
         </uib-tabset>
 
 

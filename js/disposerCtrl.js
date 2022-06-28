@@ -69,7 +69,7 @@ angular.module("formsApp")
             */
 
 
-
+/*
             //get all the VS from the dev server
             //todo - need a more refined way - ?from all VS like we do in the dashboard pr some other tag
             let vsUrl = "/ds/fhir/ValueSet"
@@ -81,7 +81,7 @@ angular.module("formsApp")
                     })
                 }
             )
-
+*/
 
             $scope.reviewComments = function() {
                 alert("Todo. Intended for project team members and/or anyone who can review & create dispositions. Need login created.")

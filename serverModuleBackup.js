@@ -26,8 +26,21 @@
 const axios = require("axios");
 let sourceServer // passed in during setup. Defaults to  "http://localhost:9099/baseR4/"
 
-//need some secure configuration, probably
+//where backups are posted
 let targetServer = "http://138.68.26.195:9999/baseR4/"
+
+//in dev mode, the target server is set on the environment
+let svr = process.env.targetServer
+if (svr) {
+    targetServer = svr
+}
+console.log('Target server set to ' + targetServer)
+
+
+
+
+
+
 
 
 let db
@@ -50,7 +63,6 @@ async function doBackup(cb) {
         let logEntry = allValues[0]
         lastSuccessfulRun = logEntry.lastSuccessfulRun
     }
-
 
 
     let time = new Date().toISOString()  //will become the lastSuccessfulRun - all going well
@@ -150,8 +162,6 @@ async function doBackup(cb) {
             cb(logEntry)
         }
     }
-
-
 }
 
 
@@ -224,7 +234,6 @@ function processBundle(hash,bundle,issues) {
 }
 
 
-
 function makeTransactionBundle(hashAllEntries,transactionBundle,logEntry) {
     //let transactionBundle = {resourceType:'Bundle',type:'transaction',entry:[]}
     Object.keys(hashAllEntries).forEach(function (key) {
@@ -286,7 +295,6 @@ function setup(app,inSourceServer,inDb) {
         }
     })
 
-
     //current log of activity
     app.get('/backup/log', async function(req,res){
         let collection = db.collection('backupLog')
@@ -302,7 +310,7 @@ function setup(app,inSourceServer,inDb) {
         res.json({log:allValues,serverTime:new Date().toISOString()})
     })
 
-    //allows an immediate backup to be performed, ignoring the error flag
+    //instructs an immediate backup to be performed
     app.post('/backup/doit', function(req,res){
         doBackup(function(log){
             res.json(log)

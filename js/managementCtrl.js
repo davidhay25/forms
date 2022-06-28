@@ -23,6 +23,65 @@ angular.module("formsApp")
                 }
             )
 
+            //get the pre-pop data
+            $http.get('/ds/api/prepop').then(
+                function (data) {
+                    $scope.prepop = data.data
+                }
+            )
+
+            //load the ServiceRequests
+            function loadSR(activeOnly) {
+                $scope.reviewRequests = []
+                let qry = "/ds/fhir/ServiceRequest?category=reviewRefer"
+                if (activeOnly) {
+                    qry += "&status=active"
+                }
+
+                $http.get(qry).then(
+                    function(data) {
+                        //console.log(data)
+
+                        if (data.data && data.data.entry) {
+                            data.data.entry.forEach(function (entry) {
+                                let sr = entry.resource
+                                let item = {status:sr.status,date : sr.authoredOn}
+                                if (sr.supportingInfo) {
+                                    sr.supportingInfo.forEach(function (si) {
+                                        if (si.reference) {
+                                            if (si.reference.indexOf('QuestionnaireResponse') > -1) {
+                                                item.QR = si.reference
+                                            } else if (si.reference.indexOf('Questionnaire') > -1) {
+                                                item.Q = si.reference
+                                            }
+                                        }
+
+                                    })
+                                }
+                                $scope.reviewRequests.push(item)
+
+
+                            })
+
+
+
+                        }
+                        //$scope.serviceRequestsBundle = data.data;
+
+                    }
+                )
+            }
+            loadSR(true)
+
+            $scope.showQR = function (url) {
+                let qry = "/ds/fhir/"+url
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.selectedQR = data.data
+                    }
+                )
+            }
+
             //uploading a document (Used to upload docs and attach to a Q)
             $scope.uploadDocument = function(drId){
                 //drid is the DocumentReference Id
