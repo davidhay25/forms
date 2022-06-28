@@ -119,7 +119,8 @@ async function doBackup(cb) {
     //return
     //now the hash of resources can be converted into the transaction
     let logEntry = {time:time,status:"",count:0,msg:"",details:"",item:[]}
-    let transactionBundle = {resourceType:'Bundle',type:'transaction',entry:[]}
+   // let transactionBundle = {resourceType:'Bundle',type:'transaction',entry:[]}
+    let transactionBundle = {resourceType:'Bundle',type:'batch',entry:[]}
     makeTransactionBundle(hashAllEntries,transactionBundle,logEntry)
     //let transactionBundle = vo.transaction
 
