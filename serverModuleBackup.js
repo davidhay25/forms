@@ -19,11 +19,13 @@
 
 const axios = require("axios");
 let sourceServer // passed in during setup. Defaults to  "http://localhost:9099/baseR4/"
-let targetServer = "http://localhost:9999/baseR4/"      // todo - config
+//let targetServer = "http://localhost:9999/baseR4/"      // todo - config
+let targetServer = "http://138.68.26.195:9999/baseR4/"
+
 
 let db
 
-let backupPeriod =  60 * 60 * 1000      //1 hour - add to config in mongo
+let backupInterval =  60 * 60 * 1000      //1 hour - add to config in mongo
 
 //let backupPeriod =   60 * 1000      //1 minute - add to config in mongo
 
@@ -190,7 +192,7 @@ async function doBackup(cb) {
 
 
 //schedule the backup runs
-setInterval(doBackup,backupPeriod)
+setInterval(doBackup,backupInterval)
 
 //create a
 //only do this for non-numeric id's (which should be all of them now
@@ -421,6 +423,15 @@ function setup(app,inSourceServer,inDb) {
         doBackup(function(log){
             res.json(log)
         })
+    })
+
+    //return the current configuration
+    app.get('/backup/config', async function(req,res){
+        let config = {backup:{}}
+        config.backup.targetServer = targetServer
+        config.backup.interval = backupInterval
+        res.json(config)
+
     })
 }
 
