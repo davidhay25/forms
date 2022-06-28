@@ -70,11 +70,11 @@ angular.module("formsApp")
 
             $scope.input.togglePane = function() {
                 if ($scope.input.rightPane == "col-md-10") {
-                    console.log('hide left pane')
+                    //console.log('hide left pane')
                     $scope.input.leftPane = "hide"
                     $scope.input.rightPane = "col-md-12"
                 } else {
-                    console.log('show left pane')
+                    //console.log('show left pane')
                     $scope.input.leftPane = "col-md-2"
                     $scope.input.rightPane = "col-md-10"
                 }

@@ -7,9 +7,9 @@ angular.module("formsApp")
             $scope.moment = moment
             $scope.now = moment()
 
-            $scope.preface = "/ds/api/document/id-1656094903114"
 
-            $scope.selectedDocumentId =  "preface" // "id-1656094903114"
+
+            $scope.selectedDocumentId =  "preface"
             $scope.selectedDocumentLocation = "/ds/api/document/" + $scope.selectedDocumentId
 
             //uploading a document (Used to upload docs and attach to a Q)
@@ -72,18 +72,30 @@ angular.module("formsApp")
                 r.readAsBinaryString(fileObject);
             }
 
-            $scope.getPreface = function() {
-             //   /id-1656094903114
+            $scope.executeBackup = function() {
+                if (confirm("Are you sure you wish to perfrom a backup now?")){
+                    $http.post("/backup/doit").then(
+                        function(data){
+                            alert(angular.toJson(data.data))
+                            updateLog()
+                        }, function(err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
             }
 
-            //get the most recent log entries
-            let qry = "/backup/log"
-            $http.get(qry).then(
-                function (data) {
-                    $scope.log = data.data.log
-                    $scope.serverTime = data.data.serverTime        //current time on the server
-                }
-            )
+            updateLog = function(){
+                //get the most recent log entries
+                let qry = "/backup/log"
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.log = data.data.log
+                        $scope.serverTime = data.data.serverTime        //current time on the server
+                    }
+                )
+            }
+            updateLog()
 
             $scope.getResource = function(item) {
                 let qry = `/ds/fhir/${item.type}/${item.id}`

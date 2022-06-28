@@ -9,21 +9,7 @@ function setup(app,serverRoot) {
     app.get('/ds/api/prepop',async function(req,res) {
         //get prepop data. currently fixed, but will enhance ? possible set by management app
         //based on linkId at present, as item codes not fully established
-        /*
-        let prePop = {}
-        prePop['NHI'] = "WER4568"
-        prePop['patient-family'] = "Doe"
-        prePop['patient-given'] = "John"
-        prePop['patient-gender'] = {valueCoding:{system:"http://hl7.org/fhir/administrative-gender",code:'male',display:"Male"}}
-        //prePop['patient-ethnicity'] = {valueCoding:{system:"https://standards.digital.health.nz/ns/ethnic-group-level-4-code",code:'11111',display:"New Zealand European"}}
-        prePop['patient-dob'] = "1975-02-15"
-
-*/
-
-
         res.json(prepopData)
-
-
     })
 
     app.get('/ds/api/proxyDEP',async function(req,res) {
@@ -38,7 +24,6 @@ function setup(app,serverRoot) {
         } catch (ex) {
             res.status(404).send("The url could not be loaded")
         }
-
     })
 
     //returns an uploaded document.
@@ -56,7 +41,8 @@ function setup(app,serverRoot) {
                     if (DocumentReference.content && DocumentReference.content.length > 0) {
                         let buff = Buffer.from(DocumentReference.content[0].attachment.data, 'base64')
                         let mimetype = DocumentReference.content[0].attachment.contentType
-                        res.setHeader("Content-Type", mimetype)
+                        //res.setHeader("Content-Type", mimetype)
+                        res.setHeader("Content-Type", "application/pdf")
                         res.status(200).send(buff)
                     } else {
                         res.status(500).send("No attachment")

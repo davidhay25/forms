@@ -147,7 +147,6 @@ angular.module("formsApp")
                     if (data.data && data.data.entry) {
                         data.data.entry.forEach(function (entry) {
                             let Q = entry.resource
-                            $scope.allQ.push(Q)         //note that this is a minimal Q
 
                             Q.hisoStatus = 'development'      //default
                             if (Q.extension) {
@@ -162,19 +161,31 @@ angular.module("formsApp")
                             }
 
                             //the folder tag
-                            Q.tags = []      //make it easier to access
+                            Q.tags = []      //make it easier to access (as opposed to the meta element)
+                            let isTest = false      //set to true if the Q has a test tag applied - don't show
                             if (Q.meta && Q.meta.tag) {
                                 let rslt = false
+
                                 Q.meta.tag.forEach(function (tag) {
                                     if (tag.system == tagFolderSystem) {
                                         let code = tag.code
-                                        Q.tags.push(code)
-                                        if ($scope.tags.indexOf(code) == -1) {
-                                            $scope.tags.push(code)
+                                        if (code && (code.toLowerCase() == 'test')) {
+                                            isTest = true
+                                        } else {
+                                            Q.tags.push(code)
+                                            if ($scope.tags.indexOf(code) == -1) {
+                                                $scope.tags.push(code)
+                                            }
                                         }
+
                                     }
                                 })
                             }
+                            if (! isTest) {
+                                $scope.allQ.push(Q)         //note that this is a minimal Q
+                            }
+
+
                             $scope.input.selectedTag = $scope.tags[0]
                             $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
                         })
