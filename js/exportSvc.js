@@ -219,7 +219,7 @@ angular.module("formsApp")
                         entry.hisoLength = meta.hisoLength
                         entry.hisoDT = meta.hisoDT
                         entry.hisoLayout = meta.hisoLayout
-
+                        entry.UOM = meta.UOM
                         entry.verification = meta.verification
 
                         /*

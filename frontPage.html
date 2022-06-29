@@ -112,32 +112,23 @@
         <h3>Modules</h3>
 
 
-
         <table class="table">
             <tr><th>Module</th><th>Description</th><th>Audience</th><th>Notes</th></tr>
             <tr>
                 <td style="width:15%"><a target="_blank" href="dataStandards.html">Data standards display</a></td>
                 <td>Has a list of data standards created to support the Structured Pathology project</td>
                 <td>General access by Clinicians, Implementers and business users</td>
-                <td>There are 2 sets of standard available from this module:
+                <td>There are 3 sets of standard available from this module:
                     <ul>
-                        <li>Draft standards that are currently being reviewed</li>
-                        <li>Standards that have been approved by HISO</li>
+                        <li><strong>Working draft dataset:</strong> A dataset that is not considered sufficiently robust since it has not been recently updated by international processes and/or insufficient clinical support available to develop</li>
+                        <li><strong>Draft data standard:</strong> A data standard that has been developed from adapting a recently updated ICCR/RCPA protocol by subject matter experts/clinical representatives. The draft data standard is considered sufficient but requires wider sector review through feedback and/or use in pathology services over a period of up to 12 months.</li>
+                        <li><strong>Data standard:</strong> Changes have been applied to the draft data standard from feedback through the release period and the subject matter experts/clinical representatives feel that it is fit for purpose.</li>
                     </ul>
                     Has functions to display each standard in a number of different renderings, including a sample form. Also allows comments
                     to be made by users, which are included as elements within the form.
 
                 </td>
 
-
-
-            </tr>
-
-            <tr>
-                <td><a target="_blank" href="designer.html">Data standard designer</a></td>
-                <td>Supports the creation and editing of a Data Standard</td>
-                <td>Standard builders. Login required. </td>
-                <td>Uses a FHIR Questionnaire resource as the underlying representation of the model. </td>
             </tr>
 
             <tr>
@@ -146,6 +137,16 @@
                 <td>Standard maintainers (business). Login required. </td>
                 <td>Uses a FHIR QuestionnaireResponse resource to represent the form instance and comments. Dispositions are recorded as Observations </td>
             </tr>
+
+
+            <tr>
+                <td><a target="_blank" href="designer.html">Data standard designer</a></td>
+                <td>Supports the creation and editing of a Data Standard</td>
+                <td>Standard builders. Login required. </td>
+                <td>Uses a FHIR Questionnaire resource as the underlying representation of the model. </td>
+            </tr>
+
+
 
             <tr>
                 <td><a target="_blank" href="management.html">Management module</a></td>

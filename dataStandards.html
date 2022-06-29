@@ -109,13 +109,13 @@
                     <span>
                         <a class="navbar-brand" href="#">
                             <!--CanShare project: Publications front page -->
-                            Canshare Data Standard Manager
+                            Structured Pathology Data Standard Manager
                         </a>
                     </span>
             </div>
 
 
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-1">
                 <div ng-show="selectedQ && input.leftPane == 'col-md-2'" class="navbar-text">
                     <button class="btn btn-link"
                             uib-popover="Hide the list of standards to give a full screen display"
@@ -141,7 +141,7 @@
                 </form>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="navbar-text" ng-show="selectedQ"
                      uib-popover="When checked, displays tabs with tecnnical information suitable for implementers"
                      popover-placement="left"
@@ -151,7 +151,7 @@
             </div>
 
             <div class="col-md-2">
-
+                <img width="150" height="auto" class="pull-right" src="icons/TAK-logo-midgreen.png"/>
             </div>
 
 
@@ -162,7 +162,31 @@
         <div class="row">
 
             <div ng-class="input.leftPane">
-                <strong>Select Standard to view</strong>
+                <H4>Select Standard to view</H4>
+
+
+                <select class="form-control" ng-model="input.selectedTag"
+                        ng-options = "tag for tag in tags"></select>
+
+
+                <br/>
+                <div ng-repeat = "hisoStatus in arHisoStatus">
+                    <strong>{{hisoStatus.display}}</strong>
+
+                    <div class="list-group">
+                        <div  ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
+                              style="cursor: pointer"
+                              ng-repeat="Q in allQ" ng-show="Q.hisoStatus == hisoStatus.code && Q.tags.indexOf(input.selectedTag) > -1">
+                            <div ng-click = "loadQ(Q)">{{Q.name}}</div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+<!--
+
                 <uib-tabset>
                     <uib-tab heading="By Folder">
                         <br/>
@@ -170,6 +194,9 @@
                                 ng-options = "tag for tag in tags"></select>
 
                         <br/>
+
+                        <strong>Developmern</strong>
+
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
                                  style="cursor: pointer"
@@ -177,6 +204,8 @@
                                 <div ng-click = "loadQ(Q)">{{Q.name}}</div>
                             </div>
                         </div>
+
+                        <strong>Dtaft</strong>
 
                         <hr/>
                     </uib-tab>
@@ -199,7 +228,7 @@
                     </uib-tab>
 
                 </uib-tabset>
-
+-->
 <!--
 
                 <div class="myScroll">

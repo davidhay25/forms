@@ -52,7 +52,7 @@ angular.module("formsApp")
         extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
 
         extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
-
+        extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
@@ -296,7 +296,7 @@ angular.module("formsApp")
                 return deferred.promise
 
             },
-            addQtoBallotList : function(Q) {
+            addQtoBallotListDEP : function(Q) {
                 //add the Q with the id to the ballot list
                 let deferred = $q.defer()
                 this.getBallotList().then(
@@ -317,7 +317,7 @@ angular.module("formsApp")
                 return deferred.promise
 
             },
-            getBallotList : function() {
+            getBallotListDEP : function() {
                 //get List of Q's open for ballot (same as for comment)
                 let deferred = $q.defer()
                 $http.get("/ds/fhir/List/ballot").then(
@@ -599,6 +599,9 @@ angular.module("formsApp")
                 updateExtension(item,extNotes,"String",meta.notes)
 
                 updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
+                updateExtension(item,extHisoUOM,"String",meta.UOM)
+
+
 
                // updateExtension(item,extHISOStatus,"Code",meta.HISOStatus)
 
@@ -763,12 +766,12 @@ angular.module("formsApp")
                 if (ar16.length > 0) {
                     meta.v2mapping= ar16[0].valueString
                 }
-/*
-                let ar17 = this.findExtension(item,extHISOStatus)
+
+                let ar17 = this.findExtension(item,extHisoUOM)
                 if (ar17.length > 0) {
-                    meta.HISOStatus = ar17[0].valueString
+                    meta.UOM = ar17[0].valueString
                 }
-*/
+
                 //updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
 
 

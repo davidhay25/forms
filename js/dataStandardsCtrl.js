@@ -19,6 +19,14 @@ angular.module("formsApp")
             $scope.input.leftPane = "col-md-2"
             $scope.input.rightPane = "col-md-10"
 
+            $scope.arHisoStatus = []
+            $scope.arHisoStatus.push({code:'development',display:'Development'})
+            $scope.arHisoStatus.push({code:'draft',display:'Draft Data Standard'})
+            $scope.arHisoStatus.push({code:'standard',display:'Data Standard'})
+
+            //$scope.arHisoStatus = [{code:'development',display:''},'draft','standard']
+            //$scope.arHisoStatu
+
 
 
             $scope.input.togglePane = function() {
