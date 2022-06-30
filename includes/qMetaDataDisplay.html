@@ -49,25 +49,8 @@
                 </div>
             </div>
             <br/>
-            <div class="row">
-                <div class="col-md-2">
-                    Folders
-                </div>
-                <div class="col-md-9">
-                    <table class="table table-bordered">
-                        <tr><th>Code (folder)</th><th>Display</th></tr>
-                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem">
-                            <td>{{tag.code}}</td>
-                            <!--<td>{{tag.system}}</td> todo maybe as a popover-->
-                            <td>{{tag.display}}</td>
-
-                        </tr>
-
-                    </table>
 
 
-                </div>
-            </div>
 
 
         </div>
@@ -91,7 +74,7 @@
                 </div>
                 <div class="col-md-9">
 
-                    <input type="text" class="form-control" disabled = "disabled" ng-model="selectedQ.hisoSstatus"/>
+                    <input type="text" class="form-control" disabled = "disabled" ng-model="selectedQ.hisoStatus"/>
 
                 </div>
             </div>
@@ -101,7 +84,7 @@
                     HISO number
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  disabled = "disabled  ng-model="input.hisoNumber"/>
+                    <input type="text" class="form-control"  disabled = "disabled"  ng-model="input.hisoNumber"/>
                 </div>
             </div>
             <br/>
@@ -127,27 +110,7 @@
             </div>
             <br/>
 
-            <div class="row" >
-                <div class="col-md-3">
-                    Authors
-                </div>
-                <div class="col-md-9">
 
-                    <table class="table table-bordered">
-                        <tr><th>Email</th><th>Name</th></tr>
-                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagAuthorSystem">
-                            <td>{{tag.code}}</td>
-                            <!--<td>{{tag.system}}</td> todo maybe as a popover-->
-                            <td>{{tag.display}}</td>
-
-                        </tr>
-
-                    </table>
-
-
-
-                </div>
-            </div>
 
         </div>
     </div>

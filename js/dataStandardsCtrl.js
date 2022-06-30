@@ -155,7 +155,7 @@ angular.module("formsApp")
             //retrieve all Q to determine their status and populate the selectors
             let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension"
             $scope.allQ = []
-            $scope.tags = []
+            $scope.tags = ['All']
             $scope.hisoStatuses = []
             $http.get(qry).then(
                 function (data) {
@@ -196,6 +196,8 @@ angular.module("formsApp")
                                     }
                                 })
                             }
+
+                            //Only include the ones NOT tagged with 'test'
                             if (! isTest) {
                                 $scope.allQ.push(Q)         //note that this is a minimal Q
                             }

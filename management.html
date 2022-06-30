@@ -30,7 +30,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage']).config(function($locationProvider) {
+        angular.module("formsApp",['ui.bootstrap','ngStorage',"firebase"]).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -46,6 +46,25 @@
 
     <script src="js/managementCtrl.js"></script>
 
+    <script src="js/qManagementCtrl.js"></script>
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
 
 
 </head>
@@ -301,6 +320,13 @@
 
 
             </uib-tab>
+
+            <uib-tab ng-show = "false" heading = "Q Management">
+                <br/>
+                <ng-include src = "'includes/qManagement.html'"></ng-include>
+
+            </uib-tab>
+
 
         </uib-tabset>
 

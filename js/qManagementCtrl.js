@@ -1,13 +1,30 @@
 angular.module("formsApp")
     .controller('qManagementCtrl',
-        function ($scope,$http,formsSvc) {
+        function ($scope,$http) {
 
             $scope.qmSelectQ = function(Q) {
                 $scope.qmSelectedQ = Q
             }
 
 
-            //if run on local machine, will create a copy with the same url & other metadata
+            //create a list of all Q
+
+            loadAllQ = function() {
+                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
+
+                $http.get(url).then(
+                    function (data) {
+                        $scope.allQ = [];
+                        data.data.entry.forEach(function (entry) {
+                            $scope.allQ.push(entry.resource)
+
+                        })
+                    }
+                )
+            }
+            loadAllQ()
+
+                            //if run on local machine, will create a copy with the same url & other metadata
             //todo - k=just makes a copy!
             $scope.downloadQ = function(Q) {
                 if (confirm("Are you sure you want to download this Q: " + Q.name)) {
@@ -34,13 +51,8 @@ angular.module("formsApp")
                     let qry = `/ds/fhir/Questionnaire/${Q.id}`
                     $http.delete(qry).then(
                         function(data) {
-                            alert("deleted")
-                            $scope.loadAllQ()       //in parent controller
-                            delete $scope.qmSelectedQ
-
-                            if ($scope.allQ.length > 0) {
-                                $scope.selectQ($scope.allQ[0])    //in parent
-                            }
+                            alert("Questionnaire has been deleted")
+                            loadAllQ()
 
                             //delete $scope.selectedQ     //in parent
                         }, function(err) {
