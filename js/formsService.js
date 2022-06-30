@@ -85,14 +85,17 @@ angular.module("formsApp")
 
             getHisoNumber : function(Q,number) {
                 let hisoNumber = ""
-                if (Q.identifier) {
-                    Q.identifier.forEach(function (ident) {
-                        if (ident.system == csHisoNumber) {
-                            hisoNumber = ident.value
-                        }
+                if (Q) {
+                    if (Q.identifier) {
+                        Q.identifier.forEach(function (ident) {
+                            if (ident.system == csHisoNumber) {
+                                hisoNumber = ident.value
+                            }
 
-                    })
+                        })
+                    }
                 }
+
                 return hisoNumber
             },
             setHisoNumber : function(Q,number) {
@@ -110,10 +113,13 @@ angular.module("formsApp")
             },
 
             getHisoStatus : function(Q) {
-                let arExt = this.findExtension(Q,extHisoStatus)
-                if (arExt.length > 0) {
-                    return arExt[0].valueCode
+                if (Q) {
+                    let arExt = this.findExtension(Q,extHisoStatus)
+                    if (arExt.length > 0) {
+                        return arExt[0].valueCode
+                    }
                 }
+
             },
             setHisoStatus : function(Q,status) {
                 Q.extension = Q.extension || []

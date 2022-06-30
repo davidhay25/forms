@@ -8,6 +8,7 @@ angular.module("formsApp")
             //system url for folder tags
             let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
 
+            $scope.formsSvc = formsSvc
 
             $scope.input = {}
 
@@ -272,6 +273,7 @@ angular.module("formsApp")
                 $scope.$broadcast('newQSelected')
 
                 $scope.selectedQ = Q
+                $scope.selectedQMeta =
                 $scope.model = exportSvc.createJsonModel(Q)
 
                 //for the form ui
