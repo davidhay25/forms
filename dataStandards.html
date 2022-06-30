@@ -272,7 +272,7 @@
                 </div>
 
                 <div ng-show="selectedQ" class="banner">
-                  <!--  <div ng-show = "hisoNumber" class="pull-right">HISO: {{hisoNumber}}</div> -->
+                    <div ng-show = "hisoNumber" > HISO number: {{hisoNumber}}</div>
                     Data Standard details: {{selectedQ.title}}
                     <br/>
                     <em>{{selectedQ.description}}</em>
@@ -513,16 +513,16 @@
                         </div>
                     </uib-tab>
 
-                    <uib-tab heading="Table">
+                    <uib-tab ng-show="input.showTechnical" heading="Table">
                         <ng-include src="'includes/showModel.html'"></ng-include>
                     </uib-tab>
 
-                    <uib-tab heading="HISO view">
+                    <uib-tab heading="HISO data elements">
                         <br/>
                         <ng-include src="'includes/hisoTable2.html'"></ng-include>
                     </uib-tab>
 
-                    <uib-tab heading="Standard Metadata">
+                    <uib-tab ng-show="input.showTechnical" heading="Standard Metadata">
                         <br/>
                         <ng-include src="'includes/qMetaDataDisplay.html'"></ng-include>
 
