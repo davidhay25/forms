@@ -1,7 +1,7 @@
 
 angular.module("formsApp")
     .controller('monitorCtrl',
-        function ($scope,$http,moment) {
+        function ($scope,$http,moment,analyticsSvc,formsSvc) {
 
             $scope.input = {}
             $scope.moment = moment
@@ -36,6 +36,100 @@ angular.module("formsApp")
                     $scope.prepop = data.data
                 }
             )
+
+
+            //----------- functions for analytics
+            //set up the analytics
+            $scope.setUpAnalytics = function() {
+                analyticsSvc.makeAllItemsList().then(
+                    function (data) {
+                        console.log(data)
+                        $scope.analyticsLoaded = true
+                    }
+                )
+            }
+
+            $scope.findItemsWithText = function(text) {
+                $scope.searchResults = analyticsSvc.findItemsWithText(text)
+
+            }
+
+            $scope.setUpAnalytics()     //todo - should this be invoked by UI - expensive...
+
+            $scope.selectThing = function(thing) {
+                $('#designTree').jstree('destroy');
+                //delete $scope.searchResults
+                $scope.selectedItem = thing.item
+                $scope.selectedQ = thing.Q
+
+                $scope.selectedNode = {data:{item:$scope.selectedItem}}
+               // $scope.input.selectedItem = thing.item
+                console.log(thing)
+
+                let qId = thing.Q.id
+                $http.get('/ds/fhir/Questionnaire/'+qId).then(
+                    function (data) {
+                        let Q = data.data
+                        let vo = formsSvc.makeTreeFromQ(Q)
+
+                        vo.treeData.forEach(function (item) {
+                            item.state.opened = true
+
+                            //by default sections are closed
+                            if (item.parent == 'root') {
+                                item.state.opened = false;
+                            }
+
+                            //open the containing section
+                            if (item.id == thing.sectionId) {
+                                item.state.opened = true;
+                            }
+
+                            //bold the selected item
+                            if (item.id == thing.item.linkId) {
+
+                                item['a_attr'] = {style:'font-weight:bold;background-color: lightgrey'};
+                            }
+                        })
+
+                        drawTree(vo.treeData)
+
+
+
+                    }
+                )
+
+            }
+
+            let drawTree = function(treeData,cb){
+                //console.log(treeData)
+              /*  treeData.forEach(function (item) {
+                    item.state.opened = true
+                    if (item.parent == 'root') {
+                        item.state.opened = false;
+                    }
+                })
+*/
+
+                $('#designTree').jstree('destroy');
+
+                let x = $('#designTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    //seems to be the node selection event...
+
+                    if (data.node) {
+                        $scope.selectedNode = data.node;
+                        console.log(data.node)
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                })
+
+
+            }
+
+            //-----------------------------------
 
             //load the ServiceRequests
             function loadSR(activeOnly) {

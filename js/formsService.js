@@ -11,6 +11,8 @@ angular.module("formsApp")
         )
 
 
+        let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
+
         let extensionUrl = {}
         termServer = "https://r4.ontoserver.csiro.au/fhir/"
         validationServer = "http://localhost:9099/baseR4/"
@@ -82,6 +84,23 @@ angular.module("formsApp")
         let arExpandedVsCache = {}      //cache of expanded VS
 
         return {
+
+            QhasFolderTag : function(Q,tag) {
+                //return true if the Q has the given folder tag (case insensitive)
+                let hasTag = false
+                let tagLC = tag.toLowerCase()
+                if (Q.meta && Q.meta.tag) {
+                    Q.meta.tag.forEach(function (tag) {
+                        if (tag.system == tagFolderSystem) {
+                            if (tag.code && tag.code.toLowerCase() == tagLC) {
+                                hasTag = true
+                            }
+                        }
+                    })
+                }
+                return hasTag
+
+            },
 
             getHisoNumber : function(Q,number) {
                 let hisoNumber = ""
@@ -1837,10 +1856,10 @@ angular.module("formsApp")
                 return arItems
             },
 
-            makeTreeFromQ : function (Q) {
+            makeTreeFromQ : function (Q,options) {
                 //specifically 3 levels. Not recursive
                 //levels root, section, child, grandchild
-                //elements with 'enableWhen' set are placed below 'parent' (assume = and one only)
+                options = options || {}     //display options - not currently used...
                 let hashEnableWhen = {} //key is the element with EW set, value is the item they are dependant on
                 let that = this
                 //let extUrl = "http://clinfhir.com/structureDefinition/q-item-description"
@@ -1877,9 +1896,7 @@ angular.module("formsApp")
                                 let iconFile = "icons/icon-q-" + child.type + ".png"
                                 item.icon = iconFile
 
-                               // if (child.type == 'group') {
-                               //     item.icon = "icons/icon_q_root.gif"
-                              //  }
+
 
                                 hash[item.id] = item.data;
                                 treeData.push(item)

@@ -36,7 +36,7 @@ let svr = process.env.targetServer
 if (svr) {
     targetServer = svr
 }
-console.log('Target server set to ' + targetServer)
+console.log('Target backup server set to ' + targetServer)
 
 
 
@@ -80,6 +80,9 @@ async function doBackup(cb) {
     } catch (ex)  {
         //oops - there was an error contacting the local server. If it's down then tha whole system is down, just stop the backup
         console.log('error getting data')
+
+        sendErrorNotification()
+
         if (cb) {
             cb(ex)
         }
@@ -121,7 +124,7 @@ async function doBackup(cb) {
     logEntry.issues = issues
 
     let updateQry = `${targetServer}`   //POST to the target server root
-
+    //console.log(updateQry)
     try {
         let result = await axios.post(updateQry,transactionBundle,{maxBodyLength:Infinity,maxContentLength:Infinity})  //send the bundle.
         //console.log('axios status',result.status)
@@ -132,7 +135,7 @@ async function doBackup(cb) {
             logEntry.status = 'fail'
             logEntry.msg = result.data      //should be an OO describing the error
             logEntry.lastSuccessfulRun = lastSuccessfulRun     //need to set the time to the last successful run...
-
+            sendErrorNotification()
         } else {
             //all good!
             logEntry.status = 'success'
@@ -149,7 +152,7 @@ async function doBackup(cb) {
 
     } catch (ex) {
         //the update failed. This includes a failure from the FHIR server. create a failure logEntry
-
+        console.log(ex)
         logEntry.status = 'fail'
         logEntry.msg = ex.message   //from axios - saying it failed
         if (ex.response) {
@@ -157,7 +160,7 @@ async function doBackup(cb) {
         }
 
         logEntry.lastSuccessfulRun = lastSuccessfulRun     //need to set the time to the last successful run...
-
+        sendErrorNotification()
         const dbresult = await collection.insertOne(logEntry);
 
         if (cb) {
@@ -247,6 +250,7 @@ function makeTransactionBundle(hashAllEntries,transactionBundle,logEntry) {
 
         //make the log entry. Note that only the most recent resource in the source bundles will be saved...
         let le = {type:resource.resourceType,id:resource.id}
+        le.resource = resource          //Jul2
         if (resource.meta) {
             le.version = resource.meta.versionId
         }
@@ -341,6 +345,11 @@ function setup(app,inSourceServer,inDb) {
         const allValues = await cursor.toArray();
         res.json(allValues)
     })
+}
+
+function sendErrorNotification() {
+
+    axios.post("https://maker.ifttt.com/trigger/canshare_backup/json/with/key/dUZYc-uqt_dac43pA5twl4",{})
 }
 
 module.exports = {

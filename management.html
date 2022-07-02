@@ -50,6 +50,10 @@
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
 
+    <script src="js/analyticsSvc.js"></script>
+    <script src="js/formsService.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
@@ -324,6 +328,113 @@
             <uib-tab ng-show = "false" heading = "Q Management">
                 <br/>
                 <ng-include src = "'includes/qManagement.html'"></ng-include>
+
+            </uib-tab>
+
+            <uib-tab heading="Analytics">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary pull-right" ng-hide="analyticsLoaded" ng-click="setUpAnalytics()">Load summary</button>
+                    </div>
+                </div>
+
+                <br/>
+                <uib-tabset>
+                    <uib-tab heading="Search by text">
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <input class="form-control" type="text" ng-model="input.searchText"/>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-link"
+                                        ng-show="input.searchText"
+                                        ng-click="findItemsWithText(input.searchText)">Search</button>
+                            </div>
+                        </div>
+                        <br/>
+
+
+                        <div class="row" ng-show="searchResults">
+                            <div class="col-md-6">
+                                <div class="myScroll">
+                                    <table class="table table-bordered table-condensed">
+                                        <tr><th>Q</th><th>LinkId</th><th>Text</th><th>Section</th><th>Group</th></tr>
+                                        <tr ng-repeat = "row in searchResults"
+                                            style="cursor: pointer"
+                                            ng-class="{listItemSelectedXXX: row.item.linkId == input.selectedItem.linkId}"
+
+                                            ng-click="selectThing(row)">
+
+                                            <td>{{row.Q.title}}
+                                                <div><em>{{row.Q.id}}</em></div>
+
+                                            </td>
+                                            <td>{{row.item.linkId}}</td>
+                                            <td>{{row.item.text}}</td>
+                                            <td>{{row.section.text}}</td>
+                                            <td>{{row.group.text}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-md-6" >
+                                {{selectedQ.title}}
+                                <uib-tabset>
+
+
+
+                                    <uib-tab heading="Tree">
+                                        <div class="row">
+                                            <div class="col-md-7">
+                                                <div id="designTree"></div>
+                                            </div>
+                                            <div class="col-md-5">
+
+                                                <div ng-show="selectedNode">
+                                                    <div>LinkId: {{selectedNode.data.item.linkId }}</div>
+                                                    <div>Text: {{selectedNode.data.item.text }}</div>
+                                                    <div>Type: {{selectedNode.data.item.type }}</div>
+                                                    <pre>{{selectedNode.data | json}}</pre>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+
+
+
+
+                                    </uib-tab>
+
+
+
+                                    <uib-tab heading="Json">
+                                        <div class="myScroll">
+                                            <pre>{{selectedItem | json}}</pre>
+                                        </div>
+                                    </uib-tab>
+
+                                </uib-tabset>
+
+                            </div>
+                        </div>
+
+                        <pre>{{searchResults | json}}</pre>
+
+                    </uib-tab>
+
+                    <uib-tab heading="Form instances">
+                        <em>analytics on sample instances - what are commenters entering as sample data? </em>
+                    </uib-tab>
+                </uib-tabset>
+
+
 
             </uib-tab>
 
