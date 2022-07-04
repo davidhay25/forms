@@ -29,7 +29,7 @@ const axios = require("axios");
 let sourceServer // passed in during setup. Defaults to  "http://localhost:9099/baseR4/"
 
 //where backups are posted
-let targetServer = "backup.canshare.co.nz:9099/baseR4/"
+let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
 //let targetServer = "http://138.68.26.195:9999/baseR4/"
 
 //in dev mode, the target server is set on the environment
