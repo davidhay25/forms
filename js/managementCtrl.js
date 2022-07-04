@@ -7,7 +7,7 @@ angular.module("formsApp")
             $scope.moment = moment
             $scope.now = moment()
 
-            $scope.input.logfilter = "last20gt0"
+            $scope.input.logfilter = "last20"
             $scope.updateLog = function(){
                 updateLog()
                 console.log($scope.input.logfilter)
@@ -50,11 +50,15 @@ angular.module("formsApp")
             }
 
             $scope.findItemsWithText = function(text) {
+                delete $scope.selectedItem
+                delete $scope.selectedQ
+                delete $scope.selectedNode
+                $('#designTree').jstree('destroy');
                 $scope.searchResults = analyticsSvc.findItemsWithText(text)
 
             }
 
-            $scope.setUpAnalytics()     //todo - should this be invoked by UI - expensive...
+            //$scope.setUpAnalytics()     //todo - should this be invoked by UI - expensive...
 
             $scope.selectThing = function(thing) {
                 $('#designTree').jstree('destroy');

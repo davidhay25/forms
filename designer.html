@@ -778,22 +778,25 @@
                             </uib-tabset>
 
 
-
-
-
                         </uib-tab>
-
-
 
                         <uib-tab heading = "Review Url">
                             <br/>
 
-                                <div >
-                                    Review UI Url: <strong>
+                                <div>
+                                    Review UI Url:
+
+                                    <strong>
                                     <a target="_blank"
+                                       ng-href="dataStandards.html?{{selectedQ.id}}">
+                                        https://canshare.co.nz/dataStandards.html?{{selectedQ.id}}
+                                    </a>
+                                        <!--  <a target="_blank"
                                        ng-href="reviewForm.html?{{selectedQ.url}}">
                                         http://canshare.clinfhir.com/reviewForm.html?{{selectedQ.url}}
-                                    </a> </strong>
+                                    </a> -->
+
+                                </strong>
                                 </div>
 
                         </uib-tab>

@@ -343,7 +343,7 @@
                 <uib-tabset>
                     <uib-tab heading="Search by text">
                         <br/>
-                        <div class="row">
+                        <div class="row" ng-show="analyticsLoaded">
                             <div class="col-md-2">
                                 <input class="form-control" type="text" ng-model="input.searchText"/>
                             </div>
@@ -367,8 +367,12 @@
 
                                             ng-click="selectThing(row)">
 
-                                            <td>{{row.Q.title}}
-                                                <div><em>{{row.Q.id}}</em></div>
+                                            <td>
+                                                <div >
+                                                    {{row.Q.title}}
+                                                    <div><em>{{row.Q.id}}</em></div>
+                                                </div>
+
 
                                             </td>
                                             <td>{{row.item.linkId}}</td>
@@ -425,7 +429,7 @@
                             </div>
                         </div>
 
-                        <pre>{{searchResults | json}}</pre>
+
 
                     </uib-tab>
 

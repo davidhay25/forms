@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
-* Script to update one server from another.
+* Script to update resources from one server from another.
 *
 *
 * */
@@ -9,16 +9,17 @@
 let axios = require('axios')
 
 //the server to copy resources from
-let sourceServer = "http://canshare.clinfhir.com/ds/fhir/"
+let sourceServer = "https://canshare.co.nz/ds/fhir/"
 //let sourceServer = "http://localhost:9090/ds/fhir/"
 
 //the server to copy resources to
 //let targetServer = "http://localhost:9099/baseR4/"
-let targetServer = "http://canshare.co.nz:9099/baseR4/"
+let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
+//let targetServer = "http://188.166.76.237:9099/baseR4/"  //the backup server
 
 syncResources("Questionnaire")
-syncResources("Observation")
-syncResources("QuestionnaireResponse")
+//syncResources("Observation")
+//syncResources("QuestionnaireResponse")
 
 
 async function syncResources(type) {

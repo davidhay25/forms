@@ -1,15 +1,22 @@
 angular.module("formsApp")
     .controller('dataStandardsCtrl',
-        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout,$sce) {
+        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout,$window,$sce) {
+
+
+            //was a Q Id passed in. It will be selected after the list of Q have been loade
+            let search = $window.location.search;
+            let QIdfromUrl = null
+            if (search) {
+                QIdfromUrl = search.substr(1)
+            }
 
             //system url for author tags
-            let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
+          //  let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
             //system url for folder tags
             let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
 
             $scope.formsSvc = formsSvc
-
             $scope.input = {}
 
             //defaults for the form
@@ -24,11 +31,6 @@ angular.module("formsApp")
             $scope.arHisoStatus.push({code:'development',display:'Development'})
             $scope.arHisoStatus.push({code:'draft',display:'Draft Data Standard'})
             $scope.arHisoStatus.push({code:'standard',display:'Data Standard'})
-
-            //$scope.arHisoStatus = [{code:'development',display:''},'draft','standard']
-            //$scope.arHisoStatu
-
-
 
             $scope.input.togglePane = function() {
                 if ($scope.input.rightPane == "col-md-10") {
@@ -207,6 +209,14 @@ angular.module("formsApp")
                             $scope.input.selectedTag = $scope.tags[0]
                             $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
                         })
+
+                        if (QIdfromUrl) {
+                            //a Q url was passed in on the query url..
+                            $scope.input.togglePane()       //hide the list of standards
+                            $scope.loadQ({id:QIdfromUrl})
+
+                        }
+
                     }
                 }, function (err) {
                     console.log(err)
@@ -362,20 +372,7 @@ angular.module("formsApp")
 
 
             }
-/*
-            //retrieve all active Q for the 'approved' ds list
-            let url = "/ds/fhir/Questionnaire?status=active"
-            $http.get(url).then(
-                function (data) {
-                    $scope.activeQ = [];
-                    if (data.data.entry) {
-                        data.data.entry.forEach(function (entry){
-                            $scope.activeQ.push(entry.resource)
-                        })
-                    }
-                }
-            )
-*/
+
 
             let drawTree = function(treeData){
                 //console.log(treeData)
@@ -414,36 +411,4 @@ angular.module("formsApp")
 
 
 
-/*
-                //load all the disposition Observations for a Q
-                $scope.loadDispositionsForQ = function(Q) {
-                        delete $scope.dispositionsForQ
-                        $scope.selectedQ = Q
-                        formsSvc.loadDispositionsForQ(Q).then(
-                            function(data) {
-                                    $scope.dispositionsForQ = data
-
-                            }
-                        )
-                }
-
-                function loadAllQ() {
-                        let url = "/ds/fhir/Questionnaire"
-                        //let url = "/fm/fhir/Questionnaire"
-                        $http.get(url).then(
-                            function (data) {
-                                    $scope.allQ = [];
-                                    data.data.entry.forEach(function (entry){
-
-                                            $scope.allQ.push(entry.resource)
-
-                                    })
-                                    //$scope.hashTerminology = terminologySvc.setValueSetHash($scope.allQ)
-                                    // console.log($scope.hashTerminology)
-                            }
-                        )
-                }
-
-                loadAllQ()
-*/
         })
