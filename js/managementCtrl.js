@@ -62,7 +62,7 @@ angular.module("formsApp")
 
             $scope.selectThing = function(thing) {
                 $('#designTree').jstree('destroy');
-                //delete $scope.searchResults
+                //delete $scope.searchResultsx
                 $scope.selectedItem = thing.item
                 $scope.selectedQ = thing.Q
 
