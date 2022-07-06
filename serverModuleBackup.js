@@ -39,12 +39,10 @@ if (svr) {
 }
 console.log('Target backup server set to ' + targetServer)
 
-
-
-
-
-
-
+let noBackup = process.env.nobackup
+if (noBackup) {
+    console.log("Backup is disabled")
+}
 
 let db
 
@@ -172,7 +170,11 @@ async function doBackup(cb) {
 
 
 //schedule the backup runs
-setInterval(doBackup,backupInterval)
+if (! noBackup) {
+    setInterval(doBackup,backupInterval)
+    console.log("Setting backup interval to " + backupInterval/60000 + " minutes")
+}
+
 
 
 //create the hash of resources to backup. Only the most recent version is included

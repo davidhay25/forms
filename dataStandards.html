@@ -140,13 +140,23 @@
                 </form>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="navbar-text" ng-show="selectedQ"
                      uib-popover="When checked, displays tabs with tecnnical information suitable for implementers"
                      popover-placement="left"
                      popover-trigger="'mouseenter'">
                     <checkbox ng-model = "input.showTechnical"></checkbox> Technical
                 </div>
+            </div>
+
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    <i class="btn btn-link glyphicon glyphicon-home clickable"
+                       ng-show="selectedQ"
+                       style="font-size:1.8em; cursor: pointer"
+                       ng-click="goHome()"></i>
+                </div>
+
             </div>
 
             <div class="col-md-2">
@@ -177,7 +187,7 @@
                               style="cursor: pointer"
                               ng-repeat="Q in allQ"
                               ng-show="Q.hisoStatus == hisoStatus.code && (input.selectedTag == 'All' ||  Q.tags.indexOf(input.selectedTag) > -1)">
-                            <div ng-click = "loadQ(Q)">{{Q.name}}</div>
+                            <div ng-click = "loadQ(Q)">{{Q.title}}</div>
                         </div>
 
                     </div>
@@ -197,6 +207,59 @@
                     <br/><br/>
                     We want to acknowledge the invaluable contributions from health care practitioners. especially our pathologist community, and equity and technical subject matter experts from across the country who are supporting this mahi.
                     <br/><br/>
+
+                    <uib-accordion >
+                        <div uib-accordion-group class="panel-default" heading="Purpose of the website">
+                            Data standards identify and describe clinically relevant data elements to aid implementation in pathology requesting and reporting data capture workflows in your systems and processes.
+                            This website provides guidance for anyone looking to:
+                            <ul>
+                                <li>give feedback on data standards in development and those published. This can be done at any time to ensure the standards stay relevant for use in clinical practice in Aotearoa.
+                                <li>use cancer specific data standards with guidance in reviewing, building and/or updating pathology data systems and associated clinical workflows.
+                                <li>use <a target="_blank" href="https://www.health.govt.nz/nz-health-statistics/classification-and-terminology/new-zealand-snomed-ct-national-release-centre/snomed-ct"> SNOMED CT</a> for pathology clinical terminology and
+                                    <a target="_blank" href="https://www.health.govt.nz/our-work/digital-health/digital-health-sector-architecture-standards-and-governance/health-information-standards/new-zealand-fhir-registry">FHIR</a>  IG for messaging data.
+                                <li>support broader work to improve the shareability of cancer information.
+                                <li>seek the latest information on data standard development and release status.
+                            </ul>
+
+                            <br/>
+                            This site will be continuously updated with new standards and additional information on SNOMED CT and FHIR IG support as developed.
+                            <br/><br/>
+                        </div>
+                        <div uib-accordion-group class="panel-default" heading="Introducing pathology data standards">
+                            We recommend you visit our <a target="_blank" href="https://teaho.govt.nz/about/our-work/pathology">project website</a>
+
+                            and read our <a target="_blank" href="/ds/api/document/preface">Structured Pathology Reporting of Cancer Preface</a> to give you a comprehensive overview of data standards including our approach to develop, publish, and maintain cancer pathology data standards in Aotearoa. This includes four key points:
+                            <ul>
+                                <li>The standards developed are based on <a target="_blank" href="http://www.iccr-cancer.org/datasets"> ICCR</a> (International Collaboration on Cancer Reporting)
+                                    and adapted by <a target="_blank" href="https://www.rcpa.edu.au/Library/Practising-Pathology/Structured-Pathology-Reporting-of-Cancer/Cancer-Protocols">RCPA</a>  (Royal College of Pathologists of Australasia) for use in Aotearoa.
+                                <li>All standards are submitted to Health Information Standards Organisation (<a target="_blank" href="https://www.health.govt.nz/our-work/digital-health/digital-health-sector-architecture-standards-and-governance/health-information-standards/new-zealand-fhir-registry">HISO</a>) for endorsement once approved by the working group that developed them.
+                                <li>The <strong>Form view</strong> you see is a visualisation of data elements that should be captured for that cancer:
+                                    <ul>
+                                        <li>It is used to ensure the data elements are <strong>clinically and technically accurate</strong> using a familiar flow.
+                                        <li>It is not an <strong>implemented form</strong> – in fact, when implemented, the data standards will look quite different in your practice/laboratory.
+                                    </ul>
+                                <li>It is not expected all data elements included can be collected immediately and/or are clinically required. This includes balancing structured data capture and free text for more nuisance narrative reporting.
+                                <li>Full implementation of the standards are subject to existing data systems, technology roadmaps and provider arrangements.
+                                <li>The data standards will be continuously monitored and updated according to international best practice, sector feedback and evolving local requirements.
+                            </ul>
+                        </div>
+
+                        <div uib-accordion-group class="panel-default" heading="Status and feedback">
+
+                            You can provide feedback on at any time using feedback boxes (called reviewer comments) throughout all visualised cancer data standard forms. You can search by cancer group and status of standards in the filter:
+                            <ul>
+                                <li><strong>Development:</strong> a standard that is actively been developed by the working group so requesting feedback in preparation for submission to HISO for approval.
+                                <li><strong>Working draft dataset:</strong> a dataset that is not considered sufficiently robust since it has not been recently updated by international processes and/or insufficient clinical support available to develop.
+                                <li><strong>Draft data standard:</strong> a HISO endorsed draft data standard that has been developed from ICCR/RCPA protocols by subject matter experts/clinical representatives. The draft data standard is considered sufficient but requires wider sector review through feedback and/or use in pathology services over a period of up to 12 months.
+                                <li><strong>Data standard: </strong>a HISO endorsed finalised data standard where changes have been applied to the draft data standard from feedback through the release period with health care practitioners and subject matter experts confirming it is fit for purpose.
+                            </ul>
+                            If you have any general questions please contact <a href="mailto:info@teaho.govt.nz">info@teaho.govt.nz</a>.
+
+                            If want to be actively involved in standard development please contact
+                            <a href="mailto:john.manderson@teaho.govt.nz">john.manderson@teaho.govt.nz</a> .
+                        </div>
+                    </uib-accordion>
+                    <!--
 
                     <h4>Purpose of the website</h4>
 
@@ -249,6 +312,7 @@
                     <a href="mailto:john.manderson@teaho.govt.nz">john.manderson@teaho.govt.nz</a> .
 
 
+                    -->
 
                     <!--
 

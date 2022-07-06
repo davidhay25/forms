@@ -64,6 +64,19 @@ angular.module("formsApp")
 
            })
 
+            $scope.goHome = function() {
+                delete $scope.hisoNumber
+                delete $scope.selectedNode
+                delete $scope.errorOO
+                delete $scope.formState
+                delete $scope.dispositionsForQ
+                delete $scope.hashDispositionsByLinkId
+                delete $scope.selectedQR
+                delete $scope.selectedSection       //the form section
+                delete $scope.selectedQ
+                delete $scope.model
+            }
+
             $scope.selectQR = function (QR) {
                 $scope.selectedQR = QR
             }
@@ -283,7 +296,7 @@ angular.module("formsApp")
                 $scope.$broadcast('newQSelected')
 
                 $scope.selectedQ = Q
-                $scope.selectedQMeta =
+                //$scope.selectedQMeta =
                 $scope.model = exportSvc.createJsonModel(Q)
 
                 //for the form ui
