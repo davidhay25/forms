@@ -144,6 +144,7 @@
                 <div class="navbar-text" ng-show="selectedQ"
                      uib-popover="When checked, displays tabs with tecnnical information suitable for implementers"
                      popover-placement="left"
+                     style="padding-top: 10px"
                      popover-trigger="'mouseenter'">
                     <checkbox ng-model = "input.showTechnical"></checkbox> Technical
                 </div>
@@ -151,8 +152,11 @@
 
             <div class="col-md-1">
                 <div class="navbar-text">
-                    <i class="btn btn-link glyphicon glyphicon-home clickable"
+                    <i class="btn btn-link glyphicon glyphicon-home clickable pull-right"
                        ng-show="selectedQ"
+                       uib-popover="Display the home page, de-selecting the Data Standard"
+                       popover-placement="left"
+                       popover-trigger="'mouseenter'"
                        style="font-size:1.8em; cursor: pointer"
                        ng-click="goHome()"></i>
                 </div>

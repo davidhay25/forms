@@ -75,6 +75,9 @@ angular.module("formsApp")
                 delete $scope.selectedSection       //the form section
                 delete $scope.selectedQ
                 delete $scope.model
+                $scope.input.leftPane = "col-md-2"
+                $scope.input.rightPane = "col-md-10"
+
             }
 
             $scope.selectQR = function (QR) {
@@ -88,8 +91,6 @@ angular.module("formsApp")
                 formsSvc.ehrPrepop($scope.selectedQ, $scope.form)
 
                 //any dropdowns need to be 'set'...
-
-
 
             }
 
