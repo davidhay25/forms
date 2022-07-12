@@ -37,9 +37,9 @@ angular.module("formsApp")
             $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','display','group','reference','display']
 
             $scope.input.codeSystems = []   //used by the editItem function
-            $scope.input.codeSystems.push({display:'Snomed',url:'http://snomed.info/sct'})
-            $scope.input.codeSystems.push({display:'Loinc',url:'http://loinc.org'})
-            $scope.input.codeSystems.push({display:'Ucum',url:'http://unitsofmeasure.org'})
+            $scope.input.codeSystems.push({display:'SNOMED CT',url:'http://snomed.info/sct'})
+            $scope.input.codeSystems.push({display:'LOINC',url:'http://loinc.org'})
+            $scope.input.codeSystems.push({display:'UCUM',url:'http://unitsofmeasure.org'})
 
             //don't change the rev-comment url!!!!
             $scope.input.codeSystems.push({display:'csReview',url:'http://clinfhir.com/fhir/CodeSystem/review-comment'})
