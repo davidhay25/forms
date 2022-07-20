@@ -1086,6 +1086,19 @@ console.log(tags)
                 $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
 
                 let csv = exportSvc.createDownloadCSV($scope.exportJsonList)
+                let ar = csv.split('\r\n')
+                $scope.auditReport = []
+
+                //need to pull out header to allow the table scroll with fixed header
+
+                ar.forEach(function (lne,inx) {
+                    if (inx == 0) {
+                        $scope.auditReportHeader = lne.split(',')
+                    } else {
+                        $scope.auditReport.push(lne.split(','))
+                    }
+
+                })
 
                 $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
                 var now = moment().format();

@@ -43,6 +43,27 @@
          }
 
 
+        .tableFixHead {
+            overflow-y: auto;
+            height: 800px;
+        }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background: #eee;
+        }
+
     </style>
 
     <script>
@@ -800,15 +821,51 @@
                                 </div>
 
                         </uib-tab>
-                        <uib-tab heading = "HISO SpreadSheet">
-
+                        <uib-tab heading = "Audit Report">
+                            <!--<uib-tab heading = "HISO SpreadSheet"> -->
                             <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
                                href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
                                 Download CSV file
                             </a>
 
-                            <ng-include src="'includes/hisoTable.html'"></ng-include>
+                            <div class="clearfix"></div>
+
+                            <div class="tableFixHead">
+                                <table class="table table-condensed table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th ng-repeat = "col in auditReportHeader">{{col}}</th>
+                                    </tr>
+                                </thead>
+                                <tr ng-repeat="row in auditReport">
+
+
+                                 <td ng-repeat = "col in row track by $index">
+                                        {{col}}
+                                    </td>
+                                </tr>
+                            </table>
+                            </div>
+
+                            <pre>{{auditReport | json}}</pre>
+
+                            <!--
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Json</strong>
+                                    <pre>{{exportJsonList | json}}</pre>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>table</strong>
+                                    <pre>{{auditReport | json}}</pre>
+                                </div>
+                            </div>
+                            -->
+
 <!--
+
+<ng-include src="'includes/hisoTable.html'"></ng-include>
+
                             <div ng-repeat = "section in exportJsonList">
                                 <h4>{{section.display}}</h4>
                                 <table class="table table-bordered">

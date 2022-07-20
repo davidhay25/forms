@@ -6,6 +6,34 @@ angular.module("formsApp")
 
             return {
 
+                createAuditModelDEP : function(Q){
+                    //a flat model intended to show key elements for audit purposes
+
+                    let arReport = []
+
+                    if (Q.item) {
+                        Q.item.forEach(function (section){
+                            //let sectionLines = {display:section.text,lines:[]}
+                            //arModel.push(sectionLines)
+                            if (section.item) {
+                                section.item.forEach(function(child){
+                                    createLine(child, formsSvc.getMetaInfoForItem(child), section,sectionLines.lines)
+                                    if (child.item) {
+                                        child.item.forEach(function (grandchild) {
+                                            createLine(grandchild, formsSvc.getMetaInfoForItem(grandchild), section,sectionLines.lines)
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+
+                    function createLine() {
+
+                    }
+
+                },
+
                 createV2Report : function(Q) {
                     let commentSystemUrl = "http://clinfhir.com/fhir/CodeSystem/review-comment"
                     //generate a report for a v2 definition. Only suitable for 'data' sections - not admin or demographics
@@ -88,6 +116,7 @@ angular.module("formsApp")
                 },
 
                 createJsonModel : function(Q) {
+                    ////add guide for use , source standards, unit of measure, conditional
                     let hashAllItems = formsSvc.makeHashAllItems(Q)
 
                     let arModel = []
@@ -222,6 +251,11 @@ angular.module("formsApp")
                         entry.UOM = meta.UOM
                         entry.verification = meta.verification
 
+
+                        //UOM
+                        entry.UOM = meta.UOM
+
+
                         /*
 
                         //hiso datatype. D
@@ -267,8 +301,99 @@ angular.module("formsApp")
 
 
                 },
-                
                 createDownloadCSV : function(arJson) {
+                    //create a download csv from the json file created by createJsonModel
+
+                   // entry.usageNotes = meta.usageNotes || ""
+                    //entry.sourceStandard = meta.sourceStandard
+                    //entry.conditionalNotes = getConditionalNote(item)
+
+                    //add guide for use , source standards, unit of measure, conditional
+
+                    let arRows = []
+
+                    let ar = []
+                    ar.push("Section")
+                    ar.push("Name")
+                    ar.push("Definition")
+
+                    ar.push("Data Domain")
+                    ar.push("Obligation")
+
+                    ar.push("Cardinality")
+                    ar.push("Guide for use")
+                    ar.push("Source Standard")
+
+                    ar.push("Data Type")
+                    ar.push("Representational Class")
+                    ar.push("Field Size")
+                    ar.push("Representational Layout")
+
+                    ar.push("UOM")
+                    ar.push("Verification")
+                    ar.push("Conditional")
+                    arRows.push(ar.join(","))
+
+                    arJson.forEach(function (section) {
+                        section.lines.forEach(function (row) {
+                            let line = []
+                            line.push(makeSafe(row.category))   //==section
+                            line.push(makeSafe(row.name))
+                            line.push(makeSafe(row.description))
+
+                            line.push(makeSafe(row.dataDomain))
+                            line.push(makeSafe(row.obligation))
+                            line.push(makeSafe(row.cardinality))
+                            //line.push(makeSafe(row.usageNotes))
+
+                            line.push(makeSafe(row.usageNotes))
+                            line.push(makeSafe(row.sourceStandard))
+
+
+                            line.push(makeSafe(row.hisoDT))
+                            line.push(makeSafe(row.hisoClass))
+                            line.push(makeSafe(row.hisoLength))
+                            line.push(makeSafe(row.hisoLayout))
+
+                            line.push(makeSafe(row.UOM))
+
+                            line.push(makeSafe(row.verification))
+
+                            line.push(makeSafe(row.conditionalNotes))
+
+
+                            arRows.push(line.join(","))
+
+                        })
+                    })
+
+
+                    return arRows.join("\r\n")
+
+                    function makeSafe(str) {
+                        if (str) {
+                            if (typeof str === 'number') {
+                                str = str.toString()
+                            }
+
+
+                            //convert commas to spaces
+                            str = str.replace(/,/g, " ")
+
+                            //convert double to single quote
+                            str = str.replace(/"/g, "'")
+                            //str = str.replace(/"/g, "' '")
+                        }
+                        return str
+
+                    }
+                },
+                createDownloadCSVDEP : function(arJson) {
+                    //create a download csv from the json file created by createJsonModel
+
+
+
+
                     let arRows = []
 
                     let ar = []
