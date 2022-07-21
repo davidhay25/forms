@@ -246,7 +246,10 @@ angular.module("formsApp")
                         $scope.saveDisposition = function(){
                             let obs = {resourceType:'Observation'}
                             obs.id = "disp-" + new Date().getTime()
-                            obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
+
+                            //obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
+                            obs.focus = {reference:QR.id}       //this is a 'normal' reference - 
+
                             obs.derivedFrom = {reference:`QuestionnaireResponse/${QR.id}`}
                             obs.status = "final"
                             //obs.category = category
