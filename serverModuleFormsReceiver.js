@@ -478,6 +478,10 @@ function createServiceRequest(QR,category,carePlan,description,Q) {
     sr.subject = QR.subject;
     sr.requester = QR.author
     sr.category = [category]
+
+    //add the Q title so can show in disposer.
+    sr.reasonCode = [{text:Q.title}]
+
     //sr.category = [{coding:[{code:"108252007",system:"http://snomed.info/sct"}],  text:"Pathology request"}]
     sr.supportingInfo = []
     sr.supportingInfo.push({reference: "QuestionnaireResponse/"+QR.id})

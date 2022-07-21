@@ -8,7 +8,8 @@ angular.module("formsApp")
 
             //load outstanding SR's
             function loadActiveSR() {
-                let qry = "/ds/fhir/ServiceRequest?category=reviewRefer&status=active"
+
+                let qry = "/ds/fhir/ServiceRequest?category=reviewRefer&status=active&_sort=authored"
                 $http.get(qry).then(
                     function(data) {
                         console.log(data)
@@ -107,18 +108,21 @@ angular.module("formsApp")
             }
 
             $scope.markSRComplete = function(SR) {
-                SR.status = "completed"
-                let qry = `/ds/fhir/ServiceRequest/${SR.id}`
-                $http.put(qry,SR).then(
-                    function(data) {
-                        loadActiveSR()
-                        delete $scope.selectedSR
-                        delete $scope.selectedQR
-                        delete $scope.selectedReview
-                    }, function(err) {
-                        alert(angular.toJson(err))
-                    }
-                )
+                if (confirm("Are you sure you wish to mark this form as completed")) {
+                    SR.status = "completed"
+                    let qry = `/ds/fhir/ServiceRequest/${SR.id}`
+                    $http.put(qry,SR).then(
+                        function(data) {
+                            loadActiveSR()
+                            delete $scope.selectedSR
+                            delete $scope.selectedQR
+                            delete $scope.selectedReview
+                        }, function(err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+                }
+
 
             }
 
@@ -139,9 +143,10 @@ angular.module("formsApp")
 
             //when a service request (indicating a review is needed) is selected
             $scope.selectSR = function(sr){
+
                 $scope.selectedSR = sr
                 delete $scope.selectedReview
-                delete $scope.selectedSR
+               // delete $scope.selectedSR
                 delete $scope.selectedQR
 
                 //get the QR from the 'supportinginfo in the SR

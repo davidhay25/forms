@@ -50,15 +50,21 @@ angular.module("formsApp")
             //todo: definately need to tidy this up!!! - just need to add call to designer.js & remove from formsCtrl
             //todo formsctrl could just raise the event...
 
-            $scope.$on("qrCreated",function(ev,qr){
+            function makeQR() {
+                let patient = null
+                let practitioner = null
 
-                console.log(qr)
-
-               let patient = null
-               let practitioner = null
                 //Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail
-               $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
-                   $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
+                $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
+                    $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
+
+            }
+
+            $scope.$on("qrCreated",function(ev,qr){
+                //need to construnct a QR that has the reviewers name in it.
+                makeQR()
+               // console.log(qr)
+               // makeQR
 
                console.log($scope.formQR)
 
@@ -109,6 +115,8 @@ angular.module("formsApp")
                 }
 
                 if (confirm("Are you sure you're ready to submit this form? You should only do this once the form is complete.")){
+
+                    makeQR()        //make a final copy of the QR that definately has the revieers details in it
                     let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
 
                     if (! $scope.input.canPublish) {

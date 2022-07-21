@@ -12,7 +12,11 @@
                          style="cursor: pointer"
                          ng-click = "selectSR(entry.resource)"
                          ng-repeat = "entry in serviceRequestsBundle.entry">
-                        {{entry.resource.requester.display}} ({{entry.resource.id}})
+
+
+                        <div class="pull-right">{{entry.resource.authoredOn | date}}</div>
+                        {{entry.resource.requester.display}} <!-- ({{entry.resource.id}}) -->
+                        <div><em>{{entry.resource.reasonCode[0].text}}</em></div>
                     </div>
                 </div>
 
@@ -63,19 +67,23 @@
 
 
                     <br/>
+
                     <div class="row" ng-show="selectedSR">
                         <div class="col-md-12">
-                            <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)" class=" btn btn-primary">Mark as review completed</button>
+                            <button ng-show="selectedQR" ng-click="markSRComplete(selectedSR)"
+                                    class=" btn btn-link">Mark as review completed</button>
                         </div>
                     </div>
                     <br/>
+                    <!--
+                    This will actually remove the QR - eg if profanity or PI in it
                     <div class="row" ng-show="selectedSR">
                         <div class="col-md-12">
                             <button ng-show="selectedQR" ng-click="deleteForm(selectedSR)"
                                     class="btn btn-danger">Remove form</button>
                         </div>
                     </div>
-
+-->
 
                 </div>
 

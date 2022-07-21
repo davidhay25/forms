@@ -105,7 +105,7 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
             <div class="container-fluid">
-            <div class="col-md-5 col-sm-5">
+            <div class="col-md-4 col-sm-4">
                     <span>
                         <a class="navbar-brand" href="#">
                             <!--CanShare project: Publications front page -->
@@ -149,6 +149,17 @@
                     <checkbox ng-model = "input.showTechnical"></checkbox> Technical
                 </div>
             </div>
+<!--
+            <div class="col-md-1">
+                <div class="navbar-text" ng-show="selectedQ"
+                     uib-popover="When checked, displays help text"
+                     popover-placement="left"
+                     style="padding-top: 10px"
+                     popover-trigger="'mouseenter'">
+                    <checkbox ng-model = "input.showHelp"></checkbox> Help
+                </div>
+            </div>
+-->
 
             <div class="col-md-1">
                 <div class="navbar-text">
@@ -201,7 +212,7 @@
             </div>
             <div ng-class="input.rightPane">
 
-                <div ng-show = "showHelp || ! selectedQ">
+                <div ng-show = "! selectedQ">
 
 
 
@@ -523,10 +534,19 @@
 
                 <uib-tabset  ng-show="selectedQ">
 
-                    <uib-tab heading="Form">
+                    <uib-tab>
+                        <uib-tab-heading>
+                            <span>Form</span>
+                        </uib-tab-heading>
 
                         <br/>
 
+                        <div ng-show="input.showHelp">
+                            <div class="alert alert-info">
+                                This is help
+                            </div>
+
+                        </div>
 
                         <div ng-show="errorOO">
                             <div class="alert alert-danger">
@@ -774,7 +794,7 @@
 
 
 
-                    <uib-tab heading="Comments">
+                    <uib-tab heading="Feedback provided">
 
                         <br/>
                         <div class="row">
@@ -837,7 +857,7 @@
                     </uib-tab>
 
 
-                    <uib-tab >
+                    <uib-tab ng-show="input.showTechnical"  >
                         <uib-tab-heading>
                             Previous examples <span ng-show="allQRforQ.entry.length > 0" class="badge">{{allQRforQ.entry.length}}</span>
                         </uib-tab-heading>
