@@ -111,9 +111,6 @@ angular.module("formsApp")
                     console.log($scope.formQR)
 
                 })
-
-
-
             }
 
             $scope.submitForm = function() {
@@ -281,6 +278,29 @@ angular.module("formsApp")
                 })
             }
 
+            function makeCsvAndDownload(Q,hashAllItems) {
+                $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
+
+                let csv = exportSvc.createDownloadCSV($scope.exportJsonList)
+                let ar = csv.split('\r\n')
+                $scope.auditReport = []
+
+                //need to pull out header to allow the table scroll with fixed header
+
+                ar.forEach(function (lne,inx) {
+                    if (inx == 0) {
+                        $scope.auditReportHeader = lne.split(',')
+                    } else {
+                        $scope.auditReport.push(lne.split(','))
+                    }
+
+                })
+
+                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([csv],{type:"text/csv"}))
+                var now = moment().format();
+                $scope.downloadLinkCsvName =  Q.name + '_' + now + '.csv';
+            }
+
             $scope.loadQ = function(Q) {
                 //The Q passed in is a minimal Q so we need to load the full one...
                 delete $scope.hisoNumber
@@ -295,6 +315,8 @@ angular.module("formsApp")
                         //needed for showing the source items in dependencies
                         let vo = formsSvc.generateQReport(data.data)
                         $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
+
+                        makeCsvAndDownload(data.data,vo.hashAllItems)
 
                     }, function (err) {
                         alert(angular.toJson(err.data))

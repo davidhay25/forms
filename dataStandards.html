@@ -586,7 +586,43 @@
                     </uib-tab>
 
                     <uib-tab ng-show="input.showTechnical" heading="Table">
+                        <!--
                         <ng-include src="'includes/showModel.html'"></ng-include>
+-->
+
+
+
+                        <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
+                           href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
+                            Download CSV file
+                        </a>
+
+
+                        <div class="clearfix"></div>
+
+                        <div class="tableFixHead">
+                            <table class="table table-condensed table-bordered">
+                                <thead>
+                                <tr>
+                                    <th ng-repeat = "col in auditReportHeader">{{col}}</th>
+                                </tr>
+                                </thead>
+                                <tr ng-repeat="row in auditReport">
+
+
+                                    <td ng-repeat = "col in row track by $index">
+                                        {{col}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+
+
+
+
+
+
                     </uib-tab>
 
                     <uib-tab heading="HISO data elements">
