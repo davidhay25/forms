@@ -154,7 +154,7 @@ angular.module("formsApp")
 
             },
 
-            ehrPrepop : function(Q,form) {
+            ehrPrepop : function(Q,form,cb) {
                 //demo the pre-population from an ehr
 
                 $http.get("/ds/api/prepop").then(
@@ -185,7 +185,9 @@ angular.module("formsApp")
                         }
 
 
-
+                        if (cb) {
+                            cb()
+                        }
 
                     }
                 )

@@ -53,22 +53,34 @@ angular.module("formsApp")
             function makeQR() {
                 let patient = null
                 let practitioner = null
-
-                //Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
                     $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
 
             }
 
             $scope.$on("qrCreated",function(ev,qr){
-                //need to construnct a QR that has the reviewers name in it.
+                //need to construct a QR that has the reviewers name in it.
                 makeQR()
-               // console.log(qr)
-               // makeQR
-
                console.log($scope.formQR)
 
            })
+
+            $scope.preview = function(){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/previewQR.html',
+                    backdrop: 'static',
+                    controller: function($scope,QR) {
+                        $scope.selectedQR = QR
+                        console.log(QR)
+                    },
+                    size : 'lg',
+                    resolve: {
+                        QR: function () {
+                            return $scope.formQR
+                        }
+                    }
+                })
+            }
 
             $scope.goHome = function() {
                 delete $scope.hisoNumber
@@ -94,9 +106,13 @@ angular.module("formsApp")
                 //a place holder for getting data from an EHR. Right now, just set some data
                 //so form fillers get the idea. Need a more robust approach
 
-                formsSvc.ehrPrepop($scope.selectedQ, $scope.form)
+                formsSvc.ehrPrepop($scope.selectedQ, $scope.form,function(){
+                    makeQR()
+                    console.log($scope.formQR)
 
-                //any dropdowns need to be 'set'...
+                })
+
+
 
             }
 

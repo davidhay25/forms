@@ -383,6 +383,10 @@ angular.module("formsApp")
                             //convert double to single quote
                             str = str.replace(/"/g, "'")
                             //str = str.replace(/"/g, "' '")
+                            str = str.replace(/(?:\r\n|\r|\n)/g, ' ');
+
+
+
                         }
                         return str
 
