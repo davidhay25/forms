@@ -527,11 +527,13 @@ angular.module("formsApp")
                     $scope.meta.renderVS = $scope.input.vs.rendermode
                 }
 
-
                 if (! $scope.newItem.linkId) {
                     alert("The linkId is mandatory...")
                     return
                 }
+
+                //todo - not actually updating the display
+                $scope.showUpdating = true
 
                 //the radio
                 if ($scope.input.displayAsRadio) {

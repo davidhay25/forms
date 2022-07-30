@@ -327,7 +327,6 @@ angular.module("formsApp")
                     }
                 )
 
-
             }
 
             $scope.viewModel = function(Q) {
@@ -348,19 +347,16 @@ angular.module("formsApp")
 
                 //for the form ui
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+
                 $scope.formTemplate = $scope.objFormTemplate.template
 
                 //need to wait for the form to be rendered before checking the defaults
+
                 $timeout(function(){
                     //returns any initial values
 
                     $scope.form = formsSvc.prepop(Q)
 
-
-                    //console.log($scope.form)
-
-                    //lets the child controllers (eg formsCtrl) know that a new Q has been selected...
-                    //$scope.$broadcast('newQSelected')
                 },1000)
 
 

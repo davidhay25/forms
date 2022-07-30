@@ -1,0 +1,180 @@
+<div>
+    <style>
+        #instanceGraph {
+            width: 100%;
+            height: 400px;
+            border: 1px solid lightgray;
+        }
+
+        .sectionclass {
+            background-color: lightgray;
+        }
+    </style>
+
+    <uib-tabset>
+
+        <uib-tab heading="Graph">
+
+            <div class="row">
+                <div class="col-md-8">
+
+                    <div id="instanceGraph"></div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <pre>{{instance.graphResource | json}}</pre>
+
+
+                </div>
+            </div>
+        </uib-tab>
+
+
+        <uib-tab heading="Table">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="tableFixHead">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr><th>Resource Type</th><th>Referenced by</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in instance.arResourceInstance">
+                                <td>
+                                    <div class="clickable" ng-click = "selectResource(item.resource)">
+                                        {{item.resource.resourceType}}
+                                    </div>
+
+                                </td>
+                                <td>{{item.parentType}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <pre>{{instance.resource | json}}</pre>
+
+                </div>
+
+
+            </div>
+
+
+        </uib-tab>
+
+
+        <uib-tab>
+            <uib-tab-heading>Validation errors <span class="badge">{{validationErrors.issue.length}}</span> </uib-tab-heading>
+<!--
+            <button class="btn btn-link" ng-click="validate()">Perform validation</button>
+-->
+            <uib-tabset>
+                <uib-tab heading="List">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="tableFixHead">
+                            <table class="table-bordered table">
+                                <thead><tr><th>Location</th><th>severity</th><th>Description</th></tr></thead>
+                                <tbody>
+                                <tr ng-repeat = "iss in validationErrors.issue">
+                                    <td>
+                                        <div class = "clickable" ng-repeat="loc in iss.location" ng-click="selectFromValidation(loc,iss)">
+                                            {{loc}}
+                                        </div>
+                                    </td>
+
+                                    <td>{{iss.severity}}</td>
+                                    <td>{{iss.diagnostics}}</td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{{selectedValidationIssue}}</strong>
+                            <pre>{{selectedFromValidation | json}}</pre>
+                        </div>
+                    </div>
+
+                </uib-tab>
+
+
+
+                <uib-tab heading="Bundle Json">
+                    <pre>{{validationBundle | json}}</pre>
+                </uib-tab>
+
+                <uib-tab heading="OO Json">
+                    <pre>{{validationErrors | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+
+
+        </uib-tab>
+
+        <uib-tab heading="Audit">
+            <em>List mapping data for all the elements in the model to ensure they all have a place in the instance bundle</em>
+            <em>Allow the mapping elements to be directly updated in the display</em>
+
+            <div class="tableFixHead">
+            <table class="table-condensed table table-bordered">
+                <thead>
+                    <tr><th>LinkId</th><th>Text</th><th>No representation</th><th>Observation</th><th>Type</th><th>Path</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="map in instance.arMappingItems">
+                    <td>
+                        <div class="clickable" ng-click="editItemFromReport({item:map.item})">
+
+                            <div ng-class="{sectionclass:map.isSection}">{{map.item.linkId}}</div>
+
+                        </div>
+
+                    </td>
+                    <td>
+
+                            {{map.item.text}}
+
+                    </td>
+                    <td>{{map.meta.extraction.none}}</td>
+                    <td>{{map.meta.extraction.extractObservation}}</td>
+                    <td>{{map.meta.extraction.type}}</td>
+                    <td>{{map.meta.extraction.path}}</td>
+
+                    <td>{{map.meta.extraction.notes}}</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+
+            <pre>{{instance.arMapItems | json}}</pre>
+
+        </uib-tab>
+
+        <uib-tab>
+            <uib-tab-heading>Issues <span class="badge">{{instance.processLog.length}}</span> </uib-tab-heading>
+            <br/>
+            <pre>{{instance.processLog | json}}</pre>
+        </uib-tab>
+
+        <uib-tab heading="HL7 v2">
+            <em>Figure out the set of OBX segments needed to make the bundle</em>
+        </uib-tab>
+
+
+        <uib-tab heading="Json">
+            <pre>{{arResourceInstance | json}}</pre>
+        </uib-tab>
+    </uib-tabset>
+
+
+
+
+
+</div>

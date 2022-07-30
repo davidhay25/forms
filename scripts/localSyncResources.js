@@ -13,13 +13,13 @@ let sourceServer = "https://canshare.co.nz/ds/fhir/"
 //let sourceServer = "http://localhost:9090/ds/fhir/"
 
 //the server to copy resources to
-//let targetServer = "http://localhost:9099/baseR4/"
-let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
+let targetServer = "http://localhost:9099/baseR4/"
+//let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
 //let targetServer = "http://188.166.76.237:9099/baseR4/"  //the backup server
 
 syncResources("Questionnaire")
 //syncResources("Observation")
-//syncResources("QuestionnaireResponse")
+syncResources("QuestionnaireResponse")
 
 
 async function syncResources(type) {

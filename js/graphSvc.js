@@ -78,7 +78,10 @@ angular.module("formsApp")
                        //'# url =  "#" + resource.id    //this is to a conained resource
 
                     } else {
-                        url =  "urn:uuid:" + resource.id    //assume all references are to uuids
+
+                        //changed Jul 24 when doing instance graphs. Not sure if it will much up the 'test extraction' in designer
+                        //url =  "urn:uuid:" + resource.id    //assume all references are to uuids
+                        url =  resource.resourceType + "/" + resource.id    //assume all references are to uuids
                     }
 
 

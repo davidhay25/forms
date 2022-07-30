@@ -112,6 +112,8 @@
     <script src="js/modalDialogSvc.js"></script>
     <script src="js/termUpdateCtrl.js"></script>
     <script src="js/termUpdateSvc.js"></script>
+    <script src="js/fhirSvc.js"></script>
+    <script src="js/fhirCtrl.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -242,17 +244,34 @@
                             ng-click="newQ()">
                         New Questionnaire
                     </button>
-
+<!--
                     <div ng-show="treeData && input.dirty">
-                        <button class="btn btn-link"
-                                ng-click="updateQ()">
+                        <button ng-show="user.email" class="btn btn-link" ng-click="updateQ()">
                             Update Q
                         </button>
+                        <div ng-hide="user.email">Login to save changes</div>
                     </div>
+                    -->
                 </div>
+
                 <div ng-class="input.rightPane">
 
-                    <button class="btn btn-primary pull-right" ng-show="input.dirty" ng-click="updateQ()">Update Q</button>
+                    <div ng-show="input.dirty">
+                        <button class="btn btn-primary pull-right"
+                                ng-show="user.email" ng-click="updateQ()">Update Q</button>
+                        <div class="pull-right" ng-hide="user.email">
+
+                            <div class="btn btn-warning">
+                                Login to save changes
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="alert alert-warning" ng-show="showLoading">
+                        Loading, please wait....
+                    </div>
 
                     <uib-tabset ng-show="treeData">
 
@@ -308,21 +327,15 @@
                                         <uib-tab heading="Details">
 
                                             <div ng-show = "selectedNode">
-
+                                                <ng-include src = "'includes/itemDetails.html'"></ng-include>
+<!--
                                                 <div class="row">
                                                     <div class="col-md-9">
                                                         <H4>Element: {{selectedNode.data.item.text}}</H4>
                                                     </div>
 
                                                     <div class="col-md-3">
-                                                        <!--
-                                                        <div ng-show="selectedNode.data.item.repeats">
-                                                            <div class="alert alert-danger pull-right">
-                                                                <strong>Element can repeat</strong>
-                                                            </div>
 
-                                                        </div>
-                                                        -->
                                                     </div>
                                                 </div>
 
@@ -561,6 +574,9 @@
                                                 </div>
 
 
+
+-->
+
                                                 <hr/>
                                                 <div class="row">
 
@@ -734,6 +750,7 @@
                                 <uib-tab heading = "Preview">
                                     <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
                                 </uib-tab>
+
 
                                 <uib-tab heading = "Raw form data">
                                     <pre>{{form | json}}</pre>
@@ -997,6 +1014,19 @@
                                     <pre>{{QValidation | json}}</pre>
                                 </uib-tab>
                             </uib-tabset>
+
+
+
+                        </uib-tab>
+
+                        <uib-tab heading="Sample Instances">
+                            <em>Create example bundles. Only used by FHIR designer.</em>
+
+
+                            <div ng-controller="fhirCtrl">
+                                <button class="btn btn-link pull-right" ng-click="makeSample(selectedQ)">Generate instance</button>
+                                <ng-include src = "'includes/instanceDisplay.html'"></ng-include>
+                            </div>
 
 
 

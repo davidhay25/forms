@@ -27,6 +27,9 @@
     </div>
     <div class="modal-body">
 
+        <div class="alert alert-warning" ng-show="showUpdating">
+            Updating item, please wait....
+        </div>
 
 
         <uib-tabset>
@@ -353,21 +356,38 @@
             <uib-tab heading = "Mapping">
 
 
-                <br/>
+
                 <div class="row">
                     <div class="col-md-6 col-sm-6">
                         <h3>Resource</h3>
 
-                        <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Extract as Observation
+                        <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Represent as Observation
                         <br/><br/>
 
-                        <strong>Resource extraction Notes</strong>
+                        <strong>Resource type</strong>
+                        <input class="form-control" ng-model="meta.extraction.type"/>
+                        <em class="pull-right">If not Observation</em>
+                        <br/><br/>
+
+                        <strong>Path in resource</strong>
+                        <input class="form-control" ng-model="meta.extraction.path"/>
+                        <br/><br/>
+
+                        <strong>Resource mapping Notes</strong>
                         <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
 
                     </div>
+
                     <div class="col-md-6 col-sm-6">
-                        <h3>HL7 Version 2</h3>
-                        <input class="form-control" ng-model="meta.extraction.v2mapping"/>
+                        <br/><br/>
+                        <checkbox ng-model="meta.extraction.none"> </checkbox> Not mapped
+                        <br/>
+                        <em class="pull-right">If not a data item (eg a selector or implicit)</em>
+                        <br/><br/>
+
+
+                        <strong>HL7 Version 2 notes</strong>
+                        <textarea class="form-control" ng-model="meta.extraction.v2mapping"></textarea>
                     </div>
                 </div>
 

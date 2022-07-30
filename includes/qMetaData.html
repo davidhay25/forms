@@ -159,6 +159,7 @@
 
                     <table class="table table-bordered">
                         <tr><th>Email</th><th>Name</th><th></th></tr>
+
                         <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagAuthorSystem">
                             <td>{{tag.code}}</td>
                             <!--<td>{{tag.system}}</td> todo maybe as a popover-->
@@ -166,6 +167,7 @@
                             <td><i class=" clickable glyphicon glyphicon-remove"
                                    ng-click = "removeTag($index)"></i></td>
                         </tr>
+
                         <tr>
                             <td><input class="form-control" type="text" ng-model="input.newTagCode"/></td>
                             <td><input class="form-control" type="text" placeholder="Optional" ng-model="input.newTagDisplay"/></td>

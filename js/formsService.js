@@ -33,6 +33,10 @@ angular.module("formsApp")
         extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
 
         extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
+        extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
+        extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
+        extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
+
         extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
 
         extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
@@ -586,6 +590,9 @@ angular.module("formsApp")
                     updateExtension(item,extUrlObsExtract,"Boolean",meta.extraction.extractObservation)
 
                     updateExtension(item,extExtractNotes,"String",meta.extraction.notes)
+                    updateExtension(item,extExtractPath,"String",meta.extraction.path)
+                    updateExtension(item,extExtractType,"String",meta.extraction.type)
+                    updateExtension(item,extExtractNone,"Boolean",meta.extraction.none)
 
                 }
 
@@ -692,6 +699,25 @@ angular.module("formsApp")
                     meta.extraction = meta.extraction || {}
                     meta.extraction.notes = ar1[0].valueString
                 }
+
+                let ar1b = this.findExtension(item,extExtractPath)
+                if (ar1b.length > 0) {
+                    meta.extraction = meta.extraction || {}
+                    meta.extraction.path = ar1b[0].valueString
+                }
+
+                let ar1c = this.findExtension(item,extExtractType)
+                if (ar1c.length > 0) {
+                    meta.extraction = meta.extraction || {}
+                    meta.extraction.type = ar1c[0].valueString
+                }
+
+                let ar1d = this.findExtension(item,extExtractNone)
+                if (ar1d.length > 0) {
+                    meta.extraction = meta.extraction || {}
+                    meta.extraction.none = ar1d[0].valueBoolean
+                }
+
 
                 //now look for description
                 let arDesc = this.findExtension(item,extDescription)

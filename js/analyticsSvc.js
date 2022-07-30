@@ -105,8 +105,10 @@ angular.module("formsApp")
                                                 })
                                             } else {
                                                 //this is a leaf
-
+                                               // todo ??? why am I not addint this to the hash??
+                                                //hashAllItems[key] = {item:child,sectionId:section.linkId}  //todo test
                                                 //arAllItems.push({item:child.item,sectionId:section.linkId})
+
                                              //   let key = Q.url + "|" + child.linkId
                                               //  hashAllItems[key] = {item:child,sectionId:section.linkId}
                                             }

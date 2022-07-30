@@ -245,8 +245,6 @@ angular.module("formsApp")
                             }
                         }
 
-
-
                     }
                 }
                 return Q

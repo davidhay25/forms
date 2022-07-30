@@ -2,7 +2,8 @@
 
 angular.module("formsApp")
     .controller('designerCtrl',
-        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc,terminologySvc,graphSvc,$timeout,$window,modalService) {
+        function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc, fhirSvc,
+                  terminologySvc,graphSvc,$timeout,$window,modalService) {
 
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
             let search = $window.location.search;
@@ -51,18 +52,15 @@ angular.module("formsApp")
             //system url for author tags
             $scope.tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
+            
+
             $scope.qStatus = ["draft","active","retired","unknown"]
 
             $scope.arHisoStatus = ['development','draft','standard']
-/*
-            $scope.getHisoStatus = function(Q) {
-                return formsSvc.getHisoStatus(Q)
-            }
 
-            $scope.setHisoStatus = function(Q) {
-                return formsSvc.setHisoStatus(Q,status)
+            $scope.makeSampleDEP = function(Q) {
+                $scope.arResourceInstance = fhirSvc.makeResourceArray(Q)
             }
-            */
 
             //toggle the left pane with the Q list
             $scope.input.leftPane = "col-md-2"
@@ -155,6 +153,7 @@ angular.module("formsApp")
                 if (user) {
                     console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
+                    console.log($scope.user)
                     $scope.$digest()
                 } else {
                     delete $scope.user
@@ -861,12 +860,10 @@ console.log(tags)
                             }
 
                             qSvc.editItem($scope.selectedQ,updatedItem,originalLinkId)
+
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.input.dirty = true;
-
-
-                            //delete $scope.selectedSection
 
                             updateReport()
                         }
@@ -996,7 +993,6 @@ console.log(tags)
             }
 
 
-
             clearWorkArea = function() {
                 delete $scope.selectedVs;
                 //delete $scope.selectedQ
@@ -1008,16 +1004,26 @@ console.log(tags)
 
             //load a single Q
             function loadQ(QtoSelect) {
+                //display the loading alert...
+                $scope.showLoading = true
+                $('#designTree').jstree('destroy');
+                delete $scope.selectedQ
+                delete $scope.treeData
+
                 delete $scope.input.hisoStatus
                 let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
+                let now = new Date(), start = new Date()
                 $http.get(qry).then(
                     function(data) {
+                        console.log('Time to load: ',moment().diff(now))
                         let Q = data.data
                         $scope.selectedQ = Q
                         $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
                         $scope.input.hisoNumber = formsSvc.getHisoNumber(Q)
+                        now = new Date()
 
                         let vo = formsSvc.generateQReport(Q)
+                        console.log("Time to generate report ",moment().diff(now))
                         $scope.report = vo.report
                         $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
 
@@ -1031,11 +1037,17 @@ console.log(tags)
                         $scope.treeIdToSelect = "root"
                         $scope.input.dirty = false
 
+                        now = new Date()
                         $scope.drawQ(Q,true)        //sets scope.selectedQ
+                        console.log("Time to make tree ",moment().diff(now))
                         $scope.treeIdToSelect = "root"
 
                         //let any other controller that might be interested about the new Q
                         $scope.$broadcast("selectedQ",Q)
+                        console.log("Time to load complete ",moment().diff(start))
+
+                        $scope.showLoading = false
+
                     },
                     function(err) {
                         alert(angular.toJson(err.data))
@@ -1057,28 +1069,7 @@ console.log(tags)
                     loadQ(QtoSelect)
 
 
-                    /*
 
-                    //for the summary tab...
-                    let vo = formsSvc.generateQReport(Q)
-                    $scope.report = vo.report
-                    $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
-
-                    makeCsvAndDownload(Q,vo.hashAllItems)
-                    makeQDownload(Q)
-
-                    $scope.allAttachments = formsSvc.getQAttachments(Q)
-                    //the template for the forms preview
-                    //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
-
-
-                    $scope.drawQ(Q,true)        //sets scope.selectedQ
-                    $scope.treeIdToSelect = "root"
-
-                    //let any other controller that might be interested about the new Q
-                    $scope.$broadcast("selectedQ",Q)
-
-                    */
                 }
             }
 
@@ -1150,7 +1141,9 @@ console.log(tags)
                 drawTree()
                 //makeFormDef()
                 //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+                now = new Date()
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
+                console.log("Time to make form template ",moment().diff(now))
                 $scope.formTemplate = $scope.objFormTemplate.template
 
                 $scope.v2List = exportSvc.createV2Report(Q)
@@ -1262,7 +1255,7 @@ console.log(tags)
             }
 
             $scope.loadAllQ = function() {
-
+                //a summary of fields only
                 let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
                 let t = {code:'all'}
                 $scope.folderTags = {} //

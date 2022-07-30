@@ -285,7 +285,7 @@
                                     <li>Data should be entered once with the sharing/reusing of data across multiple systems. Implementation
                                     in a production system should only be practical if much of the data is automatically populated via patient
                                     and clinical systems to minimise the administrative burden on clinicians and others involved in data entry.
-                                    <li>The included data elements can be collected immediately and/or are clinically required. This includes balancing structured data capture and free text for more nuanced narrative reporting.
+                                    <li>It is not expected all data elements included can be collected immediately and/or are clinically required. This includes balancing structured data capture and free text for more nuisance narrative reporting</li>
                                     <li>Form Sections <strong>patient details</strong>( e.g. NHI etc) and <strong>Administration</strong>
                                     (e.g. requesting health care practitioner etc) are there for <strong>demonstration purposes only</strong> rather than as a requirement for how these data fields should be implemented.
                                     <li>The data standards will be continuously monitored and updated according to international best practice, sector feedback and evolving local requirements
@@ -630,7 +630,7 @@
                         <ng-include src="'includes/hisoTable2.html'"></ng-include>
                     </uib-tab>
 
-                    <uib-tab ng-show="input.showTechnical" heading="Standard Metadata">
+                    <uib-tab ng-show="false" heading="Standard Metadata">
                         <br/>
                         <ng-include src="'includes/qMetaDataDisplay.html'"></ng-include>
 
