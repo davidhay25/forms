@@ -56,9 +56,11 @@ angular.module("formsApp")
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
         extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
         extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
+        extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
 
         extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
         extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
+
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
@@ -133,6 +135,44 @@ angular.module("formsApp")
                 Q.identifier = arIdentifiers
                 Q.identifier.push({system:csHisoNumber,value:number})
 
+            },
+
+            getCheckoutIdentifier : function(Q) {
+                if (Q) {
+                    let arExt = this.findExtension(Q,extCheckOutQ)
+                    if (arExt.length > 0) {
+                        return arExt[0].valueIdentifier     //identifier useas has email & dates
+                    }
+                }
+            },
+
+            clearQCheckout : function(Q) {
+                //prepare for checkin - clear the checkout extension
+                let ar = []
+                Q.extension.forEach(function (ext) {
+                    if (ext.url !== extCheckOutQ) {
+                        ar.push(ext)
+                    }
+                })
+                Q.extension = ar
+            },
+
+            checkoutQ : function(Q,email) {
+                //create the Q extension for checkout. Remove any others there may be...
+                Q.extension = Q.extension || []
+                let valueIdentifier = {system:"http://www.faqs.org/rfcs/rfc2822.html",value:email}        //using an identifier as it also has a date...
+                valueIdentifier.period = {start: new Date().toISOString()}
+                //remove any existing checkout elements...
+
+                let ar = []
+                Q.extension.forEach(function (ext) {
+                    if (ext.url !== extCheckOutQ) {
+                        ar.push(ext)
+                    }
+                })
+                Q.extension = ar
+                Q.extension.push({url:extCheckOutQ,valueIdentifier: valueIdentifier})
+                return valueIdentifier
             },
 
             getHisoStatus : function(Q) {
@@ -1556,6 +1596,22 @@ angular.module("formsApp")
             makeQR :  function(Q,form,hash,patient,practitioner,reviewerName,reviewOrganization,reviewerEmail) {
                 let that = this
 
+
+                //todo - working on multiple values for a single linkId.
+                //the form var is a hash keyed by the linkId containing the value (if any).
+                // For now, make that an array = and only take the first value when processing. Later - allow more than one
+
+                let hashFormValues = {}
+                Object.keys(form).forEach(function (key) {
+                    let value = form[key]       //the value entered. if this item can have multiple values, then the linkId will have a sufffix separated by -- - eg linkId--1 and linkId--2
+                    let ar = key.split('--')
+                    let realKey = ar[0]  //strip off any suffix - eg linkid--1 will become just linkid
+                    hashFormValues[realKey] = hashFormValues[realKey] || []
+                    hashFormValues[realKey].push(value)
+
+                })
+
+
                 //make the QuestionnaireResponse from the form data
                 //hash is items from the Q keyed by linkId - not used any more!
                 //form is the data entered keyed by linkId
@@ -1622,24 +1678,31 @@ angular.module("formsApp")
                         section.item.forEach(function (child) {
                             //items off the section. they will either be data elements, or groups
 
-                            let key = child.linkId  //the key for this Q item
-                            let value = form[key]
-
                             let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
 
-                            if (value) {        //is there a value for this item. Won't be if this is a group...
+                            let key = child.linkId  //the key for this Q item
+                            let value = form[key]
+                            let arValues = hashFormValues[key]
 
 
+                            if (arValues) {        //is there a value for this item. Won't be if this is a group...
                                 if (! parentItem) {
                                     parentItem = {linkId : section.linkId,text:section.text,item: []}
                                     QR.item.push(parentItem)
                                 }
 
-                                let result = getValue(child,value)
-                                itemToAdd.answer.push(result)
+                                arValues.forEach(function (value) {
+                                    let result = getValue(child,value)
+                                    if (result ) {
+                                        itemToAdd.answer.push(result)
+                                    }
 
+
+
+                                })
                                 parentItem.item = parentItem.item || []
                                 parentItem.item.push(itemToAdd)
+
                             }
 
 
@@ -1647,7 +1710,7 @@ angular.module("formsApp")
                             //Are there any grandchildren? If so, they will be conditional items...
                             //the immediate child is of type group, with the actual data items as grandchildren below that
                             if (child.item) {
-                                //so this will be the groups - with child items ?todo check?. Each item at this level is a group
+                                //so this will be the groups - with child items
                                 //the first is the 'main' item that goes in the left pane,
                                 // others are in the right pane. May have conditionals (but do we care here? )
                                 //but all are at the some level in the QR - on an item off the parent
@@ -1737,6 +1800,10 @@ angular.module("formsApp")
                     switch (item.type) {
                         case "choice":
 
+                            //check added Aug 2
+                            if (! value) {
+                                return null
+                            }
 
                             //when a radio is used as the input, the value is a string rather than an object
                             //but when pre-popping it is just the text, so trap the error

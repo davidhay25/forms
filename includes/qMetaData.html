@@ -58,17 +58,19 @@
                 <div class="col-md-9">
                     <table class="table table-bordered">
                         <tr><th>Code (folder)</th><th>Display</th><th></th></tr>
-                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem">
+                        <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem && ! tag.userSelected">
                             <td>{{tag.code}}</td>
                             <!--<td>{{tag.system}}</td> todo maybe as a popover-->
                             <td>{{tag.display}}</td>
                             <td><i class=" clickable glyphicon glyphicon-remove"
+                                   ng-show="user.email && miniQ.checkedoutTo == 'me'"
                                    ng-click = "removeTag($index)"></i></td>
                         </tr>
-                        <tr>
+                        <tr ng-show="user.email && miniQ.checkedoutTo == 'me'">
                             <td><input class="form-control" type="text" ng-model="input.newTagCode"/></td>
                             <td><input class="form-control" type="text" placeholder="Optional" ng-model="input.newTagDisplay"/></td>
                             <td><i class=" clickable glyphicon glyphicon-plus-sign"
+
                                    ng-click = "addTag(input.newTagCode,tagFolderSystem,input.newTagDisplay)"></i></td>
                         </tr>
                     </table>
@@ -151,7 +153,7 @@
             </div>
 
 
-            <div class="row">
+            <div ng-show="false" class="row">
                 <div class="col-md-3">
                     Authors
                 </div>
@@ -199,7 +201,7 @@
                            ng-click = "removeAttachment(att.url)"></i></td>
 
                 </tr>
-                <tr>
+                <tr  ng-show="user.email && miniQ.checkedoutTo == 'me'">
                     <td>
                         <input type="text" ng-model="input.newAttachmentTitle"
                                placeholder="Description of attachment"
@@ -218,7 +220,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row"  ng-show="user.email && miniQ.checkedoutTo == 'me'">
         <div class="col-md-1">
             Upload
         </div>

@@ -52,7 +52,9 @@ angular.module("formsApp")
             //system url for author tags
             $scope.tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
-            
+            //system url for author tags
+            $scope.tagCheckout = "http://clinfhir.com/fhir/NamingSystem/qCheckoutTag"
+
 
             $scope.qStatus = ["draft","active","retired","unknown"]
 
@@ -149,16 +151,21 @@ angular.module("formsApp")
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
             firebase.auth().onAuthStateChanged(function(user) {
-
+                console.log('auth state change')
                 if (user) {
                     console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
                     console.log($scope.user)
+                    $scope.loadAllQ()
                     $scope.$digest()
                 } else {
                     delete $scope.user
+
+                    $scope.loadAllQ()
                     $scope.$digest()
                 }
+
+                //$scope.$digest()
 
             });
 
@@ -184,6 +191,150 @@ angular.module("formsApp")
 
 
             //--------
+            //checkin/out stuff
+            //$scope.checkedOutTo is the email of the person the Q is checked out to (if any)
+
+            //when the Q is checked out to the current user, and they want to update the local copy
+            $scope.updateLocalCache = function() {
+                //save a copy in the local browser cache and clear the dirty flag
+
+                let nameInCache = "coq-" + $scope.selectedQ.url
+                $localStorage[nameInCache] = $scope.selectedQ
+
+                console.log("Updating local cache")
+                delete $scope.dirty
+            }
+
+            //make a copy for editing
+
+            $scope.checkout = function(Q) {
+                //make a copy of the Q in the local browser. Update the checkout tag on the Q and save.
+                //Q is the full Questionnaire loaded after selection
+                //miniQ is the Q in the list
+
+                if ($scope.user && $scope.user.email) {
+                    $scope.checkoutIdentifier = formsSvc.checkoutQ(Q,$scope.user.email)     //marks the Q with being checked out, returning teh Identifier
+
+                    $scope.updateQ(function(){
+                        //update the Q in the forms manager and call back when done
+
+                        //$scope.checkedOutTo = $scope.user.email
+                        let nameInCache = "coq-" + Q.url
+                        $localStorage[nameInCache] = Q
+
+                        $scope.miniQ.checkedoutTo = 'me'      //so that the list can be updated
+
+                    })
+                }
+            }
+
+            //discard the local changes. Clear the checkout flag on the server
+            //receives miniQ
+            $scope.revert = function(QtoRevert) {
+                //get the server copy of the Q
+                if (confirm("Are you sure you want to abandon any changes you have made")) {
+                    //clear the tag on the server copy of the Q
+
+                let qry = `/ds/fhir/Questionnaire/${QtoRevert.id}`
+                $http.get(qry).then(
+                    function(data) {
+
+                        let Q = data.data
+                        //clear the checkout information
+                        formsSvc.clearQCheckout(Q)
+                      //  processQ(Q)
+
+                        //now, save the updated Q back to the server
+                        let url = "/fm/fhir/Questionnaire/" + QtoRevert.id
+                        $http.put(url,Q).then(
+                            function (data) {
+                                delete QtoRevert.checkedoutTo
+                                alert("Local changes have been discarded")
+                                $scope.input.dirty = false;
+                                processQ(Q)
+
+
+                            }, function(err) {
+                                alert(angular.toJson(err.data))
+                            }
+                        )
+
+
+                       // $scope.showLoading = false
+
+                    },
+                    function(err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+                }
+
+            }
+
+
+            //check the updated copy back in
+            $scope.checkin = function() {
+
+                //Update the checkout tag in the Q first.
+                formsSvc.clearQCheckout($scope.selectedQ)
+
+                //todo - need to update the tage (folders) - move from
+                //? read Q from server - delete tags no longer in selectedQ  (I think new tags are saved OK)
+
+                // now save the Q
+                $scope.updateQ(function(){
+                    delete $scope.checkoutIdentifier
+                    //and clear the browser cache on successful save
+
+                    let nameInCache = "coq-" + $scope.selectedQ.url
+                    delete $localStorage[nameInCache]
+
+                    delete $scope.miniQ.checkedoutTo
+
+                    //Now check for any deleted tags (userSelected = true). If there are, then call the delete tag operation for them
+                    if ($scope.selectedQ.meta && $scope.selectedQ.meta.tag) {
+                        $scope.selectedQ.meta.tag.forEach(function (tag) {
+                            if (tag.userSelected) {
+                                let url = `/ds/removeqtag/${$scope.selectedQ.id}`
+                                $http.post(url,tag).then(
+                                    function (data) {
+                                        console.log('removed tag ',tag)
+                                        $scope.loadAllQ()       //if there are multiple tags to delete this will be called multiple times...
+                                    }, function (err) {
+                                        alert('error updating tag' + angular.toJson( err.data))
+                                    }
+                                )
+                            }
+
+                        })
+                    } else {
+                        $scope.loadAllQ()
+                    }
+
+
+                })
+
+            }
+
+            $scope.retireQ = function() {
+                //remove the Q
+                if (confirm("Are you sure you want to remove this Questionnaire? (It can be recovered if needed)")) {
+
+                    $scope.selectedQ.status = "retired"
+                    let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
+                    $http.put(url,$scope.selectedQ).then(
+
+                        function (data) {
+                            $scope.loadAllQ()
+                            alert("The status of the Questionnaire has been set to 'retired' and will no longer appear in lists.")
+                        },
+                        function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+            }
 
 
 
@@ -194,6 +345,7 @@ angular.module("formsApp")
                 $scope.allAttachments = formsSvc.getQAttachments($scope.selectedQ)
                 $scope.objFormTemplate = formsSvc.makeFormTemplate($scope.selectedQ)
                 $scope.input.dirty = true
+                $scope.updateLocalCache()
             }
 
             $scope.addAttachment = function(title,url) {
@@ -238,12 +390,18 @@ angular.module("formsApp")
                 delete $scope.input.newTagDisplay
                 delete $scope.input.newTagCode
                 $scope.input.dirty = true
+                $scope.updateLocalCache()
             }
 
-            //removing a tag means using the meta-delete operation
+            //removing a tag means using the meta-delete operation.
+            //with the check out/in, this needs to be done during check in
             $scope.removeTag = function(inx) {
+                //mark the tag for deletion by setting userselcted to true. Not really the purpose of this element...
+                $scope.selectedQ.meta.tag[inx].userSelected = true
+/*
                 let tags = $scope.selectedQ.meta.tag.splice(inx,1)
                 let url = `/ds/removeqtag/${$scope.selectedQ.id}`
+
                 $http.post(url,tags[0]).then(
                     function (data) {
                        // alert('Folder tag')
@@ -251,18 +409,9 @@ angular.module("formsApp")
                         alert(angular.toJson(err.data))
                     }
                 )
-/*
-console.log(tags)
-                let params = {resourceType: "Parameters",parameter:[]}
-                let param = {name:'meta'}
-                param.valueMeta = {tag:tags[0]}
-                params.parameter.push(param)
-
 */
 
             }
-
-
 
             //clear the currently selected Q when changing selected tag
             $scope.selectTag = function(tag){
@@ -334,62 +483,7 @@ console.log(tags)
 
             }
 
-            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
-/*
-            $localStorage.formsVS = $localStorage.formsVS || []
-            if ($localStorage.formsVS.length == 0) {
-
-                $localStorage.formsVS.push({display:"Yes, No, Don't know",description:"Standard VS to replace boolean",url:"http://hl7.org/fhir/ValueSet/yesnodontknow"})
-                $localStorage.formsVS.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
-            }
-            */
-/*
-            //retrieve the list of Qs to be balloted
-            formsSvc.getBallotList().then(
-                function (list) {
-                    $scope.ballotList = list
-                }
-            )
-
-            //return true if this Q is in the ballot list
-            $scope.isQinBallot = function() {
-                if ($scope.selectedQ && $scope.ballotList && $scope.ballotList.entry) {
-                    let ref = `Questionnaire/${$scope.selectedQ.id}`
-                    let ar = $scope.ballotList.entry.filter(e => e.item.reference == ref)
-                    if (ar.length >0 ) {
-                        return true
-                    }
-
-                }
-
-            }
-
-
-            $scope.addToBallotList = function() {
-                //add the current Q to the ballot list
-                formsSvc.addQtoBallotList($scope.selectedQ).then(
-                    function (list) {
-                        $scope.ballotList = list
-                        alert("Form has been added to the list to be balloted")
-
-                    }, function (err) {
-                        alert(angular.toJson(err))
-                    }
-                )
-            }
-            
-            $scope.removeFromBallotList = function () {
-                formsSvc.removeQfromBallotList($scope.selectedQ).then(
-                    function (list) {
-                        $scope.ballotList = list
-                        alert("Form has been removed from the list to be balloted")
-                    }, function (err) {
-                        alert(angular.toJson(err))
-                    }
-                )
-            }
-
-            */
+            //let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
             //see what resources are generated on a submit (and any errors)
             $scope.testSubmit = function () {
@@ -520,18 +614,7 @@ console.log(tags)
                 drawTree()
             }
 
-/*
 
-            if (!  $scope.input.vsList)  {
-
-                $scope.input.vsList = []      //populate from List of VS from forms server
-
-                $scope.input.vsList.push({display:"Yes, No, Don't know",description:"Standard VS to replace boolean",url:"http://hl7.org/fhir/ValueSet/yesnodontknow"})
-                $scope.input.vsList.push({display:"Condition codes",description:"Codes used for Condition.code",url: "http://hl7.org/fhir/ValueSet/condition-code"})
-
-            }
-
-*/
             //create a new Q
             $scope.newQ = function() {
                 $uibModal.open({
@@ -551,12 +634,40 @@ console.log(tags)
                     function (Q) {
                         if (Q) {
                             Q.id = "cf-" + new Date().getTime()
-                            //Q.resourceType = "Questionnaire"
-                            $scope.selectedQ = Q
-                            $scope.updateQ(function(){
-                                $scope.allQ.push(Q)
-                                $scope.drawQ(Q)
-                            })
+
+                            //now set as 'checked out' to current user
+                            $scope.checkoutIdentifier = formsSvc.checkoutQ(Q,$scope.user.email)     //marks the Q with being checked out, returning teh Identifier
+
+                            //the empty Q needs to be saved to the server so it will appear in the list of Q
+                            let url = "/fm/fhir/Questionnaire/" + Q.id
+                            $http.put(url,Q).then(
+                                function (data) {
+                                    $scope.selectedQ = Q
+
+                                    $scope.miniQ = Q                    //version for the list
+                                    $scope.miniQ.checkedoutTo = 'me'      //so that the list can be updated
+
+                                    //copy in browser cache
+                                    let nameInCache = "coq-" + Q.url
+                                    $localStorage[nameInCache] = Q
+
+                                    $scope.allQ.push($scope.miniQ)
+
+                                    $scope.allQ.sort(function(a,b){
+                                        if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                                            return 1
+                                        } else {
+                                            return -1
+                                        }
+                                    })
+
+                                    $scope.drawQ(Q)
+
+                                },
+                                function (err) {
+                                    alert(angular.toJson(err.data))
+                                })
+
 
                         }
                     }
@@ -590,23 +701,10 @@ console.log(tags)
                         $scope.treeIdToSelect = node.id
                         $scope.drawQ($scope.selectedQ) //,true)
                         $scope.input.dirty = true;
+                        $scope.updateLocalCache()
                         updateReport()
 
 
-                        /*
-                        //add the sections to the Q. The linkIds have been checked to be unique
-                        arSection.forEach(function (section) {
-                            $scope.selectedQ.item = $scope.selectedQ.item || []
-                            $scope.selectedQ.item.push(section)
-
-                            //$scope.treeIdToSelect = node.id
-                            $scope.drawQ($scope.selectedQ,true)
-                            $scope.input.dirty = true;
-                            //$scope.editingQ = false
-
-                            updateReport()
-                        })
-                        */
                     }
                 )
 
@@ -636,6 +734,7 @@ console.log(tags)
                             //$scope.treeIdToSelect = node.id
                             $scope.drawQ($scope.selectedQ,true)
                             $scope.input.dirty = true;
+                            $scope.updateLocalCache()
                             //$scope.editingQ = false
 
                             updateReport()
@@ -665,7 +764,7 @@ console.log(tags)
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
-                        alert("Questionnaire updated on the Forms Manager")
+                        //alert("Questionnaire updated on the Forms Manager")
                         $scope.input.dirty = false;
                         if (cb) {
                             cb()
@@ -685,7 +784,8 @@ console.log(tags)
             }
 
             $scope.validateQR = function(QR){
-                //let url = formsSvc.getServers().validationServer + "QuestionnaireResponse/$validate"
+
+                delete  $scope.qrValidationResult
                 let url =  "/ds/fhir/QuestionnaireResponse/validate"
                 $http.post(url,QR).then(
                     function(data) {
@@ -706,6 +806,7 @@ console.log(tags)
 
                     $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ,false)
+                    $scope.updateLocalCache()
                     $scope.input.dirty = true;
                     $scope.editingQ = false
 
@@ -722,6 +823,7 @@ console.log(tags)
 
                     $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ, false)
+                    $scope.updateLocalCache()
                     $scope.input.dirty = true;
                     $scope.editingQ = false
 
@@ -746,6 +848,7 @@ console.log(tags)
 
                     $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ,false)
+                    $scope.updateLocalCache()
                     $scope.input.dirty = true;
 
                     updateReport()
@@ -863,6 +966,7 @@ console.log(tags)
 
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
+                            $scope.updateLocalCache()
                             $scope.input.dirty = true;
 
                             updateReport()
@@ -935,6 +1039,7 @@ console.log(tags)
 
                             $scope.treeIdToSelect =  item.linkId    //tree id is the linkid...  node.id
                             $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
+                            $scope.updateLocalCache()
                             $scope.input.dirty = true;
 
                             updateReport()
@@ -969,7 +1074,7 @@ console.log(tags)
                 })
                 return ar
             }
-
+/*
             //find the position of the indicated node in the treeData
             function findPositionInTreeDEP(inNode) {
                 let index = -1
@@ -981,7 +1086,7 @@ console.log(tags)
                 })
                 return index
             }
-
+*/
             function findNodeById(id) {
                 let resultNode;
                 $scope.treeData.forEach(function(node,inx) {
@@ -1009,68 +1114,104 @@ console.log(tags)
                 $('#designTree').jstree('destroy');
                 delete $scope.selectedQ
                 delete $scope.treeData
+                //delete $scope.checkedOutTo      //the email of the person who has checked out this email
+                delete $scope.checkoutIdentifier
 
                 delete $scope.input.hisoStatus
                 let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
                 let now = new Date(), start = new Date()
-                $http.get(qry).then(
-                    function(data) {
-                        console.log('Time to load: ',moment().diff(now))
-                        let Q = data.data
-                        $scope.selectedQ = Q
-                        $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
-                        $scope.input.hisoNumber = formsSvc.getHisoNumber(Q)
-                        now = new Date()
 
-                        let vo = formsSvc.generateQReport(Q)
-                        console.log("Time to generate report ",moment().diff(now))
-                        $scope.report = vo.report
-                        $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
+                if (QtoSelect.checkedoutTo == 'me') {
+                    //if the Q has been checked out to the local user, then get the Q from the local cache
+                    let nameInCache = "coq-" + QtoSelect.url
+                    let Q = $localStorage[nameInCache]
+                    if (!Q) {
+                        alert(`The local copy of the model was not found in the browser cache (${nameInCache}). Did you check out on a different machine?`)
+                        delete $scope.showLoading
 
-                        makeCsvAndDownload(Q,vo.hashAllItems)
-                        makeQDownload(Q)
+                        //remove the checkout lock on the server Q
+                        return
 
-                        $scope.allAttachments = formsSvc.getQAttachments(Q)
-                        //the template for the forms preview
-                        //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
-
-                        $scope.treeIdToSelect = "root"
-                        $scope.input.dirty = false
-
-                        now = new Date()
-                        $scope.drawQ(Q,true)        //sets scope.selectedQ
-                        console.log("Time to make tree ",moment().diff(now))
-                        $scope.treeIdToSelect = "root"
-
-                        //let any other controller that might be interested about the new Q
-                        $scope.$broadcast("selectedQ",Q)
-                        console.log("Time to load complete ",moment().diff(start))
-
-                        $scope.showLoading = false
-
-                    },
-                    function(err) {
-                        alert(angular.toJson(err.data))
                     }
-                )
+                    processQ(Q)
+                } else {
+                    $http.get(qry).then(
+                        function(data) {
+                            console.log('Time to load: ',moment().diff(now))
+                            let Q = data.data
+                            processQ(Q)
+                            $scope.showLoading = false
+
+                        },
+                        function(err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
             }
 
-            //when called from Q list
+            //set up the UI for the selected Q
+            function processQ(Q) {
+                delete $scope.showLoading
+                $scope.selectedQ = Q
+                $scope.checkoutIdentifier = formsSvc.getCheckoutIdentifier(Q)  //the identifier of who has checked this out (if any)
+
+                $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
+                $scope.input.hisoNumber = formsSvc.getHisoNumber(Q)
+                now = new Date()
+
+                let vo = formsSvc.generateQReport(Q)
+                console.log("Time to generate report ",moment().diff(now))
+                $scope.report = vo.report
+                $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
+
+                makeCsvAndDownload(Q,vo.hashAllItems)
+                makeQDownload(Q)
+
+                $scope.allAttachments = formsSvc.getQAttachments(Q)
+                //the template for the forms preview
+                //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+
+                $scope.treeIdToSelect = "root"
+                $scope.input.dirty = false
+
+                now = new Date()
+                $scope.drawQ(Q,true)        //sets scope.selectedQ
+                console.log("Time to make tree ",moment().diff(now))
+                $scope.treeIdToSelect = "root"
+
+                //let any other controller that might be interested about the new Q
+                $scope.$broadcast("selectedQ",Q)
+                //console.log("Time to load complete ",moment().diff(start))
+
+            }
+
+
+            //when called from Q list. Passes in the 'mini-Q'
             $scope.selectQ = function(QtoSelect) {
-                console.log("selecting ",QtoSelect)
-                if ($scope.input.dirty) {
-                    if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
+                $scope.miniQ = QtoSelect    //save the miniQ so that if the Q is checked in or out rge display can be updated...
+                    //As any edits are saved immediately in the local cache, there's nothing stopping an immediate load...
+                    //$scope.miniQ = QtoSelect    //save the miniQ so that if the Q is checked in or out rge display can be updated...
+                loadQ(QtoSelect)
+                /*
+                    if ($scope.input.dirty) {
+                        if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
+                            loadQ(QtoSelect)
+
+                        }
+                    } else {
+
+                        //the Q that was passed in is only a minimal Q. load the complete one first
                         loadQ(QtoSelect)
 
+
+
                     }
-                } else {
 
-                    //the Q that was passed in is only a minimal Q. load the complete one first
-                    loadQ(QtoSelect)
+*/
 
+                console.log("selecting ",QtoSelect)
 
-
-                }
             }
 
             function makeCsvAndDownload(Q,hashAllItems) {
@@ -1229,6 +1370,7 @@ console.log(tags)
 
                     //temp $scope.treeIdToSelect = node.id
                     $scope.drawQ($scope.selectedQ, false)
+                    $scope.updateLocalCache()
                     $scope.input.dirty = true;
                 }
 
@@ -1241,22 +1383,11 @@ console.log(tags)
 
             }
 
-            //used in the preview
-            function makeFormDefDEP() {
-                return  //todo - think this is no longer used...
 
-
-                formsSvc.makeFormDefinition(angular.copy($scope.treeData)).then(
-                    function (data) {
-                        $scope.formDef = data
-                    }
-                )
-
-            }
 
             $scope.loadAllQ = function() {
                 //a summary of fields only
-                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
+                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&_sort=name&status:not=retired"
                 let t = {code:'all'}
                 $scope.folderTags = {} //
                 $scope.folderTags['all'] = t
@@ -1266,7 +1397,30 @@ console.log(tags)
                     function (data) {
                         $scope.allQ = [];
                         data.data.entry.forEach(function (entry){
+
+                            console.log(formsSvc.getCheckoutIdentifier(entry.resource))
+
+                            //get the checkout status for the model. This is used for display, and also if the model is to be edited will cause the local copy to be edited
+                            //when the full Q is loaded, the $scope.checkoutIdentifier variable is set. Used to control the actions..
+                            let checkOut = formsSvc.getCheckoutIdentifier(entry.resource)
+
+
+                            if (checkOut) {
+                                //this model is checked out to someone
+                                if ($scope.user && $scope.user.email == checkOut.value) {
+                                    entry.resource.checkedoutTo = 'me'
+                                } else {
+                                    entry.resource.checkedoutTo = checkOut.value
+                                }
+                            }
+
+                            //entry.resource.checkIdentifier = formsSvc.getCheckoutIdentifier(entry.resource)
+                            //these are 'miniQ' - and have the checkedoutTo entry set to 'me' or the email of the person who has checked it out
                             $scope.allQ.push(entry.resource)
+                            //console.log(entry.resource.extension)
+
+
+
 
                             //populate tag list
                             if (entry.resource && entry.resource.meta && entry.resource.meta.tag) {
@@ -1304,5 +1458,6 @@ console.log(tags)
                 )
             }
 
-            $scope.loadAllQ()
+            //now done when the auth state changes as the user identity is needed
+            //$scope.loadAllQ()
         })

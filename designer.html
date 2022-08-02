@@ -28,6 +28,10 @@
             overflow-y: scroll;
         }
 
+        .horizontalButtonSpacer {
+            margin-right: 8px;
+        }
+
         .obsExtract {
             background-color: #ebcccc;
         }
@@ -38,8 +42,21 @@
              border: 1px solid lightgray;
          }
 
+         .checkoutbyme {
+             color: green;
+         }
+
+         .checkoutbyother {
+             color: red;
+         }
+
          .hide {
              display:none;
+         }
+
+         .selectedInList {
+             font-weight: bold;
+            // background-color: #d9d9d9;
          }
 
 /*
@@ -209,6 +226,50 @@
 
     <uib-tabset>
 
+
+        <!-- The Q is checked out to another user -->
+        <div ng-show="checkoutIdentifier.value && checkoutIdentifier.value !== user.email">
+            <strong class="pull-right">Checked out to {{checkoutIdentifier.value}}</strong>
+        </div>
+
+        <!-- The Q is checked out to the current user-->
+        <div ng-show="user.email && checkoutIdentifier.value == user.email">
+
+            <!-- Check in any changes -->
+            <button class="btn btn-success pull-right horizontalButtonSpacer"
+                    uib-popover="Upload the updated model to the server, releasing the check out lock."
+                    popover-placement="left"
+                    popover-trigger="'mouseenter'"
+                    ng-click = "checkin()">Check in</button>
+
+            <!-- If has been changed, then can update in local cache (or do this automatically - yes, saved automatically?
+            <div ng-show="input.dirty">
+                <button class="btn btn-primary pull-right horizontalButtonSpacer" ng-click = "updateLocalCache(selectedQ)">Save in local cache</button>
+            </div>
+-->
+            <!--  Discard any local changes-->
+            <button class="btn btn-danger pull-right horizontalButtonSpacer"
+                    uib-popover="Discard the local changes"
+                    popover-placement="left"
+                    popover-trigger="'mouseenter'"
+                    ng-click = "revert(miniQ)">Revert</button>
+
+        </div>
+
+        <!-- The Q is not checked out, but there is a logged in user, so could potentially be checked in-->
+        <div ng-show="! checkoutIdentifier.value && user.email && selectedQ">
+            <button class="btn btn-success pull-right"
+                    uib-popover="Save this model locally, and allow editing"
+                    popover-placement="left"
+                    popover-trigger="'mouseenter'"
+                    ng-click="checkout(selectedQ)">Check out</button>
+        </div>
+
+        <!-- No user login - read only-->
+        <div ng-show = "!user.email && !  checkoutIdentifier.value">
+            <div class="pull-right">Login to enable update (via check in / check out)</div>
+        </div>
+
         <uib-tab heading="Questionnaire resources">
             <br/>
 
@@ -230,48 +291,58 @@
 
                     <div class="myScroll">
                         <div class="list-group">
-                            <div ng-class="{'list-group-item':true,'listItemSelected':Q.id == selectedQ.id}"
+                            <div ng-class="{'list-group-item':true,'listItemSelected':miniQ.id == selectedQ.id}"
                                  style="cursor: pointer"
-                                 ng-show="canShowQ(Q)"
-                                 ng-click="selectQ(Q)"
-                                 ng-repeat="Q in allQ">
-                                {{Q.name}}
+                                 ng-show="canShowQ(miniQ)"
+                                 ng-click="selectQ(miniQ)"
+                                 ng-repeat="miniQ in allQ">
+                                {{miniQ.name}}
+                                <!--
+                                <div>{{Q.checkedoutTo}}</div>
+                                -->
+
+                                <div ng-show="miniQ.checkedoutTo">
+
+                                    <em ng-class="{checkoutbyme:miniQ.checkedoutTo == 'me',checkoutbyother:miniQ.checkedoutTo !== 'me'}">
+                                        Checked out by {{miniQ.checkedoutTo}}
+                                    </em>
+
+
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
-                    <button class="btn btn-link"
+                    <button class="btn btn-link" ng-show="user.email"
                             ng-click="newQ()">
                         New Questionnaire
                     </button>
-<!--
-                    <div ng-show="treeData && input.dirty">
-                        <button ng-show="user.email" class="btn btn-link" ng-click="updateQ()">
-                            Update Q
-                        </button>
-                        <div ng-hide="user.email">Login to save changes</div>
-                    </div>
-                    -->
+
                 </div>
 
                 <div ng-class="input.rightPane">
 
-                    <div ng-show="input.dirty">
-                        <button class="btn btn-primary pull-right"
-                                ng-show="user.email" ng-click="updateQ()">Update Q</button>
-                        <div class="pull-right" ng-hide="user.email">
-
-                            <div class="btn btn-warning">
-                                Login to save changes
-                            </div>
-
-                        </div>
-                    </div>
-
-
+                    <!-- If the Q is not checkedout, then it cannot be updated - only saved locally-->
                     <div class="alert alert-warning" ng-show="showLoading">
                         Loading, please wait....
                     </div>
+
+                    <div class="alert alert-success" ng-show="miniQ.checkedoutTo == 'me' && selectedQ">
+                        Model is checked out and local browser copy is being edited. Use the 'Check In' button to update the server when finished editing.
+                        Use 'Revert' to discard your changes.
+                    </div>
+
+                    <div class="alert alert-warning" ng-hide="miniQ.checkedoutTo == 'me' || !selectedQ">
+                        This is a readonly view.
+                        <span ng-show = "miniQ.checkedoutTo">It has been checked out by {{miniQ.checkedoutTo}}</span>
+                        <span ng-hide = "miniQ.checkedoutTo">
+                            To edit, <span ng-hide="user.email">log in, then</span>  check out the model, edit it, and check it back in.
+                        </span>
+
+                    </div>
+
+
 
                     <uib-tabset ng-show="treeData">
 
@@ -293,21 +364,6 @@
                                     </div>
 
 
-                                    <!--
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div style="padding-top: 8px" ng-show="input.rightPane == 'col-md-12'">
-                                                <strong >{{selectedQ.name}}</strong>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="pull-right">
-                                                <button class="btn btn-link" ng-click="expandAll()">Expand all</button>
-                                                <button class="btn btn-link" ng-click="showSection()">Show sections</button>
-                                            </div>
-                                        </div>
-                                    </div>
--->
 
 
                                     <div class="clearfix"></div>
@@ -578,7 +634,9 @@
 -->
 
                                                 <hr/>
-                                                <div class="row">
+
+
+                                                <div ng-show = "miniQ.checkedoutTo == 'me'" class="row">
 
                                                     <div class="col-md-2">
                                                         <button class="btn btn-link" ng-hide = "selectedNode.id == 'root'"
@@ -654,7 +712,7 @@
 
 
                                                     <div class="col-md-2">
-                                                        <div ng-show="selectedNode">
+                                                        <div ng-show="selectedNode  && selectedNode.id !== 'root'">
                                                             <button class="btn btn-link"
                                                                     ng-click="moveUp(selectedNode)">
                                                                 Move up
@@ -726,6 +784,11 @@
                             <br/>
 
                             <ng-include src = "'includes/qMetaData.html'"></ng-include>
+
+                            <div ng-show="user.email && checkoutIdentifier.value == user.email">
+                                <button class="btn btn-link pull-right" ng-click="retireQ()">Retire Questionnaire</button>
+                            </div>
+
 
                         </uib-tab>
 

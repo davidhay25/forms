@@ -191,7 +191,7 @@ angular.module("formsApp")
             }
 
             //retrieve all Q to determine their status and populate the selectors
-            let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension"
+            let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&status:not=retired"
             $scope.allQ = []
             $scope.tags = ['All']
             $scope.hisoStatuses = []

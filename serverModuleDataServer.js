@@ -91,7 +91,7 @@ function setup(app,serverRoot) {
             res.status(400).json({msg:'Tag missing'})
         }
     })
-
+/*
     app.delete('/ds/fhir/Questionnaire/:id',function(req,res){
         let url = serverRoot + "Questionnaire/" + req.params.id
 
@@ -116,7 +116,7 @@ function setup(app,serverRoot) {
               //  res.status(err.response.status).send(err.response.data)
             })
     })
-
+*/
     app.post('/ds/fhir/:type/validate',function(req,res) {
 
         let resource = req.body
@@ -199,7 +199,6 @@ function setup(app,serverRoot) {
                 }
             })
     })
-
 
     //get specific version
     app.get('/ds/fhir/:type/:id/:version',function(req,res){

@@ -133,11 +133,39 @@
                                    ng-model="form[cell.item.linkId]"/>
 
                             {{option.valueCoding.display}}
-                    </span>
+                        </span>
 
                     </div>
 
-                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
+                    <!-- Choice as checkboxes - https://www.npmjs.com/package/angular-bootstrap-checkbox -->
+
+                    <div ng-show="cell.displayHint == 'check-box' ">
+
+                        <span ng-repeat="option in cell.item.answerOption">
+<!-- -->
+                            <checkbox
+                                    ng-true-value = {{option}}
+                                    ng-false-value = ""
+                                    ng-change = makeQR()
+                                    ng-model="form[cell.item.linkId + '--' + $index]">
+
+                            </checkbox>
+
+                            <!--
+                            <input type="checkbox" value="{{option}}"
+                                   ng-change="makeQR(cell.item.linkId)"
+                                   ng-model="form[cell.item.linkId + '--' + $index]"/>
+-->
+                            {{option.valueCoding.display}}
+
+
+
+                        </span>
+
+                    </div>
+
+
+                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio' || cell.displayHint == 'check-box'">
 
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                                 ng-change="makeQR(cell.item.linkId)"
