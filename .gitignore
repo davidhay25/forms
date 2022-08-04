@@ -6,3 +6,4 @@ Thumbs.db
 .ideasendgrid.env
 logs
 **/backups
+artifacts/systemConfig.json

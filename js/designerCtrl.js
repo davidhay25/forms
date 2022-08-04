@@ -11,6 +11,17 @@ angular.module("formsApp")
                 $scope.QfromUrl = search.substr(1)
             }
 
+            $http.get("/config").then(
+                function(data) {
+                    $scope.systemConfig = data.data
+                    console.log($scope.systemConfig)
+                    //if ($scope.systemConfig.type == 'public') {
+                       // alert("You can't edit Standards directly on the public site. The app will be set to read-only (ie checkout will be disabled).")
+                    //}
+                }
+            )
+
+
             //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
             $scope.$on('termImported',function(){
                 $scope.drawQ($scope.selectedQ)  //in dashboard.js
@@ -336,9 +347,19 @@ angular.module("formsApp")
                 }
             }
 
+            $scope.publish = function(Q) {
+                if (confirm(`Are you sure you want to publish this Standard to the public server (${$scope.publicServer})?`)){
+                    //use the custom publish endpoint on the local server to send to the public server
 
+
+                }
+            }
 
             //------
+
+            $scope.makeQDependancyAudit = function() {
+                $scope.dependencyAudit = qSvc.auditDependencies($scope.selectedQ,$scope.hashAllItems)
+            }
 
             $scope.removeAttachment = function(url) {
                 formsSvc.removeQAttachment($scope.selectedQ,url)
@@ -398,18 +419,7 @@ angular.module("formsApp")
             $scope.removeTag = function(inx) {
                 //mark the tag for deletion by setting userselcted to true. Not really the purpose of this element...
                 $scope.selectedQ.meta.tag[inx].userSelected = true
-/*
-                let tags = $scope.selectedQ.meta.tag.splice(inx,1)
-                let url = `/ds/removeqtag/${$scope.selectedQ.id}`
 
-                $http.post(url,tags[0]).then(
-                    function (data) {
-                       // alert('Folder tag')
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
-*/
 
             }
 
@@ -536,10 +546,6 @@ angular.module("formsApp")
                                     let nodeId = obj.nodes[0];  //get the first node
                                     let node = vo.graphData.nodes.get(nodeId);
 
-                                    //$scope.selectedFromSingleGraph = node.resource;
-
-
-
                                     if (node.data && node.data.resource) {
                                         $scope.selectResource({resource:node.data.resource,OO:{}})
                                         $scope.$digest()
@@ -556,8 +562,6 @@ angular.module("formsApp")
 
                             },2000)
 
-                            //add other resources so they're visible in the display
-                            //$scope.extractedResources.push({resource:$scope.QR,OO:{},valid:true})
 
 
                         }, function(err) {
@@ -582,20 +586,6 @@ angular.module("formsApp")
             $scope.selectSection = function(section) {
                 $scope.selectedSection = section
             }
-
-            //count the number of completed answers in each section - used by tabbed form...
-            $scope.completedAnswersInSectionDEP = function(section) {
-
-                let cnt = 0
-                section.item.forEach(function (item){
-                    if ($scope.form[item.linkId]) {
-                        cnt ++
-                    }
-                })
-
-                return cnt
-            }
-
 
 
             $scope.expandAll = function() {
@@ -679,7 +669,6 @@ angular.module("formsApp")
             $scope.importGroup = function(node){
                 //the node will be a section node
 
-
                 $uibModal.open({
                     templateUrl: 'modalTemplates/importGroup.html',
                     backdrop: 'static',
@@ -762,9 +751,10 @@ angular.module("formsApp")
 
 
                 let url = "/fm/fhir/Questionnaire/" + $scope.selectedQ.id
+
                 $http.put(url,$scope.selectedQ).then(
                     function (data) {
-                        //alert("Questionnaire updated on the Forms Manager")
+
                         $scope.input.dirty = false;
                         if (cb) {
                             cb()
@@ -779,9 +769,7 @@ angular.module("formsApp")
             //------------ QR related functions
             //invoked from ng-blur on for elements in renderSingleItem
 
-            $scope.makeQRDEP = function() {
-                $scope.selectedQR = formsSvc.makeQR($scope.selectedQ, $scope.form)
-            }
+
 
             $scope.validateQR = function(QR){
 
@@ -853,45 +841,7 @@ angular.module("formsApp")
 
                     updateReport()
                 }
-                /*
 
-                let item = hash.item    //there must be an entre in hashallitems
-
-
-
-                if (item.de)
-
-                //if ()
-                let isaSource = ""
-                Object.keys($scope.hashAllItems).forEach(function (key) {
-                    if (key !== node.id) {
-                        let item = $scope.hashAllItems[key].item
-                        if (item.enableWhen) {
-                            item.enableWhen.forEach(function (ew) {
-                                if (ew.question == node.id) {isaSource += key + " "}
-                            })
-                        }
-                    }
-                })
-
-                if () {
-                   // if (isaSource) {
-
-                    alert("There are items with a dependency on this one: "+ isaSource)
-                } else {
-                    $scope.selectedQ = qSvc.removeItem($scope.selectedQ,node.data.item.linkId)
-
-
-                    $scope.treeIdToSelect = node.id
-                    $scope.drawQ($scope.selectedQ,false)
-                    $scope.input.dirty = true;
-
-                    updateReport()
-                }
-
-                //let linkId = node.data.item.linkId
-
-*/
 
 
             }
@@ -918,8 +868,6 @@ angular.module("formsApp")
 
             //edit an existing item
             $scope.editItem = function(node) {
-
-
 
                 let item = node.data.item
 
@@ -1074,19 +1022,7 @@ angular.module("formsApp")
                 })
                 return ar
             }
-/*
-            //find the position of the indicated node in the treeData
-            function findPositionInTreeDEP(inNode) {
-                let index = -1
-                $scope.treeData.forEach(function(node,inx) {
-                    if (node.id == inNode.id) {
-                        index = inx
-                    }
 
-                })
-                return index
-            }
-*/
             function findNodeById(id) {
                 let resultNode;
                 $scope.treeData.forEach(function(node,inx) {
@@ -1193,24 +1129,9 @@ angular.module("formsApp")
                     //As any edits are saved immediately in the local cache, there's nothing stopping an immediate load...
                     //$scope.miniQ = QtoSelect    //save the miniQ so that if the Q is checked in or out rge display can be updated...
                 loadQ(QtoSelect)
-                /*
-                    if ($scope.input.dirty) {
-                        if (confirm("the Q has been updated. If you select another the changes will be lost. Are you sure you want to select this one?")) {
-                            loadQ(QtoSelect)
-
-                        }
-                    } else {
-
-                        //the Q that was passed in is only a minimal Q. load the complete one first
-                        loadQ(QtoSelect)
 
 
-
-                    }
-
-*/
-
-                console.log("selecting ",QtoSelect)
+                //console.log("selecting ",QtoSelect)
 
             }
 
@@ -1280,8 +1201,7 @@ angular.module("formsApp")
                 }
 
                 drawTree()
-                //makeFormDef()
-                //$scope.formTemplate = formsSvc.makeFormTemplate(Q)
+
                 now = new Date()
                 $scope.objFormTemplate = formsSvc.makeFormTemplate(Q)
                 console.log("Time to make form template ",moment().diff(now))
@@ -1289,7 +1209,7 @@ angular.module("formsApp")
 
                 $scope.v2List = exportSvc.createV2Report(Q)
 
-              //  $scope.input.dirty = false
+
             }
 
             let drawTree = function() {
@@ -1386,9 +1306,10 @@ angular.module("formsApp")
 
 
             $scope.loadAllQ = function() {
-                //a summary of fields only
+                //a summary of fields only - miniQ. Structure may not be exactly the same as a Q (eg folder hash)
                 let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&_sort=name&status:not=retired"
                 let t = {code:'all'}
+                let extFolderTag = formsSvc.getFolderTagExtUrl()     //the extension url for folder tag extensions
                 $scope.folderTags = {} //
                 $scope.folderTags['all'] = t
                 $scope.input.selectedFolderTag = $scope.folderTags['all']
@@ -1398,7 +1319,10 @@ angular.module("formsApp")
                         $scope.allQ = [];
                         data.data.entry.forEach(function (entry){
 
-                            console.log(formsSvc.getCheckoutIdentifier(entry.resource))
+                            //console.log(formsSvc.getCheckoutIdentifier(entry.resource))
+
+
+
 
                             //get the checkout status for the model. This is used for display, and also if the model is to be edited will cause the local copy to be edited
                             //when the full Q is loaded, the $scope.checkoutIdentifier variable is set. Used to control the actions..
@@ -1416,13 +1340,24 @@ angular.module("formsApp")
 
                             //entry.resource.checkIdentifier = formsSvc.getCheckoutIdentifier(entry.resource)
                             //these are 'miniQ' - and have the checkedoutTo entry set to 'me' or the email of the person who has checked it out
-                            $scope.allQ.push(entry.resource)
+
+                            //create hash of all tag extensions and attach to the miniQ
+                            let miniQ = entry.resource
+                            miniQ.hashFolderTag = {}
+                            if (miniQ.extension) {
+                                miniQ.extension.forEach(function (ext) {
+                                    if (ext.url == extFolderTag) {
+                                        miniQ.hashFolderTag[ext.valueString] = true
+                                        $scope.folderTags[ext.valueString] = true
+                                    }
+                                })
+                            }
+
+                            $scope.allQ.push(miniQ)
                             //console.log(entry.resource.extension)
 
 
-
-
-                            //populate tag list
+                            //populate tag list - todo this should go...
                             if (entry.resource && entry.resource.meta && entry.resource.meta.tag) {
                                 entry.resource.meta.tag.forEach(function (tag) {
                                     if (tag.system == $scope.tagFolderSystem) {

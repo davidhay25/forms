@@ -8,6 +8,52 @@ angular.module("formsApp")
             //fin
 
 
+            auditDependencies : function(Q,hash) {
+                //check that the all the sources
+
+
+                let arResult = []
+
+                //construct a list of all items with a dependency
+                let arDependencies = []
+
+                if (Q.item) {
+                    Q.item.forEach(function (section){
+                        checkDependency(section)
+
+                        if (section.item) {
+                            section.item.forEach( function(child){
+                                if (child.item) {
+                                    child.item.forEach(function (grandchild) {
+                                        checkDependency(grandchild)
+                                    })
+                                } else {
+                                    checkDependency(child)
+                                }
+                            })
+                        }
+
+
+
+                    })
+                }
+
+                return arResult //arDependencies
+
+                function checkDependency(item) {
+                    if (item.enableWhen) {
+
+                        item.enableWhen.forEach(function (dep) {
+                            if (! hash[dep.question]) {
+                                let entry = {msg:`Item ${item.linkId} has a dependency on ${dep.question} which is missing`}
+                                arResult.push()
+                            }
+                        })
+                        arDependencies = arDependencies.concat(item.enableWhen)
+                    }
+                }
+
+            },
 
 
             dnd : function(Q,sourceItem,targetItem) {

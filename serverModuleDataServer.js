@@ -91,6 +91,7 @@ function setup(app,serverRoot) {
             res.status(400).json({msg:'Tag missing'})
         }
     })
+
 /*
     app.delete('/ds/fhir/Questionnaire/:id',function(req,res){
         let url = serverRoot + "Questionnaire/" + req.params.id
@@ -245,18 +246,7 @@ function setup(app,serverRoot) {
             return
         }
 
-/*
-        //resources that anyone can access without auth
-        let allowedResources = ['Questionnaire','ServiceRequest']
 
-        //Anyone can get all the Questionnaires...
-        //if (req.params.type !== 'Questionnaire' &&  ! checkAuth(req)) {
-        if ( allowedResources.indexOf(req.params.type) == -1  &&  ! checkAuth(req)) {
-            res.status(403).json()
-            return
-        }
-*/
-        //console.log(req.query)
         let delimiter = '?'
         Object.keys(req.query).forEach(function(key,inx){
             let val = req.query[key]        //can be an array

@@ -38,6 +38,17 @@ const formsManagerModule = require("./serverModuleFormsManager.js")
 const dataServerModule = require("./serverModuleDataServer.js")
 const backupModule = require("./serverModuleBackup");
 
+//systemConfig is specific to a server environment - eg design, production etc
+//default to design (which enables the 'publish button')
+let systemConfig
+    try {
+         systemConfig = require("./artifacts/systemConfig.json")
+    } catch (ex) {
+        systemConfig = {type:"design","publicServer":"https://canshare.co.nz"}
+    }
+
+console.log("Config settings:",JSON.stringify(systemConfig))
+
 
 const { MongoClient } = require('mongodb')
 const uri = 'mongodb://localhost:27017/'
@@ -60,21 +71,16 @@ MongoClient.connect(uri, function(err, client) {
     //client.close();
 });
 
-
-
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 
-
-
-
-
-
-
-
 formsReceiverModule.setup(app,serverRoot,db)   //the module needs access to the app so that any processing errors can be logged
-formsManagerModule.setup(app,serverRoot)
+formsManagerModule.setup(app,serverRoot,systemConfig)
 dataServerModule.setup(app,serverRoot)
 
+//return the system config so the client can adjust the UI (eg hide / show the publish button
+app.get('/config',function(req,res) {
+    res.json(systemConfig)
+})
 
 //var db;
 var port = process.env.port;

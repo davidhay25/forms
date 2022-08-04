@@ -254,15 +254,25 @@
                     popover-trigger="'mouseenter'"
                     ng-click = "revert(miniQ)">Revert</button>
 
+
+
         </div>
 
-        <!-- The Q is not checked out, but there is a logged in user, so could potentially be checked in-->
-        <div ng-show="! checkoutIdentifier.value && user.email && selectedQ">
+        <!-- The Q is not checked out, but there is a logged in user, so could potentially be checked out (unless this is being invoked on the public site)-->
+        <div ng-show="! checkoutIdentifier.value && user.email && selectedQ && systemConfig.type !== 'public'">
             <button class="btn btn-success pull-right"
                     uib-popover="Save this model locally, and allow editing"
                     popover-placement="left"
                     popover-trigger="'mouseenter'"
                     ng-click="checkout(selectedQ)">Check out</button>
+
+            <!--  Publish-->
+            <button class="btn btn-danger pull-right horizontalButtonSpacer"
+                    uib-popover="Will copy the Q to the public server"
+                    popover-placement="left"
+                    popover-trigger="'mouseenter'"
+                    ng-click = "publish(selectedQ)">Publish</button>
+
         </div>
 
         <!-- No user login - read only-->
@@ -333,13 +343,17 @@
                         Use 'Revert' to discard your changes.
                     </div>
 
-                    <div class="alert alert-warning" ng-hide="miniQ.checkedoutTo == 'me' || !selectedQ">
+
+                    <div class="alert alert-warning" ng-hide="miniQ.checkedoutTo == 'me' || !selectedQ || systemConfig.type == 'public'">
                         This is a readonly view.
                         <span ng-show = "miniQ.checkedoutTo">It has been checked out by {{miniQ.checkedoutTo}}</span>
                         <span ng-hide = "miniQ.checkedoutTo">
                             To edit, <span ng-hide="user.email">log in, then</span>  check out the model, edit it, and check it back in.
                         </span>
+                    </div>
 
+                    <div class="alert alert-warning" ng-show="systemConfig.type == 'public'">
+                        This app is being executed on the Public site, and so check out has been disabled. Use the Designer site instead.
                     </div>
 
 
@@ -728,17 +742,7 @@
 
                                                         </div>
                                                     </div>
-                                                    <!--
-                                                    <div class="col-md-2">
-                                                        <div ng-show="selectedNode">
-                                                            <button class="btn btn-link"
-                                                                    ng-click="moveDown(selectedNode)">
-                                                                Move Down
-                                                            </button>
-                                                        </div>
 
-                                                    </div>
--->
                                                     <div class="col-md-2">
                                                         <div ng-show="selectedNode && selectedNode.id !== 'root'">
                                                             <button class="btn btn-link"
@@ -762,6 +766,11 @@
                                         <uib-tab heading="Json">
                                             <pre>{{selectedNode.data.item | json}}</pre>
                                             <em>Only for internal use</em>
+                                        </uib-tab>
+
+                                        <uib-tab heading="Dependencies">
+                                            <button class="btn btn-link" ng-click="makeQDependancyAudit()">Make audit</button>
+                                            <pre>{{dependencyAudit | json}}</pre>
                                         </uib-tab>
 
                                     </uib-tabset>

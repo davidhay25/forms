@@ -1,27 +1,126 @@
 // forms manager API
 const axios = require('axios').default;
 
-function setup(app,serverRoot) {
+function setup(app,serverRoot,config) {
 
-    //routes that are intended to be 'public' routes - ie that matches what the IG requires
 
-    app.put('/fm/fhir/Questionnaire/:id',function(req,res){
-        let Q = req.body
-        let url = serverRoot + "Questionnaire/" + Q.id
-        //console.log(url)
-        axios.put(url,Q)
-            .then(function (response){
-                res.status(response.status).json(response.data)
-            })
-            .catch(function (err){
-                console.log(err.response.data)
-                res.status(400).send(err.response.data)
-            })
+    /* --------- endpoints for the 'copy to public server
 
-    })
+    config.type is environment - 'design' or 'public'
 
+    There is one endpoint specific to the design mode that accepts the Q, and POST's it to the public server.
+        This is a custom endpoint (for now) so the meaning is clear
+
+    There is also an endpoint hosted by the public server - it's a POST verb that:
+        accepts the Q
+        locate any existing Q with the Q.url
+        If there are none, then create it, if 1 then replace it, if > 1 return an error
+
+*/
+
+    if (config.type == 'design') {
+        //only the design server supports Q update by Id (PUT)
+        app.put('/fm/fhir/Questionnaire/:id',function(req,res){
+
+            let Q = req.body
+            let url = serverRoot + "Questionnaire/" + Q.id
+            //console.log(url)
+            axios.put(url,Q)
+                .then(function (response){
+                    res.status(response.status).json(response.data)
+                })
+                .catch(function (err){
+                    console.log(err.response.data)
+                    res.status(400).send(err.response.data)
+                })
+
+        })
+
+        //the publish endpoint used by the design server
+        app.post('/fm/publish', function (req, res) {
+            let Q = req.body
+
+            res.status(404).json()  //just while I'm thinking about it
+            return
+
+            let url = serverRoot + "Questionnaire/" + Q.id
+            //console.log(url)
+            axios.put(url, Q)
+                .then(function (response) {
+                    res.status(response.status).json(response.data)
+                })
+                .catch(function (err) {
+                    console.log(err.response.data)
+                    res.status(400).send(err.response.data)
+                })
+
+        })
+    }
+
+
+
+    if (config.type == 'public') {
+
+        //process a POST of a Q to the public server
+        app.post('/fm/fhir/Questionnaire', async function (req, res) {
+            if (! checkAuth(req)) {
+                res.status(403).json()
+                return
+            }
+
+            let Q = req.body
+            let url = Q.url
+            let version = Q.version
+
+            //need to check the number of Q on this server (the public server) with that url
+            try {
+                if (url && version) {
+                    let qry = `${serverRoot}Questionnaire?url=${url}&version=${version}`
+                    let config
+                    let results = await axios.get(qry)      //get the first
+                    let bundle = results.data       //matching Q (based on url
+                    let cnt = 0
+                    if (bundle.entry) {
+                        cnt = bundle.entry.length
+                    }
+                    switch (cnt) {
+                        case 0:
+                            //No existing Q - POST the Q to the local (public) server
+                            let url = `${serverRoot}Questionnaire`
+                            let results = await axios.post(url,Q)      //get the first
+                            res.json(results.data)
+                            break
+                        case 1:
+                            //1 existing - PUT to the id on the local (public) server
+                            let currentQ = bundle.entry[0].resource     //the current Q on the server
+                            let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
+                            let putResults = await axios.put(putUrl,Q)      //get the first
+                            res.json(putResults.data)
+                            break
+                        default :
+                            //must be > 1 - error
+                            res.status(500).json({msg: "There were multiple Q with this Url & version"})
+                            break
+
+                    }
+
+
+                } else {
+                    res.status(400).json({msg: "Url or version missing"})
+
+                }
+
+            } catch (e) {
+                res.status(500).json(e)
+            }
+            //have to delete any tags too. bugger.
+
+        })
+
+    }
 
     //return all the questionnaires - or search by url
+    //todo not sure if this is used...
     app.get('/fm/fhir/Questionnaire',function(req,res){
         let url = serverRoot + "Questionnaire"
 
@@ -44,6 +143,14 @@ function setup(app,serverRoot) {
     })
 
 
+
+}
+
+//check that the call is authorized. very basic ATM!
+function checkAuth(req) {
+    if (req.headers.authorization == 'dhay') {
+        return true
+    }
 
 }
 

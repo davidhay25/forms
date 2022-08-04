@@ -498,10 +498,10 @@
                                                 <td>Options</td>
                                                 <td>
                                                     <div>
-                                                        <span ng-repeat = "option in selectedNode.data.item.answerOption">
+                                                        <div ng-repeat = "option in selectedNode.data.item.answerOption">
                                                             {{option.valueInteger}}{{option.valueString}}
-                                                            {{option.valueCoding.display}},
-                                                        </span>
+                                                            {{option.valueCoding.display}}
+                                                        </div>
                                                     </div>
                                                 </td>
 

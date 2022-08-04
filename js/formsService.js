@@ -61,6 +61,8 @@ angular.module("formsApp")
         extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
         extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
 
+        extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
+
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
@@ -90,6 +92,9 @@ angular.module("formsApp")
         let arExpandedVsCache = {}      //cache of expanded VS
 
         return {
+            getFolderTagExtUrl : function(){
+                return extFolderTag
+            },
 
             QhasFolderTag : function(Q,tag) {
                 //return true if the Q has the given folder tag (case insensitive)
@@ -312,7 +317,6 @@ angular.module("formsApp")
             addQAttachment : function(Q,att) {
                 Q.extension = Q.extension || []
                 Q.extension.push({url:extQAttachment,valueAttachment : att})
-
             },
             removeQAttachment : function(Q,url) {
                 let pos = -1
@@ -1697,8 +1701,6 @@ angular.module("formsApp")
                                         itemToAdd.answer.push(result)
                                     }
 
-
-
                                 })
                                 parentItem.item = parentItem.item || []
                                 parentItem.item.push(itemToAdd)
@@ -1719,9 +1721,11 @@ angular.module("formsApp")
                                 child.item.forEach(function (gcItem) {      //gc is grandChild...
                                     //is there data for this iyem
                                     //todo - not checking whether the item has conditions - should we?
-                                    let gcValue = form[gcItem.linkId]
-                                    if (gcValue) {
+                                    //let gcValue = form[gcItem.linkId]
 
+                                    let arValues = hashFormValues[gcItem.linkId]
+
+                                    if (arValues) {
 
                                         //the parent (off the section) may not have been created yet
                                         if (! parentItem) {
@@ -1729,11 +1733,9 @@ angular.module("formsApp")
                                             QR.item.push(parentItem)
                                         }
 
-
                                         if (! gcRootItem) {
                                             //the root hasn't been created
                                             gcRootItem = {linkId:child.linkId,text:child.text,item:[]}
-
                                             parentItem.item = parentItem.item || []
                                             parentItem.item.push(gcRootItem)
                                         }
@@ -1741,9 +1743,13 @@ angular.module("formsApp")
 
                                         let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text,answer:[]}
 
-                                        let result = getValue(gcItem,gcValue)
+                                        arValues.forEach(function (v) {
+                                            let result = getValue(gcItem,v)
+                                            if (result) {
+                                                gcItemToInsert.answer.push(result)
+                                            }
 
-                                        gcItemToInsert.answer.push(result)
+                                        })
 
                                         gcRootItem.item.push(gcItemToInsert)
 
