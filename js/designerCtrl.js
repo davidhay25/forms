@@ -403,7 +403,21 @@ angular.module("formsApp")
                 })
             }
 
-            $scope.addTag = function(code,system,display) {
+            $scope.addTag = function(code) {
+
+                $scope.selectedQ.extension = $scope.selectedQ.extension || []
+                let ext = {url:formsSvc.getFolderTagExtUrl(),valueString:code}
+                $scope.selectedQ.extension.push(ext)
+                $scope.miniQ.hashFolderTag[code] = code
+                delete $scope.input.newTagCode
+                if ($scope.folderTags.indexOf(code) == -1) {
+                    $scope.folderTags.push(code)
+                }
+
+
+                $scope.updateLocalCache()
+
+                /*
                 $scope.folderTags[code] = {code:code}
                 $scope.selectedQ.meta = $scope.selectedQ.meta || {}
                 $scope.selectedQ.meta.tag = $scope.selectedQ.meta.tag || []
@@ -412,21 +426,37 @@ angular.module("formsApp")
                 delete $scope.input.newTagCode
                 $scope.input.dirty = true
                 $scope.updateLocalCache()
+                */
             }
 
-            //removing a tag means using the meta-delete operation.
-            //with the check out/in, this needs to be done during check in
-            $scope.removeTag = function(inx) {
+
+
+            $scope.removeTag = function(tag) {
+                let extFolderTag = formsSvc.getFolderTagExtUrl()  //the extension url
+                let currentExtensions = $scope.selectedQ.extension  //must be present if remove is being called
+                $scope.selectedQ.extension = []
+                //delete $scope.miniQ
+                currentExtensions.forEach(function (ext) {
+                    if (ext.url == extFolderTag && ext.valueString == tag) {
+                        //do nothing - it will be removed
+                    } else {
+                        $scope.selectedQ.extension.push(ext)
+                    }
+                })
+
+                //remove the entry from miniQ
+
+//miniQ.hashFolderTag
                 //mark the tag for deletion by setting userselcted to true. Not really the purpose of this element...
-                $scope.selectedQ.meta.tag[inx].userSelected = true
+                //$scope.selectedQ.meta.tag[inx].userSelected = true
 
 
             }
 
-            //clear the currently selected Q when changing selected tag
+            //clear the currently selected Q when changing selected tag. tag is a string
             $scope.selectTag = function(tag){
                 delete $scope.selectedQ
-                $localStorage.selectedFolderTag = tag.code  //only save the code
+                $localStorage.selectedFolderTag = tag  // .code  //only save the code
             }
 
 
@@ -447,7 +477,16 @@ angular.module("formsApp")
 
             //determines if an individual Q can be shown in the list - folder support
             //note: can't select Q from here as loading Q is now async
-            $scope.canShowQ = function(Q) {
+            $scope.canShowQDEP = function(miniQ) {
+
+                if ($scope.input.selectedFolderTag == 'all') {
+                    return true
+                } else {
+                   // if (miniQ.hashFolderTag[])
+                }
+
+                /*
+
                 if ($scope.input.selectedFolderTag) {
                     //a folder has been selected - does this Q have the required tag?
                     if ($scope.input.selectedFolderTag.code == 'all') {
@@ -473,7 +512,7 @@ angular.module("formsApp")
                 } else {
                     return true
                 }
-
+*/
 
 
             }
@@ -1310,9 +1349,9 @@ angular.module("formsApp")
                 let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&_sort=name&status:not=retired"
                 let t = {code:'all'}
                 let extFolderTag = formsSvc.getFolderTagExtUrl()     //the extension url for folder tag extensions
-                $scope.folderTags = {} //
-                $scope.folderTags['all'] = t
-                $scope.input.selectedFolderTag = $scope.folderTags['all']
+                $scope.folderTags = [] //
+                $scope.folderTags.push('all')
+                $scope.input.selectedFolderTag = $scope.folderTags[0]
 
                 $http.get(url).then(
                     function (data) {
@@ -1323,40 +1362,59 @@ angular.module("formsApp")
 
 
 
-
-                            //get the checkout status for the model. This is used for display, and also if the model is to be edited will cause the local copy to be edited
-                            //when the full Q is loaded, the $scope.checkoutIdentifier variable is set. Used to control the actions..
-                            let checkOut = formsSvc.getCheckoutIdentifier(entry.resource)
-
-
-                            if (checkOut) {
-                                //this model is checked out to someone
-                                if ($scope.user && $scope.user.email == checkOut.value) {
-                                    entry.resource.checkedoutTo = 'me'
-                                } else {
-                                    entry.resource.checkedoutTo = checkOut.value
-                                }
-                            }
-
                             //entry.resource.checkIdentifier = formsSvc.getCheckoutIdentifier(entry.resource)
                             //these are 'miniQ' - and have the checkedoutTo entry set to 'me' or the email of the person who has checked it out
 
                             //create hash of all tag extensions and attach to the miniQ
                             let miniQ = entry.resource
-                            miniQ.hashFolderTag = {}
+                            miniQ.hashFolderTag = {all:'all'}
                             if (miniQ.extension) {
                                 miniQ.extension.forEach(function (ext) {
                                     if (ext.url == extFolderTag) {
-                                        miniQ.hashFolderTag[ext.valueString] = true
-                                        $scope.folderTags[ext.valueString] = true
+                                        let tag = ext.valueString
+                                        miniQ.hashFolderTag[ext.valueString] = tag
+                                        if ($scope.folderTags.indexOf(tag) == -1) {
+                                            $scope.folderTags.push(tag)
+                                        }
+                                        //$scope.folderTags[ext.valueString] = ext.valueString
                                     }
                                 })
                             }
 
+                            //get the checkout status for the model. This is used for display, and also if the model is to be edited will cause the local copy to be edited
+                            //when the full Q is loaded, the $scope.checkoutIdentifier variable is set. Used to control the actions..
+                            let checkOut = formsSvc.getCheckoutIdentifier(entry.resource)
+                            if (checkOut) {
+                                //this model is checked out to someone
+                                if ($scope.user && $scope.user.email == checkOut.value) {
+                                    entry.resource.checkedoutTo = 'me'
+
+                                    //need to see if a tag has been added - it may need to be added to the folder list
+                                    let nameInCache = "coq-" + miniQ.url
+                                    let Q = $localStorage[nameInCache]
+                                    if (Q && Q.extension) {
+                                        Q.extension.forEach(function(ext) {
+                                            if (ext.url == extFolderTag) {
+                                                let tag = ext.valueString
+                                                miniQ.hashFolderTag[ext.valueString] = tag
+                                                if ($scope.folderTags.indexOf(tag) == -1) {
+                                                    $scope.folderTags.push(tag)
+                                                }
+                                                //$scope.folderTags[ext.valueString] = ext.valueString
+                                            }
+                                        })
+                                    }
+
+                                } else {
+                                    entry.resource.checkedoutTo = checkOut.value
+                                }
+                            }
+
+
                             $scope.allQ.push(miniQ)
                             //console.log(entry.resource.extension)
 
-
+/*
                             //populate tag list - todo this should go...
                             if (entry.resource && entry.resource.meta && entry.resource.meta.tag) {
                                 entry.resource.meta.tag.forEach(function (tag) {
@@ -1365,6 +1423,7 @@ angular.module("formsApp")
                                     }
                                 })
                             }
+                            */
 
                         })
 
@@ -1384,7 +1443,7 @@ angular.module("formsApp")
 
                         //set any saved foldertag
                         if ($localStorage.selectedFolderTag) {
-                            $scope.input.selectedFolderTag = $scope.folderTags[$localStorage.selectedFolderTag]
+                            $scope.input.selectedFolderTag = $localStorage.selectedFolderTag // $scope.folderTags[$localStorage.selectedFolderTag]
 
                         } else {
                             //select the first one

@@ -56,11 +56,12 @@
                     Folders
                 </div>
                 <div class="col-md-9">
+                    <!--
                     <table class="table table-bordered">
                         <tr><th>Code (folder)</th><th>Display</th><th></th></tr>
                         <tr ng-repeat = "tag in selectedQ.meta.tag" ng-show="tag.system == tagFolderSystem && ! tag.userSelected">
                             <td>{{tag.code}}</td>
-                            <!--<td>{{tag.system}}</td> todo maybe as a popover-->
+
                             <td>{{tag.display}}</td>
                             <td><i class=" clickable glyphicon glyphicon-remove"
                                    ng-show="user.email && miniQ.checkedoutTo == 'me'"
@@ -74,7 +75,26 @@
                                    ng-click = "addTag(input.newTagCode,tagFolderSystem,input.newTagDisplay)"></i></td>
                         </tr>
                     </table>
+                    -->
+                    <table class="table table-bordered">
+                        <tr><th>Code (folder)</th><th></th></tr>
 
+                        <tr ng-repeat = "(k,v) in miniQ.hashFolderTag"
+                            ng-show = "k !== 'all'">
+                            <td>{{k}}</td>
+
+                            <td><i class="clickable glyphicon glyphicon-remove"
+                                   ng-show="user.email && miniQ.checkedoutTo == 'me'"
+                                   ng-click = "removeTag(tag)"></i></td>
+                        </tr>
+                        <tr ng-show="user.email && miniQ.checkedoutTo == 'me'">
+                            <td><input class="form-control" type="text" ng-model="input.newTagCode"/></td>
+
+                            <td><i class=" clickable glyphicon glyphicon-plus-sign"
+
+                                   ng-click = "addTag(input.newTagCode)"></i></td>
+                        </tr>
+                    </table>
 
                 </div>
             </div>

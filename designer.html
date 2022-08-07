@@ -293,7 +293,7 @@
                         <div class="col-md-8">
                             <select class="form-control" ng-model="input.selectedFolderTag"
                                     ng-change = "selectTag(input.selectedFolderTag)"
-                                    ng-options = "coding.code for coding in folderTags">
+                                    ng-options = "tag for tag in folderTags">
                             </select>
                         </div>
                     </div>
@@ -303,7 +303,7 @@
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,'listItemSelected':miniQ.id == selectedQ.id}"
                                  style="cursor: pointer"
-                                 ng-show="canShowQ(miniQ)"
+                                 ng-show="miniQ.hashFolderTag[input.selectedFolderTag]"
                                  ng-click="selectQ(miniQ)"
                                  ng-repeat="miniQ in allQ">
                                 {{miniQ.name}}

@@ -4,8 +4,6 @@ const https = require('https');
 
 const bodyParser = require('body-parser')
 
-let serverRoot = "http://localhost:9099/baseR4/"
-
 var express = require('express');
 var app = express();
 
@@ -41,14 +39,23 @@ const backupModule = require("./serverModuleBackup");
 //systemConfig is specific to a server environment - eg design, production etc
 //default to design (which enables the 'publish button')
 let systemConfig
-    try {
-         systemConfig = require("./artifacts/systemConfig.json")
-    } catch (ex) {
-        systemConfig = {type:"design","publicServer":"https://canshare.co.nz"}
-    }
+try {
+     systemConfig = require("./artifacts/systemConfig.json")
+} catch (ex) {
+    systemConfig = {type:"design","publicServer":"https://canshare.co.nz",port:9090,serverRoot : "http://localhost:9099/baseR4/"}
+}
+
+//allows multiple instances of the app (with associated hapi) on the same VM. Not actually using this ATM
+let serverRoot = systemConfig.serverRoot  // "http://localhost:9099/baseR4/"
+
+var port = process.env.port;
+if (! port) {
+    // temp - really need this port=80;
+    port = systemConfig.port;
+}
+
 
 console.log("Config settings:",JSON.stringify(systemConfig))
-
 
 const { MongoClient } = require('mongodb')
 const uri = 'mongodb://localhost:27017/'
@@ -83,10 +90,7 @@ app.get('/config',function(req,res) {
 })
 
 //var db;
-var port = process.env.port;
-if (! port) {
-    port=80;
-}
+
 
 let server;
 
