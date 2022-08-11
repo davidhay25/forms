@@ -106,14 +106,6 @@ angular.module("formsApp")
             }
 
             let drawTree = function(treeData,cb){
-                //console.log(treeData)
-              /*  treeData.forEach(function (item) {
-                    item.state.opened = true
-                    if (item.parent == 'root') {
-                        item.state.opened = false;
-                    }
-                })
-*/
 
                 $('#designTree').jstree('destroy');
 

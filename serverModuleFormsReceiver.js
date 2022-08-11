@@ -259,8 +259,6 @@ function performObservationExtraction(Q,QR) {
         })
     }
 
-
-
     //go through the QR and generate a hash or response items keyed by linkId
     function parseQR(hashQR,item) {
         if (item.item) {
@@ -280,9 +278,6 @@ function performObservationExtraction(Q,QR) {
             parseQR(hashQR,topLevel)
         })
     }
-
-
-
 
     //the provenance resource for this action
     let provenance = {resourceType:"Provenance"}

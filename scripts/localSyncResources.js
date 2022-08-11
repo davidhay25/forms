@@ -5,8 +5,10 @@
 *
 *
 * */
-
+let fs = require("fs")
 let axios = require('axios')
+
+let fileRoot="backups/"
 
 //the server to copy resources from
 let sourceServer = "https://canshare.co.nz/ds/fhir/"
@@ -30,6 +32,10 @@ async function syncResources(type) {
     axios.get(qry,config).then(
         function(response) {
             let bundle = response.data;
+
+            //save to a local file
+           // let fileName = fileRoot + type + "-" + new Date().toISOString() + ".json"
+           // fs.writeFileSync(fileName,JSON.stringify(bundle))
 
             let newBundle = {'resourceType':"Bundle",type:'transaction',entry:[]}
 

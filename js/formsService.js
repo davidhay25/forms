@@ -92,6 +92,107 @@ angular.module("formsApp")
         let arExpandedVsCache = {}      //cache of expanded VS
 
         return {
+
+            checkForConditional(Q,linkId) {
+                //Find all items that have a conditional on the linkId (ie the enableWhen.question is the same as the linkId
+                let lst = []
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        checkEW(section,linkId)
+                        if (section.item) {
+                            section.item.forEach(function (child) {
+                                if (child.item) {
+                                    child.item.forEach(function (grandChild) {
+                                        checkEW(grandChild,linkId)
+                                    })
+                                } else {
+                                    checkEW(child,linkId)
+                                }
+                            })
+                        }
+
+                    })
+                }
+                return lst
+
+                function checkEW(item,linkId) {
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ew) {
+                            if (ew.question == linkId) {
+                                lst.push(item.linkId)
+                            }
+                        })
+                    }
+
+                }
+
+
+
+
+            },
+
+
+            makeChoiceElement : function(Q,linkId,hashAllItems) {
+                //take an item with child elements (a group) and convert it into a cholce element, removing the children
+                //if (item.item) {
+                //need to locate the item in the Q with the given linkId
+                let that = this
+
+                for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+                    let section = Q.item[sectionIndex]
+                    if (section.item) {
+                        section.item.forEach(function (child) {
+                            if (child.linkId == linkId) {
+
+                                //this is the item in the Q that will be converted to a choice.
+                                //first, make sure that none of the child items are a
+
+                                let ar = []
+                                child.item.forEach(function (grandChild) {
+                                    ar = ar.concat(that.checkForConditional(Q,grandChild.linkId))
+                                })
+
+
+                               // if (ar.length == 0) {
+                                    child.answerOption = []
+                                    child.item.forEach(function (grandChild) {
+                                        //construct a coding
+                                        child.answerOption.push({valueCoding:{display:grandChild.text}})
+                                    })
+
+                                    child.type = "choice"
+                                    //remove the column count extension
+                                    if (child.extension) {
+                                        let arExtensions = child.extension
+                                        child.extension = []
+                                        arExtensions.forEach(function (ext) {
+                                            if (ext.url !== extColumnCount) {
+                                                child.extension.push(ext)
+                                            }
+                                        })
+                                    }
+                                    delete child.item
+                                //} else {
+                                    return ar
+                               // }
+
+
+                            }
+                        })
+                    }
+                }
+
+
+                function checkForConditional(child) {
+                    //check all the children of the child.
+
+
+
+                }
+
+
+            },
+
             getFolderTagExtUrl : function(){
                 return extFolderTag
             },
@@ -1996,8 +2097,6 @@ angular.module("formsApp")
 
                                 let iconFile = "icons/icon-q-" + child.type + ".png"
                                 item.icon = iconFile
-
-
 
                                 hash[item.id] = item.data;
                                 treeData.push(item)

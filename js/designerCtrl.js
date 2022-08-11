@@ -91,6 +91,51 @@ angular.module("formsApp")
                 }
             }
 
+            $scope.dependencyErrors = function(){
+                if ($scope.dependencyAudit) {
+                    return $scope.dependencyAudit.filter((aud) => ! aud.ok).length
+                } else {
+                    return ""
+                }
+
+            }
+
+            $scope.doSearch = function(searchText) {
+                $scope.searchResults = qSvc.search($scope.selectedQ,searchText)
+            }
+
+            $scope.selectSearchItem = function(thing){
+
+                $scope.selectedSearchItem = thing
+
+                let selectedItemId = thing.item.linkId  //the linkId and node id are the same
+
+                $scope.showSection()       //collapse to section level
+
+                //set the selectedNode for this item
+
+                $scope.treeData.forEach(function (node) {
+                    if (node.id === selectedItemId) {
+                        $scope.selectedNode = node
+
+                        //unselect all nodes
+                        $("#designTree").jstree("deselect_all")
+
+
+                        //need to select that item in the main tree
+                        $("#designTree").jstree("select_node", node.id);
+                        try {
+                        //    $scope.$digest()
+                        } catch(ex) {}
+
+
+                    }
+                })
+
+
+
+            }
+
             //uploading a document (Used to upload docs and attach to a Q)
             $scope.uploadDocument = function(){
                 let id = "#fileUploadFileRef"    //in qMetadata
@@ -348,6 +393,10 @@ angular.module("formsApp")
             }
 
             $scope.publish = function(Q) {
+
+                alert("This will copy the Specification to the public server")
+                return
+
                 if (confirm(`Are you sure you want to publish this Standard to the public server (${$scope.publicServer})?`)){
                     //use the custom publish endpoint on the local server to send to the public server
 
@@ -403,11 +452,62 @@ angular.module("formsApp")
                 })
             }
 
+            $scope.saveTreeStateDEP = function() {
+                $scope.currentTreeState = {}
+                $scope.treeData.forEach(function (node){
+                    if (node.state.opened) {
+                        $scope.currentTreeState[node.id] = 'opened'
+                    }
+
+                    // node.state = node.state || {}
+                    // node.state.opened = hashState[node.id]
+                })
+                console.log($scope.currentTreeState)
+
+            }
+
+
+            $scope.makeChoiceElement = function(node) {
+
+                //$scope.saveTreeState()
+
+                //save current state of tree (todo move to function
+
+
+
+                let ar = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId,$scope.hashAllItems)
+                if (ar && ar.length > 0) {
+                    //this is a list of items that have a conditional reference to one of the child items being
+                    //converted to a list. The conversion did not proceed.
+                    console.log(ar)
+                    alert(ar)
+                }
+
+                let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
+                $scope.treeData = vo.treeData       //for drawing the tree
+/*
+                //restore the tree state
+                $scope.treeData.forEach(function (node){
+                    if ($scope.currentTreeState[node.id]) {
+                        node.state.opened = true
+
+                    } else {
+                        node.state.opened = false
+                    }
+                })
+*/
+
+                //restore the state
+                drawTree()
+            }
+
             $scope.addTag = function(code) {
 
                 $scope.selectedQ.extension = $scope.selectedQ.extension || []
                 let ext = {url:formsSvc.getFolderTagExtUrl(),valueString:code}
                 $scope.selectedQ.extension.push(ext)
+
+
                 $scope.miniQ.hashFolderTag[code] = code
                 delete $scope.input.newTagCode
                 if ($scope.folderTags.indexOf(code) == -1) {
@@ -456,6 +556,7 @@ angular.module("formsApp")
             //clear the currently selected Q when changing selected tag. tag is a string
             $scope.selectTag = function(tag){
                 delete $scope.selectedQ
+                delete $scope.dependencyAudit
                 $localStorage.selectedFolderTag = tag  // .code  //only save the code
             }
 
@@ -628,16 +729,26 @@ angular.module("formsApp")
 
 
             $scope.expandAll = function() {
-                expandAll()
-                drawTree()
+                $("#designTree").jstree("open_all");
+                //expandAll()
+                //drawTree()
             }
 
             //collapse to sections
             $scope.showSection = function() {
+
+                // close all the elements that have a parent of 'root'
+
+                $("#designTree").jstree("close_all");
+                $("#designTree").jstree("open_node","root");
+
+
+return
                 $scope.treeData.forEach(function (item) {
-                    item.state.opened = true
+                    //temp - is this helpful?    item.state.opened = true
                     if (item.parent == 'root') {
-                        item.state.opened = false;
+                        $("#designTree").jstree("close_node",  item.id);
+
                     }
                 })
                 drawTree()
@@ -828,6 +939,7 @@ angular.module("formsApp")
             $scope.moveUp = function(node) {
                 if (! $scope.editingQ) {
                     $scope.editingQ = true
+
                     $scope.selectedQ = qSvc.moveItem($scope.selectedQ,'up',node.data.item.linkId)
                     // moveItem : function(Q,dirn,linkId) {
 
@@ -957,6 +1069,7 @@ angular.module("formsApp")
                             $scope.input.dirty = true;
 
                             updateReport()
+                            $scope.makeQDependancyAudit()
                         }
                     })
             }
@@ -1086,6 +1199,11 @@ angular.module("formsApp")
             function loadQ(QtoSelect) {
                 //display the loading alert...
                 $scope.showLoading = true
+
+                try {
+                    $scope.$digest()
+                } catch (ex) {}
+
                 $('#designTree').jstree('destroy');
                 delete $scope.selectedQ
                 delete $scope.treeData
@@ -1093,13 +1211,20 @@ angular.module("formsApp")
                 delete $scope.checkoutIdentifier
 
                 delete $scope.input.hisoStatus
+                delete $scope.dependencyAudit
+
+                //$timeout(function(){},1)
+
                 let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
                 let now = new Date(), start = new Date()
 
                 if (QtoSelect.checkedoutTo == 'me') {
                     //if the Q has been checked out to the local user, then get the Q from the local cache
                     let nameInCache = "coq-" + QtoSelect.url
+
                     let Q = $localStorage[nameInCache]
+                    //$timeout(function(){},1)
+                    //console.log('readfromLS')
                     if (!Q) {
                         alert(`The local copy of the model was not found in the browser cache (${nameInCache}). Did you check out on a different machine?`)
                         delete $scope.showLoading
@@ -1115,7 +1240,7 @@ angular.module("formsApp")
                             console.log('Time to load: ',moment().diff(now))
                             let Q = data.data
                             processQ(Q)
-                            $scope.showLoading = false
+                           // $scope.showLoading = false
 
                         },
                         function(err) {
@@ -1127,8 +1252,9 @@ angular.module("formsApp")
 
             //set up the UI for the selected Q
             function processQ(Q) {
-                delete $scope.showLoading
+                //delete $scope.showLoading
                 $scope.selectedQ = Q
+
                 $scope.checkoutIdentifier = formsSvc.getCheckoutIdentifier(Q)  //the identifier of who has checked this out (if any)
 
                 $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
@@ -1139,7 +1265,7 @@ angular.module("formsApp")
                 console.log("Time to generate report ",moment().diff(now))
                 $scope.report = vo.report
                 $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
-
+                $scope.makeQDependancyAudit()
                 makeCsvAndDownload(Q,vo.hashAllItems)
                 makeQDownload(Q)
 
@@ -1164,6 +1290,8 @@ angular.module("formsApp")
 
             //when called from Q list. Passes in the 'mini-Q'
             $scope.selectQ = function(QtoSelect) {
+                $scope.showLoading = true
+
                 $scope.miniQ = QtoSelect    //save the miniQ so that if the Q is checked in or out rge display can be updated...
                     //As any edits are saved immediately in the local cache, there's nothing stopping an immediate load...
                     //$scope.miniQ = QtoSelect    //save the miniQ so that if the Q is checked in or out rge display can be updated...
@@ -1212,6 +1340,10 @@ angular.module("formsApp")
             //perfroms a 'redraw' of the Q - called frequently
             $scope.drawQ = function(Q,resetToSection) {
                 //save the current state of node expansion from the jstree - not the treedata!!!
+                now = new Date()
+
+
+
                 let hashState = {}
                 try {
                     let ar = $('#designTree').jstree('get_state').core.open
@@ -1230,7 +1362,7 @@ angular.module("formsApp")
                 $scope.treeData = vo.treeData       //for drawing the tree
 
                 if (resetToSection) {
-                    $scope.showSection()
+                 //   $scope.showSection()
                 } else {
                     //restore the opened state
                     $scope.treeData.forEach(function (node){
@@ -1248,6 +1380,7 @@ angular.module("formsApp")
 
                 $scope.v2List = exportSvc.createV2Report(Q)
 
+                console.log("Time to draw Q ",moment().diff(now))
 
             }
 
@@ -1255,6 +1388,10 @@ angular.module("formsApp")
                 if (!$scope.treeData) {
                     return
                 }
+
+
+                now = new Date()
+
 
                 $('#designTree').jstree('destroy');
                 //https://www.c-sharpcorner.com/article/drag-and-drop-in-jstree/
@@ -1281,7 +1418,7 @@ angular.module("formsApp")
                                     return false
                                 },
                                 'themes': {name: 'proton', responsive: true}},
-                        plugins:['dnd'],
+                        plugins:['dnd','state'],
                         dnd: {
                             'is_draggable' : function(nodes,e) {
                                 //don't allow groups to be dragged
@@ -1304,18 +1441,31 @@ angular.module("formsApp")
                     if (data.node) {
                         $scope.selectedNode = data.node;
 
-
                     }
+                    try {
+                        $scope.$digest();       //as the event occurred outside of angular...
+                    } catch (ex) {}
 
-                    $scope.$digest();       //as the event occurred outside of angular...
                 }).on('redraw.jstree', function (e, data) {
+
+
+                    delete $scope.showLoading
+
+                    console.log("Time to draw tree ",moment().diff(now))
 
                     //ensure the selected node remains so after a redraw...
                     if ($scope.treeIdToSelect) {
-                        $("#designTree").jstree("select_node", "#" + $scope.treeIdToSelect);
+                        $("#designTree").jstree("select_node",  $scope.treeIdToSelect);
                         delete $scope.treeIdToSelect
                     }
-
+/*
+                    //restore state
+                    $scope.treeData.forEach(function(node){
+                        if (node.id == data.node.id){
+                            node.state.opened = data.node.state.opened;
+                        }
+                    });
+*/
 
                 })
             }
@@ -1339,7 +1489,6 @@ angular.module("formsApp")
                 $scope.treeData.forEach(function (item) {
                     item.state.opened = true;
                 })
-
             }
 
 
@@ -1358,11 +1507,6 @@ angular.module("formsApp")
                         $scope.allQ = [];
                         data.data.entry.forEach(function (entry){
 
-                            //console.log(formsSvc.getCheckoutIdentifier(entry.resource))
-
-
-
-                            //entry.resource.checkIdentifier = formsSvc.getCheckoutIdentifier(entry.resource)
                             //these are 'miniQ' - and have the checkedoutTo entry set to 'me' or the email of the person who has checked it out
 
                             //create hash of all tag extensions and attach to the miniQ

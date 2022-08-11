@@ -50,6 +50,14 @@
              color: red;
          }
 
+        .pass {
+            background-color: #dff0d8;
+        }
+
+        .fail {
+            background-color: #e4b9c0;
+        }
+
          .hide {
              display:none;
          }
@@ -271,7 +279,7 @@
                     uib-popover="Will copy the Q to the public server"
                     popover-placement="left"
                     popover-trigger="'mouseenter'"
-                    ng-click = "publish(selectedQ)">Publish</button>
+                    ng-click = "publish(selectedQ)">Publish (not yet enabled)</button>
 
         </div>
 
@@ -333,6 +341,7 @@
 
                 <div ng-class="input.rightPane">
 
+
                     <!-- If the Q is not checkedout, then it cannot be updated - only saved locally-->
                     <div class="alert alert-warning" ng-show="showLoading">
                         Loading, please wait....
@@ -355,8 +364,6 @@
                     <div class="alert alert-warning" ng-show="systemConfig.type == 'public'">
                         This app is being executed on the Public site, and so check out has been disabled. Use the Designer site instead.
                     </div>
-
-
 
                     <uib-tabset ng-show="treeData">
 
@@ -711,6 +718,13 @@
                                                                 Add child element
                                                             </button>
 
+                                                            <button  ng-show="selectedNode.data.item.item.length > 0" class="btn btn-link"
+                                                                    ng-click="makeChoiceElement(selectedNode)">
+                                                                Convert to choice
+                                                            </button>
+
+
+
                                                         </div>
 
                                                         <div ng-show="selectedNode.data.level == 'grandchild'">
@@ -759,25 +773,84 @@
                                         </uib-tab>
 
                                         <uib-tab heading="Meta">
-                                            <pre>{{selectedNode.data.meta | json}}</pre>
                                             <em>Only for internal use</em>
+                                            <pre>{{selectedNode.data.meta | json}}</pre>
+
+                                        </uib-tab>
+
+                                        <uib-tab heading="Search">
+                                            <br/>
+                                            <ng-include src = "'includes/search.html'"></ng-include>
+
                                         </uib-tab>
 
                                         <uib-tab heading="Json">
-                                            <pre>{{selectedNode.data.item | json}}</pre>
                                             <em>Only for internal use</em>
+                                            <pre>{{selectedNode.data.item | json}}</pre>
+
                                         </uib-tab>
 
-                                        <uib-tab heading="Dependencies">
-                                            <button class="btn btn-link" ng-click="makeQDependancyAudit()">Make audit</button>
-                                            <pre>{{dependencyAudit | json}}</pre>
-                                        </uib-tab>
 
                                     </uib-tabset>
 
                                 </div>
                             </div>
 
+
+                        </uib-tab>
+
+                        <uib-tab>
+                            <uib-tab-heading>
+                                Dependencies
+                                <span class="badge">
+                                    {{dependencyErrors()}}
+                                </span>
+                            </uib-tab-heading>
+
+                            <button class="btn btn-link pull-right" ng-click="makeQDependancyAudit()">Update audit</button>
+                            <div class="clearfix"></div>
+                            <div class="tableFixHead">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr><th>This item is...</th><th>...dependant on this one to show</th><th>Operator</th><th>Operand (what is being compared in the dependant item)</th></tr>
+                                </thead>
+                                <tr ng-repeat="aud in dependencyAudit"
+                                    ng-class="{pass:aud.ok,fail: ! aud.ok}">
+                                    <td>
+                                        <div class="clickable" ng-click="editItemFromLinkId(aud.source)">
+                                            <div>{{aud.sourceText}}</div>
+                                            <em>{{aud.source}}</em>
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="clickable" ng-click="editItemFromLinkId(aud.target)">
+                                            <div>{{aud.controllerText}}</div>
+                                            <em>{{aud.target}}</em>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{aud.dep.operator}}
+
+                                    </td>
+                                    <td>
+                                        {{aud.dep.answerBoolean}} {{aud.dep.answerCoding}}
+                                        <div>{{aud.err}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            </div>
+
+
+
+
+
+                        </uib-tab>
+
+                        <uib-tab ng-show="false" heading="Search">
+                            <br/>
+                            <ng-include src = "'includes/search.html'"></ng-include>
 
                         </uib-tab>
 
@@ -1091,7 +1164,7 @@
 
                         </uib-tab>
 
-                        <uib-tab heading="Sample Instances">
+                        <uib-tab ng-show="false" heading="Sample Instances">
                             <em>Create example bundles. Only used by FHIR designer.</em>
 
 

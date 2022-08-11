@@ -2,15 +2,58 @@ angular.module("formsApp")
     //editing questionnaire
     .service('qSvc', function(formsSvc) {
 
-
-
         return {
-            //fin
 
+            search : function(Q,text) {
+                //locate all itens where the text or any answeroption element have that text
+
+                text = text.toLowerCase()
+                let matchingItems = []
+                if (Q.item) {
+                    Q.item.forEach(function (section){
+
+                        checkIfTextPresent(section,text,section)
+                        if (section.item) {
+                            section.item.forEach( function(child){
+                                if (child.item) {
+                                    child.item.forEach(function (grandchild) {
+                                        checkIfTextPresent(grandchild,text,section,child)
+                                    })
+                                } else {
+                                    checkIfTextPresent(child,text,section)
+                                }
+                            })
+                        }
+                    })
+                }
+                return matchingItems
+
+                function checkIfTextPresent(item,text,section,group) {
+                    if (item.text.toLowerCase().indexOf(text) > -1 ) {
+                        matchingItems.push({item:item,match:'Text element',section:section,group:group})
+                    } else if (item.answerOption) {
+                        let found = false
+                        item.answerOption.forEach(function (ao) {
+                            let vc = ao.valueCoding
+                            if (vc.display && vc.display.toLowerCase().indexOf(text) > -1) {
+                                found = true
+                            }
+
+
+
+                        })
+                        if (found) {
+                            matchingItems.push({item:item,match:"Answer option",section:section,group:group})
+                        }
+                    }
+
+                }
+
+
+            },
 
             auditDependencies : function(Q,hash) {
                 //check that the all the sources
-
 
                 let arResult = []
 
@@ -20,7 +63,6 @@ angular.module("formsApp")
                 if (Q.item) {
                     Q.item.forEach(function (section){
                         checkDependency(section)
-
                         if (section.item) {
                             section.item.forEach( function(child){
                                 if (child.item) {
@@ -32,9 +74,6 @@ angular.module("formsApp")
                                 }
                             })
                         }
-
-
-
                     })
                 }
 
@@ -45,8 +84,47 @@ angular.module("formsApp")
 
                         item.enableWhen.forEach(function (dep) {
                             if (! hash[dep.question]) {
-                                let entry = {msg:`Item ${item.linkId} has a dependency on ${dep.question} which is missing`}
-                                arResult.push()
+                                let err = "Controlling item not found"
+                                let entry = {source:item.linkId,target:dep.question, ok:false,dep:dep,err:err}
+                                entry.sourceText = item.text
+                                arResult.push(entry)
+                            } else {
+                                let OK = true
+                                let controllerText = hash[dep.question].item.text
+                                //if this is a coding, then is the target in the dependency still present
+                                let err
+                                if (dep.answerCoding) {
+                                    let depItem = hash[dep.question].item       //the item this one is dependant on...
+
+                                    if (depItem.answerOption) {
+                                        //locate the specific answew
+                                        let found = false
+                                        depItem.answerOption.forEach(function (ao) {
+                                            let vc = ao.valueCoding
+                                            if ((vc.system == dep.answerCoding.system) && (vc.code == dep.answerCoding.code)) {
+                                                found = true
+                                            }
+
+                                        })
+
+                                        if (! found) {
+                                            err = "This value is not in the set of answers"
+                                            OK = false
+                                        }
+
+                                    } else {
+                                        //there are no answerOptions
+                                        err = "There are no answerOptions in the dependency"
+                                        OK = false
+                                    }
+
+                                }
+
+
+                                let entry = {source:item.linkId,target:dep.question, ok:OK,dep:dep,err:err}
+                                entry.sourceText = item.text
+                                entry.controllerText = controllerText
+                                arResult.push(entry)
                             }
                         })
                         arDependencies = arDependencies.concat(item.enableWhen)

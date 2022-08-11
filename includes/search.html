@@ -1,0 +1,67 @@
+<div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <div style="padding-top: 8px">Search string</div>
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" ng-model="input.searchText"/>
+        </div>
+        <div class="col-md-2">
+            <button class="btn-link btn" ng-click="doSearch(input.searchText)">Search</button>
+        </div>
+    </div>
+
+    <br/>
+
+
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="myScroll">
+                <div class="list-group">
+                    <div ng-class="{'list-group-item':true,listItemSelected:item.item.linkId == selectedSearchItem.item.linkId}" ng-repeat="item in searchResults"
+                         style="cursor:pointer;"
+                         ng-click="selectSearchItem(item)">
+                        {{item.item.text}}
+                        <div class="pull-right clickable" ng-click="editItemFromReport(item)">Edit</div>
+                        <div><em>{{item.match}}</em></div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <div class="col-md-7">
+
+            <div ng-show = "selectedSearchItem">
+                <ng-include src = "'includes/itemDetails.html'"></ng-include>
+            </div>
+
+
+            <!--
+            <div ng-show="selectedSearchItem">LinkId: {{selectedSearchItem.item.linkId}}</div>
+            <div ng-show="selectedSearchItem">Section: {{selectedSearchItem.section.text}}</div>
+            <div ng-show="selectedSearchItem.group">Group: {{selectedSearchItem.group.text}}</div>
+            <hr/>
+            <uib-tabset ng-show="selectedSearchItem">
+                <uib-tab heading="Details">
+                    <ng-include src = "'includes/itemDetails.html'"></ng-include>
+                </uib-tab>
+
+                <uib-tab heading="Json">
+                    <pre>{{selectedSearchItem.item | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+            -->
+        </div>
+
+    </div>
+
+
+
+
+</div>
