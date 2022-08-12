@@ -15,12 +15,13 @@ angular.module("formsApp")
                         checkIfTextPresent(section,text,section)
                         if (section.item) {
                             section.item.forEach( function(child){
+                                checkIfTextPresent(child,text,section)
                                 if (child.item) {
                                     child.item.forEach(function (grandchild) {
                                         checkIfTextPresent(grandchild,text,section,child)
                                     })
                                 } else {
-                                    checkIfTextPresent(child,text,section)
+                                    //checkIfTextPresent(child,text,section)
                                 }
                             })
                         }

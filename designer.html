@@ -664,6 +664,11 @@
                                                                 ng-click="editItem(selectedNode)">
                                                             Edit
                                                         </button>
+
+                                                        <button class="btn btn-link" ng-show = "selectedNode.data.level == 'child'"
+                                                                ng-click="codeGroup(selectedNode)">
+                                                            Coding
+                                                        </button>
                                                     </div>
 
                                                     <div class="col-md-3">
@@ -772,17 +777,18 @@
 
                                         </uib-tab>
 
+                                        <uib-tab heading="Search">
+                                            <br/>
+                                            <ng-include src = "'includes/search.html'"></ng-include>
+
+                                        </uib-tab>
+
                                         <uib-tab heading="Meta">
                                             <em>Only for internal use</em>
                                             <pre>{{selectedNode.data.meta | json}}</pre>
 
                                         </uib-tab>
 
-                                        <uib-tab heading="Search">
-                                            <br/>
-                                            <ng-include src = "'includes/search.html'"></ng-include>
-
-                                        </uib-tab>
 
                                         <uib-tab heading="Json">
                                             <em>Only for internal use</em>

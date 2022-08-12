@@ -171,7 +171,7 @@
 <!-- - not working, why?
   {{selectedNode.data.meta.extraction}} {{Object.keys(selectedNode.data.meta.extraction)}}
 -->
-  <div class="row" ng-hide="selectedNode.data.item.type == 'group'">
+  <div class="row">
     <div class="col-md-3">
       Mapping
     </div>
@@ -182,14 +182,17 @@
         No Mapping defined
       </div>
 
-      <div ng-show="selectedNode.data.meta.extraction.type" || selectedNode.data.meta.extraction.path>
-        Type:{{selectedNode.data.meta.extraction.type}}   Path:{{selectedNode.data.meta.extraction.path}}
-      </div>
-
-
       <div ng-show="selectedNode.data.meta.extraction.extractObservation">
         Extract as Observation
       </div>
+
+      <div ng-show="selectedNode.data.meta.extraction.type || selectedNode.data.meta.extraction.path">
+        <span ng-show="selectedNode.data.meta.extraction.type">Type: </span>{{selectedNode.data.meta.extraction.type}}
+        <span ng-show="selectedNode.data.meta.extraction.path"> Path: </span>{{selectedNode.data.meta.extraction.path}}
+      </div>
+
+
+
 
       {{selectedNode.data.meta.extraction.notes}}
     </div>

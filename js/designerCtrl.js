@@ -221,7 +221,7 @@ angular.module("formsApp")
                     $scope.$digest()
                 }
 
-                //$scope.$digest()
+
 
             });
 
@@ -250,15 +250,25 @@ angular.module("formsApp")
             //checkin/out stuff
             //$scope.checkedOutTo is the email of the person the Q is checked out to (if any)
 
+            $scope.codeGroup = function () {
+                alert("This could be a specific dialog containing item (observable entity) and possible values for easier data entry")
+            }
+
             //when the Q is checked out to the current user, and they want to update the local copy
             $scope.updateLocalCache = function() {
                 //save a copy in the local browser cache and clear the dirty flag
 
                 let nameInCache = "coq-" + $scope.selectedQ.url
+
+
+                now = new Date()
+
                 $localStorage[nameInCache] = $scope.selectedQ
 
-                console.log("Updating local cache")
-                delete $scope.dirty
+                console.log("Time to generate update local cache ",moment().diff(now))
+
+                //console.log("Updating local cache")
+                //delete $scope.dirty
             }
 
             //make a copy for editing
@@ -274,7 +284,7 @@ angular.module("formsApp")
                     $scope.updateQ(function(){
                         //update the Q in the forms manager and call back when done
 
-                        //$scope.checkedOutTo = $scope.user.email
+
                         let nameInCache = "coq-" + Q.url
                         $localStorage[nameInCache] = Q
 
@@ -298,7 +308,6 @@ angular.module("formsApp")
                         let Q = data.data
                         //clear the checkout information
                         formsSvc.clearQCheckout(Q)
-                      //  processQ(Q)
 
                         //now, save the updated Q back to the server
                         let url = "/fm/fhir/Questionnaire/" + QtoRevert.id
@@ -308,7 +317,6 @@ angular.module("formsApp")
                                 alert("Local changes have been discarded")
                                 $scope.input.dirty = false;
                                 processQ(Q)
-
 
                             }, function(err) {
                                 alert(angular.toJson(err.data))
@@ -332,44 +340,46 @@ angular.module("formsApp")
             //check the updated copy back in
             $scope.checkin = function() {
 
-                //Update the checkout tag in the Q first.
-                formsSvc.clearQCheckout($scope.selectedQ)
-
-                //todo - need to update the tage (folders) - move from
-                //? read Q from server - delete tags no longer in selectedQ  (I think new tags are saved OK)
-
-                // now save the Q
-                $scope.updateQ(function(){
-                    delete $scope.checkoutIdentifier
-                    //and clear the browser cache on successful save
-
-                    let nameInCache = "coq-" + $scope.selectedQ.url
-                    delete $localStorage[nameInCache]
-
-                    delete $scope.miniQ.checkedoutTo
-
-                    //Now check for any deleted tags (userSelected = true). If there are, then call the delete tag operation for them
-                    if ($scope.selectedQ.meta && $scope.selectedQ.meta.tag) {
-                        $scope.selectedQ.meta.tag.forEach(function (tag) {
-                            if (tag.userSelected) {
-                                let url = `/ds/removeqtag/${$scope.selectedQ.id}`
-                                $http.post(url,tag).then(
-                                    function (data) {
-                                        console.log('removed tag ',tag)
-                                        $scope.loadAllQ()       //if there are multiple tags to delete this will be called multiple times...
-                                    }, function (err) {
-                                        alert('error updating tag' + angular.toJson( err.data))
-                                    }
-                                )
-                            }
-
-                        })
-                    } else {
-                        $scope.loadAllQ()
-                    }
+                if (confirm("Are you sure you're ready to upload your changes?")) {
+                    //Update the checkout tag in the Q first.
+                    formsSvc.clearQCheckout($scope.selectedQ)
 
 
-                })
+                    // now save the Q
+                    $scope.updateQ(function(){
+                        delete $scope.checkoutIdentifier
+                        //and clear the browser cache on successful save
+
+                        let nameInCache = "coq-" + $scope.selectedQ.url
+                        delete $localStorage[nameInCache]
+
+                        delete $scope.miniQ.checkedoutTo
+
+                        //Now check for any deleted tags (userSelected = true). If there are, then call the delete tag operation for them
+                        if ($scope.selectedQ.meta && $scope.selectedQ.meta.tag) {
+                            $scope.selectedQ.meta.tag.forEach(function (tag) {
+                                if (tag.userSelected) {
+                                    let url = `/ds/removeqtag/${$scope.selectedQ.id}`
+                                    $http.post(url,tag).then(
+                                        function (data) {
+                                            console.log('removed tag ',tag)
+                                            $scope.loadAllQ()       //if there are multiple tags to delete this will be called multiple times...
+                                        }, function (err) {
+                                            alert('error updating tag' + angular.toJson( err.data))
+                                        }
+                                    )
+                                }
+
+                            })
+                        } else {
+                            $scope.loadAllQ()
+                        }
+
+
+                    })
+                }
+
+
 
             }
 
@@ -485,20 +495,12 @@ angular.module("formsApp")
 
                 let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
                 $scope.treeData = vo.treeData       //for drawing the tree
-/*
-                //restore the tree state
-                $scope.treeData.forEach(function (node){
-                    if ($scope.currentTreeState[node.id]) {
-                        node.state.opened = true
 
-                    } else {
-                        node.state.opened = false
-                    }
-                })
-*/
-
-                //restore the state
                 drawTree()
+                makeQDependancyAudit()
+
+             //   $scope.showSection()
+                $("#designTree").jstree("select_node",  node.id);
             }
 
             $scope.addTag = function(code) {
@@ -1199,11 +1201,11 @@ return
             function loadQ(QtoSelect) {
                 //display the loading alert...
                 $scope.showLoading = true
-
+/*
                 try {
                     $scope.$digest()
                 } catch (ex) {}
-
+*/
                 $('#designTree').jstree('destroy');
                 delete $scope.selectedQ
                 delete $scope.treeData
@@ -1222,8 +1224,13 @@ return
                     //if the Q has been checked out to the local user, then get the Q from the local cache
                     let nameInCache = "coq-" + QtoSelect.url
 
+
+                    try {
+                        $scope.$digest()
+                    } catch (ex) {}
+
                     let Q = $localStorage[nameInCache]
-                    //$timeout(function(){},1)
+                    //$timeout(function(){},100)
                     //console.log('readfromLS')
                     if (!Q) {
                         alert(`The local copy of the model was not found in the browser cache (${nameInCache}). Did you check out on a different machine?`)
@@ -1233,7 +1240,26 @@ return
                         return
 
                     }
-                    processQ(Q)
+                    //return
+
+                   // processQ(Q)
+                    //a short delay to allow the digest to run and display the loading alert
+                    $timeout(function(){
+                        processQ(Q)
+                    },1)
+
+                    //for some reason which I can't figure out, the showLoading alert won't show unless there is an http
+                    //operation here. timeout & digest don't work. In any case, it would be nice to show a diff at some point
+                    //so I'll just make the call so that the UI updates
+                 /*   $http.get(qry).then(
+                        function () {
+                            processQ(Q)
+                        }, function(err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+*/
+
                 } else {
                     $http.get(qry).then(
                         function(data) {
