@@ -250,8 +250,22 @@ angular.module("formsApp")
             //checkin/out stuff
             //$scope.checkedOutTo is the email of the person the Q is checked out to (if any)
 
-            $scope.codeGroup = function () {
-                alert("This could be a specific dialog containing item (observable entity) and possible values for easier data entry")
+            $scope.codeGroup = function (node) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editCodes.html',
+                    backdrop: 'static',
+                    controller: 'editCodesCtrl',
+                    size : 'vlg',
+                    resolve: {
+                        item: function () {
+                            return node.data.item
+                        }
+                    }
+                }).result.then(
+                    function (item) {
+
+                    }
+               )
             }
 
             //when the Q is checked out to the current user, and they want to update the local copy
@@ -1201,11 +1215,7 @@ return
             function loadQ(QtoSelect) {
                 //display the loading alert...
                 $scope.showLoading = true
-/*
-                try {
-                    $scope.$digest()
-                } catch (ex) {}
-*/
+
                 $('#designTree').jstree('destroy');
                 delete $scope.selectedQ
                 delete $scope.treeData
@@ -1387,6 +1397,7 @@ return
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
 
+                //todo - change to use jstree functions
                 if (resetToSection) {
                  //   $scope.showSection()
                 } else {
@@ -1424,24 +1435,22 @@ return
                 let x = $('#designTree').jstree(
                     {'core':
                             {'multiple': false,
-                                'data': $scope.treeData,
-                                'check_callback' : function(operation, node, node_parent, node_position, more) {
-                                    //return false to prevent the tree being updated (we'd re-create it on a successful move anyway
-                                    delete $scope.dndTarget
-                                    if (more.ref) {
-                                        let target = more.ref.id    //the id of the node being dragged over
+                            'data': $scope.treeData,
+                            'check_callback' : function(operation, node, node_parent, node_position, more) {
+                                //return false to prevent the tree being updated (we'd re-create it on a successful move anyway
+                                delete $scope.dndTarget
+                                if (more.ref) {
+                                    let target = more.ref.id    //the id of the node being dragged over
 
-                                        let item = $scope.hashAllItems[target].item
-                                        if (item && item.type == 'group') {
-                                            //only set the drop target for a group
-                                            $scope.dndTarget = item
-
-                                            return false
-                                        }
-
+                                    let item = $scope.hashAllItems[target].item
+                                    if (item && item.type == 'group') {
+                                        //only set the drop target for a group
+                                        $scope.dndTarget = item
+                                        return false
                                     }
+                                }
 
-                                    return false
+                                return false
                                 },
                                 'themes': {name: 'proton', responsive: true}},
                         plugins:['dnd','state'],
@@ -1466,6 +1475,7 @@ return
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
+                        //todo - get from hashNode
 
                     }
                     try {
