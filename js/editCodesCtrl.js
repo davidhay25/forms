@@ -4,6 +4,8 @@ angular.module("formsApp")
 
             let server = "https://r4.ontoserver.csiro.au/fhir/"
 
+            $scope.mode = "designer"  //other is valueSet
+
             $scope.clone = angular.copy(item)
             if (item.code) {
                 $scope.itemCode = item.code[0].code
@@ -12,9 +14,53 @@ angular.module("formsApp")
 
             let hashConceptCode = {}
 
-            $scope.selectConcept = function (code) {
+            //if there is a url, retrieve any existing VS from the canshare server
+            if ($scope.clone.url) {
 
-                code = "195967001"
+            }
+
+            $scope.save = function() {
+                $scope.clone.code = $scope.clone.code || [{system:'http://snomed.info/ct'}]
+                $scope.clone.code[0].code = $scope.itemCode
+                $scope.$close($scope.clone)
+            }
+
+            $scope.setMode = function(mode) {
+                $scope.createValueSet()
+                $scope.mode = mode
+            }
+
+
+            $scope.createValueSet = function () {
+                //assume that they are all snomed codes. If not, will need to filter by system
+                let vs = {resourceType:'ValueSet',status:'draft',url:$scope.clone.answerValueSet,compose:{include:[]}}
+
+
+
+                let include = {system:'http://snomed.info/ct',concept:[]}
+                if ($scope.clone.answerOption) {
+                    $scope.clone.answerOption.forEach(function (ao) {
+                        include.concept.push({code:ao.valueCoding.code,display:ao.valueCoding.display})
+                    })
+                }
+                vs.compose.include.push(include)
+
+                $scope.vs = vs
+
+            }
+
+            //update the selected answer option from the lookup
+            $scope.updateDisplayFromLookup = function(display) {
+                if ($scope.selectedAnswerOption) {
+                    $scope.selectedAnswerOption.valueCoding.display = display
+                }
+            }
+
+            //todo should replace the display with the vakue from the term serv.
+            $scope.selectConcept = function (ao,code) {
+                $scope.selectedAnswerOption = ao
+                delete $scope.err
+                code = code || "195967001"
 
                 delete $scope.children
                 delete $scope.parents
@@ -50,6 +96,8 @@ angular.module("formsApp")
                             $scope.parents = getRelations($scope.selectedConceptLookup.parameter,'parent')
                             $scope.children = getRelations($scope.selectedConceptLookup.parameter,'child')
                         }
+                    }, function (err) {
+                        $scope.err = err.data
                     }
                 ).finally(function() {
                     $scope.showWaiting = false

@@ -263,6 +263,18 @@ angular.module("formsApp")
                     }
                 }).result.then(
                     function (item) {
+                        //update the answerOptions, answerValueSet and code
+                        //having both answerOption and answerValueSet will generate a validation error that we'll ignore for now
+
+                        qSvc.editItem($scope.selectedQ,item,item.linkId)
+
+                        //$scope.treeIdToSelect = updatedItem.linkId
+                        $scope.drawQ($scope.selectedQ,false)
+                        $scope.updateLocalCache()
+                        $scope.input.dirty = true;
+
+                        updateReport()
+                        $scope.makeQDependancyAudit()
 
                     }
                )
@@ -496,25 +508,27 @@ angular.module("formsApp")
                 //$scope.saveTreeState()
 
                 //save current state of tree (todo move to function
+                if (confirm("Are you sure you wish to convert all child nodes into a set of choices (using only the text element)? This is not reversable")) {
+                    let ar = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId,$scope.hashAllItems)
+                    if (ar && ar.length > 0) {
+                        //this is a list of items that have a conditional reference to one of the child items being
+                        //converted to a list. The conversion did not proceed.
+                        console.log(ar)
+                        alert(ar)
+                    }
 
+                    let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
+                    $scope.treeData = vo.treeData       //for drawing the tree
 
+                    drawTree()
+                    makeQDependancyAudit()
 
-                let ar = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId,$scope.hashAllItems)
-                if (ar && ar.length > 0) {
-                    //this is a list of items that have a conditional reference to one of the child items being
-                    //converted to a list. The conversion did not proceed.
-                    console.log(ar)
-                    alert(ar)
+                    //   $scope.showSection()
+                    $("#designTree").jstree("select_node",  node.id);
                 }
 
-                let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
-                $scope.treeData = vo.treeData       //for drawing the tree
 
-                drawTree()
-                makeQDependancyAudit()
 
-             //   $scope.showSection()
-                $("#designTree").jstree("select_node",  node.id);
             }
 
             $scope.addTag = function(code) {

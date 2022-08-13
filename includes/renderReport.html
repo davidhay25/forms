@@ -356,7 +356,7 @@
             </table>
         </uib-tab>
 
-        <uib-tab heading = "Conditionals by target">
+        <uib-tab  ng-show = "false" heading = "Conditionals by target">
             <br/>
             <em>These are the items whose visibility depends on another</em>
             <br/>
@@ -399,7 +399,7 @@
 
         </uib-tab>
 
-        <uib-tab heading = "Conditionals by source">
+        <uib-tab  ng-show = "false" heading = "Conditionals by source">
             <br/>
             <em>These are the items that control the visibility of another</em>
             <br/>
@@ -580,22 +580,11 @@
             </div>
 
 
-            <!--
-            <div ng-repeat="section in report.section">
-                <h4>{{section.item.text}}</h4>
 
-                <div ng-repeat = "child in section.children" ng-show="child.meta.extraction">
-
-                    {{child.meta}}
-
-
-                </div>
-            </div>
-            -->
 
         </uib-tab>
 
-        <uib-tab heading = "References">
+        <uib-tab ng-show = "false" heading = "References">
             <br/>
             <table class="table table-bordered table-condensed">
                 <tr><th>linkId</th><th>Text</th><th>Resource Type/s</th></tr>
@@ -621,7 +610,7 @@
 
         </uib-tab>
 
-        <uib-tab heading = "HL7 v2 (report)">
+        <uib-tab  ng-show = "false" heading = "HL7 v2 (report)">
             <br/>
 
             <ng-include src = "'includes/v2Report.html'"></ng-include>

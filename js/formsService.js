@@ -1326,12 +1326,16 @@ angular.module("formsApp")
                 }
 
 
-                //if the item has answerValueSet and the rendering is dropdorn or radio then fetch the values from the
+                //if the item has answerValueSet and the rendering is dropdown or radio then fetch the values from the
                 //term server and add them to the meta (so they can't update the item). They will never be saved back....
                 //todo - this could be non-perormant when editing / previewing, do we care?
                 function fillFromValueSet(cell,termServer) {
 
-
+                    if (cell.item.answerOption) {
+                        //ATM there can be both answerOption and answerValueSet as an artifact of authoring (strictly incorrect).
+                        //If there is an answerOption, then use that rather than the valueSet
+                        return
+                    }
 
                     if (cell.item.answerValueSet && (cell.meta.renderVS !== 'lookup')) {
                         //if (cell.item.answerValueSet && (cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'dropdown')) {
@@ -1397,6 +1401,7 @@ angular.module("formsApp")
                                         }
                                     },
                                     function(err){
+
                                         console.log(err)
                                         alert("There was an error expanding the VS with the url: "+ vsUrl + " " + angular.toJson(err.data))
                                         return [{display:"no matching values"}]
