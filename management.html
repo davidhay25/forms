@@ -359,8 +359,8 @@
                             <div class="col-md-6">
                                 <div class="myScroll">
                                     <table class="table table-bordered table-condensed">
-                                        <tr><th>Q</th><th>LinkId</th><th>Text</th><th>Section</th><th>Group</th></tr>
-                                        <tr ng-repeat = "row in searchResults"
+                                        <tr><th>Q</th><th>LinkId</th><th>Text / Match</th><th>Section</th><th>Group</th></tr>
+                                        <tr ng-repeat = "row in searchResults track by $index"
                                             style="cursor: pointer"
                                             ng-class="{listItemSelectedXXX: row.item.linkId == input.selectedItem.linkId}"
 
@@ -375,7 +375,9 @@
 
                                             </td>
                                             <td>{{row.item.linkId}}</td>
-                                            <td>{{row.item.text}}</td>
+                                            <td>{{row.item.text}}
+                                                <div><em>{{row.matchSource}}</em></div>
+                                            </td>
                                             <td>{{row.section.text}}</td>
                                             <td>{{row.group.text}}</td>
                                         </tr>

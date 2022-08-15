@@ -198,9 +198,24 @@ angular.module("formsApp")
             },
 
             QhasFolderTag : function(Q,tag) {
+                //let extFolderTag = formsSvc.getFolderTagExtUrl()
+
                 //return true if the Q has the given folder tag (case insensitive)
                 let hasTag = false
                 let tagLC = tag.toLowerCase()
+
+
+                if (Q.extension) {
+                    Q.extension.forEach(function (ext) {
+                        if (ext.url == extFolderTag) {
+                            if (ext.valueString && ext.valueString.toLowerCase() == tagLC) {
+                                hasTag = true
+                            }
+                        }
+                    })
+                }
+
+/*
                 if (Q.meta && Q.meta.tag) {
                     Q.meta.tag.forEach(function (tag) {
                         if (tag.system == tagFolderSystem) {
@@ -210,6 +225,7 @@ angular.module("formsApp")
                         }
                     })
                 }
+                */
                 return hasTag
 
             },

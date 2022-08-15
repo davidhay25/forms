@@ -123,15 +123,15 @@
     </div>
     <div class="col-md-9">
       <div ng-repeat="ew in selectedNode.data.item.enableWhen">
-                                                           <span class="clickable" ng-click="editItemFromLinkId(ew.question)"
+         <span class=" clickableDotted" ng-click="editItemFromLinkId(ew.question)"
 
-                                                                 uib-popover="Section: {{hashAllItems[ew.question].section.text}}"
-                                                                 popover-placement="right"
-                                                                 popover-trigger="'mouseenter'"
-                                                           >
-                                                               {{ew.question}}
+               uib-popover="Text: {{hashAllItems[ew.question].item.text}},  Section: {{hashAllItems[ew.question].section.text}}"
+               popover-placement="right"
+               popover-trigger="'mouseenter'"
+         >
+             {{ew.question}}
 
-                                                           </span>
+         </span>
         {{ew.operator}}
 
         <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>

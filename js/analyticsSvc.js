@@ -20,8 +20,6 @@ angular.module("formsApp")
                     if (text) {
                         let lc = text.toLowerCase()
                         if (lc.indexOf(srch) > -1) {
-
-
                             //this is a match
                             let ar1 = key.split('|')
                             let url = ar1[0]        //q.url
@@ -40,15 +38,28 @@ angular.module("formsApp")
                                     thing.group =tt.item
                                 }
                             }
-
-
-
+                            thing.matchSource = "text"
                             ar.push(thing)
-                           // hash[url] = hash[url] || []
-                           // hash[url].push(thing)
                         }
 
                     }
+
+                    //now search any answerOptions
+                    if (thing.item.answerOption) {
+                        thing.item.answerOption.forEach(function (ao) {
+                            let vc = ao.valueCoding
+                            if (vc && vc.display && vc.display.toLowerCase().indexOf(srch) > -1) {
+                                let ar1 = key.split('|')
+                                let url = ar1[0]
+                                thing.Q = hashAllQ[url]
+
+                               // let clone = angular.copy(thing)
+                                thing.matchSource = "answerOption"
+                                ar.push(thing)
+                            }
+                        })
+                    }
+
 
                 })
                 return ar
@@ -57,7 +68,7 @@ angular.module("formsApp")
 
             },
             makeAllItemsList: function () {
-                //construct a hash containing all items from all Qs as basis cor analytics...
+                //construct a hash containing all items from all Qs as basis for analytics...
                 let deferred = $q.defer()
                 //let arAllItems = []    // flattened list of all items {item: sectionId: groupId: }
                 //let hashAllItems = {}    //hash of item keyed by Q.url+item.linkId

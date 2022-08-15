@@ -14,7 +14,9 @@ angular.module("formsApp")
           //  let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
             //system url for folder tags
-            let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
+            //let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
+
+            let extFolderTag = formsSvc.getFolderTagExtUrl()
 
             $scope.formsSvc = formsSvc
             $scope.input = {}
@@ -216,12 +218,23 @@ angular.module("formsApp")
                             //the folder tag
                             Q.tags = []      //make it easier to access (as opposed to the meta element)
                             let isTest = false      //set to true if the Q has a test tag applied - don't show
-                            if (Q.meta && Q.meta.tag) {
+
+                            //tags are now extensions
+
+
+                            //if (Q.meta && Q.meta.tag) {
+                            if (Q.extension){
                                 let rslt = false
 
-                                Q.meta.tag.forEach(function (tag) {
-                                    if (tag.system == tagFolderSystem) {
-                                        let code = tag.code
+                                Q.extension.forEach(function (ext) {
+                                    if (ext.url == extFolderTag) {
+                                        let code = ext.valueString
+
+
+
+                               // Q.meta.tag.forEach(function (tag) {
+                                  //  if (tag.system == tagFolderSystem) {
+                                     //   let code = tag.code
                                         if (code && (code.toLowerCase() == 'test')) {
                                             isTest = true
                                         } else {

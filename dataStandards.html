@@ -501,6 +501,7 @@
                                                         <div ng-repeat = "option in selectedNode.data.item.answerOption">
                                                             {{option.valueInteger}}{{option.valueString}}
                                                             {{option.valueCoding.display}}
+                                                           <span ng-show="option.valueCoding"> ({{option.valueCoding.code}})</span>
                                                         </div>
                                                     </div>
                                                 </td>
