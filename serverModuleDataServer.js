@@ -201,6 +201,10 @@ function setup(app,serverRoot) {
             })
     })
 
+
+    //get history
+
+
     //get specific version
     app.get('/ds/fhir/:type/:id/:version',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id + "/_history/" + req.params.version

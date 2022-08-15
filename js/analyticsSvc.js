@@ -9,6 +9,30 @@ angular.module("formsApp")
 
         return {
 
+            analyseChoice : function(lstItem) {
+                //analyse all the choice elements
+                let hashVS = {unassigned:[]}            //the unassigned is for choice items with no VS
+                lstItem.forEach(function (item) {
+                    if (item.answerValueSet) {
+                        //a VS url has been assigned to this element
+                        hashVS[item.answerValueSet] = hashVS[item.answerValueSet] || []
+
+                    } else {
+                        //no url is present. Add to unassigned
+                        hashVS.unassigned.push(item)
+
+                        //no url is present. Add to unassigned if there are answerOptions in the item, otherwise ignore
+                      //  if (item.answerOption) {
+                    //        hashVS.unassigned.push(item)
+                   //     }
+
+                    }
+
+                })
+                return hashVS
+
+            },
+
             findItemsWithText : function(searchText) {
                 //find all items that contain the text
                 let srch = searchText.toLowerCase()
@@ -73,6 +97,8 @@ angular.module("formsApp")
                 //let arAllItems = []    // flattened list of all items {item: sectionId: groupId: }
                 //let hashAllItems = {}    //hash of item keyed by Q.url+item.linkId
 
+                let arChoiceItems = []   //an array of all the items of type choice - used for the VS analytics {Q.url: item}
+
                 let qry = "/ds/fhir/Questionnaire"
                 let config = {headers:{Authorization:'dhay'}}
                 $http.get(qry,config).then(
@@ -88,40 +114,27 @@ angular.module("formsApp")
                                 //exclude test Q
                                 Q.item.forEach(function (section) {
 
-                                    //add the section to the hash
+                                    //add the section to the hash (but not the choice - it can't be)
                                     let key = Q.url + "|" + section.linkId
                                     hashAllItems[key] = {item:section}
 
 
                                     if (section.item) {
                                         //the section has items
-
-
-
                                         section.item.forEach(function (child) {
 
                                             let key = Q.url + "|" + child.linkId
                                             hashAllItems[key] = {item:child,sectionId:section.linkId}
-
+                                            checkChoice(Q.url,child)
                                             if (child.item) {
                                                 //this is a group
-
-                                              //  let key = Q.url + "|" + child.linkId
-                                               // hashAllItems[key] = {item:child}
 
                                                 child.item.forEach(function (grandChild) {
                                                     //arAllItems.push({item:grandChild,sectionId:section.linkId,groupId:child.linkId})
                                                     let key = Q.url + "|" + grandChild.linkId
                                                     hashAllItems[key] = {item:grandChild,sectionId:section.linkId,groupId:child.linkId}
+                                                    checkChoice(Q.url,grandChild)
                                                 })
-                                            } else {
-                                                //this is a leaf
-                                               // todo ??? why am I not addint this to the hash??
-                                                //hashAllItems[key] = {item:child,sectionId:section.linkId}  //todo test
-                                                //arAllItems.push({item:child.item,sectionId:section.linkId})
-
-                                             //   let key = Q.url + "|" + child.linkId
-                                              //  hashAllItems[key] = {item:child,sectionId:section.linkId}
                                             }
 
                                         })
@@ -131,11 +144,18 @@ angular.module("formsApp")
 
                             }
                         })
-                        deferred.resolve({arAllItems:arAllItems,hashAllItems:hashAllItems})
+                        deferred.resolve({arAllItems:arAllItems,hashAllItems:hashAllItems,arChoiceItems:arChoiceItems})
                     }
                 )
 
                 return deferred.promise
+
+                function checkChoice(url,item) {
+                    //add to the choice array if this is a choice datatype
+                    if (item.type == 'choice') {
+                        arChoiceItems.push({url:url,item:item})
+                    }
+                }
             }
 
         }

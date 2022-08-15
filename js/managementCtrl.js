@@ -30,6 +30,8 @@ angular.module("formsApp")
                 }
             )
 
+
+
             //get the pre-pop data
             $http.get('/ds/api/prepop').then(
                 function (data) {
@@ -38,13 +40,37 @@ angular.module("formsApp")
             )
 
 
-            //----------- functions for analytics
+            let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&_sort=name&status:not=retired"
+            $http.get(url).then(
+                function (data) {
+                    $scope.allQ = data.data;
+                    // data.data.entry.forEach(function (entry) {
+                    // })
+                })
+
+            $scope.selectHistoryOfQ = function(id){
+                let url = `/ds/fhir/Questionnaire/${id}/_history`
+                $http.get(url).then(
+                    function (data) {
+                        $scope.hxQ = data.data;
+                        console.log($scope.hxQ)
+                        // data.data.entry.forEach(function (entry) {
+                        // })
+                    })
+            }
+
+
+                            //----------- functions for analytics
             //set up the analytics
             $scope.setUpAnalytics = function() {
                 analyticsSvc.makeAllItemsList().then(
                     function (data) {
                         console.log(data)
-                        $scope.analyticsLoaded = true
+                        /* temp
+                        let hashVS = analyticsSvc.analyseChoice(data.arChoiceItems)
+                        $scope.hashVS = analyticsSvc.analyseChoice(data.arChoiceItems)
+                        console.log(hashVS)
+                        */
                     }
                 )
             }

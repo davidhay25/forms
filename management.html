@@ -107,7 +107,8 @@
 
             <div class="col-md-3 col-sm-3">
                 <div class="navbar-text pull-right">
-                    <div >Version: 3.0</div>
+                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit#heading=h.vctq46si6ggr" >
+                        Version: 3.0</a>
                 </div>
             </div>
         </div>
@@ -248,6 +249,9 @@
 
             </uib-tab>
 
+
+
+
             <uib-tab heading="Pre-pop data">
                 <em>Set the sample ehr pre-pop data. Perhaps multiple sets that the user can select from?</em>
                 <div><em>Perhaps complete a form, then save the data in a prepop format (hash)</em></div>
@@ -255,8 +259,31 @@
                 <pre>{{prepop | json}}</pre>
             </uib-tab>
 
+            <uib-tab heading="History">
+                <br/>
+                <em>List of Q to the left, versions of selected Q to the right. Diff & restore options</em>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true}"
+                                 ng-click="selectHistoryOfQ(entry.resource.id)"
+                                 ng-repeat = "entry in allQ.entry">
+                                {{entry.resource.title}}
+                                <div><em>{{entry.resource.url}}</em></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-9">
+
+                    </div>
+                </div>
+            </uib-tab>
+
             <uib-tab heading="Processing errors">
 
+                <em>errors from the backup - ?is this useful</em>
                 <div class="row">
                     <div class="col-md-6">
                         <table class="table table-condensed table-bordered">
@@ -356,13 +383,13 @@
 
 
                         <div class="row" ng-show="searchResults">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="myScroll">
                                     <table class="table table-bordered table-condensed">
-                                        <tr><th>Q</th><th>LinkId</th><th>Text / Match</th><th>Section</th><th>Group</th></tr>
+                                        <tr><th>Q</th><th>Text / Match</th></tr>
                                         <tr ng-repeat = "row in searchResults track by $index"
                                             style="cursor: pointer"
-                                            ng-class="{listItemSelectedXXX: row.item.linkId == input.selectedItem.linkId}"
+                                            ng-class="{listItemSelected: row.item.linkId == selectedItem.linkId}"
 
                                             ng-click="selectThing(row)">
 
@@ -374,12 +401,11 @@
 
 
                                             </td>
-                                            <td>{{row.item.linkId}}</td>
+
                                             <td>{{row.item.text}}
                                                 <div><em>{{row.matchSource}}</em></div>
                                             </td>
-                                            <td>{{row.section.text}}</td>
-                                            <td>{{row.group.text}}</td>
+
                                         </tr>
                                     </table>
                                 </div>
@@ -387,7 +413,7 @@
 
 
                             </div>
-                            <div class="col-md-6" >
+                            <div class="col-md-9" >
                                 {{selectedQ.title}}
                                 <uib-tabset>
 
@@ -395,31 +421,42 @@
 
                                     <uib-tab heading="Tree">
                                         <div class="row">
-                                            <div class="col-md-7">
-                                                <div id="designTree"></div>
-                                            </div>
                                             <div class="col-md-5">
-
-                                                <div ng-show="selectedNode">
-                                                    <div>LinkId: {{selectedNode.data.item.linkId }}</div>
-                                                    <div>Text: {{selectedNode.data.item.text }}</div>
-                                                    <div>Type: {{selectedNode.data.item.type }}</div>
-                                                    <pre>{{selectedNode.data | json}}</pre>
+                                                <div class="myScroll">
+                                                    <div id="designTree"></div>
                                                 </div>
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                                <uib-tabset>
+                                                    <uib-tab heading="Details">
+                                                        <ng-include src = "'includes/itemDetails.html'"></ng-include>
+                                                    </uib-tab>
+                                                    <uib-tab heading="Json">
+                                                        <div ng-show="selectedNode">
+                                                            <!--
+                                                            <div>LinkId: {{selectedNode.data.item.linkId }}</div>
+                                                            <div>Text: {{selectedNode.data.item.text }}</div>
+                                                            <div>Type: {{selectedNode.data.item.type }}</div>
+                                                            -->
+                                                            <pre>{{selectedNode.data | json}}</pre>
+                                                        </div>
+                                                    </uib-tab>
+
+                                                </uib-tabset>
+
 
 
                                             </div>
                                         </div>
 
 
-
-
-
                                     </uib-tab>
 
 
 
-                                    <uib-tab heading="Json">
+                                    <uib-tab heading="Item Json">
                                         <div class="myScroll">
                                             <pre>{{selectedItem | json}}</pre>
                                         </div>
@@ -432,6 +469,16 @@
 
 
 
+                    </uib-tab>
+
+                    <uib-tab heading="ValueSets">
+                        <em>All choice items</em>
+
+
+
+
+
+                        <pre>{{ hashVS | json}}</pre>
                     </uib-tab>
 
                     <uib-tab heading="Form instances">

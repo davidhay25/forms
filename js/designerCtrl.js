@@ -93,7 +93,7 @@ angular.module("formsApp")
 
             $scope.dependencyErrors = function(){
                 if ($scope.dependencyAudit) {
-                    return $scope.dependencyAudit.filter((aud) => ! aud.ok).length
+                    return $scope.dependencyAudit.filter((aud) => ! aud.ok)
                 } else {
                     return ""
                 }
@@ -367,6 +367,16 @@ angular.module("formsApp")
             $scope.checkin = function() {
 
                 if (confirm("Are you sure you're ready to upload your changes?")) {
+
+                    $scope.makeQDependancyAudit()           //re do the dependency check
+                    let ar = $scope.dependencyErrors()
+                    if (ar.length > 0) {
+                        if (! confirm("There are " + ar.length + " dependency errors (details on the dependency tab). Do you still want to check in?"  )) {
+                            return
+                        }
+                    }
+
+
                     //Update the checkout tag in the Q first.
                     formsSvc.clearQCheckout($scope.selectedQ)
 
@@ -430,11 +440,13 @@ angular.module("formsApp")
 
             $scope.publish = function(Q) {
 
-                alert("This will copy the Specification to the public server")
+                alert("This will copy the Specification to the public (Production) server")
                 return
 
                 if (confirm(`Are you sure you want to publish this Standard to the public server (${$scope.publicServer})?`)){
                     //use the custom publish endpoint on the local server to send to the public server
+
+                    //add the email of the current user to .publisher
 
 
                 }

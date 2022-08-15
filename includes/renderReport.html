@@ -222,6 +222,7 @@
                     <div class="col-md-8">
                         <div class="clickable pull-right" ng-click="fullQExport()">Export whole Q to tsv</div>
                     </div>
+
                     <!--
                     <div class="col-md-2">
                         <div class="pull-right">Import from tsv:</div>
@@ -276,21 +277,25 @@
 
                         <td style="width:10%">
                             <div ng-show="coded.item.answerOption">
-                                <div class="clickable" ng-click="termExport(coded.item)">Export to tsv</div>
+<!--
+                                <button class="btn btn-link"
+                                        ng-show = "selectedNode.data.item.type=='choice'"
+                                        ng-click="codeGroup(selectedNode)">
+                                    Edit codes
+                                </button>
+-->
+                                <div class="clickable"
+                                     ng-click="codeGroup({data: {item :coded.item}})">Edit codes</div>
+
+
 
 <!--
-                                <input type="file" id="termUploadFile{{coded.item.linkId}}" />
--->
-                                <div class="clickable" ng-click="termImport(coded.item)">Import from tsv</div>
-
-                              <!--  <div class="clickable" ng-click="termUpload(coded.item)">Upload</div>
+                                <i <div class="clickable" ng-click="termExport(coded.item)">Export to tsv</div>
+                                   <div class="clickable" ng-click="termImport(coded.item)">Import from tsv</div>
 
 -->
 
-<!--
-                                <div class="clickable" ng-click="termEdit()">Edit directly</div>
-                                <div class="clickable" ng-click="termConvert()">Convert to VS</div>
-                                -->
+
                             </div>
                         </td>
 
