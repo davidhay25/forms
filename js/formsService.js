@@ -123,7 +123,72 @@ angular.module("formsApp")
                             }
                         })
                     }
+                }
 
+            },
+
+
+            makeChoiceElementDEP : function(Q,linkId) {
+                //take an item with child elements (a group) and convert it into a cholce element, removing the children
+
+                //if (item.item) {
+                //need to locate the item in the Q with the given linkId
+                let that = this
+                let sectionToUpdate, originalChild, pos
+                for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+
+                    let section = Q.item[sectionIndex]
+                    if (section.item) {
+                        section.item.forEach(function (child,inx) {
+                            if (child.linkId == linkId) {
+                                //this is the item in the Q that will be converted to a choice.
+
+                                //Insert a copy of item after conversion. It must be deleted at some point as the linkId's will be the same
+                                originalChild = angular.copy(child)
+                                sectionToUpdate = section
+                                pos = inx
+                                child.text = child.text + " (converted)"
+                                child.answerOption = []
+                                child.item.forEach(function (grandChild) {
+                                    //construct a coding
+                                    child.answerOption.push({valueCoding:{display:grandChild.text}})
+                                })
+
+                                child.type = "choice"
+                                //remove the column count extension
+                                if (child.extension) {
+                                    let arExtensions = child.extension
+                                    child.extension = []
+                                    arExtensions.forEach(function (ext) {
+                                        if (ext.url !== extColumnCount) {
+                                            child.extension.push(ext)
+                                        }
+                                    })
+                                }
+                                delete child.item
+
+                            }
+                        })
+
+                        if (pos) {
+                            //convert all the linkIds
+                            originalChild.linkId = 'delete-' + originalChild.linkId
+                            originalChild.item.forEach(function (item) {
+                                item.linkId = 'delete-' + item.linkId
+                                delete item.enableWhen  //always show the item
+                                //check and conditionals
+                                /*
+                                if (item.enableWhen) {
+                                    item.enableWhen.forEach(function (ew) {
+                                        ew.question =
+                                    })
+                                }
+                                */
+                            })
+                            //delete originalChild.item
+                            sectionToUpdate.item.splice(pos,0,originalChild)
+                        }
+                    }
                 }
 
 
@@ -131,64 +196,56 @@ angular.module("formsApp")
 
             },
 
-
-            makeChoiceElement : function(Q,linkId,hashAllItems) {
-                //take an item with child elements (a group) and convert it into a cholce element, removing the children
-                //if (item.item) {
+            makeChoiceElement : function(Q,linkId) {
+                //take an item with child elements (a group) and create a cholce element, with the children of the original as options in the answerOptions element
                 //need to locate the item in the Q with the given linkId
+                let choiceItem;         //the item to be created
                 let that = this
-
+                let sectionToUpdate, originalChild, pos
                 for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
+
                     let section = Q.item[sectionIndex]
                     if (section.item) {
-                        section.item.forEach(function (child) {
+                        section.item.forEach(function (child,inx) {
                             if (child.linkId == linkId) {
-
                                 //this is the item in the Q that will be converted to a choice.
-                                //first, make sure that none of the child items are a
 
-                                let ar = []
+                                //Insert a copy of item after conversion. It must be deleted at some point as the linkId's will be the same
+                                choiceItem = angular.copy(child)
+                                //sectionToUpdate = section
+                                pos = inx
+                                choiceItem.text = child.text + " (converted)"
+                                choiceItem.linkId = choiceItem.linkId + "-converted"
+                                choiceItem.answerOption = []
                                 child.item.forEach(function (grandChild) {
-                                    ar = ar.concat(that.checkForConditional(Q,grandChild.linkId))
+                                    //construct a coding
+                                    choiceItem.answerOption.push({valueCoding:{display:grandChild.text}})
                                 })
 
+                                choiceItem.type = "choice"
 
-                               // if (ar.length == 0) {
-                                    child.answerOption = []
-                                    child.item.forEach(function (grandChild) {
-                                        //construct a coding
-                                        child.answerOption.push({valueCoding:{display:grandChild.text}})
+                                //remove the column count extension
+                                if (choiceItem.extension) {
+                                    let arExtensions = choiceItem.extension
+                                    choiceItem.extension = []
+                                    arExtensions.forEach(function (ext) {
+                                        if (ext.url !== extColumnCount) {
+                                            choiceItem.extension.push(ext)
+                                        }
                                     })
-
-                                    child.type = "choice"
-                                    //remove the column count extension
-                                    if (child.extension) {
-                                        let arExtensions = child.extension
-                                        child.extension = []
-                                        arExtensions.forEach(function (ext) {
-                                            if (ext.url !== extColumnCount) {
-                                                child.extension.push(ext)
-                                            }
-                                        })
-                                    }
-                                    delete child.item
-                                //} else {
-                                    return ar
-                               // }
-
+                                }
+                                delete choiceItem.item      //remove the children
 
                             }
                         })
+
+                        if (pos !== undefined) {          //ie the item to convert was found
+                            section.item.splice(pos,0,choiceItem)
+                        }
                     }
                 }
 
 
-                function checkForConditional(child) {
-                    //check all the children of the child.
-
-
-
-                }
 
 
             },

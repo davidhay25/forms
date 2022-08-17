@@ -4,6 +4,64 @@ angular.module("formsApp")
 
         return {
 
+            fixDependencies : function(Q,arMapping) {
+                //adjust dependencies based on mapping array (produced by editCodes = but could be editItem)
+
+                if (arMapping.length < 1) {
+                    return
+                }
+
+                //create a hash on the original values
+                let hash = {}
+                arMapping.forEach(function (map) {
+
+                    let key = map.original.valueCoding.system + "|" + map.original.valueCoding.code
+                    hash[key] = map.mapped
+                })
+
+                //now go through the Q looking for dependencies that match this key and update them
+
+                if (Q.item) {
+                    Q.item.forEach(function (section){
+                        checkDependency(section)
+                        if (section.item) {
+                            section.item.forEach( function(child){
+                                if (child.item) {
+                                    child.item.forEach(function (grandchild) {
+                                        checkDependency(grandchild)
+                                    })
+                                } else {
+                                    checkDependency(child)
+                                }
+                            })
+                        }
+                    })
+                }
+
+                return Q
+
+                function checkDependency(item) {
+                    if (item.enableWhen) {
+
+                        item.enableWhen.forEach(function (dep) {
+                            let key = dep.answerCoding.system + "|" + dep.answerCoding.code
+                            if (hash[key]) {
+                                //this is a dependency that may needs to be changed
+
+                                console.log(hash[key])
+                                dep.answerCoding.system = hash[key].valueCoding.system
+                                dep.answerCoding.code = hash[key].valueCoding.code
+
+                            }
+
+                        })
+                    }
+                }
+
+
+
+            },
+
             search : function(Q,text) {
                 //locate all itens where the text or any answeroption element have that text
 
@@ -338,8 +396,8 @@ angular.module("formsApp")
             },
 
             editItem : function(Q,item,originalLinkId) {
-                //edit an item - called after the item editor
-                //todo - what is this doing?
+                //edit an item - replace the existing item with the updated one called after the item editor
+
                 //if the originalLinkId is passed in, then the linkId was changed (we assume that any dependencies were checked)
                 //in this case we need to search based on the original linkId
                 let linkId = originalLinkId || item.linkId

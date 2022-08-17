@@ -2,7 +2,11 @@ angular.module("formsApp")
     .controller('editCodesCtrl',
         function ($scope,$http,item) {
 
+            //todo important - if implementre-ordering, need to adjust the original values array
+
             let server = "https://r4.ontoserver.csiro.au/fhir/"
+
+
 
             $scope.mode = "designer"  //other is valueSet
 
@@ -20,9 +24,25 @@ angular.module("formsApp")
             }
 
             $scope.save = function() {
+
+                //set the code of the overall item
                 $scope.clone.code = $scope.clone.code || [{system:'http://snomed.info/ct'}]
                 $scope.clone.code[0].code = $scope.itemCode
-                $scope.$close($scope.clone)
+
+
+                //create a 'mapping' table between old & new codes so dependencies can be adjusted
+              //this will need adjustment if the ability to add of move codes is added...
+                let arMapping = []
+                if (item.answerOption) {
+                    item.answerOption.forEach(function (ao,inx) {
+                        let map = {original:ao,mapped:$scope.clone.answerOption[inx]}
+                        arMapping.push(map)
+
+                    })
+                }
+
+
+                $scope.$close({item:$scope.clone,mapping:arMapping})
             }
 
             $scope.setMode = function(mode) {
@@ -34,8 +54,6 @@ angular.module("formsApp")
             $scope.createValueSet = function () {
                 //assume that they are all snomed codes. If not, will need to filter by system
                 let vs = {resourceType:'ValueSet',status:'draft',url:$scope.clone.answerValueSet,compose:{include:[]}}
-
-
 
                 let include = {system:'http://snomed.info/ct',concept:[]}
                 if ($scope.clone.answerOption) {

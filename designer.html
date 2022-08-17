@@ -144,7 +144,7 @@
     <script src="js/fhirSvc.js"></script>
     <script src="js/fhirCtrl.js"></script>
     <script src="js/editCodesCtrl.js"></script>
-
+    <script src="js/newAncillaryStudy.js"></script>
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
 
@@ -471,6 +471,15 @@
                                                                 </button>
                                                             </div>
 
+                                                            <div>
+                                                                <button class="btn btn-link"
+                                                                        ng-click="newAncillaryStudy(selectedNode)">
+                                                                    Add ancillary study
+                                                                </button>
+                                                            </div>
+
+
+
 
                                                         </div>
 
@@ -488,7 +497,7 @@
 
                                                             <button  ng-show="selectedNode.data.item.item.length > 0" class="btn btn-link"
                                                                     ng-click="makeChoiceElement(selectedNode)">
-                                                                Convert to choice
+                                                                Make choice item
                                                             </button>
 
 
@@ -649,8 +658,7 @@
                             <uib-tabset>
 
                                 <uib-tab heading = "Edit">
-                                    <div class="clickable pull-right" ng-click="setDefaults()">Set defaults</div>
-
+                                    <div class="clickable pull-right" ng-click="setDefaults()">Set defaults (including the initial values of items)</div>
 
                                     <br/>
 

@@ -446,7 +446,28 @@
             <uib-tab ng-show="! newItem.answerValueSet && (newItem.type == 'choice' || newItem.type == 'open-choice')" >
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
-                <table class="table table-bordered table-condensed">
+
+                <div ng-hide="newItem.answerOption.length > 0">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <em>Enter the list of options - 1 per line. When finished, click the
+                            link below labelled 'Parse options'. This will create a set of options
+                            from the contents of the box - one option for each line.</em>
+                            <br/><br/><br/>
+                            <button class="btn-link btn" ng-click="parseOptionsText(input.answerOptionsInput)">Parse options</button>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <textarea class="form-control" rows = "6" ng-model="input.answerOptionsInput">
+
+                            </textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div ng-show="newItem.answerOption.length > 0">
+                    <table class="table table-bordered table-condensed">
                     <tr><th>Display</th><th>Code</th><th>System</th><th></th><th></th><th></th></tr>
                     <tr ng-repeat = "option in newItem.answerOption">
                         <td>{{option.valueCoding.display}}</td>
@@ -500,6 +521,7 @@
 
                     </tr>
                 </table>
+                </div>
 
             </uib-tab>
 

@@ -69,7 +69,12 @@
                     <table class="table-bordered table">
                         <tr><th>Display</th><th>SNOMED code</th><th></th></tr>
                         <tr ng-repeat="row in clone.answerOption">
-                            <td>{{row.valueCoding.display}}
+                            <td>
+                                <!--
+                                {{row.valueCoding.display}}
+-->
+                                <input type="text" class="form-control" ng-model="row.valueCoding.display"/>
+
                             </td>
                             <td> <input type="text" class="form-control" ng-model="row.valueCoding.code"/></td>
                             <td><button class="btn btn-link" ng-click="selectConcept(row,row.valueCoding.code)">Check</button> </td>

@@ -3,6 +3,15 @@ angular.module("formsApp")
         function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService) {
 
 
+            $http.get("/config").then(
+                function(data) {
+                    $scope.systemConfig = data.data
+                    console.log($scope.systemConfig)
+
+                }
+            )
+
+
             //-----------  login & user stuff....
 
             $scope.login=function(){

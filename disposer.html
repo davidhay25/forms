@@ -150,7 +150,10 @@
         </div>
     </nav>
 
-
+        <div class="alert alert-warning" ng-show="systemConfig.type == 'design'">
+            This app is being executed on the Designer site, so won't be accessing any real comments. This is
+            really only useful for testing.
+        </div>
 
     <div ng-controller="formReviewsCtrl">
         <ng-include src = "'includes/formReviews.html'"></ng-include>

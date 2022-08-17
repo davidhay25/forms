@@ -1,0 +1,113 @@
+
+<div>
+    <!--<div ng-controller="newResourceCtrl">-->
+    <style>
+        .model-vlg {
+
+        }
+    </style>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <h3 class="modal-title">New Ancillary study</h3>
+            </div>
+
+            <div class="col-md-3 col-sm-3">
+                <div class="pull-right">
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div  ng-show="showWaiting">
+                    <img src="css/ajax_loader_blue_32.gif"/>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-4">
+
+
+                <button ng-show="input.name && input.text" class="btn btn-primary pull-right" ng-click="save()">Save</button>
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <uib-tabset>
+            <uib-tab heading="Design">
+                <br/>
+                <div class="row">
+
+                    <div class="col-md-2 col-sm-2">
+                        Name & Text
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" class="form-control" placeholder="Name (One word) required" ng-model="input.name"/>
+                    </div>
+
+                    <div class="col-md-3 col-sm-3">
+                        <input type="text" class="form-control" placeholder="Display text required" ng-model="input.text"/>
+                    </div>
+
+                    <div class="col-md-4 col-sm-4">
+                        The name should be unique
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Results</strong>
+                        <textarea class="form-control" ng-model="input.results" rows="5"></textarea>
+                        <div><em>Don't remove 'Failed'</em></div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Not done reasons</strong>
+                        <textarea class="form-control" ng-model="input.notdone" rows="5"></textarea>
+                        <div><em>Don't remove 'Other'</em></div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Failure reasons</strong>
+                        <textarea class="form-control" ng-model="input.fail" rows="5"></textarea>
+                        <div><em>Don't remove 'Other'</em></div>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Primary methodology</strong>
+                        <textarea class="form-control" ng-model="input.primary" rows="3"></textarea>
+                        <div><em>Leave blank if not applicable</em></div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Secondary methodology</strong>
+                        <textarea class="form-control" ng-model="input.secondary" rows="3"></textarea>
+                        <div><em>Leave blank if not applicable</em></div>
+                    </div>
+
+                </div>
+
+            </uib-tab>
+            <uib-tab heading="Json">
+                <div>
+                    <button class="btn btn-link pull-right" ng-click="makeItems()">Refresh</button>
+                </div>
+                <pre>{{items | json}}</pre>
+            </uib-tab>
+        </uib-tabset>
+
+
+    </div>
+
+
+    <div class="modal-header">
+
+    </div>
+</div>

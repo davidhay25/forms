@@ -23,14 +23,19 @@ angular.module("formsApp")
                 }
             )
 
-            //get the config
+            //get the systemconfig
+            $http.get("config").then(
+                function (data) {
+                    $scope.systemConfig = data.data
+                }
+            )
+
+            //get the backup config
             $http.get("backup/config").then(
                 function (data) {
                     $scope.config = data.data
                 }
             )
-
-
 
             //get the pre-pop data
             $http.get('/ds/api/prepop').then(

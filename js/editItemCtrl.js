@@ -113,6 +113,31 @@ angular.module("formsApp")
                 )
             }
 
+            //create a set on anserOptopns from the contents of the text box
+            $scope.parseOptionsText = function(options){
+                let ar = options.split("\n")
+                $scope.newItem.answerOption = []
+                ar.forEach(function (lne) {
+                    let code = lne.replace(/\s+/g, '').toLowerCase()
+
+
+
+                    let opt = {valueCoding:{}}
+                    opt.valueCoding.code = code
+                   // opt.valueCoding.system = system
+                    opt.valueCoding.display = lne
+
+                    //let the selected system remain
+                   // delete $scope.input.newAnswerCode
+                   // delete $scope.input.newAnswerDisplay
+
+                    $scope.newItem.answerOption.push(opt)
+
+
+
+                   // $scope.newItem.answerOption.push({answerOption:opt})
+                })
+            }
 
 
             //has to be above check for new
@@ -133,7 +158,7 @@ angular.module("formsApp")
                     case "text" :
                         $scope.meta.hisoDT = "Alphanumeric (X)"
                         $scope.meta.hisoLength = 1000
-                        $scope.meta.hisoLayout = "A(1000)"
+                        $scope.meta.hisoLayout = "X(1000)"
                         $scope.meta.hisoClass = "free text"
                         break
 

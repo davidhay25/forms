@@ -22,6 +22,7 @@ angular.module("formsApp")
             )
 
 
+
             //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
             $scope.$on('termImported',function(){
                 $scope.drawQ($scope.selectedQ)  //in dashboard.js
@@ -250,6 +251,44 @@ angular.module("formsApp")
             //checkin/out stuff
             //$scope.checkedOutTo is the email of the person the Q is checked out to (if any)
 
+            $scope.newAncillaryStudy = function (node) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/newAncillaryStudy.html',
+                    backdrop: 'static',
+                    controller: 'newAncillaryStudyCtrl',
+                    size : 'lg',
+                    resolve: {
+                        section: function () {
+                            //the section to add the study to
+                            return {}
+                        }
+                    }
+                }).result.then(
+                    function (group) {
+
+                        if (group) {
+                            let parentLinkId = node.data.item.linkId
+
+                            $scope.selectedQ = qSvc.addItem($scope.selectedQ,parentLinkId,group)
+                           // items.forEach(function (item) {
+                              //  $scope.selectedQ = qSvc.addItem($scope.selectedQ,parentLinkId,item)
+                        //    })
+
+                           // $scope.treeIdToSelect =  item.linkId    //tree id is the linkid...  node.id
+                            $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
+                            $scope.updateLocalCache()
+                            $scope.input.dirty = true;
+
+
+
+                            updateReport()
+                            $scope.makeQDependancyAudit()
+                        }
+
+                    }
+                )
+            }
+
             $scope.codeGroup = function (node) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editCodes.html',
@@ -262,11 +301,19 @@ angular.module("formsApp")
                         }
                     }
                 }).result.then(
-                    function (item) {
+                    function (vo) {
                         //update the answerOptions, answerValueSet and code
                         //having both answerOption and answerValueSet will generate a validation error that we'll ignore for now
-
+                        let item = vo.item
+                        //updates the Q with the updated item
                         qSvc.editItem($scope.selectedQ,item,item.linkId)
+                        console.log(vo.mapping)
+
+
+                        //replace any dependencies on any of the options in the list
+                        qSvc.fixDependencies($scope.selectedQ,vo.mapping)
+
+
 
                         //$scope.treeIdToSelect = updatedItem.linkId
                         $scope.drawQ($scope.selectedQ,false)
@@ -500,43 +547,44 @@ angular.module("formsApp")
                 })
             }
 
-            $scope.saveTreeStateDEP = function() {
-                $scope.currentTreeState = {}
-                $scope.treeData.forEach(function (node){
-                    if (node.state.opened) {
-                        $scope.currentTreeState[node.id] = 'opened'
-                    }
-
-                    // node.state = node.state || {}
-                    // node.state.opened = hashState[node.id]
-                })
-                console.log($scope.currentTreeState)
-
-            }
 
 
+
+            //make a choice element from the group children
             $scope.makeChoiceElement = function(node) {
 
                 //$scope.saveTreeState()
 
                 //save current state of tree (todo move to function
-                if (confirm("Are you sure you wish to convert all child nodes into a set of choices (using only the text element)? This is not reversable")) {
+                if (confirm("This will create a new item of type choice with the options being the text value of the children. Proceed?")) {
+
+                    formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId)
+                    /*
                     let ar = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId,$scope.hashAllItems)
+
                     if (ar && ar.length > 0) {
                         //this is a list of items that have a conditional reference to one of the child items being
                         //converted to a list. The conversion did not proceed.
                         console.log(ar)
                         alert(ar)
                     }
+*/
+
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
                     $scope.treeData = vo.treeData       //for drawing the tree
 
-                    drawTree()
-                    makeQDependancyAudit()
+
+                    $scope.drawQ($scope.selectedQ,false)
+                    $scope.updateLocalCache()
+
+                    //updateReport()
+
+                    //drawTree()
+                    //$scope.makeQDependancyAudit()
 
                     //   $scope.showSection()
-                    $("#designTree").jstree("select_node",  node.id);
+                    $("#designTree").jstree("select_node",  node.id + "-converted");
                 }
 
 
@@ -816,9 +864,16 @@ return
                     function (Q) {
                         if (Q) {
                             Q.id = "cf-" + new Date().getTime()
+                            $scope.selectedQ = Q        //as we may need to add the tab...
 
                             //now set as 'checked out' to current user
                             $scope.checkoutIdentifier = formsSvc.checkoutQ(Q,$scope.user.email)     //marks the Q with being checked out, returning teh Identifier
+
+                            //If a tag is selected, add it to the Q
+                            if ($scope.input.selectedFolderTag) {
+                                $scope.addTag($scope.input.selectedFolderTag)
+                            }
+
 
                             //the empty Q needs to be saved to the server so it will appear in the list of Q
                             let url = "/fm/fhir/Questionnaire/" + Q.id
@@ -843,6 +898,7 @@ return
                                         }
                                     })
 
+                                    updateReport()
                                     $scope.drawQ(Q)
 
                                 },
@@ -1103,12 +1159,13 @@ return
                                 originalLinkId = item.linkId
                             }
 
+                            //replace the previous item with the updated one
                             qSvc.editItem($scope.selectedQ,updatedItem,originalLinkId)
 
                             $scope.treeIdToSelect = updatedItem.linkId
                             $scope.drawQ($scope.selectedQ,false)
                             $scope.updateLocalCache()
-                            $scope.input.dirty = true;
+                           // $scope.input.dirty = true;
 
                             updateReport()
                             $scope.makeQDependancyAudit()
@@ -1237,7 +1294,7 @@ return
 
 
 
-            //load a single Q
+            //load a single Q - QtoSelect in a miniQ
             function loadQ(QtoSelect) {
                 //display the loading alert...
                 $scope.showLoading = true
@@ -1272,8 +1329,37 @@ return
                         alert(`The local copy of the model was not found in the browser cache (${nameInCache}). Did you check out on a different machine?`)
                         delete $scope.showLoading
 
-                        //remove the checkout lock on the server Q
-                        return
+                        if (confirm("Do you wish to release the check out flag?")) {
+                            let qId = QtoSelect.id
+
+                            //get the Q from the server (the qry was set above)
+                            $http.get(qry).then(
+                                function(data) {
+                                    console.log('Time to load: ',moment().diff(now))
+                                    $scope.selectedQ = data.data
+                                    formsSvc.clearQCheckout($scope.selectedQ)           //clear the checkout
+
+                                    //save the Q back to the server
+                                    $scope.updateQ(function(){
+                                        //and process
+                                        processQ($scope.selectedQ)
+                                    })
+
+                                    // $scope.showLoading = false
+
+                                },
+                                function(err) {
+                                    alert(angular.toJson(err.data))
+                                }
+                            )
+
+                            delete QtoSelect.checkedoutTo  //update the list of Q
+
+
+                        } else {
+                            //remove the checkout lock on the server Q
+                            return
+                        }
 
                     }
                     //return
