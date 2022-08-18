@@ -141,8 +141,8 @@
 
                     <div ng-show="cell.displayHint == 'check-box' ">
 
-                        <span ng-repeat="option in cell.item.answerOption">
-<!-- -->
+                        <div class="row">
+                           <div class="col-md-3" ng-repeat="option in cell.item.answerOption">
                             <checkbox
                                     ng-true-value = {{option}}
                                     ng-false-value = ""
@@ -150,17 +150,25 @@
                                     ng-model="form[cell.item.linkId + '--' + $index]">
 
                             </checkbox>
-
-                            <!--
-                            <input type="checkbox" value="{{option}}"
-                                   ng-change="makeQR(cell.item.linkId)"
-                                   ng-model="form[cell.item.linkId + '--' + $index]"/>
--->
                             {{option.valueCoding.display}}
+                        </div>
+                        </div>
 
 
+                        <!--
+                         <span ng-repeat="option in cell.item.answerOption">
+                            <checkbox
+                                    ng-true-value = {{option}}
+                                    ng-false-value = ""
+                                    ng-change = makeQR()
+                                    ng-model="form[cell.item.linkId + '--' + $index]">
 
+                            </checkbox>
+                            {{option.valueCoding.display}}
                         </span>
+                        -->
+
+
 
                     </div>
 

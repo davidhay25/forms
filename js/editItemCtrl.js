@@ -9,7 +9,7 @@ angular.module("formsApp")
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
 
             $scope.input = {}
-            $scope.input.colCount = [0,2,3,4]
+            $scope.input.colCount = [0,1,2,3,4]
             $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
             $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
 

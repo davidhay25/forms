@@ -486,14 +486,23 @@ angular.module("formsApp")
             }
 
             $scope.publish = function(Q) {
+                let msg = "Are you sure you wish to publish this Standard to the public server at " + $scope.systemConfig.publicServer
 
-                alert("This will copy the Specification to the public (Production) server")
-                return
+              //  alert("This will copy the Specification to the public (Production) server")
 
-                if (confirm(`Are you sure you want to publish this Standard to the public server (${$scope.publicServer})?`)){
+                if (confirm(msg)){
                     //use the custom publish endpoint on the local server to send to the public server
+                    Q.publisher = $scope.user.email  //the person doing the publishing
+                    let qry = "/ds/publish/" + Q.id
+                    $http.put(qry,Q).then(
+                        function (data) {
+                            console.log(data.data)
+                            alert("The Q was published to " + $scope.systemConfig.publicServer)
+                        },function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
 
-                    //add the email of the current user to .publisher
 
 
                 }

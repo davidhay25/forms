@@ -82,6 +82,25 @@ June 14
 
                 <div class="row">
 
+
+
+                    <!-- 1 columns  - Aug-18-->
+
+                    <div ng-if = "row.meta.columnCount == 1 ">
+                        <div class="col-md-12">
+                            <div ng-repeat="cell in row.col1 track by $index">
+                                <div style="margin-bottom: 8px">
+                                    <ng-include src = "'includes/renderSingleItem.html'"></ng-include>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+
                     <!-- 2 columns -->
                     <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
                         <div class="col-md-6">

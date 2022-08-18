@@ -1,7 +1,7 @@
 // forms manager API
 const axios = require('axios').default;
 
-function setup(app,serverRoot,config) {
+function setup(app,serverRoot,systemConfig) {
 
 
     /* --------- endpoints for the 'copy to public server
@@ -18,7 +18,7 @@ function setup(app,serverRoot,config) {
 
 */
 
-    if (config.type == 'design') {
+    if (systemConfig.type == 'design') {
         //only the design server supports Q update by Id (PUT)
         app.put('/fm/fhir/Questionnaire/:id',function(req,res){
 
@@ -59,9 +59,11 @@ function setup(app,serverRoot,config) {
 
 
 
-    if (config.type == 'public') {
+    if (systemConfig.type == 'public') {
 
-        //process a POST of a Q to the public server
+        //process a POST of a Q to the public server - used when publishing
+        //has to be a post, as we can't assume that the id id the same between servers - we need to use
+        //the canonical url
         app.post('/fm/fhir/Questionnaire', async function (req, res) {
             if (! checkAuth(req)) {
                 res.status(403).json()
@@ -72,48 +74,55 @@ function setup(app,serverRoot,config) {
             let url = Q.url
             let version = Q.version
 
-            //need to check the number of Q on this server (the public server) with that url
-            try {
-                if (url && version) {
-                    let qry = `${serverRoot}Questionnaire?url=${url}&version=${version}`
-                    let config
-                    let results = await axios.get(qry)      //get the first
-                    let bundle = results.data       //matching Q (based on url
-                    let cnt = 0
-                    if (bundle.entry) {
-                        cnt = bundle.entry.length
-                    }
-                    switch (cnt) {
-                        case 0:
-                            //No existing Q - POST the Q to the local (public) server
-                            let url = `${serverRoot}Questionnaire`
-                            let results = await axios.post(url,Q)      //get the first
-                            res.json(results.data)
-                            break
-                        case 1:
-                            //1 existing - PUT to the id on the local (public) server
-                            let currentQ = bundle.entry[0].resource     //the current Q on the server
-                            let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
-                            let putResults = await axios.put(putUrl,Q)      //get the first
-                            res.json(putResults.data)
-                            break
-                        default :
-                            //must be > 1 - error
-                            res.status(500).json({msg: "There were multiple Q with this Url & version"})
-                            break
+            if (! Q || ! url || ! version) {
+                res.status(400).send({msg:"Questionnaire must have url and version"})
+            } else {
+                //need to check the number of Q on this server (the public server) with that url
+                try {
+                    if (url && version) {
+                        let qry = `${serverRoot}Questionnaire?url=${url}&version=${version}`
+                        let config
+                        let results = await axios.get(qry)      //get the first
+                        let bundle = results.data       //matching Q (based on url
+                        let cnt = 0
+                        if (bundle.entry) {
+                            cnt = bundle.entry.length
+                        }
+                        switch (cnt) {
+                            case 0:
+                                //No existing Q - POST the Q to the local (public) server
+                                console.log(`New Q: ${url} ${version}`)
+                                let url = `${serverRoot}Questionnaire`
+                                let results = await axios.post(url,Q)      //get the first
+                                res.json(results.data)
+                                break
+                            case 1:
+                                //1 existing - PUT to the id on the local (public) server
+                                let currentQ = bundle.entry[0].resource     //the current Q on the server
+                                let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
+                                let putResults = await axios.put(putUrl,Q)      //get the first
+                                res.json(putResults.data)
+                                break
+                            default :
+                                //must be > 1 - error
+                                res.status(500).json({msg: "There were multiple Q with this Url & version"})
+                                break
+
+                        }
+
+
+                    } else {
+                        res.status(400).json({msg: "Url or version missing"})
 
                     }
 
-
-                } else {
-                    res.status(400).json({msg: "Url or version missing"})
-
+                } catch (e) {
+                    res.status(500).json(e)
                 }
-
-            } catch (e) {
-                res.status(500).json(e)
             }
-            //have to delete any tags too. bugger.
+
+
+
 
         })
 

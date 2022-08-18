@@ -19,6 +19,9 @@ let targetServer = "http://localhost:9099/baseR4/"
 //let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
 //let targetServer = "http://188.166.76.237:9099/baseR4/"  //the backup server
 
+console.log("Source server: " + sourceServer)
+console.log("Target server: " +targetServer)
+
 syncResources("Questionnaire")
 //syncResources("Observation")
 syncResources("QuestionnaireResponse")

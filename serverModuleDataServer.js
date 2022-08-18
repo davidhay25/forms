@@ -5,7 +5,39 @@ let prepopData = require("./prePopData.json")
 
 
 
-function setup(app,serverRoot) {
+function setup(app,serverRoot,systemConfig) {
+
+    //copy the Q from the local server to the one in the config
+    //This is called from the designer during the publish operation - it initiates the call
+    app.put('/ds/publish/:id',async function(req,res) {
+
+        try {
+            //first retrieve the Q from the local server
+            let url = serverRoot + "Questionnaire/"+ req.params.id
+            let result = await axios.get(url)
+            //console.log(result)
+            let Q = result.data
+
+            //now send it to the public server
+            //this will go to a nodejs endpoint (not the hapi server - will firewall that off eventually)
+            let publishQry = systemConfig.publicServer + "fm/fhir/Questionnaire"
+            let config = {headers:{Authorization:'dhay'}}
+            console.log(publishQry)
+
+            //let publishResult = await axios.post(publishQry,Q,config)
+            //res.json(publishResult.data)
+
+            res.json(Q)
+        } catch (ex) {
+            //console.log(ex)
+            res.status (500).json(ex.message)
+        }
+
+
+
+
+
+    })
 
 
     app.get('/ds/api/prepop',async function(req,res) {

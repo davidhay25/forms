@@ -224,16 +224,14 @@ angular.module("formsApp")
 
                                 choiceItem.type = "choice"
 
-                                //remove the column count extension
-                                if (choiceItem.extension) {
-                                    let arExtensions = choiceItem.extension
-                                    choiceItem.extension = []
-                                    arExtensions.forEach(function (ext) {
-                                        if (ext.url !== extColumnCount) {
-                                            choiceItem.extension.push(ext)
-                                        }
-                                    })
-                                }
+                                //set the column count and control type xtensions
+                                choiceItem.extension = []
+                                choiceItem.extension.push({url:extColumnCount,valueInteger:1})
+
+                                let ext = {url:extItemControl}
+                                ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"check-box"}]}
+                                choiceItem.extension.push(ext)
+
                                 delete choiceItem.item      //remove the children
 
                             }

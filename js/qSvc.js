@@ -44,15 +44,22 @@ angular.module("formsApp")
                     if (item.enableWhen) {
 
                         item.enableWhen.forEach(function (dep) {
-                            let key = dep.answerCoding.system + "|" + dep.answerCoding.code
-                            if (hash[key]) {
-                                //this is a dependency that may needs to be changed
 
-                                console.log(hash[key])
-                                dep.answerCoding.system = hash[key].valueCoding.system
-                                dep.answerCoding.code = hash[key].valueCoding.code
+                            if (dep.answerCoding) {
+                                let key = dep.answerCoding.system + "|" + dep.answerCoding.code
+                                if (hash[key]) {
+                                    //this is a dependency that may needs to be changed
+
+                                    console.log(hash[key])
+                                    dep.answerCoding.system = hash[key].valueCoding.system
+                                    dep.answerCoding.code = hash[key].valueCoding.code
+
+                                }
 
                             }
+
+
+
 
                         })
                     }

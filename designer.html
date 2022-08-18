@@ -287,9 +287,10 @@
             <!--  Publish-->
             <button class="btn btn-danger pull-right horizontalButtonSpacer"
                     uib-popover="Will copy the Q to the public server"
+                    ng-show = "systemConfig.type == 'design' && systemConfig.publicServer"
                     popover-placement="left"
                     popover-trigger="'mouseenter'"
-                    ng-click = "publish(selectedQ)">Publish (not yet enabled)</button>
+                    ng-click = "publish(selectedQ)">Publish</button>
 
         </div>
 
