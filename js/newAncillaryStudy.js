@@ -54,9 +54,14 @@ angular.module("formsApp")
                     $scope.group.item.push(makeChoice("secondary-methodology","Secondary methodology",$scope.input.secondary,dep7))
                 }
 
+                //guidelines
+                $scope.group.item.push(makeChoice("guidelines","Guidelines",$scope.input.guidelines))
+
                 //the 'other' reason for fail
                 let dep8 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
                 $scope.group.item.push(makeInput("comment","Comment",dep8))
+
+
 
                // console.log()
 
@@ -95,13 +100,17 @@ angular.module("formsApp")
                 item.type = 'choice'
                 item.text = text
                 item.answerOption = []
-                let ar = txtOptions.split('\n')
-                ar.forEach(function (lne) {
-                    if (lne) {
-                        let code = lne.replace(/\s+/g, '').toLowerCase()  //remove all spaces
-                        item.answerOption.push({valueCoding:{display:lne,code:code}})
-                    }
-                })
+                if (txtOptions) {
+                    let ar = txtOptions.split('\n')
+                    ar.forEach(function (lne) {
+                        if (lne) {
+                            let code = lne.replace(/\s+/g, '').toLowerCase()  //remove all spaces
+                            item.answerOption.push({valueCoding:{display:lne,code:code}})
+                        }
+                    })
+                }
+
+
                 //create the dependency
                 if (dep) {
                     item.enableWhen = []

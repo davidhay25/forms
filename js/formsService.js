@@ -1061,6 +1061,10 @@ angular.module("formsApp")
             generateQReport : function(Q) {
                 //generate report for Q
 
+                if (! Q) {
+                    return
+                }
+
                 let clone = angular.copy(Q)
 
                 let that = this;
