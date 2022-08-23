@@ -101,7 +101,7 @@ angular.module("formsApp")
                         let found = false
                         item.answerOption.forEach(function (ao) {
                             let vc = ao.valueCoding
-                            if (vc.display && vc.display.toLowerCase().indexOf(text) > -1) {
+                            if (vc && vc.display && vc.display.toLowerCase().indexOf(text) > -1) {
                                 found = true
                             }
 

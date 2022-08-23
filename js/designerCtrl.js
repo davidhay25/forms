@@ -1178,12 +1178,20 @@ return
                             qSvc.editItem($scope.selectedQ,updatedItem,originalLinkId)
 
                             $scope.treeIdToSelect = updatedItem.linkId
-                            $scope.drawQ($scope.selectedQ,false)
+                           //temp  $scope.drawQ($scope.selectedQ,false)
                             $scope.updateLocalCache()
-                           // $scope.input.dirty = true;
 
-                            updateReport()
-                            $scope.makeQDependancyAudit()
+                            //improves the screen re-draw
+                            $timeout(
+                                function(){
+                                    $scope.drawQ($scope.selectedQ,false)
+                                    updateReport()
+                                    $scope.makeQDependancyAudit()
+                                },5
+                            )
+
+
+                         // $scope.makeQDependancyAudit()
                         }
                     })
             }
@@ -1252,11 +1260,21 @@ return
                             }
 
                             $scope.treeIdToSelect =  item.linkId    //tree id is the linkid...  node.id
-                            $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
+                            //$scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
                             $scope.updateLocalCache()
-                            $scope.input.dirty = true;
+                           // $scope.input.dirty = true;
 
-                            updateReport()
+                            //updateReport()
+
+                            //improves the screen re-draw
+                            $timeout(
+                                function(){
+                                    $scope.drawQ($scope.selectedQ,false)
+                                    updateReport()
+                                    $scope.makeQDependancyAudit()
+                                },5
+                            )
+
 
                         }
                     })
@@ -1271,8 +1289,10 @@ return
                 $scope.report = vo.report
                 $scope.hashAllItems = vo.hashAllItems
 
-                makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
-                makeQDownload($scope.selectedQ)
+                //These have been commented out as they show the screen re-draw - and I'm not sure if they are needed...
+               // makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
+              //  makeQDownload($scope.selectedQ)
+
             }
 
             //-----------  tree utility functions
@@ -1466,6 +1486,8 @@ return
             }
 
             function makeCsvAndDownload(Q,hashAllItems) {
+
+
                 $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
 
                 let csv = exportSvc.createDownloadCSV($scope.exportJsonList)
