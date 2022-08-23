@@ -579,6 +579,11 @@ angular.module("formsApp")
                     }
 */
 
+                    //create the hashAllItems so the dependency can be set
+                    let vo1 = formsSvc.generateQReport($scope.selectedQ)
+                    $scope.report = vo1.report
+                    $scope.hashAllItems = vo1.hashAllItems
+
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
 

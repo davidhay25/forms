@@ -550,9 +550,27 @@
                         <div class="col-sm-5">
                             <strong>Source question</strong>
                             <br/>
+                            <select ng-model="input.newEwQuestionSection" class="form-control"
+                                    ng-change="selectSectionForEW(input.newEwQuestionSection)"
+                                    ng-options = "section.text for section in dependencySections"></select>
+                            <br/>
+
+                            <!--
+
+                           <select ng-model="input.newEwQuestion" class="form-control"
+                                   ng-change = "ewSelected(input.newEwQuestion)"
+
+                                   ng-options = "item.display for item in dependencySources"></select>
+
+
+                             -->
+
                             <select ng-model="input.newEwQuestion" class="form-control"
                                     ng-change = "ewSelected(input.newEwQuestion)"
-                                    ng-options = "item.display for item in dependencySources"></select>
+                                    ng-options = "item.display for item in ewOptions"></select>
+
+
+
                             <br/>
                             <em>The question that this one depends on</em>
                         </div>
@@ -613,6 +631,8 @@
                         </div>
                     </div>
                 </div>
+
+                <em>If there are multiple dependencies, then if any of them are true, the item will show.</em>
 
             </uib-tab>
 

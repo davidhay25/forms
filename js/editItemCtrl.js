@@ -217,6 +217,7 @@ angular.module("formsApp")
 
 
             //determine potential dependency sources
+            $scope.dependencySections = []      //sections that have potential sources
             Object.keys(hashAllItems).forEach(function (key) {
                 let item1 = hashAllItems[key].item
                 let section =  hashAllItems[key].section;
@@ -230,18 +231,34 @@ angular.module("formsApp")
                     })
                 }
 
-                //an item with a type of choice or boolean or string with is considered to be a possible source of a dependency
+                //an item with a type of choice or boolean or string/integer with options is considered to be a possible source of a dependency
                 if (item1.type == 'choice' || item1.type == 'boolean' ||
                     (item1.type == 'string' && item1.answerOption && item1.answerOption.length > 0) ||
                     (item1.type == 'integer' && item1.answerOption && item1.answerOption.length > 0))
                 {
+
                     item1.display = item1.text
                     if (section) {
-                        item1.display = "("+ section.linkId + ") " + item1.display
+                       // item1.display = "("+ section.linkId + ") " + item1.display
+
+                        item1.sectionLinkId = section.linkId    //todo - does this update the child item? seems OK...
+
+                        if ($scope.dependencySections.indexOf(section) == -1) {
+                            $scope.dependencySections.push(section)
+                        }
+
                     }
+
                     $scope.dependencySources.push(item1)
+
+
                 }
             })
+
+            $scope.shouldShow = function (permissionLevel) {
+                // put your authorization logic here
+                return $scope.permission.canWrite || permissionLevel.value !== 'ROLE_WRITE';
+            }
 
 
             $scope.dependencySources.sort(function (a,b){
@@ -266,7 +283,18 @@ angular.module("formsApp")
                 $scope.newItem.enableWhen.splice(inx,1)
             }
 
-            //add a new ew - when supporting multiple
+            $scope.selectSectionForEW = function(section){
+                $scope.ewOptions = []
+                $scope.dependencySources.forEach(function(src){
+                    if (src.sectionLinkId == section.linkId) {
+                        $scope.ewOptions.push(src)
+                    }
+
+                })
+
+            }
+
+            //add a new enableWhen - when supporting multiple
             $scope.addNewEw = function() {
                 let source = $scope.input.newEwQuestion
                 let operator = $scope.input.conditionalOperator || "="

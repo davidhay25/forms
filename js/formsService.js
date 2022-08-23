@@ -219,7 +219,7 @@ angular.module("formsApp")
                                 choiceItem.answerOption = []
                                 child.item.forEach(function (grandChild) {
                                     //construct a coding
-                                    choiceItem.answerOption.push({valueCoding:{display:grandChild.text}})
+                                    choiceItem.answerOption.push({valueCoding:{code:grandChild.text,display:grandChild.text}})
                                 })
 
                                 choiceItem.type = "choice"
@@ -1525,6 +1525,7 @@ angular.module("formsApp")
             //determine whether the condition on an item is true...
             checkConditional : function(item,formData) {
 
+                //operates like an OR - return true if any of the conditionals match
 
                 if (item.enableWhen && item.enableWhen.length > 0) {
                     let canShow = false     //default is to hide (ie it is an OR )
@@ -1532,6 +1533,26 @@ angular.module("formsApp")
                     item.enableWhen.forEach(function(conditional){
 
                         let formValue = formData[conditional.question]  //the value from the form to be compared
+                        
+                        if (! formValue) {
+                            //if the question is from a VS rendered as a checkbox, each checkbox has the
+                            //id of linkid--{n} so the value could be in any of them (but a simple lookup like this will fail).
+
+                            let prefix = conditional.question + "--"   //any answers will start with this
+                            Object.keys(formData).forEach(function (key) {
+                                if (key.indexOf(prefix) > -1) {
+                                    //this formData item belongs to the set of controls rendered for this question.
+                                    //does the value match the answerCoding?
+                                    let stringValueCoding = formData[key]
+                                    if (stringValueCoding) {
+                                        let ans = JSON.parse(stringValueCoding)   //It will be a string representation
+                                        if (checkEqualCoding(ans.valueCoding,conditional.answerCoding)) {
+                                            canShow = true
+                                        }
+                                    }
+                                }
+                            })
+                        }
 
                         //when a radio is used as the input, the value is a string rather than an object
                         if (typeof formValue === 'string' || formValue instanceof String) {
@@ -1584,9 +1605,6 @@ angular.module("formsApp")
                                             }
                                         }
 
-
-
-
                                     }
     /*
                                     //when a radio is used as the input, the value is a string rather than an object
@@ -1601,8 +1619,6 @@ angular.module("formsApp")
                                     if (conditional.answerInteger !== undefined) {
                                         let targetValue = parseInt(conditional.answerInteger)
                                         let value = formValue.valueInteger
-
-
 
                                         if (value > targetValue) {
                                             canShow = true
