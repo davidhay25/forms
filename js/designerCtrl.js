@@ -581,6 +581,7 @@ angular.module("formsApp")
 
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
+
                     $scope.treeData = vo.treeData       //for drawing the tree
 
 

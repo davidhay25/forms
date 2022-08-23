@@ -61,7 +61,7 @@ function setup(app,sr) {
 
 
                 let arResources = result.obs     //An array of created observations todo - and others, rename
-if (debug) {console.log('arResources',arResources)}
+                if (debug) {console.log('arResources',arResources)}
                 //need to add other resources to provenance
                 //let provenance = resources.provenance
 

@@ -37,15 +37,15 @@ async function syncResources(type) {
             let bundle = response.data;
 
             //save to a local file
-           // let fileName = fileRoot + type + "-" + new Date().toISOString() + ".json"
-           // fs.writeFileSync(fileName,JSON.stringify(bundle))
+            let fileName = fileRoot + type + "-" + new Date().toISOString() + ".json"
+            fs.writeFileSync(fileName,JSON.stringify(bundle))
 
             let newBundle = {'resourceType':"Bundle",type:'transaction',entry:[]}
 
             //now convert the response bundle into a transaction
             bundle.type = "transaction"
             delete bundle.link
-            console.log(bundle.entry.length + " entries returned")
+            console.log(qry + " " + bundle.entry.length + " entries returned")
             bundle.entry.forEach(function (entry){
                 delete entry.fullUrl
                 delete entry.search

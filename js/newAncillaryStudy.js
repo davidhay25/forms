@@ -118,10 +118,10 @@ angular.module("formsApp")
                 let item = {}
                 item.linkId = $scope.input.name + "-workflow"
                 item.type = 'choice'
-                item.text = "Was the test done"
+                item.text = "Was the test performed"
                 item.answerOption = []
-                item.answerOption.push({valueCoding:{display:"Done",code:"done"}})
-                item.answerOption.push({valueCoding:{display:"Not Done",code:"notdone"}})
+                item.answerOption.push({valueCoding:{display:"Performed",code:"done"}})
+                item.answerOption.push({valueCoding:{display:"Not Performed",code:"notdone"}})
 
                 //set 'done' as the default
                 item.initial = []

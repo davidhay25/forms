@@ -192,8 +192,6 @@ angular.module("formsApp")
                 }
 
 
-
-
             },
 
             makeChoiceElement : function(Q,linkId) {
@@ -206,7 +204,9 @@ angular.module("formsApp")
 
                     let section = Q.item[sectionIndex]
                     if (section.item) {
+
                         section.item.forEach(function (child,inx) {
+
                             if (child.linkId == linkId) {
                                 //this is the item in the Q that will be converted to a choice.
 
@@ -239,6 +239,9 @@ angular.module("formsApp")
 
                         if (pos !== undefined) {          //ie the item to convert was found
                             section.item.splice(pos,0,choiceItem)
+                            console.log('inserting...')
+                            //Only want to insert it once!
+                            return
                         }
                     }
                 }
