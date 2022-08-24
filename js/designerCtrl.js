@@ -567,22 +567,48 @@ angular.module("formsApp")
                 //save current state of tree (todo move to function
                 if (confirm("This will create a new item of type choice with the options being the text value of the children. Proceed?")) {
 
-                    formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId)
-                    /*
-                    let ar = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId,$scope.hashAllItems)
+                    //lstEW is the list of 'enableWhen' snippets that some other element could be using
+                    //to refer to an item that has been converted into the choice element. It is used to update
+                    //others
 
-                    if (ar && ar.length > 0) {
-                        //this is a list of items that have a conditional reference to one of the child items being
-                        //converted to a list. The conversion did not proceed.
-                        console.log(ar)
-                        alert(ar)
-                    }
-*/
+                    let lstEW = formsSvc.makeChoiceElement($scope.selectedQ, node.data.item.linkId)
 
                     //create the hashAllItems so the dependency can be set
                     let vo1 = formsSvc.generateQReport($scope.selectedQ)
                     $scope.report = vo1.report
                     $scope.hashAllItems = vo1.hashAllItems
+
+                    if (lstEW && lstEW.length > 0) {
+                        qSvc.updateAfterChoice($scope.selectedQ,lstEW)
+/*
+                        $scope.selectedQ.item.forEach(function (section) {
+                            if (section.enableWhen) {
+                                section.enableWhen.forEach(function (ewToCheck) {   //check all the enableWhens
+                                    lstEW.forEach(function (ew) {
+                                        if (ewToCheck.question == ew.question) {
+                                            //this item has an enebleWhen reference to one that has been converted into a choice
+                                            ewToCheck.question = ew.newQuestion //change to point to the generated question
+                                            ewToCheck.answerCoding = ew.answerCoding.valueCoding
+                                            //remove the previous possible answers. There are others, but the app never supported them
+                                            delete ewToCheck.answerBoolean
+                                            delete ewToCheck.answerString
+                                            delete ewToCheck.answerInteger
+                                        }
+                                    })
+
+                                })
+                            }
+                        })
+                        */
+
+
+
+                    }
+
+
+
+
+
 
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)

@@ -199,6 +199,7 @@ angular.module("formsApp")
                 //need to locate the item in the Q with the given linkId
                 let choiceItem;         //the item to be created
                 let that = this
+                let ewList = []     //list of enableWhen (delendencies) that could refer to any child elements
                 let sectionToUpdate, originalChild, pos
                 for (var sectionIndex = 0; sectionIndex < Q.item.length;sectionIndex ++) {
 
@@ -219,7 +220,16 @@ angular.module("formsApp")
                                 choiceItem.answerOption = []
                                 child.item.forEach(function (grandChild) {
                                     //construct a coding
-                                    choiceItem.answerOption.push({valueCoding:{code:grandChild.text,display:grandChild.text}})
+                                    let ao = {valueCoding:{code:grandChild.text,display:grandChild.text}}
+                                    choiceItem.answerOption.push(ao)
+
+                                    //create what an 'enableWhen' from another element (ie a dependeny) would look like.
+                                    //this will be used to update other items that have a dependency on this one
+                                    let ew = {question:grandChild.linkId}    //the question would have been be this one
+                                    ew.answerCoding = ao //how the dependant item would refer to this one now
+                                    ew.newQuestion = choiceItem.linkId //the new linkId that a dependant item should use
+                                    ewList.push(ew)  //don't need the operator - this will be on the item that is dependant on this one...
+
                                 })
 
                                 choiceItem.type = "choice"
@@ -241,7 +251,7 @@ angular.module("formsApp")
                             section.item.splice(pos,0,choiceItem)
                             console.log('inserting...')
                             //Only want to insert it once!
-                            return
+                            return ewList
                         }
                     }
                 }

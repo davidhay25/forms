@@ -80,7 +80,7 @@ async function syncResources(type) {
 
         }
     ).catch(function(ex) {
-        console.log("Error: " + ex.response.status)
+        console.log("Error: " + ex)
     })
 }
 

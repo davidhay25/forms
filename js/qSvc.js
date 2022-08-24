@@ -4,6 +4,47 @@ angular.module("formsApp")
 
         return {
 
+            updateAfterChoice : function(Q,lstEW) {
+                //after an item has been converted to a choice, updates any dependencies
+                //may alsa be useful later on (with some changes) when codes are updated and we need to do the same...
+
+                Q.item.forEach(function (section) {
+                    checkItem(section)
+                    if (section.item) {
+                        section.item.forEach(function (child) {
+                            checkItem(child)
+                            if (child.item) {
+                                child.item.forEach(function (grandChild) {
+                                    checkItem(grandChild)
+                                })
+                            }
+
+                        })
+                    }
+
+                })
+
+                function checkItem(item) {
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ewToCheck) {   //check all the enableWhens
+                            lstEW.forEach(function (ew) {
+                                if (ewToCheck.question == ew.question) {
+                                    //this item has an enebleWhen reference to one that has been converted into a choice
+                                    ewToCheck.question = ew.newQuestion //change to point to the generated question
+                                    ewToCheck.answerCoding = ew.answerCoding.valueCoding
+                                    //remove the previous possible answers. There are others, but the app never supported them
+                                    delete ewToCheck.answerBoolean
+                                    delete ewToCheck.answerString
+                                    delete ewToCheck.answerInteger
+                                }
+                            })
+
+                        })
+                    }
+                }
+
+            },
+
             fixDependencies : function(Q,arMapping) {
                 //adjust dependencies based on mapping array (produced by editCodes = but could be editItem)
 
