@@ -23,9 +23,9 @@ function setup(app,serverRoot,systemConfig) {
             let publishQry = systemConfig.publicServer + "fm/fhir/Questionnaire"
             let config = {headers:{Authorization:'dhay'}}
             console.log(publishQry)
-
+            let publishResult
             try {
-                let publishResult = await axios.post(publishQry,Q,config)
+                publishResult = await axios.post(publishQry,Q,config)
             } catch (ex) {
                 if (ex.response) {
                     console.log(ex.response.data)

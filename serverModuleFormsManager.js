@@ -102,7 +102,7 @@ function setup(app,serverRoot,systemConfig) {
                             break
                         case 1:
                             //1 existing - PUT to the id on the local (public) server
-                            console.log(`Update Q: ${url} ${version}`)
+                           // console.log(`Update Q: ${url} ${version}`)
                             let currentQ = bundle.entry[0].resource     //the current Q on the server
                             let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
                             console.log(putUrl)
