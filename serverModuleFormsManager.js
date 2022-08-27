@@ -106,8 +106,21 @@ function setup(app,serverRoot,systemConfig) {
                             let currentQ = bundle.entry[0].resource     //the current Q on the server
                             let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
                             console.log(putUrl)
-                            let putResults = await axios.put(putUrl,Q)      //get the first
-                            res.json(putResults.data)
+                            let response
+                            try {
+                                response = await axios.put(putUrl,Q)      //get the first
+                            } catch (ex) {
+                                //this is directly to the hapiu sever
+                                if (ex.response) {
+                                    res.status(500).json(ex.response.data)
+                                    return
+                                } else {
+                                    res.status(500).json(ex)
+                                    return
+                                }
+                            }
+
+                            res.json(response.data)
                             break
                         default :
                             //must be > 1 - error
