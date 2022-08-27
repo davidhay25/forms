@@ -97,13 +97,30 @@ function setup(app,serverRoot,systemConfig) {
                             console.log(`New Q: ${url} ${version}`)
 
                             console.log(url)
-                            let results = await axios.post(url,Q)      //get the first
+
+                            let results
+                            try {
+                                results = await axios.post(url,Q)      //get the first
+                            } catch (ex) {
+                                //this is directly to the hapiu sever
+                                if (ex.response) {
+                                    res.status(500).json(ex.response.data)
+                                    return
+                                } else {
+                                    res.status(500).json(ex)
+                                    return
+                                }
+                            }
+
+                            //let results = await axios.post(url,Q)      //get the first
                             res.json(results.data)
                             break
                         case 1:
                             //1 existing - PUT to the id on the local (public) server
+
                            // console.log(`Update Q: ${url} ${version}`)
                             let currentQ = bundle.entry[0].resource     //the current Q on the server
+                            Q.id = currentQ.id      //the id needs to be the one on the target server
                             let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
                             console.log(putUrl)
                             let response
