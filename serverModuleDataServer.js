@@ -24,13 +24,33 @@ function setup(app,serverRoot,systemConfig) {
             let config = {headers:{Authorization:'dhay'}}
             console.log(publishQry)
 
-            //let publishResult = await axios.post(publishQry,Q,config)
-            //res.json(publishResult.data)
+            try {
+                let publishResult = await axios.post(publishQry,Q,config)
+            } catch (ex) {
+                if (ex.response) {
+                    console.log(ex.response.data)
+                    res.status (400).json(ex.response.data)
+                    return
+                } else {
+                    console.log(ex.message)
+                    res.status (500).json(ex.message)
+                    return
+                }
+            }
 
-            res.json(Q)
+
+            console.log("publishResult " ,publishResult)
+            res.json(publishResult.data)
+
+           // res.json(Q)
         } catch (ex) {
-            //console.log(ex)
-            res.status (500).json(ex.message)
+            console.log(ex.data)
+            if (ex.response) {
+                res.status (400).json(ex.response.data)
+            } else {
+                res.status (500).json(ex.message)
+            }
+
         }
 
 

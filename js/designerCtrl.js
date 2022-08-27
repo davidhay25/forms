@@ -638,8 +638,9 @@ angular.module("formsApp")
                 let ext = {url:formsSvc.getFolderTagExtUrl(),valueString:code}
                 $scope.selectedQ.extension.push(ext)
 
-
+                $scope.miniQ.hashFolderTag = $scope.miniQ.hashFolderTag || {}
                 $scope.miniQ.hashFolderTag[code] = code
+
                 delete $scope.input.newTagCode
                 if ($scope.folderTags.indexOf(code) == -1) {
                     $scope.folderTags.push(code)
@@ -910,10 +911,7 @@ return
                             //now set as 'checked out' to current user
                             $scope.checkoutIdentifier = formsSvc.checkoutQ(Q,$scope.user.email)     //marks the Q with being checked out, returning teh Identifier
 
-                            //If a tag is selected, add it to the Q
-                            if ($scope.input.selectedFolderTag) {
-                                $scope.addTag($scope.input.selectedFolderTag)
-                            }
+
 
 
                             //the empty Q needs to be saved to the server so it will appear in the list of Q
@@ -924,6 +922,11 @@ return
 
                                     $scope.miniQ = Q                    //version for the list
                                     $scope.miniQ.checkedoutTo = 'me'      //so that the list can be updated
+                                    //If a tag is selected, add it to the Q
+
+                                    if ($scope.input.selectedFolderTag) {
+                                        $scope.addTag($scope.input.selectedFolderTag)
+                                    }
 
                                     //copy in browser cache
                                     let nameInCache = "coq-" + Q.url

@@ -77,6 +77,7 @@ function setup(app,serverRoot,systemConfig) {
             if (! Q || ! url || ! version) {
                 res.status(400).send({msg:"Questionnaire must have url and version"})
             } else {
+                console.log("Publishing " + url + " " + version)
                 //need to check the number of Q on this server (the public server) with that url
                 try {
                   //  if (url && version) {
@@ -93,18 +94,22 @@ function setup(app,serverRoot,systemConfig) {
                             //No existing Q - POST the Q to the local (public) server
                             console.log(`New Q: ${url} ${version}`)
                             let url = `${serverRoot}Questionnaire`
+                            console.log(url)
                             let results = await axios.post(url,Q)      //get the first
                             res.json(results.data)
                             break
                         case 1:
                             //1 existing - PUT to the id on the local (public) server
+                            console.log(`Update Q: ${url} ${version}`)
                             let currentQ = bundle.entry[0].resource     //the current Q on the server
                             let putUrl = `${serverRoot}Questionnaire/${currentQ.id}`
+                            console.log(putUrl)
                             let putResults = await axios.put(putUrl,Q)      //get the first
                             res.json(putResults.data)
                             break
                         default :
                             //must be > 1 - error
+                            console.log(`Multiple Q with ${url} ${version}`)
                             res.status(500).json({msg: "There were multiple Q with this Url & version"})
                             break
 
@@ -118,6 +123,7 @@ function setup(app,serverRoot,systemConfig) {
                     */
 
                 } catch (e) {
+                    console.log(e)
                     res.status(500).json(e)
                 }
             }

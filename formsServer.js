@@ -82,7 +82,7 @@ MongoClient.connect(uri, function(err, client) {
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
 
-formsReceiverModule.setup(app,serverRoot,db)   //the module needs access to the app so that any processing errors can be logged
+formsReceiverModule.setup(app,serverRoot)   //the module needs access to the app so that any processing errors can be logged
 formsManagerModule.setup(app,serverRoot,systemConfig)
 dataServerModule.setup(app,serverRoot,systemConfig)
 
