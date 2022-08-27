@@ -92,8 +92,10 @@ function setup(app,serverRoot,systemConfig) {
                     switch (cnt) {
                         case 0:
                             //No existing Q - POST the Q to the local (public) server
-                            console.log(`New Q: ${url} ${version}`)
+
                             let url = `${serverRoot}Questionnaire`
+                            console.log(`New Q: ${url} ${version}`)
+
                             console.log(url)
                             let results = await axios.post(url,Q)      //get the first
                             res.json(results.data)
