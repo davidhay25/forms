@@ -1,10 +1,10 @@
 angular.module("formsApp")
     .controller('editCodesCtrl',
-        function ($scope,$http,item) {
+        function ($scope,$http,item,formsSvc) {
 
             //todo important - if implementre-ordering, need to adjust the original values array
 
-            let server = "https://r4.ontoserver.csiro.au/fhir/"
+            let server = formsSvc.getServers().termServer //let server = "https://r4.ontoserver.csiro.au/fhir/"
 
 
 

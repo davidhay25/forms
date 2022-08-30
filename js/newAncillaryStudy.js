@@ -3,8 +3,9 @@ angular.module("formsApp")
         function ($scope) {
             $scope.input = {}
             $scope.input.fail = "Insufficient material\nOther"
-            $scope.input.notdone = "Insufficient material\nOther"
-            $scope.input.results = "Failed"
+            $scope.input.notdone = "Not publicly funded\nInsufficient material\nOther"
+            $scope.input.results = "Inconclusive\nFailed"
+            $scope.input.inconclusive = "Insufficient material\nOther"
 
             $scope.save = function() {
                 $scope.makeItems()
@@ -20,42 +21,52 @@ angular.module("formsApp")
 
                 $scope.group.item.push(workflowItem(prefix))
 
+                //primary methodology - triggered if the result was done
+                if ($scope.input.methodology) {
+                    //the methodology
+                    let dep6 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                    $scope.group.item.push(makeChoice("methodology","Methodology",$scope.input.methodology,dep6))
+                }
+
                 //the result list.
                 let dep1 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
                 $scope.group.item.push(makeChoice("results","Result",$scope.input.results,dep1))
 
                 //the reason not done list
                 let dep2 = {linkId:$scope.input.name + "-workflow",code:"notdone", op:'='}
-                $scope.group.item.push(makeChoice("notdone-reason","Reason not done",$scope.input.notdone,dep2))
+                $scope.group.item.push(makeChoice("notdone-reason","Reason not performed",$scope.input.notdone,dep2))
 
                 //the 'other' reason for not done. when not-done reason
                 let dep3 = {linkId:$scope.input.name + "-notdone-reason",code:"other", op:'='}
-                $scope.group.item.push(makeInput("notdone-reason-other","Other reason not done",dep3))
+                $scope.group.item.push(makeInput("notdone-reason-other","Other reason not performed",dep3))
 
                 //the failure reasons
                 let dep4 = {linkId:$scope.input.name + "-results",code:"failed", op:'='}
                 $scope.group.item.push(makeChoice("failed-reason","Failure reason",$scope.input.fail,dep4))
 
+                //the inconclusive reasons
+                let dep4a = {linkId:$scope.input.name + "-results",code:"inconclusive", op:'='}
+                $scope.group.item.push(makeChoice("inconclusive-reason","Inconclusive reason",$scope.input.inconclusive,dep4a))
+
                 //the 'other' reason for fail
                 let dep5 = {linkId:$scope.input.name + "-failed-reason",code:"other", op:'='}
                 $scope.group.item.push(makeInput("fail-reason-other","Other reason failed",dep5))
 
-                //primary methodology
-                if ($scope.input.primary) {
-                    //the failure reasons
-                    let dep6 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
-                    $scope.group.item.push(makeChoice("primary-methodology","Primary methodology",$scope.input.primary,dep6))
-                }
+                //if the result was inconclusive
 
+
+
+                /*
                 //secondary methodology
                 if ($scope.input.secondary) {
                     //the failure reasons
                     let dep7 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
                     $scope.group.item.push(makeChoice("secondary-methodology","Secondary methodology",$scope.input.secondary,dep7))
                 }
-
+*/
                 //guidelines
-                $scope.group.item.push(makeChoice("guidelines","Guidelines",$scope.input.guidelines))
+                let dep1a = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                $scope.group.item.push(makeChoice("guidelines","Guidelines",$scope.input.guidelines,dep1a))
 
                 //the 'other' reason for fail
                 let dep8 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
@@ -74,9 +85,6 @@ angular.module("formsApp")
                 item.type = 'group'
                 item.text = text
                 item.item = []
-
-
-
 
                 return item
             }

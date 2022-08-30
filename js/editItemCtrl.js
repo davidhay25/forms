@@ -83,8 +83,24 @@ angular.module("formsApp")
             //set the code system to default to snomed (the forst in the list)
             //if (! $scope.newItem.)
 
+
+            $scope.viewVS = function(url) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsViewer.html',
+                    backdrop: 'static',
+                    controller: 'vsViewerCtrl',
+                    size: 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        }
+                    }
+                })
+
+            }
+
             //create a new VS for this item - or edit the existing
-            $scope.editVS = function(url){
+            $scope.editVSDEP = function(url){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
                     backdrop: 'static',

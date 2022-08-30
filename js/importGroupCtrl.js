@@ -6,7 +6,6 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.section = {}
 
-
             $scope.canInsert = function () {
                 let canInsert = false
                 if ($scope.input.section) {
@@ -55,11 +54,6 @@ angular.module("formsApp")
                 )
 
 
-
-
-
-
-                //$scope.eQ = eQ
             }
 
 

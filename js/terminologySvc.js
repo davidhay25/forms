@@ -2,7 +2,7 @@ angular.module("formsApp")
     //primarily building logical model of act-now data
     .service('terminologySvc', function($q,$http,formsSvc) {
 
-        termServer = "https://r4.ontoserver.csiro.au/fhir/"
+        let termServer = formsSvc.getServers().termServer //termServer = "https://r4.ontoserver.csiro.au/fhir/"
         let hashVS = {}
 
         return {

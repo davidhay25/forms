@@ -2,7 +2,6 @@ angular.module("formsApp")
 
     .service('formsSvc', function($q,$http,$filter,moment) {
 
-
         let globals
         $http.get("globals.json").then(
             function(data) {
@@ -10,11 +9,14 @@ angular.module("formsApp")
             }
         )
 
-
         let tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"
 
         let extensionUrl = {}
-        termServer = "https://r4.ontoserver.csiro.au/fhir/"
+
+        //termServer = "https://r4.ontoserver.csiro.au/fhir/"
+        termServer = "https://terminz.azurewebsites.net/fhir/"
+
+
         validationServer = "http://localhost:9099/baseR4/"
 
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"

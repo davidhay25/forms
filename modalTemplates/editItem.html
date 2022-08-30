@@ -86,6 +86,8 @@
                                    placeholder="Text to display to the user"
                                    ng-model="newItem.text" class="form-control"/> </td>
 
+
+
                     </tr>
 
                     <tr>
@@ -196,16 +198,32 @@
                         <td>ValueSet</td>
                         <td>
                             <div class="row">
-                                <div class="col-md-5 col-sm-5">
+                                <div class="col-md-1 col-sm-1">
+                                    Url
+                                </div>
+
+                                <div class="col-md-9 col-sm-9">
                                     <input class="form-control" type="text" ng-model="newItem.answerValueSet"
-                                           disabled = "disabled"
+
                                            placeholder="ValueSet url"/>
                                 </div>
+                                <!--
                                 <div class="col-md-1 col-sm-1">
                                     <button class="btn btn-link" ng-click="editVS(newItem.answerValueSet)">Edit</button>
                                 </div>
+                                -->
+
+                                <div class="col-md-1 col-sm-1">
+                                    <button class="btn btn-link" ng-click="viewVS(newItem.answerValueSet)">View</button>
+                                </div>
+
+                            </div>
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1">
+                                        <div style="padding-top: 6px">Render</div>
+                                    </div>
                                 <div class="col-md-6 col-sm-6">
-                                    <div style="padding-top: 6px"> Render:
+                                    <div style="padding-top: 6px;padding-right: 10px">
                                         <input type="radio" ng-model="input.vs.rendermode" value="radio-button"> Radio
                                         <input type="radio" ng-model="input.vs.rendermode" value="drop-down"> Dropdown
                                         <input type="radio" ng-model="input.vs.rendermode" value="lookup"> Lookup
@@ -443,7 +461,7 @@
 
             </uib-tab>
 
-            <uib-tab ng-show="! newItem.answerValueSet && (newItem.type == 'choice' || newItem.type == 'open-choice')" >
+            <uib-tab ng-show="(newItem.type == 'choice' || newItem.type == 'open-choice')" >
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
 

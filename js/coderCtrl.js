@@ -3,7 +3,7 @@ angular.module("formsApp")
         function ($scope,$http,termUpdateSvc,formsSvc) {
 
             $scope.input = {};
-            let server = "https://r4.ontoserver.csiro.au/fhir/"
+            let server = formsSvc.getServers().termServer //let server = "https://r4.ontoserver.csiro.au/fhir/"
 
             $scope.input.filter = "indic"   //temp
 

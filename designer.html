@@ -127,12 +127,13 @@
     <script src="js/terminologySvc.js"></script>
     <script src="js/terminologyCtrl.js"></script>
     <script src="js/graphSvc.js"></script>
-    <script src="js/vsEditorCtrl.js"></script>
+    <script src="js/vsViewer.js"></script>
     <script src="js/libs/vis.min.js"></script>
     <script src="directive/noSpaces.js"></script>
 
     <script src="js/qManagementCtrl.js"></script>
-    <!--  <script src="js/dispositionCtrl.js"></script> -->
+    <!--  <script src="js/dispositionCtrl.js"></script>
+       <script src="js/vsEditorCtrl.js"></script>-->
 
     <script src="js/termIOCtrl.js"></script>
     <script src="js/termIOSvc.js"></script>
@@ -429,10 +430,17 @@
                                                         </button>
 
                                                         <button class="btn btn-link"
+                                                                ng-click="cloneItem(selectedNode)">
+                                                            Clone item
+                                                        </button>
+
+                                                        <button class="btn btn-link"
                                                                 ng-show = "selectedNode.data.item.type=='choice'"
                                                                 ng-click="codeGroup(selectedNode)">
                                                             Edit codes
                                                         </button>
+
+
                                                     </div>
 
                                                     <div class="col-md-3">
@@ -479,9 +487,6 @@
                                                                 </button>
                                                             </div>
 
-
-
-
                                                         </div>
 
 
@@ -503,6 +508,8 @@
 
 
 
+
+
                                                         </div>
 
                                                         <div ng-show="selectedNode.data.level == 'grandchild'">
@@ -510,6 +517,12 @@
                                                                     ng-click="addItem(selectedNode,'grandchild',true)">
                                                                 Add sibling element
                                                             </button>
+<!--
+                                                            <button class="btn btn-link"
+                                                                    ng-click="cloneItem(selectedNode)">
+                                                                Clone item
+                                                            </button>
+                                                            -->
 
                                                         </div>
 

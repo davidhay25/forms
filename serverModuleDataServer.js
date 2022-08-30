@@ -80,10 +80,37 @@ function setup(app,serverRoot,systemConfig) {
         }
     })
 
+    //---------- document storage functions
+    //all documents are saved on the public server. - no copies in the design env.
+
+    //upload a document
+    app.put("/ds/fhir/DocumentReference/:id",function(res,req){
+
+        let resource = req.body
+        let url = `${systemConfig.publicServer}DocumentReference/${id}`
+
+        axios.put(url,resource,{maxBodyLength:Infinity,maxContentLength:Infinity})
+            .then(function (response){
+                //console.log('r',response.data)
+                res.status(response.status).json(response.data)
+            })
+            .catch(function (err){
+                //console.log(err)
+                if (err.response) {
+                    res.status(err.response.status).send(err.response.data)
+                } else {
+                    res.status(500).send(err)
+                }
+            })
+    })
+
+
     //returns an uploaded document.
     app.get('/ds/api/document/:id',function(req,res){
         let id = req.params.id
-        let url = `${serverRoot}DocumentReference/${id}`
+
+        let url = `${systemConfig.publicServer}DocumentReference/${id}`
+        //let url = `${serverRoot}DocumentReference/${id}`
 
         axios.get(url)
             .then(function (response){
@@ -117,6 +144,7 @@ function setup(app,serverRoot,systemConfig) {
             })
     })
 
+
     app.post('/ds/removeqtag/:qid',async function(req,res){
         //delete a questionnaire tag
         let tag = req.body
@@ -143,32 +171,7 @@ function setup(app,serverRoot,systemConfig) {
         }
     })
 
-/*
-    app.delete('/ds/fhir/Questionnaire/:id',function(req,res){
-        let url = serverRoot + "Questionnaire/" + req.params.id
 
-        axios.delete(url)
-            .then(function (response){
-                //console.log(response.data)
-                res.status(response.status).json(response.data)
-            })
-            .catch(function (err){
-                //console.log(err)
-                //todo - err.response only available when the server responded
-                // err.request if the request was made
-                // neither if there was an error making the request in the first place
-
-                if (err.response) {
-                    res.status(err.response.status).send(err.response.data)
-                } else {
-                    res.status(500).send(err.response.data)
-                }
-
-
-              //  res.status(err.response.status).send(err.response.data)
-            })
-    })
-*/
     app.post('/ds/fhir/:type/validate',function(req,res) {
 
         let resource = req.body
@@ -211,7 +214,7 @@ function setup(app,serverRoot,systemConfig) {
     })
 
     app.get('/ds/fhir/ValueSet/\[$]expand',function(req,res){
-//console.log(req.query)
+
         let url = serverRoot + "ValueSet/$expand?url=" + req.query.url
 
         axios.get(url)
@@ -230,6 +233,7 @@ function setup(app,serverRoot,systemConfig) {
 
     })
 
+    //a PUT operation to the local server. Note that DocumentReference PUT's are handled by a specific handler defined before this one
     app.put('/ds/fhir/:type/:id',function(req,res){
         let url = serverRoot + req.params.type + "/" + req.params.id
         let resource = req.body

@@ -157,12 +157,9 @@ angular.module("formsApp")
                     let arKnownFileTypes = [{key:'.pdf',mime:'application/pdf'}]
                     arKnownFileTypes.push({key:'.docx',mime:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
 
-
                     //save the uploaded data as a binary, then create an attachment extension from the Q
                     let dr = {resourceType:"DocumentReference",id:'id-' + new Date().getTime(),status:"current",content:[]}
                     let att = {}
-
-
 
                     //works with the readAsArrayBuffer but runs out of stack...const base64String = btoa(String.fromCharCode(...new Uint8Array(data)));
 
@@ -178,6 +175,7 @@ angular.module("formsApp")
                         }
                     })
                     dr.content.push({attachment:att})
+
                     let qry = `/ds/fhir/DocumentReference/${dr.id}`
 
 
@@ -438,6 +436,8 @@ angular.module("formsApp")
 
                         delete $scope.miniQ.checkedoutTo
 
+                        $scope.loadAllQ()
+                        /*
                         //Now check for any deleted tags (userSelected = true). If there are, then call the delete tag operation for them
                         if ($scope.selectedQ.meta && $scope.selectedQ.meta.tag) {
                             $scope.selectedQ.meta.tag.forEach(function (tag) {
@@ -457,12 +457,31 @@ angular.module("formsApp")
                         } else {
                             $scope.loadAllQ()
                         }
-
+*/
 
                     })
                 }
+            }
 
+            $scope.cloneItem = function(node) {
+                //create a new group with all the children of the original group
+                //? need to adjust conditionals
+                let parentLinkId = node.parent  //the node.is is the same as the linkId
+                let itemToClone = node.data.item
 
+                let err = qSvc.cloneItem(itemToClone,parentLinkId,$scope.selectedQ,$scope.hashAllItems)   //create the cloned item - with linkIds adjusted
+
+                if (err) {
+                    alert(err)
+                } else {
+                    let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
+                    $scope.treeData = vo.treeData       //for drawing the tree
+                    $scope.drawQ($scope.selectedQ,false)
+                    updateReport()   //in particular it will update hashAllItems
+                    $scope.updateLocalCache()
+
+                    $("#designTree").jstree("select_node",  itemToClone + '-c');
+                }
 
             }
 
@@ -531,7 +550,22 @@ angular.module("formsApp")
                 delete $scope.input.newAttachmentUrl
             }
 
-            $scope.viewVS = function(url,useRemote){
+            $scope.viewVS = function(url) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/vsViewer.html',
+                    backdrop: 'static',
+                    controller: 'vsViewerCtrl',
+                    size: 'lg',
+                    resolve: {
+                        vsUrl: function () {
+                            return url
+                        }
+                    }
+                })
+
+            }
+
+            $scope.viewVSDEP = function(url,useRemote){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/vsEditor.html',
                     backdrop: 'static',
@@ -612,19 +646,10 @@ angular.module("formsApp")
 
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
-
                     $scope.treeData = vo.treeData       //for drawing the tree
-
-
                     $scope.drawQ($scope.selectedQ,false)
                     $scope.updateLocalCache()
 
-                    //updateReport()
-
-                    //drawTree()
-                    //$scope.makeQDependancyAudit()
-
-                    //   $scope.showSection()
                     $("#designTree").jstree("select_node",  node.id + "-converted");
                 }
 
@@ -984,6 +1009,7 @@ return
                         $scope.input.dirty = true;
                         $scope.updateLocalCache()
                         updateReport()
+                        $scope.makeQDependancyAudit()
 
 
                     }
@@ -1019,6 +1045,7 @@ return
                             //$scope.editingQ = false
 
                             updateReport()
+                            $scope.makeQDependancyAudit()
                         })
                     }
                 )
@@ -1556,7 +1583,7 @@ return
                 //save the current state of node expansion from the jstree - not the treedata!!!
                 now = new Date()
 
-
+/*
 
                 let hashState = {}
                 try {
@@ -1569,12 +1596,14 @@ return
 
                 }
 
+                */
+
                 clearWorkArea()
                 //$scope.selectedQ = Q
 
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
-
+/*
                 //todo - change to use jstree functions
                 if (resetToSection) {
                  //   $scope.showSection()
@@ -1585,6 +1614,8 @@ return
                         node.state.opened = hashState[node.id]
                     })
                 }
+
+                */
 
                 drawTree()
 

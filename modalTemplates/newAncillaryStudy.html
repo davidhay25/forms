@@ -62,38 +62,48 @@
                     </div>
                 </div>
                 <br/>
+                <div>
+                    <strong>The workflow element performed / not performed is added automatically</strong>
+                </div>
+
+
                 <div class="row">
+
                     <div class="col-md-4 col-sm-4">
-                        <strong>Results</strong>
-                        <textarea class="form-control" ng-model="input.results" rows="5"></textarea>
-                        <div><em>Don't remove 'Failed'</em></div>
-                    </div>
-                    <div class="col-md-4 col-sm-4">
-                        <strong>Not done reasons</strong>
+                        <strong>Not performed reasons</strong>
                         <textarea class="form-control" ng-model="input.notdone" rows="5"></textarea>
                         <div><em>Don't remove 'Other'</em></div>
                     </div>
+
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Methodology</strong>
+                        <textarea class="form-control" ng-model="input.methodology" rows="5"></textarea>
+                        <div><em>Leave blank if not applicable</em></div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <strong>Results</strong>
+                        <textarea class="form-control" ng-model="input.results" rows="5"></textarea>
+                        <div><em>Don't remove 'Inconclusive' or  'Failed'</em></div>
+                    </div>
+
+                </div>
+                <br/>
+                <div class="row">
                     <div class="col-md-4 col-sm-4">
                         <strong>Failure reasons</strong>
                         <textarea class="form-control" ng-model="input.fail" rows="5"></textarea>
                         <div><em>Don't remove 'Other'</em></div>
                     </div>
-                </div>
-                <br/>
-                <div class="row">
+
                     <div class="col-md-4 col-sm-4">
-                        <strong>Primary methodology</strong>
-                        <textarea class="form-control" ng-model="input.primary" rows="3"></textarea>
-                        <div><em>Leave blank if not applicable</em></div>
+                        <strong>Inconclusive reasons</strong>
+                        <textarea class="form-control" ng-model="input.inconclusive" rows="5"></textarea>
+                        <div><em>Don't remove 'Other'</em></div>
                     </div>
-                    <div class="col-md-4 col-sm-4">
-                        <strong>Secondary methodology</strong>
-                        <textarea class="form-control" ng-model="input.secondary" rows="3"></textarea>
-                        <div><em>Leave blank if not applicable</em></div>
-                    </div>
+
                     <div class="col-md-4 col-sm-4">
                         <strong>Guidelines</strong>
-                        <textarea class="form-control" ng-model="input.guidelines" rows="3"></textarea>
+                        <textarea class="form-control" ng-model="input.guidelines" rows="5"></textarea>
                         <div><em>Can leave blank - will add element anyway</em></div>
                     </div>
 

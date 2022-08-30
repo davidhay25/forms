@@ -4,6 +4,103 @@ angular.module("formsApp")
 
         return {
 
+            cloneItem : function(item,parentLinkId,Q,hash) {
+                //create a copy of this item and all its children
+
+                //we only want an item to be cloned once...
+                if (hash[item.linkId + '-c']) {
+                    return "This item has already been cloned. (But you can clone the clone if you wish)"
+                }
+
+                let originalLinkId = item.linkId  //need this to know where to insert the cloned item...
+                let newItem = angular.copy(item)
+                newItem.linkId = newItem.linkId + "-c" //update the linkIds - just add 'c' to the end (for copy)
+                if (newItem.item) {
+                    newItem.item.forEach(function (child) {
+                        child.linkId = child.linkId + "-c"
+                        if (child.item) {
+                            child.item.forEach(function (grandChild) {
+                                grandChild.linkId = grandChild.linkId + "-c"
+                            })
+                        }
+                    })
+                }
+
+                //now insert into the Q
+                if (parentLinkId == 'root') {
+                    //the item being cloned is a section.
+                    for (var i=0; i < Q.item.length; i++) {
+                        if (Q.item[i].linkId == originalLinkId) {
+                            Q.item.splice(i+1,0,newItem)
+                            break
+                        }
+                    }
+
+                } else {
+                    //this could be a cloned group or item
+                    for (var i=0; i < Q.item.length; i++) {
+                        let section = Q.item[i]
+                        if (section.item) {
+                            for (var j=0; j < section.item.length; j++) {
+                                let child = section.item[j]
+                                if (child.linkId == originalLinkId) {
+                                    //this is a group being cloned...
+                                    section.item.splice(j+1,0,newItem)
+                                    break
+                                } else {
+                                    //need to check any grand children
+                                    if (child.item) {
+                                        for (var k=0; k < child.item.length; k++) {
+                                            let grandChild = child.item[k]
+                                            if (grandChild.linkId == originalLinkId) {
+                                                child.item.splice(k+1,0,newItem)
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+
+                    }
+
+                }
+
+                return
+
+
+                /*
+                
+                function getLinkIdSuffix(DEPlinkId) {
+                    //find the next available suffix for this linkId. assume a pattern of '-n' for the suffix
+                    let newSuffix = 0   //this will be the new suffix to use
+                    Object.keys(hashAllItem).forEach(function (key) {
+                        if (key.indexOf(linkId)) {
+                            let ar = key.split('-')
+                            if (ar.length == 0) {
+                                //
+                            } else {
+                                let currentSuffix = ar[ar.length-1]
+                                if (currentSuffix > newSuffix) {
+                                    newSuffix = currentSuffix
+                                }
+                            }
+
+                            //
+                        }
+                    })
+                    return newSuffix +1
+                    
+                    */
+                    
+                    
+                    
+
+                
+            },
+            
             updateAfterChoice : function(Q,lstEW) {
                 //after an item has been converted to a choice, updates any dependencies
                 //may alsa be useful later on (with some changes) when codes are updated and we need to do the same...

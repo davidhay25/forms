@@ -1,0 +1,76 @@
+
+<div>
+    <style>
+        .selected {
+            font-weight: bold;
+        }
+        .spacing {
+            margin-left: 8px;
+        }
+    </style>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 ">
+
+                <h3>ValueSet viewer</h3>
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+
+                <button class="btn btn-link pull-right"
+                        ng-click="$dismiss()">Close</button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <uib-tabset>
+            <uib-tab heading = "Concepts">
+                <br/>
+                <table class="table table-bordered table-condensed">
+                    <tr><th>Code</th><th>Display</th><th>System</th></tr>
+
+                    <tr ng-repeat="concept in selectedValueSet.expansion.contains">
+                        <td>{{concept.code}}</td>
+                        <td>{{concept.display}}</td>
+                        <td>{{concept.system}}</td>
+                    </tr>
+                </table>
+            </uib-tab>
+            <uib-tab heading = "Json">
+                <pre>{{selectedValueSet | json}}</pre>
+            </uib-tab>
+        </uib-tabset>
+
+
+
+
+    </div>
+
+    <div class="modal-header">
+        {{qry}}
+<!--
+        <div class="row">
+
+            <div class="col-md-4 col-sm-4">
+                {{termServer}}
+            </div>
+
+            <div class="col-md-4 col-sm-4">
+                <div>{{vsUrl}}</div>
+
+
+            </div>
+            <div class="col-md-4 col-sm-4">
+
+            </div>
+        </div>
+
+        -->
+
+    </div>
+</div>
