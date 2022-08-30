@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>CanShare Public page</title>
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+    <script src="js/libs/moment.min.js"></script>
+    <script src="js/libs/jstree.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+    <script src="js/libs/angular-sanitize.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+    <style>
+        .myScroll {
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+
+
+    </style>
+
+    <script>
+        angular.module("formsApp",['ui.bootstrap']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("formsApp").constant("moment", moment);
+        angular.module("formsApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+        }]);
+
+    </script>
+
+    <script src="js/frontPageCtrl.js"></script>
+    <script src="js/formsService.js"></script>
+
+
+
+    <script src="js/modalDialogSvc.js"></script>
+
+    <style>
+
+        .section {
+            border: 1px solid gainsboro;
+            padding : 12px;
+            margin: 4px;
+            -webkit-border-radius: 15px;
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+            height: 600px;
+            position:relative;
+        }
+
+        .header {
+            background-color: #F6F6F6;
+            padding : 8px;
+            -webkit-border-radius: 15px;
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+        }
+        .myButton {
+            position: absolute;
+            bottom: 20px;
+            left: 120px
+
+        }
+
+    </style>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="formsApp" ng-controller="frontPageCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5 col-sm-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Canshare Public Page
+                        </a>
+                    </span>
+            </div>
+
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3 col-sm-3">
+
+
+
+            </div>
+
+            <div class="col-md-2">
+
+                <div class="navbar-text pull-right">
+                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit#heading=h.vctq46si6ggr" >
+                        Version: 4.0</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+        <div>
+            <div class="text-center"> This is the front page for  the CanShare programme of work. Appropriate words here</div>
+        </div>
+
+
+        <br/><br/>
+        <div class="row">
+
+            <div class="col-md-3 col-md-offset-1">
+                <div class="section">
+                    <div class="text-center header">Structured Pathology</div>
+                    <br/><br/>
+                    
+                    <img class="center-block" width="300" height = "auto" src="images/structuredPath.jpeg">
+
+                    <br/>
+
+                    <em>Text about Structured Path with an appropriate picture</em>
+
+                    <div class="myButton">
+                        <a href="dataStandards.html" class="btn btn-primary ">View standards</a>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-3">
+                <div class="section">
+                    <div class="text-center header">ACT-NOW</div>
+                    <br/><br/>
+                    <em>Text about ACT-NOW with an appropriate picture</em>
+                    <br/><br/>
+                    <div class="myButton">
+                        <button class="btn btn-primary center-block">View standard</button>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-3">
+                <div class="section">
+                    <div class="text-center header">MDM</div>
+                    <br/><br/>
+
+
+
+
+                    <img class="center-block" width="300" height = "auto" src="https://hcmsitesstorage.blob.core.windows.net/cca/assets/waves_a379d55e83.jpg">
+
+                    A cancer multidisciplinary meeting (MDM) is a regular meeting where health professionals
+                    from different specialities discuss and recommend options for a patient&#39;s treatment and care.
+                    Access to high-quality patient information is vital for informed decision-making during the
+                    MDM process. Consistent and reliable data enables MDM attendees to agree on clinical
+                    recommendations for the treatment pathway that best meets the individual needs of a
+                    patient. This is particularly important for Māori and Pacific who experience poorer access,
+                    timeliness and quality of health care, contributing to avoidable and unfair differences in
+                    cancer outcomes.
+                    The first Multidisciplinary Meeting (MDM) Data Standard review has started in partnership
+                    with the sector with an expected release in the second quarter of 2022/2023.
+                    <br/><br/>
+                    <div class="myButton">
+                        <a href="dataStandards.html?cf-1654205531202" class="btn btn-primary center-block">View standards</a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+</body>
+</html>

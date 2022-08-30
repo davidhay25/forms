@@ -931,12 +931,11 @@ return
                     function (Q) {
                         if (Q) {
                             Q.id = "cf-" + new Date().getTime()
+                            Q.version = "0.1"
                             $scope.selectedQ = Q        //as we may need to add the tab...
 
                             //now set as 'checked out' to current user
                             $scope.checkoutIdentifier = formsSvc.checkoutQ(Q,$scope.user.email)     //marks the Q with being checked out, returning teh Identifier
-
-
 
 
                             //the empty Q needs to be saved to the server so it will appear in the list of Q

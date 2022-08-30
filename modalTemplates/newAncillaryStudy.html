@@ -9,7 +9,7 @@
     <div class="modal-header">
 
         <div class="row">
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-3 col-sm-3">
                 <h3 class="modal-title">New Ancillary study</h3>
             </div>
 
@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-3 col-sm-3">
 
 
                 <button ng-show="input.name && input.text" class="btn btn-primary pull-right" ng-click="save()">Save</button>
@@ -57,7 +57,7 @@
                         <input type="text" class="form-control" placeholder="Display text required" ng-model="input.text"/>
                     </div>
 
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         The name should be unique
                     </div>
                 </div>
@@ -70,18 +70,25 @@
 
                 <div class="row">
 
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
+                        <strong>Test status</strong>
+                        <textarea class="form-control" ng-model="input.status" rows="5"></textarea>
+                        <div><em>Don't remove 'Other'</em></div>
+                    </div>
+
+
+                    <div class="col-md-3 col-sm-3">
                         <strong>Not performed reasons</strong>
                         <textarea class="form-control" ng-model="input.notdone" rows="5"></textarea>
                         <div><em>Don't remove 'Other'</em></div>
                     </div>
 
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         <strong>Methodology</strong>
                         <textarea class="form-control" ng-model="input.methodology" rows="5"></textarea>
                         <div><em>Leave blank if not applicable</em></div>
                     </div>
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         <strong>Results</strong>
                         <textarea class="form-control" ng-model="input.results" rows="5"></textarea>
                         <div><em>Don't remove 'Inconclusive' or  'Failed'</em></div>
@@ -90,19 +97,19 @@
                 </div>
                 <br/>
                 <div class="row">
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         <strong>Failure reasons</strong>
                         <textarea class="form-control" ng-model="input.fail" rows="5"></textarea>
                         <div><em>Don't remove 'Other'</em></div>
                     </div>
 
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         <strong>Inconclusive reasons</strong>
                         <textarea class="form-control" ng-model="input.inconclusive" rows="5"></textarea>
                         <div><em>Don't remove 'Other'</em></div>
                     </div>
 
-                    <div class="col-md-4 col-sm-4">
+                    <div class="col-md-3 col-sm-3">
                         <strong>Guidelines</strong>
                         <textarea class="form-control" ng-model="input.guidelines" rows="5"></textarea>
                         <div><em>Can leave blank - will add element anyway</em></div>

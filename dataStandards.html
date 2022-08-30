@@ -186,30 +186,41 @@
         <div class="row">
 
             <div ng-class="input.leftPane">
-                <H4>Select Standard to view</H4>
 
 
-                <select class="form-control" ng-model="input.selectedTag"
+                <uib-accordion close-others="false">
+                    <div uib-accordion-group class="panel-default" heading="Structured Pathology">
+                        <H4>Select Standard to view</H4>
+                    <select class="form-control" ng-model="input.selectedTag"
                         ng-options = "tag for tag in tags"></select>
 
 
-                <br/>
-                <div ng-repeat = "hisoStatus in arHisoStatus">
-                    <strong>{{hisoStatus.display}}</strong>
+                    <br/>
+                    <div ng-repeat = "hisoStatus in arHisoStatus">
+                <strong>{{hisoStatus.display}}</strong>
 
-                    <div class="list-group">
-                        <div  ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
-                              style="cursor: pointer"
-                              ng-repeat="Q in allQ"
-                              ng-show="Q.hisoStatus == hisoStatus.code && (input.selectedTag == 'All' ||  Q.tags.indexOf(input.selectedTag) > -1)">
-                            <div ng-click = "loadQ(Q)">{{Q.title}}</div>
-                        </div>
+                <div class="list-group">
+                    <div  ng-class="{'list-group-item':true,listItemSelected:Q.id == selectedQ.id}"
+                          style="cursor: pointer"
+                          ng-repeat="Q in allQ"
+                          ng-show="Q.hisoStatus == hisoStatus.code && (input.selectedTag == 'All' ||  Q.tags.indexOf(input.selectedTag) > -1)">
+                        <div ng-click = "loadQ(Q)">{{Q.title}}</div>
+                    </div>
+
+                </div>
+            </div>
 
                     </div>
-                </div>
-
+                    <div uib-accordion-group class="panel-default" heading="ACT-NOW">
+                    </div>
+                    <div uib-accordion-group class="panel-default" heading="MDM">
+                    </div>
+                </uib-accordion>
 
             </div>
+
+
+
             <div ng-class="input.rightPane">
 
                 <div ng-show = "! selectedQ">
@@ -641,7 +652,7 @@
 
 
 
-                    <uib-tab heading="Feedback provided">
+                    <uib-tab ng-show="false" heading="Feedback provided">
 
                         <br/>
                         <div class="row">

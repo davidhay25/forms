@@ -4,8 +4,14 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.fail = "Insufficient material\nOther"
             $scope.input.notdone = "Not publicly funded\nInsufficient material\nOther"
-            $scope.input.results = "Inconclusive\nFailed"
+            $scope.input.results = "Inconclusive"
             $scope.input.inconclusive = "Insufficient material\nOther"
+            $scope.input.status = "Completed\nFailed"
+
+
+            //these 2 just for testing
+            $scope.input.methodology = "method1\nmethod2"
+            $scope.input.guidelines = "guide1\nguide2"
 
             $scope.save = function() {
                 $scope.makeItems()
@@ -21,36 +27,42 @@ angular.module("formsApp")
 
                 $scope.group.item.push(workflowItem(prefix))
 
-                //primary methodology - triggered if the result was done
+                //primary methodology - triggered if the workflow was performed
                 if ($scope.input.methodology) {
                     //the methodology
-                    let dep6 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                    let dep6 = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                     $scope.group.item.push(makeChoice("methodology","Methodology",$scope.input.methodology,dep6))
                 }
 
-                //the result list.
-                let dep1 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                //the test status. if he workflow was 'performed'
+                let dep1b = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
+                $scope.group.item.push(makeChoice("status","Status",$scope.input.status,dep1b))
+
+                //the result list. if the test status was completed
+                let dep1 = {linkId:$scope.input.name + "-status",code:"completed", op:'='}
                 $scope.group.item.push(makeChoice("results","Result",$scope.input.results,dep1))
 
                 //the reason not done list
-                let dep2 = {linkId:$scope.input.name + "-workflow",code:"notdone", op:'='}
+                let dep2 = {linkId:$scope.input.name + "-workflow",code:"notperformed", op:'='}
                 $scope.group.item.push(makeChoice("notdone-reason","Reason not performed",$scope.input.notdone,dep2))
 
                 //the 'other' reason for not done. when not-done reason
                 let dep3 = {linkId:$scope.input.name + "-notdone-reason",code:"other", op:'='}
                 $scope.group.item.push(makeInput("notdone-reason-other","Other reason not performed",dep3))
 
-                //the failure reasons
-                let dep4 = {linkId:$scope.input.name + "-results",code:"failed", op:'='}
+                //the failure reasons when the status is failed
+                let dep4 = {linkId:$scope.input.name + "-status",code:"failed", op:'='}
                 $scope.group.item.push(makeChoice("failed-reason","Failure reason",$scope.input.fail,dep4))
+
+                //the 'other' reason for fail
+                let dep5 = {linkId:$scope.input.name + "-failed-reason",code:"other", op:'='}
+                $scope.group.item.push(makeInput("fail-reason-other","Other reason failed",dep5))
 
                 //the inconclusive reasons
                 let dep4a = {linkId:$scope.input.name + "-results",code:"inconclusive", op:'='}
                 $scope.group.item.push(makeChoice("inconclusive-reason","Inconclusive reason",$scope.input.inconclusive,dep4a))
 
-                //the 'other' reason for fail
-                let dep5 = {linkId:$scope.input.name + "-failed-reason",code:"other", op:'='}
-                $scope.group.item.push(makeInput("fail-reason-other","Other reason failed",dep5))
+
 
                 //if the result was inconclusive
 
@@ -64,8 +76,8 @@ angular.module("formsApp")
                     $scope.group.item.push(makeChoice("secondary-methodology","Secondary methodology",$scope.input.secondary,dep7))
                 }
 */
-                //guidelines
-                let dep1a = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                //guidelines. Show if the workflow was performed
+                let dep1a = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                 $scope.group.item.push(makeChoice("guidelines","Guidelines",$scope.input.guidelines,dep1a))
 
                 //the 'other' reason for fail
@@ -137,12 +149,12 @@ angular.module("formsApp")
                 item.type = 'choice'
                 item.text = "Was the test performed"
                 item.answerOption = []
-                item.answerOption.push({valueCoding:{display:"Performed",code:"done"}})
-                item.answerOption.push({valueCoding:{display:"Not Performed",code:"notdone"}})
+                item.answerOption.push({valueCoding:{display:"Performed",code:"performed"}})
+                item.answerOption.push({valueCoding:{display:"Not Performed",code:"notperformed"}})
 
                 //set 'done' as the default
                 item.initial = []
-                item.initial.push({valueCoding:{display:"Done",code:"done"}})
+                item.initial.push({valueCoding:{display:"Performed",code:"performed"}})
                 return item
 
             }

@@ -155,9 +155,12 @@
             really only useful for testing.
         </div>
 
-    <div ng-controller="formReviewsCtrl">
-        <ng-include src = "'includes/formReviews.html'"></ng-include>
-    </div>
+        <div ng-show = "user.email">
+            <div ng-controller="formReviewsCtrl">
+                <ng-include src = "'includes/formReviews.html'"></ng-include>
+            </div>
+        </div>
+
 
 
     </div>

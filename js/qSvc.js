@@ -15,6 +15,7 @@ angular.module("formsApp")
                 let originalLinkId = item.linkId  //need this to know where to insert the cloned item...
                 let newItem = angular.copy(item)
                 newItem.linkId = newItem.linkId + "-c" //update the linkIds - just add 'c' to the end (for copy)
+                newItem.text += " (clone)"
                 if (newItem.item) {
                     newItem.item.forEach(function (child) {
                         child.linkId = child.linkId + "-c"
