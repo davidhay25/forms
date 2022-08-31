@@ -3,7 +3,7 @@ angular.module("formsApp")
         function ($scope) {
             $scope.input = {}
             $scope.input.fail = "Insufficient material\nOther"
-            $scope.input.notdone = "Not publicly funded\nInsufficient material\nOther"
+            $scope.input.notperformedreason = "Not publicly funded\nInsufficient material\nOther"
             $scope.input.results = "Inconclusive"
             $scope.input.inconclusive = "Insufficient material\nOther"
             $scope.input.status = "Completed\nFailed"
@@ -44,11 +44,11 @@ angular.module("formsApp")
 
                 //the reason not done list
                 let dep2 = {linkId:$scope.input.name + "-workflow",code:"notperformed", op:'='}
-                $scope.group.item.push(makeChoice("notdone-reason","Reason not performed",$scope.input.notdone,dep2))
+                $scope.group.item.push(makeChoice("notPerformed-reason","Reason not performed",$scope.input.notperformedreason,dep2))
 
                 //the 'other' reason for not done. when not-done reason
-                let dep3 = {linkId:$scope.input.name + "-notdone-reason",code:"other", op:'='}
-                $scope.group.item.push(makeInput("notdone-reason-other","Other reason not performed",dep3))
+                let dep3 = {linkId:$scope.input.name + "-notPerformed-reason",code:"other", op:'='}
+                $scope.group.item.push(makeInput("notPerformed-reason-other","Other reason not performed",dep3))
 
                 //the failure reasons when the status is failed
                 let dep4 = {linkId:$scope.input.name + "-status",code:"failed", op:'='}
@@ -80,8 +80,8 @@ angular.module("formsApp")
                 let dep1a = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                 $scope.group.item.push(makeChoice("guidelines","Guidelines",$scope.input.guidelines,dep1a))
 
-                //the 'other' reason for fail
-                let dep8 = {linkId:$scope.input.name + "-workflow",code:"done", op:'='}
+                //the 'comment
+                let dep8 = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                 $scope.group.item.push(makeInput("comment","Comment",dep8))
 
 

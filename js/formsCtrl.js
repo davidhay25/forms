@@ -78,8 +78,6 @@ angular.module("formsApp")
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
 
-
-
                 if (! cell.meta) {
                     console.log(cell.item.text + " no meta")
                 }
@@ -91,6 +89,10 @@ angular.module("formsApp")
 
                 let show = formsSvc.checkConditional(cell.item,$scope.form)
 
+                //if it isn't to be shown, clear any content  (Aug31)
+                if (!show) {
+                    delete $scope.form[cell.item.linkId]
+                }
 
                 return show
 

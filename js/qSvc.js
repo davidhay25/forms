@@ -13,19 +13,37 @@ angular.module("formsApp")
                 }
 
                 let originalLinkId = item.linkId  //need this to know where to insert the cloned item...
+                let hashLinkId = {}       //this is a hash of all the original linkId. Need to update the dependencies
                 let newItem = angular.copy(item)
+                hashLinkId[newItem.linkId] = true
                 newItem.linkId = newItem.linkId + "-c" //update the linkIds - just add 'c' to the end (for copy)
                 newItem.text += " (clone)"
                 if (newItem.item) {
                     newItem.item.forEach(function (child) {
+                        hashLinkId[child.linkId] = true
                         child.linkId = child.linkId + "-c"
                         if (child.item) {
                             child.item.forEach(function (grandChild) {
+                                hashLinkId[grandChild.linkId] = true
                                 grandChild.linkId = grandChild.linkId + "-c"
                             })
                         }
                     })
                 }
+
+                //now go through and update any depedencies to items in this item. We couldn't do it before as we needed the hashLinkId forst
+                updateDependencies(newItem,hashLinkId)
+                if (newItem.item) {
+                    newItem.item.forEach(function (child) {
+                        updateDependencies(child,hashLinkId)
+                        if (child.item) {
+                            child.item.forEach(function (grandChild) {
+                                updateDependencies(grandChild,hashLinkId)
+                            })
+                        }
+                    })
+                }
+
 
                 //now insert into the Q
                 if (parentLinkId == 'root') {
@@ -70,6 +88,20 @@ angular.module("formsApp")
                 }
 
                 return
+
+
+                //if there are any 'enableWhen' enries, add the -c to the question. If the
+                function updateDependencies(item,hashLinkId) {
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ew) {
+                            if (hashLinkId[ew.question]) {
+                                ew.question += "-c"
+                                console.log('update dep')
+                            }
+
+                        })
+                    }
+                }
 
 
                 /*
