@@ -62,6 +62,9 @@ angular.module("formsApp")
                 let dep4a = {linkId:$scope.input.name + "-results",code:"inconclusive", op:'='}
                 $scope.group.item.push(makeChoice("inconclusive-reason","Inconclusive reason",$scope.input.inconclusive,dep4a))
 
+                //the 'other' reason for inconclusive
+                let dep4b = {linkId:$scope.input.name + "-inconclusive-reason",code:"other", op:'='}
+                $scope.group.item.push(makeInput("inconclusive-reason-other","Other reason inconclusive",dep4b))
 
 
                 //if the result was inconclusive
@@ -97,6 +100,9 @@ angular.module("formsApp")
                 item.type = 'group'
                 item.text = text
                 item.item = []
+
+                //add the SDC extension to support definition based extraction
+                let ext
 
                 return item
             }
