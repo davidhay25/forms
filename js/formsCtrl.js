@@ -75,6 +75,23 @@ angular.module("formsApp")
             }
 
 
+            $scope.showAncillaryDialog = function(group) {
+                console.log(group)
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/renderAncillary.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: "renderAncillaryCtrl",
+                    resolve: {
+                        group: function () {
+                            return group
+                        }
+                    }
+
+                })
+            }
+
             //determine if an element should be displayed
             $scope.showConditional = function (cell) {
 
@@ -102,7 +119,16 @@ angular.module("formsApp")
 
             //code to show (or not) a conditional group - limited to Coding comparisons ATM
             $scope.showConditionalGroup = function(group) {
+
+                //delete $scope.ancillary
+
                 if (group) {
+
+                 //   if (group.code[0].code == 'ancillary') {
+                   //     $scope.ancillary = group
+                  //  }
+
+
                     let show = formsSvc.checkConditional(group,$scope.form)
 
                     return show

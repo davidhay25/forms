@@ -4,13 +4,13 @@ angular.module("formsApp")
             $scope.input = {}
             $scope.input.fail = "Insufficient material\nOther"
             $scope.input.notperformedreason = "Not publicly funded\nInsufficient material\nOther"
-            $scope.input.results = "Inconclusive"
+            $scope.input.results = "Positive\nNegative\nInconclusive"
             $scope.input.inconclusive = "Insufficient material\nOther"
             $scope.input.status = "Completed\nFailed"
 
 
             //these 2 just for testing
-            $scope.input.methodology = "method1\nmethod2"
+           // $scope.input.methodology = "method1\nmethod2"
             $scope.input.guidelines = "guide1\nguide2"
 
             $scope.save = function() {
@@ -28,15 +28,19 @@ angular.module("formsApp")
                 $scope.group.item.push(workflowItem(prefix))
 
                 //primary methodology - triggered if the workflow was performed
-                if ($scope.input.methodology) {
+          /*      if ($scope.input.methodology) {
                     //the methodology
                     let dep6 = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                     $scope.group.item.push(makeChoice("methodology","Methodology",$scope.input.methodology,dep6))
                 }
-
+*/
                 //the test status. if he workflow was 'performed'
                 let dep1b = {linkId:$scope.input.name + "-workflow",code:"performed", op:'='}
                 $scope.group.item.push(makeChoice("status","Status",$scope.input.status,dep1b))
+
+                //add boolean for primary methodology
+                //dependant on is performed
+                $scope.group.item.push(makeBoolean("primary-methodology","Is primary methodology",dep1b))
 
                 //the result list. if the test status was completed
                 let dep1 = {linkId:$scope.input.name + "-status",code:"completed", op:'='}
@@ -96,10 +100,12 @@ angular.module("formsApp")
             //the 'top level' group
             function makeGroup(suffix,text) {
                 let item = {}
-                item.linkId = $scope.input.name + "-" + suffix
+                item.linkId = suffix
+                //item.linkId = $scope.input.name + "-" + suffix
                 item.type = 'group'
                 item.text = text
                 item.item = []
+                item.code = [{code:"ancillary"}]     //temp
 
                 //add the SDC extension to support definition based extraction
                 let ext
@@ -111,6 +117,19 @@ angular.module("formsApp")
                 let item = {}
                 item.linkId = $scope.input.name + "-" + suffix
                 item.type = 'string'
+                item.text = text
+
+                if (dep) {
+                    item.enableWhen = []
+                    item.enableWhen.push({question:dep.linkId,operator:dep.op,answerCoding:{code:dep.code}})
+                }
+                return item
+            }
+
+            function makeBoolean(suffix,text,dep) {
+                let item = {}
+                item.linkId = $scope.input.name + "-" + suffix
+                item.type = 'boolean'
                 item.text = text
 
                 if (dep) {
@@ -158,9 +177,9 @@ angular.module("formsApp")
                 item.answerOption.push({valueCoding:{display:"Performed",code:"performed"}})
                 item.answerOption.push({valueCoding:{display:"Not Performed",code:"notperformed"}})
 
-                //set 'done' as the default
-                item.initial = []
-                item.initial.push({valueCoding:{display:"Performed",code:"performed"}})
+                //set 'done' as the default - not any more
+             //   item.initial = []
+              //  item.initial.push({valueCoding:{display:"Performed",code:"performed"}})
                 return item
 
             }

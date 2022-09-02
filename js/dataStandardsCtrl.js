@@ -67,6 +67,10 @@ angular.module("formsApp")
 
            })
 
+            $scope.accordianOpened = function(inx) {
+                console.log(inx)
+            }
+
             $scope.preview = function(){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQR.html',

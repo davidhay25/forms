@@ -80,6 +80,11 @@ June 14
 
 
 
+                <span ng-show = "row.group.code[0].code == 'ancillary'" >
+                    <span style="padding-left: 30px" ng-click="showAncillaryDialog(row.group)" class="clickable">Form view</span>
+                </span>
+
+
                 <div class="row">
 
 
@@ -178,6 +183,15 @@ June 14
                 <hr style="margin: 2px"/>
 
             </div>
+
+<!--
+            <div ng-show = "row.group.code[0].code == 'ancillary'">
+                <div ng-controller="renderAncillaryCtrl">
+                    <ng-include src = "'includes/renderAncillary.html'"></ng-include>
+                </div>
+
+            </div>
+            -->
 
 
 

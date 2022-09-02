@@ -63,6 +63,14 @@
       {{selectedNode.data.item.type}}
     </div>
   </div>
+
+  <div class="row" ng-show="selectedNode.data.item.required">
+    <div class="col-md-3">
+      Item is mandatory
+    </div>
+
+  </div>
+
   <div class="row">
     <div class="col-md-3"  ng-show= "selectedNode.data.item.code">
       Code
