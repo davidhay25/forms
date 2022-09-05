@@ -327,19 +327,11 @@ angular.module("formsApp")
 
             //when the Q is checked out to the current user, and they want to update the local copy
             $scope.updateLocalCache = function() {
-                //save a copy in the local browser cache and clear the dirty flag
+                //save a copy in the local browser cache
 
                 let nameInCache = "coq-" + $scope.selectedQ.url
-
-
-                now = new Date()
-
                 $localStorage[nameInCache] = $scope.selectedQ
 
-                console.log("Time to generate update local cache ",moment().diff(now))
-
-                //console.log("Updating local cache")
-                //delete $scope.dirty
             }
 
             //make a copy for editing
@@ -671,8 +663,6 @@ angular.module("formsApp")
             }
 
 
-
-
             //make a choice element from the group children
             $scope.makeChoiceElement = function(node) {
 
@@ -694,36 +684,8 @@ angular.module("formsApp")
 
                     if (lstEW && lstEW.length > 0) {
                         qSvc.updateAfterChoice($scope.selectedQ,lstEW)
-/*
-                        $scope.selectedQ.item.forEach(function (section) {
-                            if (section.enableWhen) {
-                                section.enableWhen.forEach(function (ewToCheck) {   //check all the enableWhens
-                                    lstEW.forEach(function (ew) {
-                                        if (ewToCheck.question == ew.question) {
-                                            //this item has an enebleWhen reference to one that has been converted into a choice
-                                            ewToCheck.question = ew.newQuestion //change to point to the generated question
-                                            ewToCheck.answerCoding = ew.answerCoding.valueCoding
-                                            //remove the previous possible answers. There are others, but the app never supported them
-                                            delete ewToCheck.answerBoolean
-                                            delete ewToCheck.answerString
-                                            delete ewToCheck.answerInteger
-                                        }
-                                    })
-
-                                })
-                            }
-                        })
-                        */
-
-
 
                     }
-
-
-
-
-
-
 
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
                     $scope.treeData = vo.treeData       //for drawing the tree
@@ -732,9 +694,6 @@ angular.module("formsApp")
 
                     $("#designTree").jstree("select_node",  node.id + "-converted");
                 }
-
-
-
             }
 
             $scope.addTag = function(code) {
@@ -751,19 +710,7 @@ angular.module("formsApp")
                     $scope.folderTags.push(code)
                 }
 
-
                 $scope.updateLocalCache()
-
-                /*
-                $scope.folderTags[code] = {code:code}
-                $scope.selectedQ.meta = $scope.selectedQ.meta || {}
-                $scope.selectedQ.meta.tag = $scope.selectedQ.meta.tag || []
-                $scope.selectedQ.meta.tag.push({code:code,system:system,display:display})
-                delete $scope.input.newTagDisplay
-                delete $scope.input.newTagCode
-                $scope.input.dirty = true
-                $scope.updateLocalCache()
-                */
             }
 
 
@@ -772,20 +719,20 @@ angular.module("formsApp")
                 let extFolderTag = formsSvc.getFolderTagExtUrl()  //the extension url
                 let currentExtensions = $scope.selectedQ.extension  //must be present if remove is being called
                 $scope.selectedQ.extension = []
-                //delete $scope.miniQ
+
                 currentExtensions.forEach(function (ext) {
-                    if (ext.url == extFolderTag && ext.valueString == tag) {
+                    if ((ext.url == extFolderTag) && (ext.valueString == tag)) {
                         //do nothing - it will be removed
                     } else {
                         $scope.selectedQ.extension.push(ext)
                     }
                 })
 
-                //remove the entry from miniQ
+                $scope.updateLocalCache()
 
-//miniQ.hashFolderTag
-                //mark the tag for deletion by setting userselcted to true. Not really the purpose of this element...
-                //$scope.selectedQ.meta.tag[inx].userSelected = true
+                //update the list of tags.
+                delete $scope.miniQ.hashFolderTag[tag]
+
 
 
             }

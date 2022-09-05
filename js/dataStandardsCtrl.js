@@ -67,8 +67,10 @@ angular.module("formsApp")
 
            })
 
-            $scope.accordianOpened = function(inx) {
-                console.log(inx)
+
+            $scope.accordianOpened = function(type) {
+                //type will be 'structuredpath, actnow, mdm
+                $scope.standardType = type
             }
 
             $scope.preview = function(){
@@ -196,9 +198,15 @@ angular.module("formsApp")
                 $scope.selectedDocumentLocation = url
             }
 
+
+
             //retrieve all Q to determine their status and populate the selectors
+            //
             let qry = "/ds/fhir/Questionnaire?_elements=url,title,name,description,extension&status:not=retired"
-            $scope.allQ = []
+            $scope.allQ = []                    //Structured Path standards
+            $scope.allMdm = []                  //Mdm
+            $scope.allActnow = []              //actnow
+
             $scope.tags = ['All']
             $scope.hisoStatuses = []
             $http.get(qry).then(
@@ -206,7 +214,9 @@ angular.module("formsApp")
                     if (data.data && data.data.entry) {
                         data.data.entry.forEach(function (entry) {
                             let Q = entry.resource
+                            let isActnow, isMdm         //used to create separate actnow & mdmcategories. Tidy up if there are more...
 
+                            //Set the hisoStatus - default to 'development'
                             Q.hisoStatus = 'development'      //default
                             if (Q.extension) {
                                 let hs = formsSvc.getHisoStatus(Q)
@@ -225,43 +235,55 @@ angular.module("formsApp")
 
                             //tags are now extensions
 
-
-                            //if (Q.meta && Q.meta.tag) {
                             if (Q.extension){
                                 let rslt = false
 
                                 Q.extension.forEach(function (ext) {
                                     if (ext.url == extFolderTag) {
                                         let code = ext.valueString
+                                        if (code) {
+                                            isActnow = code.toLowerCase() == 'actnow' ? true : false
+                                            isMdm = code.toLowerCase() == 'mdm' ? true : false
 
-
-
-                               // Q.meta.tag.forEach(function (tag) {
-                                  //  if (tag.system == tagFolderSystem) {
-                                     //   let code = tag.code
-                                        if (code && (code.toLowerCase() == 'test')) {
-                                            isTest = true
-                                        } else {
-                                            Q.tags.push(code)
-                                            if ($scope.tags.indexOf(code) == -1) {
-                                                $scope.tags.push(code)
+                                            //create separate
+                                            if  (code.toLowerCase() == 'test') {
+                                                isTest = true
+                                            } else {
+                                                Q.tags.push(code)
+                                                if ($scope.tags.indexOf(code) == -1) {
+                                                    $scope.tags.push(code)
+                                                }
                                             }
+
                                         }
+
 
                                     }
                                 })
                             }
 
-                            //Only include the ones NOT tagged with 'test'
-                            if (! isTest) {
-                                $scope.allQ.push(Q)         //note that this is a minimal Q
-                            }
 
+                            //Only include the ones NOT tagged with 'test'. todo - not really needed
+                            if (! isTest) {
+                                //so it's not a test
+                                if (isMdm) {
+                                    $scope.allMdm.push(Q)
+                                } else if (isActnow) {
+                                    $scope.allActnow.push(Q)
+                                } else {
+                                    $scope.allQ.push(Q)         //note that this is a minimal Q
+                                }
+
+
+
+                            }
 
                             $scope.input.selectedTag = $scope.tags[0]
                             $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
+
                         })
 
+                        //-----------
                         if (QIdfromUrl) {
                             //a Q url was passed in on the query url..
                             $scope.input.togglePane()       //hide the list of standards
