@@ -129,5 +129,5 @@ try {
 }
 
 
-app.use('/', express.static(__dirname,{index:'/frontPage.html'}));
-
+//app.use('/', express.static(__dirname,{index:'/frontPage.html'}));
+app.use('/', express.static(__dirname,{index:'/dataStandards.html'}));

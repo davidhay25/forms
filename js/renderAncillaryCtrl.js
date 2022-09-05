@@ -77,36 +77,47 @@ angular.module("formsApp")
 
                         case baseLinkId + '-notPerformed-reason' :
                             //
-                            item.answerOption.forEach(function (ao) {
-                                $scope.input.reasonsNotPerformed.push(ao.valueCoding)
-                            })
+                            if (item.answerOption) {
+                                item.answerOption.forEach(function (ao) {
+                                    $scope.input.reasonsNotPerformed.push(ao.valueCoding)
+                                })
+                            }
                             break
 
                         case baseLinkId + '-inconclusive-reason' :
                             //
-                            item.answerOption.forEach(function (ao) {
-                                $scope.input.reasonsInconclusive.push(ao.valueCoding)
-                            })
+                            if (item.answerOption) {
+                                item.answerOption.forEach(function (ao) {
+                                    $scope.input.reasonsInconclusive.push(ao.valueCoding)
+                                })
+                            }
                             break
 
                         case baseLinkId + '-failed-reason' :
                             //
-                            item.answerOption.forEach(function (ao) {
-                                $scope.input.reasonsFailed.push(ao.valueCoding)
-                            })
+                            if (item.answerOption) {
+                                item.answerOption.forEach(function (ao) {
+                                    $scope.input.reasonsFailed.push(ao.valueCoding)
+                                })
+                            }
+
                             break
 
                         case baseLinkId + '-guidelines' :
                             //
-                            item.answerOption.forEach(function (ao) {
-                                $scope.input.guidelines.push(ao.valueCoding)
-                            })
+                            if (item.answerOption) {
+                                item.answerOption.forEach(function (ao) {
+                                    $scope.input.guidelines.push(ao.valueCoding)
+                                })
+                            }
                             break
 
                         case resultsLinkId :
-                            item.answerOption.forEach(function (ao) {
-                                $scope.input.firstListOptions.push(ao.valueCoding)
-                            })
+                            if (item.answerOption) {
+                                item.answerOption.forEach(function (ao) {
+                                    $scope.input.firstListOptions.push(ao.valueCoding)
+                                })
+                            }
 
 
                             $scope.input.firstListOptions.push({display:"---------"})
