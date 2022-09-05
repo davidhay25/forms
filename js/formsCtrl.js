@@ -2,7 +2,7 @@
 
 angular.module("formsApp")
     .controller('formsCtrl',
-        function ($scope,$http,formsSvc,$uibModal) {
+        function ($scope,$http,formsSvc,$uibModal,qSvc) {
 
 
            // $scope.datePopup = {opened :false}
@@ -74,7 +74,6 @@ angular.module("formsApp")
 
             }
 
-
             $scope.showAncillaryDialog = function(group) {
                 console.log(group)
 
@@ -89,7 +88,41 @@ angular.module("formsApp")
                         }
                     }
 
-                })
+                }).result.then(
+                    function (vo) {
+                        console.log(vo)
+
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-workflow`,vo.performed,$scope.form,'Coding')
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-status`,vo.status,$scope.form,'Coding')
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-results`,vo.results,$scope.form,'Coding')
+
+                        //not performed
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-notPerformed-reason`,vo.reasonNotPerformed,$scope.form,'Coding')
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-notPerformed-reason-other`,vo.reasonNotPerformedOther,$scope.form,'String')
+
+                        //inconclusive
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-inconclusive-reason`,vo.reasonInconclusive,$scope.form,'Coding')
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-inconclusive-reason-other`,vo.reasonInconclusiveOther,$scope.form,'String')
+
+                        //failed
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-failed-reason`,vo.reasonFailed,$scope.form,'Coding')
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-failed-reason-other`,vo.reasonIFailedOther,$scope.form,'String')
+
+
+                        qSvc.setItemValue($scope.formTemplate,`${vo.baseLinkId}-comment`,vo.comment,$scope.form,'String')
+
+
+                        //additional items - these don't have a linkId that starts with the same
+                        //vo.additionalItems.push({linkId:item.linkId,value:value,type:item.type})
+                        vo.additionalItems.forEach(function (ai) {
+                            qSvc.setItemValue($scope.formTemplate,ai.linkId,ai.value,$scope.form,ai.type)
+
+
+                        })
+
+
+                    }
+                )
             }
 
             //determine if an element should be displayed

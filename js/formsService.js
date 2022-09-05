@@ -268,7 +268,6 @@ angular.module("formsApp")
             },
 
             QhasFolderTag : function(Q,tag) {
-                //let extFolderTag = formsSvc.getFolderTagExtUrl()
 
                 //return true if the Q has the given folder tag (case insensitive)
                 let hasTag = false
@@ -285,17 +284,6 @@ angular.module("formsApp")
                     })
                 }
 
-/*
-                if (Q.meta && Q.meta.tag) {
-                    Q.meta.tag.forEach(function (tag) {
-                        if (tag.system == tagFolderSystem) {
-                            if (tag.code && tag.code.toLowerCase() == tagLC) {
-                                hasTag = true
-                            }
-                        }
-                    })
-                }
-                */
                 return hasTag
 
             },
@@ -398,12 +386,6 @@ angular.module("formsApp")
                         form = form || {}
                         let hashPrepop = data.data
 
-
-
-                       // Object.keys(hashPrepop).forEach(function (key){
-                         //   form[key] = hashPrepop[key]
-                       // })
-
                         if (Q.item) {
                             Q.item.forEach(function (sectionItem) {
                                 if (sectionItem.item) {
@@ -481,13 +463,9 @@ angular.module("formsApp")
                                     form[child.linkId] = opt
                                 }
                             })
-
-
                         }
                     }
-
                 }
-
             },
 
             getQAttachments : function(Q) {

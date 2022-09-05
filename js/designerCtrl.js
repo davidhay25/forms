@@ -529,9 +529,89 @@ angular.module("formsApp")
 
             //------
 
-            $scope.makeQDependancyAudit = function() {
-                $scope.dependencyAudit = qSvc.auditDependencies($scope.selectedQ,$scope.hashAllItems)
+            $scope.fitDependencyGraph = function(){
+                $timeout(function(){
+                    $scope.dependencyChart.fit()
+                },500)
             }
+
+            $scope.fitSingleGraph = function(){
+                $timeout(function(){
+                    $scope.singleDependencyGraph.fit()
+                },500)
+            }
+            //construct the audit object. This is done once to establish the
+          //  $scope.makeQDependancyAudit = function(linkId) {
+               // $scope.dependencyAudit = qSvc.auditDependencies($scope.selectedQ,$scope.hashAllItems)
+
+          //  }
+
+
+
+            $scope.makeQDependancyAudit = function(linkId,graphId) {
+                //if linkId is set then only items that are a source or target are shown in the graph
+
+                let graphContainer = graphId || 'dependencyGraph'
+
+
+                $scope.dependencyAudit = qSvc.auditDependencies($scope.selectedQ,$scope.hashAllItems)
+                console.log($scope.dependencyAudit)
+
+                let vo = qSvc.makeDependencyGraph($scope.dependencyAudit,linkId)
+
+                //construct an array from hashNodes that has all the items involved in a conditional (source or target)
+                //this is only done when drawing the full graph (the initial show)
+                if (! linkId) {
+                    $scope.itemsInDependency = [""]
+                    Object.keys(vo.hashNodes).forEach(function (key) {
+                        $scope.itemsInDependency.push(key)
+                    })
+                }
+
+
+
+                let container = document.getElementById(graphContainer);
+                let graphOptions = {
+                    physics: {
+                        enabled: true,
+                        barnesHut: {
+                            gravitationalConstant: -10000,
+                        },
+                        stabilization : {
+                            iterations: 100
+                        }
+                    }
+                };
+
+                $scope.dependencyChart = new vis.Network(container, vo.graphData, graphOptions);
+
+                $scope.dependencyChart.on("stabilizationIterationsDone", function () {
+                    $scope.dependencyChart.setOptions( { physics: false } );
+                });
+
+                $scope.dependencyChart.on("click", function (obj) {
+                    let nodeId = obj.nodes[0];  //get the first node
+
+
+                    if (nodeId) {
+                        let node = vo.graphData.nodes.get(nodeId);
+                        let thing = $scope.hashAllItems[node.id]
+                        if (thing) {
+                            $scope.resourceFromDependencyGraph = thing.item
+                            $scope.$digest()
+                        }
+
+                    }
+
+
+
+                })
+
+                console.log(vo)
+            }
+
+
+
 
             $scope.removeAttachment = function(url) {
                 formsSvc.removeQAttachment($scope.selectedQ,url)
@@ -1582,39 +1662,12 @@ return
                 //save the current state of node expansion from the jstree - not the treedata!!!
                 now = new Date()
 
-/*
-
-                let hashState = {}
-                try {
-                    let ar = $('#designTree').jstree('get_state').core.open
-                    ar.forEach(function (id) {
-                        hashState[id] = true
-                    })
-
-                } catch (ex) {
-
-                }
-
-                */
 
                 clearWorkArea()
                 //$scope.selectedQ = Q
 
                 let vo = formsSvc.makeTreeFromQ(Q)
                 $scope.treeData = vo.treeData       //for drawing the tree
-/*
-                //todo - change to use jstree functions
-                if (resetToSection) {
-                 //   $scope.showSection()
-                } else {
-                    //restore the opened state
-                    $scope.treeData.forEach(function (node){
-                        node.state = node.state || {}
-                        node.state.opened = hashState[node.id]
-                    })
-                }
-
-                */
 
                 drawTree()
 
@@ -1623,7 +1676,7 @@ return
                 console.log("Time to make form template ",moment().diff(now))
                 $scope.formTemplate = $scope.objFormTemplate.template
 
-                $scope.v2List = exportSvc.createV2Report(Q)
+                //temp - not using this now I think... $scope.v2List = exportSvc.createV2Report(Q)
 
                 console.log("Time to draw Q ",moment().diff(now))
 
@@ -1684,6 +1737,10 @@ return
                     if (data.node) {
                         $scope.selectedNode = data.node;
                         //todo - get from hashNode
+
+
+                        //generate dependency graph for item
+                        $scope.makeQDependancyAudit($scope.selectedNode.id,'singleDependencyGraph')
 
                     }
                     try {

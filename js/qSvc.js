@@ -4,6 +4,162 @@ angular.module("formsApp")
 
         return {
 
+            setItemValue : function(sections,linkId,value,form,dt) {
+                //set the answerOption in the template for that linkid
+                if (! value) { return}
+
+                sections.forEach(function (section) {
+                    section.rows.forEach(function (row) {
+
+                        ['col1','col2','col3','col4'].forEach(function (col) {
+                            if (row[col]) {
+                                row[col].forEach(function (cell) {
+                                    checkItem(cell)
+                                })
+                            }
+                        })
+
+
+
+                    })
+
+                })
+
+
+                function checkItem(cell) {
+                    if (cell.item.linkId == linkId) {
+
+                        switch (dt) {
+                            case 'Coding' :
+                                //This is the item to change - set the value. Has to be the one from the template...
+                                if (cell.item.answerOption) {
+                                    cell.item.answerOption.forEach(function (ao) {
+                                        if (ao.valueCoding && ao.valueCoding.code == value.code) {
+                                            form[linkId] = ao
+                                        }
+                                    })
+                                }
+                                break
+
+                            default :
+                                form[linkId] = value
+                                break
+
+                        }
+
+
+                    }
+
+                }
+
+
+
+
+            },
+
+            makeDependencyGraph : function(audit,linkId){
+                //make a graph of dependencies between items in the Q
+                //uses the audit object created by auditDependencies()
+                //audit.source is the one whode visibility is controlled by the target
+                //the arrow should be from target -> source
+                //if linkId is present, then only show items with a link (either way) to that one
+
+                let arNodes = []    //
+                let arEdges = []
+                //create a hash of all the objects that are sources or targets
+                let hashNodes = {}
+/*
+                //all items that are either a source or target of a dependency link
+                audit.forEach(function (vo) {
+                    if (linkId) {
+                        //should this item be added to the list? Either if it is the item, or it references the item
+                        if (vo.source == linkId || vo.target == linkId) {
+                            hashNodes[vo.source] = hashNodes[vo.source] || {text: vo.sourceText}
+                            hashNodes[vo.target] = hashNodes[vo.target] || {text: vo.controllerText}
+                        }
+                    } else {
+                        //add both source & target
+                        hashNodes[vo.source] = hashNodes[vo.source] || {text: vo.sourceText}
+                        hashNodes[vo.target] = hashNodes[vo.target] || {text: vo.controllerText}
+                    }
+
+                })
+*/
+                //if linkId is present, then we want to include all nodes where there is a link - includng recirsive - to that node
+                if (linkId) {
+                    let itemsOfInterest = [linkId]
+                    let lastLength = 1      //the last length of the list of nodes
+                    let ctr = 0
+                    do {
+                        audit.forEach(function (vo) {
+                            let question = vo.dep.question
+                            if (vo.source == linkId || (itemsOfInterest.indexOf(question) > -1)|| (itemsOfInterest.indexOf(vo.source) > -1)) {
+                                hashNodes[vo.source] = hashNodes[vo.source] || {text: vo.sourceText}
+                                hashNodes[vo.target] = hashNodes[vo.target] || {text: vo.controllerText}
+                                itemsOfInterest.push(vo.target)
+                                itemsOfInterest.push(vo.source)
+                                // hashNodes[vo.target] = hashNodes[vo.target] || {text: vo.controllerText}
+                            }
+                        })
+                        ctr++
+                    } while (
+                        ctr < 5
+                        )
+                } else {
+                    audit.forEach(function (vo) {
+                        hashNodes[vo.source] = hashNodes[vo.source] || {text: vo.sourceText}
+                        hashNodes[vo.target] = hashNodes[vo.target] || {text: vo.controllerText}
+                    })
+                }
+
+                //make the nodes array
+                Object.keys(hashNodes).forEach(function (key) {
+                    let vo = hashNodes[key]
+                    let node = {id: key, label: vo.text,
+                        shape: 'box'}
+
+                    if (linkId && (key == linkId)) {
+                        node.color = 'red'
+                    }
+                    arNodes.push(node)
+                })
+
+                //now go through the dependencies - arrow is target -> source
+                audit.forEach(function (vo) {
+                    let linkText = ""
+
+                    if (vo.dep && vo.dep.answerCoding && vo.dep.answerCoding.code) {
+                        linkText = vo.dep.answerCoding.code
+                    } else {
+                        console.log("Missing answerCoding in linkid " + vo.target)
+                    }
+
+                    let edge = {id: 'e' + arEdges.length +1,
+                        from: vo.target,
+                        to: vo.source, // targetNode.id,
+                        label: linkText,
+                        arrows : {to:true}}
+
+                    arEdges.push(edge)
+                })
+
+                let nodes;
+                let edges;
+
+                //nodes = new vis.DataSet(arNodes);
+                nodes = new vis.DataSet(arNodes)
+                edges = new vis.DataSet(arEdges);
+
+                // provide the data in the vis format
+                var data = {
+                    nodes: nodes,
+                    edges: edges
+                };
+
+                return {graphData : data,hashNodes:hashNodes};
+
+            },
+
             cloneItem : function(item,parentLinkId,Q,hash) {
                 //create a copy of this item and all its children
 
@@ -322,6 +478,8 @@ angular.module("formsApp")
                         item.enableWhen.forEach(function (dep) {
                             if (! hash[dep.question]) {
                                 let err = "Controlling item not found"
+                                //source = linkId of the item being controlled - sourceText is the text (slightly weird direction
+                                //target = linkId of the item doing the controlling
                                 let entry = {source:item.linkId,target:dep.question, ok:false,dep:dep,err:err}
                                 entry.sourceText = item.text
                                 arResult.push(entry)
@@ -356,7 +514,6 @@ angular.module("formsApp")
                                     }
 
                                 }
-
 
                                 let entry = {source:item.linkId,target:dep.question, ok:OK,dep:dep,err:err}
                                 entry.sourceText = item.text

@@ -1,6 +1,7 @@
 angular.module("formsApp")
     .controller('newAncillaryStudyCtrl',
         function ($scope) {
+
             $scope.input = {}
             $scope.input.fail = "Insufficient material\nOther"
             $scope.input.notperformedreason = "Not publicly funded\nInsufficient material\nOther"
@@ -8,6 +9,10 @@ angular.module("formsApp")
             $scope.input.inconclusive = "Insufficient material\nOther"
             $scope.input.status = "Completed\nFailed"
 
+
+            //This is a codesystem defined so that the wizard can be implemented. ConceptMap can be user
+            //to convert to SNOMED codes
+            let system = "http://canshare.co.nz/fhir/CodeSystem/ancillary-test-codes"
 
             //these 2 just for testing
            // $scope.input.methodology = "method1\nmethod2"
@@ -60,7 +65,7 @@ angular.module("formsApp")
 
                 //the 'other' reason for fail
                 let dep5 = {linkId:$scope.input.name + "-failed-reason",code:"other", op:'='}
-                $scope.group.item.push(makeInput("fail-reason-other","Other reason failed",dep5))
+                $scope.group.item.push(makeInput("failed-reason-other","Other reason failed",dep5))
 
                 //the inconclusive reasons
                 let dep4a = {linkId:$scope.input.name + "-results",code:"inconclusive", op:'='}
