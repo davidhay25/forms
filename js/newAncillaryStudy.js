@@ -146,6 +146,12 @@ angular.module("formsApp")
 
             function makeChoice(suffix,text,txtOptions,dep) {
                 let item = {}
+
+                let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"radio-button"}]}
+                item.extension = [ext]
+
+
                 item.linkId = $scope.input.name + "-" + suffix
                 item.type = 'choice'
                 item.text = text
@@ -175,6 +181,11 @@ angular.module("formsApp")
                 //the initial dropdown - done / not done
 
                 let item = {}
+
+                let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"radio-button"}]}
+                item.extension = [ext]
+
                 item.linkId = $scope.input.name + "-workflow"
                 item.type = 'choice'
                 item.text = "Was the test performed"
