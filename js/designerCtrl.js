@@ -526,12 +526,13 @@ angular.module("formsApp")
                     $scope.dependencyChart.fit()
                 },500)
             }
-
+/*
             $scope.fitSingleGraph = function(){
                 $timeout(function(){
                     $scope.singleDependencyGraph.fit()
                 },500)
             }
+            */
             //construct the audit object. This is done once to establish the
           //  $scope.makeQDependancyAudit = function(linkId) {
                // $scope.dependencyAudit = qSvc.auditDependencies($scope.selectedQ,$scope.hashAllItems)

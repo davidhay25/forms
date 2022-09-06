@@ -100,7 +100,7 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
             <div class="container-fluid">
-            <div class="col-md-5">
+            <div class="col-md-4">
                     <span>
                         <a class="navbar-brand" href="#">
                             <!--CanShare project: Publications front page -->
@@ -131,7 +131,6 @@
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
                     <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
-
                 </form>
             </div>
 
@@ -167,6 +166,22 @@
                        ng-click="goHome()"></i>
                 </div>
 
+            </div>
+
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    <a href="designer.html" target="_blank">
+                        <i class="btn btn-link glyphicon glyphicon-edit clickable pull-right"
+
+                           uib-popover="Display the designer in a new tab. This is only useful for editors."
+                           popover-placement="left"
+                           popover-trigger="'mouseenter'">
+
+                        </i>
+                    </a>
+
+
+                </div>
             </div>
 
             <div class="col-md-2">
