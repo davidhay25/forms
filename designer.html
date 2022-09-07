@@ -357,7 +357,7 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-link" ng-show="user.email"
+                    <button class="btn btn-link" ng-show="user.email && systemConfig.type !== 'public'"
                             ng-click="newQ()">
                         New Questionnaire
                     </button>

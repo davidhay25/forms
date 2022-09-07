@@ -20,7 +20,7 @@ function setup(app,serverRoot,systemConfig) {
 
             //now send it to the public server
             //this will go to a nodejs endpoint (not the hapi server - will firewall that off eventually)
-            let publishQry = systemConfig.publicServer + "fm/fhir/Questionnaire"
+            let publishQry = systemConfig.publicServer + "fm/fhir/Questionnaire/" +  req.params.id
             let config = {headers:{Authorization:'dhay'}}
             console.log(publishQry)
             let publishResult
@@ -32,6 +32,7 @@ function setup(app,serverRoot,systemConfig) {
             } catch (ex) {
                 if (ex.response) {
                     console.log(ex.response.data)
+                    console.log(ex.response.status)
                     res.status (400).json(ex.response.data)
                     return
                 } else {
