@@ -25,7 +25,10 @@ function setup(app,serverRoot,systemConfig) {
             console.log(publishQry)
             let publishResult
             try {
-                publishResult = await axios.post(publishQry,Q,config)
+                //publishResult = await axios.post(publishQry,Q,config)
+                //this is now a PUT as the id of the Q on the public server will be the same as on the design server
+                //it also requires authorization...
+                publishResult = await axios.put(publishQry,Q,config)
             } catch (ex) {
                 if (ex.response) {
                     console.log(ex.response.data)

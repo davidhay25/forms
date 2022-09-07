@@ -20,6 +20,8 @@ function setup(app,serverRoot,systemConfig) {
 
     if (systemConfig.type == 'design') {
         //only the design server supports Q update by Id (PUT)
+        //note that there are actually 2 endpoints responding to this, one in the design & another in public
+        //the only difference is that the one on the public site requires authorization
         app.put('/fm/fhir/Questionnaire/:id',function(req,res){
 
             let Q = req.body
@@ -57,13 +59,41 @@ function setup(app,serverRoot,systemConfig) {
         })
     }
 
-
-
     if (systemConfig.type == 'public') {
 
         //process a POST of a Q to the public server - used when publishing
         //has to be a post, as we can't assume that the id id the same between servers - we need to use
         //the canonical url
+
+        //THIS HAS CHANGED. We now do assume that the id of the questionnaire is the same on both
+        //design and public servers - set when the Q is created in design. So the public server accepts
+        //a PUT to the location of the Q - though must be authorized
+
+        //this endpoint (exposed only by the public server) required authentication.
+        // Functionally it's otherwise the same as the one exposed by the design site
+        app.put('/fm/fhir/Questionnaire/:id',function(req,res){
+
+            if (! checkAuth(req)) {
+                res.status(403).json()
+                return
+            }
+
+            let Q = req.body
+            let url = serverRoot + "Questionnaire/" + Q.id
+            //console.log(url)
+            axios.put(url,Q)
+                .then(function (response){
+                    res.status(response.status).json(response.data)
+                })
+                .catch(function (err){
+                    console.log(err.response.data)
+                    res.status(400).send(err.response.data)
+                })
+
+        })
+
+/*
+
         app.post('/fm/fhir/Questionnaire', async function (req, res) {
             if (! checkAuth(req)) {
                 res.status(403).json()
@@ -147,12 +177,7 @@ function setup(app,serverRoot,systemConfig) {
 
                     }
 
-/*
-                    } else {
-                        res.status(400).json({msg: "Url or version missing"})
 
-                    }
-                    */
 
                 } catch (e) {
                     console.log(e)
@@ -164,6 +189,8 @@ function setup(app,serverRoot,systemConfig) {
 
 
         })
+
+        */
 
     }
 
