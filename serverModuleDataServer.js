@@ -43,7 +43,7 @@ function setup(app,serverRoot,systemConfig) {
             }
 
 
-            console.log("publishResult " ,publishResult)
+            //console.log("publishResult " ,publishResult)
             res.json(publishResult.data)
 
            // res.json(Q)
