@@ -16,7 +16,7 @@
     </style>
 
 
-    <div ng-show="showConditional(cell)">
+    <div  style="margin-bottom: 15px"  ng-show="showConditional(cell)">
 
         <div ng-hide="cell.item.type == 'display'">
             <span ng-show="cell.item.type == 'reference'">
@@ -48,17 +48,11 @@
                        popover-trigger="'mouseenter'"></i>
                 </span>
 
-
-
-
             </div>
-
-
 
         </div>
 
-
-        <div ng-switch="cell.item.type">
+        <div style="padding-left: 15px" ng-switch="cell.item.type">
 
             <div ng-switch-when="group">
 

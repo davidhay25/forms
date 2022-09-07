@@ -100,11 +100,11 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
             <div class="container-fluid">
-            <div class="col-md-4">
+            <div class="col-md-5">
                     <span>
                         <a class="navbar-brand" href="#">
                             <!--CanShare project: Publications front page -->
-                            Structured Pathology Data Standard Manager
+                            Te Aho o Te Kahu, Cancer Control Agency Data Standards Manager
                         </a>
                     </span>
             </div>
@@ -130,7 +130,10 @@
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
-                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                        <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+
                 </form>
             </div>
 
@@ -143,17 +146,7 @@
                     <checkbox ng-model = "input.showTechnical"></checkbox> Technical
                 </div>
             </div>
-<!--
-            <div class="col-md-1">
-                <div class="navbar-text" ng-show="selectedQ"
-                     uib-popover="When checked, displays help text"
-                     popover-placement="left"
-                     style="padding-top: 10px"
-                     popover-trigger="'mouseenter'">
-                    <checkbox ng-model = "input.showHelp"></checkbox> Help
-                </div>
-            </div>
--->
+
 
             <div class="col-md-1">
                 <div class="navbar-text">
@@ -168,24 +161,12 @@
 
             </div>
 
-            <div class="col-md-1">
-                <div class="navbar-text">
-                    <a href="designer.html" target="_blank">
-                        <i class="btn btn-link glyphicon glyphicon-edit clickable pull-right"
 
-                           uib-popover="Display the designer in a new tab. This is only useful for editors."
-                           popover-placement="left"
-                           popover-trigger="'mouseenter'">
-
-                        </i>
-                    </a>
-
-
-                </div>
-            </div>
 
             <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
                 <img width="150" height="auto" class="pull-right" src="icons/TAK-logo-midgreen.png"/>
+                </a>
             </div>
 
 
@@ -199,7 +180,7 @@
 
 
                 <uib-accordion close-others="false">
-                    <div uib-accordion-group class="panel-default" headingX="Structured Pathology">
+                    <div uib-accordion-group class="panel-default" is-open="input.accordianStatus['SP']">
                         <uib-accordion-heading>
                             <span ng-click="accordianOpened('structuredpath')">Structured Pathology</span>
                         </uib-accordion-heading>
@@ -224,7 +205,7 @@
                     </div>
 
                     </div>
-                    <div uib-accordion-group class="panel-default">
+                    <div uib-accordion-group class="panel-default" is-open="input.accordianStatus['AN']">
 
                         <uib-accordion-heading>
                             <span ng-click="accordianOpened('actnow')">ACT-NOW</span>
@@ -244,7 +225,7 @@
 
                         <a target="_blank" href="http://actnow.canshare.co.nz/">Reference Implementation</a>
                     </div>
-                    <div uib-accordion-group class="panel-default" heading="MDM">
+                    <div uib-accordion-group class="panel-default"  is-open="input.accordianStatus['MDM']">
 
                         <uib-accordion-heading>
                             <span ng-click="accordianOpened('mdm')">MDM</span>
@@ -269,6 +250,7 @@
             <div ng-class="input.rightPane">
 
                 <div ng-show = "! selectedQ">
+
 
 
                     <div ng-hide="standardType">
@@ -663,7 +645,7 @@
                     </uib-tab>
 
 
-                    <uib-tab ng-show="input.showTechnical"  >
+                    <uib-tab >
                         <uib-tab-heading>
                             Previous examples <span ng-show="allQRforQ.entry.length > 0" class="badge">{{allQRforQ.entry.length}}</span>
                         </uib-tab-heading>

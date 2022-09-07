@@ -67,10 +67,40 @@ angular.module("formsApp")
 
            })
 
-
             $scope.accordianOpened = function(type) {
                 //type will be 'structuredpath, actnow, mdm
+
+
                 $scope.standardType = type
+                $timeout(function(){
+                    console.log($scope.input.accordianStatus)
+                    let allClosed = true
+                    Object.keys($scope.input.accordianStatus).forEach(function (key) {
+                        if (($scope.input.accordianStatus[key])) {
+                            allClosed = false
+                        }
+                    })
+                    if (allClosed) {
+                        delete $scope.standardType
+                    }
+
+                },100)
+
+                //delete any open Q
+                delete $scope.selectedQ
+
+
+                return
+
+                if ($scope.standardType == type) {
+                    delete $scope.standardType
+                } else {
+                    $scope.standardType = type
+                }
+
+
+
+
             }
 
             $scope.preview = function(){

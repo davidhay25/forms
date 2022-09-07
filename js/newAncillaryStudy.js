@@ -16,7 +16,7 @@ angular.module("formsApp")
 
             //these 2 just for testing
            // $scope.input.methodology = "method1\nmethod2"
-            $scope.input.guidelines = "guide1\nguide2"
+            //$scope.input.guidelines = "guide1\nguide2"
 
             $scope.save = function() {
                 $scope.makeItems()
