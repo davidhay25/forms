@@ -64,7 +64,7 @@
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
-
+    <script src="js/HISOSvc.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -151,7 +151,7 @@
             <div class="col-md-1">
                 <div class="navbar-text">
                     <i class="btn btn-link glyphicon glyphicon-home clickable pull-right"
-                       ng-show="selectedQ"
+                       ng-showDEP="selectedQ"
                        uib-popover="Display the home page, de-selecting the Data Standard"
                        popover-placement="left"
                        popover-trigger="'mouseenter'"
@@ -251,8 +251,6 @@
 
                 <div ng-show = "! selectedQ">
 
-
-
                     <div ng-hide="standardType">
                         <ng-include src = "'includes/dsIntroNone.html'"></ng-include>
                     </div>
@@ -274,7 +272,7 @@
 
                 <div ng-show="selectedQ" class="banner">
                     <div ng-show = "hisoNumber" > HISO number: {{hisoNumber}}</div>
-                    Data Standard details: {{selectedQ.title}}
+                    Data Standard details: {{selectedQ.title}} <span ng-show="selectedQ.version">(version: {{selectedQ.version}})</span>
                     <br/>
                     <em>{{selectedQ.description}}</em>
 
@@ -390,7 +388,7 @@
                                 <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
                                 <br/>
                                 <div class="clickable" ng-show="formQR"
-                                     ng-click="preview()">Print preview</div>
+                                     ng-click="preview()">Single page</div>
 
                                 <br/>
                                 <div>
@@ -569,6 +567,24 @@
 
                     <uib-tab heading="HISO data elements">
                         <br/>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a ng-show="HisoDownloadLinkCsvName" class="btn btn-link pull-right" download="{{HisoDownloadLinkCsvName}}"
+                                   href="{{HisoDownloadLinkCsv}}" title="{{HisoDownloadLinkCsvName}}" >
+                                    Download CSV file
+                                </a>
+
+                                <a ng-show="HisoDownloadLinkHtmlName" class="btn btn-link pull-right" download="{{HisoDownloadLinkHtmlName}}"
+                                   href="{{HisoDownloadLinkHtml}}" title="{{HisoDownloadLinkHtmlName}}" >
+                                    Download HTML file
+                                </a>
+
+                            </div>
+                        </div>
+
+
+
                         <ng-include src="'includes/hisoTable2.html'"></ng-include>
                     </uib-tab>
 

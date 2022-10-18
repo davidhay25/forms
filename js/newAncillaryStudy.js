@@ -111,10 +111,16 @@ angular.module("formsApp")
                 item.text = text
                 item.item = []
                 item.code = [{code:"ancillary"}]     //temp
+                item.extension = [{url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count",valueInteger:1}]
 
                 //add the SDC extension to support definition based extraction
                 let ext
-
+/*extension": [
+    {
+      "url": "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count",
+      "valueInteger": 1
+    }
+  ]*/
                 return item
             }
 
@@ -188,6 +194,7 @@ angular.module("formsApp")
 
                 item.linkId = $scope.input.name + "-workflow"
                 item.type = 'choice'
+                item.required = true
                 item.text = "Was the test performed"
                 item.answerOption = []
                 item.answerOption.push({valueCoding:{display:"Performed",code:"performed"}})

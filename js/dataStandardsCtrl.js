@@ -1,6 +1,6 @@
 angular.module("formsApp")
     .controller('dataStandardsCtrl',
-        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout,$window,$sce) {
+        function ($scope,$http,formsSvc,$uibModal,exportSvc,terminologySvc,modalService,$timeout,$window,$sce,hisoSvc) {
 
 
             //was a Q Id passed in. It will be selected after the list of Q have been loade
@@ -63,7 +63,7 @@ angular.module("formsApp")
             $scope.$on("qrCreated",function(ev,qr){
                 //need to construct a QR that has the reviewers name in it.
                 makeQR()
-               console.log($scope.formQR)
+               //console.log($scope.formQR)
 
            })
 
@@ -73,7 +73,7 @@ angular.module("formsApp")
 
                 $scope.standardType = type
                 $timeout(function(){
-                    console.log($scope.input.accordianStatus)
+                    //console.log($scope.input.accordianStatus)
                     let allClosed = true
                     Object.keys($scope.input.accordianStatus).forEach(function (key) {
                         if (($scope.input.accordianStatus[key])) {
@@ -131,8 +131,13 @@ angular.module("formsApp")
                 delete $scope.selectedSection       //the form section
                 delete $scope.selectedQ
                 delete $scope.model
+                delete $scope.standardType
                 $scope.input.leftPane = "col-md-2"
                 $scope.input.rightPane = "col-md-10"
+
+                $scope.input.accordianStatus['SP'] = false
+                $scope.input.accordianStatus['MDM'] = false
+                $scope.input.accordianStatus['AN'] = false
 
             }
 
@@ -422,19 +427,42 @@ angular.module("formsApp")
                 //need to wait for the form to be rendered before checking the defaults
 
                 $timeout(function(){
-                    //returns any initial values
-
+                    //returns any initial values - need to wait for the page to load
                     $scope.form = formsSvc.prepop(Q)
-
                 },1000)
 
 
                 //for the HISO table display
-                let voHiso = formsSvc.generateQReport($scope.selectedQ)
+                // an array - 1 line per section
+                // section has .lines array - each line {type: item: linkId: name: description:
+                let voReport = formsSvc.generateQReport($scope.selectedQ)
 
-                let hashAllItems = voHiso.hashAllItems
+                //create a summary object suitable for the HISO table. Has functionality specific to HISO needs...
+                let hashAllItems = voReport.hashAllItems
                 $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
+
+                //create an array of HISO metadata - one line per element
+                //returns {array: fle: }
+                let voHISO = hisoSvc.createHisoArray($scope.exportJsonList)
+                //now construct the download data
+
+                let fle = voHISO.fle // arHISO.join("\r\n")
+
+                let uniquer = moment().format()
+                $scope.HisoDownloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))
+                $scope.HisoDownloadLinkCsvName = Q.name + '_hiso_' + uniquer + '.csv';
+
+                //Now, create the HTML download
+                let htmlDownload = hisoSvc.createHtmlDownload(Q,voHISO.array)
+                //console.log(htmlDownload)
+
+                $scope.HisoDownloadLinkHtml = window.URL.createObjectURL(new Blob([htmlDownload],{type:"text/html"}))
+                $scope.HisoDownloadLinkHtmlName = Q.name + '_hiso_' + uniquer + '.html';
+
+                //console.log($scope.exportJsonList)
+
                 //convert the object into a single level for the table
+
                 $scope.arHisoAllRows = []
                 $scope.exportJsonList.forEach(function (sect) {
                     $scope.arHisoAllRows.push({type:'section',display:sect.display})
@@ -445,7 +473,13 @@ angular.module("formsApp")
                 })
 
 
-                //create the download
+
+
+
+
+
+
+                //create the Q download
                 let json = angular.toJson(Q,null,2)
                 $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([json],{type:"application/json"}))
                 var now = moment().format();

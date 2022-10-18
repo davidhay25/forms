@@ -114,6 +114,7 @@ function setup(app,serverRoot,systemConfig) {
         let id = req.params.id
 
         let url = `${systemConfig.publicServer}DocumentReference/${id}`
+        console.log(url)
         //let url = `${serverRoot}DocumentReference/${id}`
 
         axios.get(url)

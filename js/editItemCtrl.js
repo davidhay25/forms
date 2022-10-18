@@ -153,6 +153,7 @@ angular.module("formsApp")
 
                    // $scope.newItem.answerOption.push({answerOption:opt})
                 })
+                delete $scope.input.answerOptionsInput      //clear the text area so we know on exit whether they have been parsed...
             }
 
 
@@ -591,6 +592,10 @@ angular.module("formsApp")
 
             $scope.save = function() {
 
+                if ($scope.input.answerOptionsInput) {
+                    alert("You have entered text into the options box without parsing...")
+                    return
+                }
 
                 if ($scope.input.vs && $scope.input.vs.rendermode) {
                     $scope.meta.renderVS = $scope.input.vs.rendermode

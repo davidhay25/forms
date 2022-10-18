@@ -56,6 +56,7 @@
     <script src="js/loginCtrl.js"></script>
     <script src="js/modalDialogSvc.js"></script>
     <script src="js/formReviewsCtrl.js"></script>
+    <script src="js/formReviewsSummaryCtrl.js"></script>
     <!--
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
@@ -83,7 +84,6 @@
     if (firebase) {
         console.log('init firebase')
         firebase.initializeApp(firebaseConfig);
-
     }
 </script>
 
@@ -156,10 +156,35 @@
         </div>
 
         <div ng-show = "user.email">
-            <div ng-controller="formReviewsCtrl">
-                <ng-include src = "'includes/formReviews.html'"></ng-include>
-            </div>
+
+            <uib-tabset>
+
+                <uib-tab heading="Summary of comments">
+                    <br/>
+                    <div ng-controller="formReviewsSummaryCtrl">
+                        <ng-include src = "'includes/formReviewsSummary.html'"></ng-include>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Active comments">
+                    <br/>
+                    <div ng-controller="formReviewsCtrl">
+                        <ng-include src = "'includes/formReviews.html'"></ng-include>
+                    </div>
+                </uib-tab>
+
+
+
+            </uib-tabset>
+
+
+
+
+
         </div>
+
+
+
 
 
 

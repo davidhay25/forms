@@ -9,30 +9,30 @@
 
     <div class="col-md-8">
 
-        <div ng-show="answer.valueDecimal">
+        <div ng-if="answer.valueDecimal">
             {{answer.valueDecimal}}
         </div>
 
-        <div ng-show="answer.valueString">
+        <div ng-if="answer.valueString">
             {{answer.valueString}}
         </div>
 
-        <div ng-show="answer.valueBoolean">
+        <div ng-if="answer.valueBoolean">
             {{answer.valueBoolean ? "Yes" : "No"}}
         </div>
 
-        <div ng-show="answer.valueCoding">
+        <div ng-if="answer.valueCoding">
             {{answer.valueCoding.display}} <!--({{answer.valueCoding.code}}  {{answer.valueCoding.system}}) -->
         </div>
-        <div ng-show="answer.valueReference">
+        <div ng-if="answer.valueReference">
             {{answer.valueReference.display}}
         </div>
 
-        <div ng-show="answer.valueDate">
+        <div ng-if="answer.valueDate">
             {{answer.valueDate}}
         </div>
 
-        <div ng-show="answer.valueInteger">
+        <div ng-if="answer.valueInteger">
             {{answer.valueInteger}}
         </div>
 

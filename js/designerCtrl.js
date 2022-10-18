@@ -47,7 +47,7 @@ angular.module("formsApp")
             }
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','display','group','reference','display']
+            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
 
             $scope.input.codeSystems = []   //used by the editItem function
             $scope.input.codeSystems.push({display:'SNOMED CT',url:'http://snomed.info/sct'})

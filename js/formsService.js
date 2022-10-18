@@ -1049,7 +1049,7 @@ angular.module("formsApp")
             },
 
             generateQReport : function(Q) {
-                //generate report for Q
+                //generate report for Q. Used in the HISO table...
 
                 if (! Q) {
                     return

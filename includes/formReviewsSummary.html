@@ -1,0 +1,64 @@
+<div>
+  Summary of forms
+
+
+
+  <button class="btn btn-link" ng-click="refresh()">Refresh</button>
+
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="myScroll">
+        <div class="list-group">
+          <div class="list-group-item" ng-repeat="(k,v) in allQ" ng-click = "selectQ(v)" ng-show="v.lstQR.length > 0" style="cursor: pointer">
+            <div ng-show="v.lstQR.length > 0" class="pull-right badge">{{v.lstQR.length}}</div>
+            {{v.Q.name}}
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="col-md-9">
+
+      <div ng-show = "arComments.length > 0">
+
+
+        <div class="row">
+          <div class="col-md-8">
+            <strong>{{summary.Q.name}}</strong>
+          </div>
+          <div class="col-md-4">
+            <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
+               href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
+              Download CSV file
+            </a>
+
+
+          </div>
+        </div>
+        <br/>
+
+        <div class="myScroll">
+            <div class="tableFixHead">
+                <table class="table table-bordered table-condensed">
+                  <thead>
+                      <tr><th>Reviewer</th><th>Section</th><th>Item text</th><th>Comment</th></tr>
+                  </thead>
+                  <tbody>
+                      <tr ng-repeat = "comment in arComments">
+                        <td>{{comment.reviewer}}</td>
+                        <td>{{comment.sectionText}}</td>
+                        <td>{{comment.text}}</td>
+                        <td>{{comment.comment}}</td>
+                      </tr>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

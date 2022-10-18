@@ -11,7 +11,9 @@ let axios = require('axios')
 let fileRoot="backups/"
 
 //the server to copy resources from
+//let sourceServer = "http://design.canshare.co.nz/ds/fhir/"
 let sourceServer = "https://canshare.co.nz/ds/fhir/"
+
 //let sourceServer = "http://localhost:9090/ds/fhir/"
 
 //the server to copy resources to

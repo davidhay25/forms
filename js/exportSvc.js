@@ -206,12 +206,7 @@ angular.module("formsApp")
                                     } else if (ew.answerInteger !== undefined) {
                                         entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerInteger
                                     }
-/*
-                                        <span ng-show = "ew.answerCoding"> {{ew.answerCoding.code}} ({{ew.answerCoding.display}})</span>
-                                    <span ng-show = "ew.answerBoolean !== undefined"> {{ew.answerBoolean}}</span>
-                                    <span ng-show = "ew.answerString">{{ew.answerString}}</span>
-                                    <span ng-show = "ew.answerInteger !== undefined">{{ew.answerInteger}}</span>
-*/
+
 
 
 

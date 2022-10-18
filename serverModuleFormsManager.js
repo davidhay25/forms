@@ -80,9 +80,12 @@ function setup(app,serverRoot,systemConfig) {
 
             let Q = req.body
             let url = serverRoot + "Questionnaire/" + Q.id
-            //console.log(url)
+            console.log('#' + url + "#")
+            console.log('#' + url + "#")
+
             axios.put(url,Q)
                 .then(function (response){
+                    console.log(response.status)
                     res.status(response.status).json(response.data)
                 })
                 .catch(function (err){

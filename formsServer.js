@@ -49,6 +49,7 @@ try {
 let serverRoot = systemConfig.serverRoot  || "http://localhost:9099/baseR4/"
 console.log("FHIR Server root " + serverRoot)
 
+//port is the port the server is listening on
 var port = process.env.port;
 if (! port) {
     // temp - really need this port=80;
