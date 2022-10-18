@@ -58,6 +58,9 @@
 
     <script src="js/formsCtrl.js"></script>
 
+
+
+
     <script src="js/viewQRCtrl.js"></script>
 
     <script src="js/qSvc.js"></script>
@@ -75,6 +78,8 @@
             height: 550px;
             border: 1px solid lightgray;
         }
+
+
     </style>
 
 <script>
@@ -94,7 +99,7 @@
 </script>
 
 </head>
-<body style="padding: 8px;padding-top: 80px">
+<body style="padding: 8px;padding-top: 80px" >
     <div ng-app="formsApp" ng-controller="dataStandardsCtrl" class="container-fluid">
 
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -174,7 +179,7 @@
         </nav>
 
 
-        <div class="row">
+        <div ng-cloak class="row">
 
             <div ng-class="input.leftPane">
 
@@ -243,6 +248,9 @@
                     </div>
                 </uib-accordion>
 
+                <br/>
+                <button class="btn-link btn" ng-click="showAboutSite()">About this site</button>
+
             </div>
 
 
@@ -267,6 +275,9 @@
                         <ng-include src = "'includes/dsIntroActnow.html'"></ng-include>
                     </div>
 
+                    <div ng-show="standardType == 'about'">
+                        <ng-include src = "'includes/dsAbout.html'"></ng-include>
+                    </div>
 
                 </div>
 

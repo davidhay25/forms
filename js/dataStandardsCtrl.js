@@ -67,6 +67,11 @@ angular.module("formsApp")
 
            })
 
+            $scope.showAboutSite = function() {
+                let allClosed = true
+                $scope.standardType = "about"
+            }
+
             $scope.accordianOpened = function(type) {
                 //type will be 'structuredpath, actnow, mdm
 
