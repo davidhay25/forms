@@ -162,6 +162,15 @@ angular.module("formsApp")
 
                 function addMeta(item) {
                     let meta = that.getMetaInfoForItem(item)
+                    //check that there is a UOM for integer and numeric datatypes
+                    if (item.type == 'integer' || item.type == 'decimal') {
+                        if (! meta.UOM) {
+                            meta.UOMClass = "missingUOM"
+                        }
+
+                    }
+
+
                     lst.push({linkId:item.linkId,type:item.type,text:item.text,meta:meta})
                 }
 
@@ -170,6 +179,7 @@ angular.module("formsApp")
             getHisoDefaults(dt) {
                 //return the HISO defaults for a given Q datatype
                 let meta = {}
+
                 switch (dt) {
                     case "string" :
                         meta.hisoDT = "String"
