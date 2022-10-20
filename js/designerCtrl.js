@@ -21,6 +21,14 @@ angular.module("formsApp")
                 }
             )
 
+            $scope.updateAllHiso = function(){
+                if (confirm("This will update all HISO information to default values (apart from Unot Of Measure). Are you sure you want to do this?")){
+                    formsSvc.updateAllHiso($scope.selectedQ)
+                    $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
+
+                }
+
+            }
 
 
             //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
@@ -47,7 +55,12 @@ angular.module("formsApp")
             }
 
             $scope.input = {}
-            $scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
+
+            $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display']
+
+            //$scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
+
+
 
             $scope.input.codeSystems = []   //used by the editItem function
             $scope.input.codeSystems.push({display:'SNOMED CT',url:'http://snomed.info/sct'})
@@ -429,27 +442,7 @@ angular.module("formsApp")
                         delete $scope.miniQ.checkedoutTo
 
                         $scope.loadAllQ()
-                        /*
-                        //Now check for any deleted tags (userSelected = true). If there are, then call the delete tag operation for them
-                        if ($scope.selectedQ.meta && $scope.selectedQ.meta.tag) {
-                            $scope.selectedQ.meta.tag.forEach(function (tag) {
-                                if (tag.userSelected) {
-                                    let url = `/ds/removeqtag/${$scope.selectedQ.id}`
-                                    $http.post(url,tag).then(
-                                        function (data) {
-                                            console.log('removed tag ',tag)
-                                            $scope.loadAllQ()       //if there are multiple tags to delete this will be called multiple times...
-                                        }, function (err) {
-                                            alert('error updating tag' + angular.toJson( err.data))
-                                        }
-                                    )
-                                }
 
-                            })
-                        } else {
-                            $scope.loadAllQ()
-                        }
-*/
 
                     })
                 }
@@ -467,6 +460,26 @@ angular.module("formsApp")
                     alert(err)
                 } else {
                     let vo = formsSvc.makeTreeFromQ($scope.selectedQ)
+
+                    //there seem to be circumstances where items are being duplicated. Take a look and at least alert the user
+                    let hash = {}
+                    if (vo.treeData) {
+                        vo.treeData.forEach(function (lne) {
+                            if (hash[lne.id]) {
+                                let msg = "There was an error in cloning - an element id was duplicated. The operation was cancelled."
+                                alert(msg)
+                                $scope.selectQ($scope.miniQ)
+                                return
+                            } else {
+                                hash[lne.id] = true
+                            }
+                        })
+                    }
+
+
+
+
+
                     $scope.treeData = vo.treeData       //for drawing the tree
                     $scope.drawQ($scope.selectedQ,false)
                     updateReport()   //in particular it will update hashAllItems
@@ -474,7 +487,6 @@ angular.module("formsApp")
 
                     $("#designTree").jstree("select_node",  itemToClone + '-c');
                 }
-
             }
 
             $scope.retireQ = function() {
@@ -682,7 +694,7 @@ angular.module("formsApp")
                     let vo1 = formsSvc.generateQReport($scope.selectedQ)
                     $scope.report = vo1.report
                     $scope.hashAllItems = vo1.hashAllItems
-
+                    $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
                     if (lstEW && lstEW.length > 0) {
                         qSvc.updateAfterChoice($scope.selectedQ,lstEW)
 
@@ -1270,6 +1282,8 @@ return
                                     $scope.drawQ($scope.selectedQ,false)
                                     updateReport()
                                     $scope.makeQDependancyAudit()
+
+
                                 },5
                             )
 
@@ -1371,7 +1385,7 @@ return
                 let vo = formsSvc.generateQReport($scope.selectedQ)
                 $scope.report = vo.report
                 $scope.hashAllItems = vo.hashAllItems
-
+                $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
                 //These have been commented out as they show the screen re-draw - and I'm not sure if they are needed...
                // makeCsvAndDownload($scope.selectedQ,vo.hashAllItems)
               //  makeQDownload($scope.selectedQ)
@@ -1530,6 +1544,7 @@ return
                 let vo = formsSvc.generateQReport(Q)
                 console.log("Time to generate report ",moment().diff(now))
                 $scope.report = vo.report
+                $scope.hisoElementsList = formsSvc.getHisoElementsList(Q)
                 $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
                 $scope.makeQDependancyAudit()
                 makeCsvAndDownload(Q,vo.hashAllItems)
@@ -1552,6 +1567,8 @@ return
                 //console.log("Time to load complete ",moment().diff(start))
 
             }
+
+
 
 
             //when called from Q list. Passes in the 'mini-Q'

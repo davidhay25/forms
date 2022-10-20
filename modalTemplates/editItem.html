@@ -239,29 +239,36 @@
                         <td>HISO</td>
                         <td>
                             <div class="row">
-
+<!--
                                 <div class="col-md-3 col-sm-3">
                                     <label>Class</label>
                                     <select class="form-control" ng-model="meta.hisoClass"
                                             ng-options = "class for class in input.hisoClass"></select>
                                 </div>
-
+-->
                                 <div class="col-md-2 col-sm-2">
                                     <label>Length</label>
                                     <input type="text" class="form-control" ng-model = "meta.hisoLength" />
                                 </div>
 
+
                                 <div class="col-md-3 col-sm-3">
                                     <label>DataType</label>
+                                    <input type="text" disabled = "disabled" class="form-control" ng-model = "meta.hisoDT" />
+                                    <!--
                                     <select class="form-control" ng-model="meta.hisoDT"
                                             ng-options = "dt for dt in input.hisoDT"></select>
+                                    -->
                                 </div>
 
-                                <div class="col-md-2 col-sm-2">
+                                <div class="col-md-3 col-sm-3">
                                     <label>Layout</label>
                                     <input type="text" class="form-control" ng-model = "meta.hisoLayout" />
                                 </div>
-                                <div class="col-md-2 col-sm-2">
+
+
+
+                                <div class="col-md-3 col-sm-3">
                                     <label>Unit of Meas.</label>
                                     <input type="text" class="form-control" ng-model = "meta.UOM" />
                                 </div>

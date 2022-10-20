@@ -442,7 +442,7 @@
                                                             Edit item
                                                         </button>
 
-                                                        <button class="btn btn-link"
+                                                        <button class="btn btn-link" ng-show="selectedNode.id !== 'root'"
                                                                 ng-click="cloneItem(selectedNode)">
                                                             Clone item
                                                         </button>
@@ -837,7 +837,40 @@
                                 </div>
 
                         </uib-tab>
-                        <uib-tab heading = "Audit Report">
+                        <uib-tab heading = "HISO metadata">
+                            <br/>
+                            <div>
+                                <em>Items only - exclude section and group</em>
+                                <div class="pull-right clickable"
+                                     ng-show="miniQ.checkedoutTo == 'me'"
+                                     ng-click="updateAllHiso()">Update all Hiso datatypes</div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="tableFixHead">
+                                <table class="table-condensed table table-bordered">
+                                    <thead>
+                                        <tr><th>LinkId</th><th>Text</th><th>Datatype</th><th>HISO Datatype</th><th>Length</th><th>Layout</th><th>Unit of measure</th></tr>
+                                    </thead>
+                                   <tbody>
+                                       <tr ng-repeat="entry in hisoElementsList">
+                                           <td><div class="clickable" ng-click="editItemFromLinkId(entry.linkId)"> {{entry.linkId}}</div></td>
+                                           <td>{{entry.text}}</td>
+                                           <td>{{entry.type}}</td>
+                                           <td>{{entry.meta.hisoDT}}</td>
+                                           <td>{{entry.meta.hisoLength}}</td>
+
+                                           <td>{{entry.meta.hisoLayout}}</td>
+                                           <td>{{entry.meta.UOM}}</td>
+                                       </tr>
+                                   </tbody>
+
+                                </table>
+                            </div>
+
+
+
+                        </uib-tab>
+                        <uib-tab ng-show="false" heading = "Audit Report">
                             <!--<uib-tab heading = "HISO SpreadSheet"> -->
                             <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
                                href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >

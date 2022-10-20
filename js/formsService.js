@@ -16,7 +16,6 @@ angular.module("formsApp")
         //termServer = "https://r4.ontoserver.csiro.au/fhir/"
         termServer = "https://terminz.azurewebsites.net/fhir/"
 
-
         validationServer = "http://localhost:9099/baseR4/"
 
         HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
@@ -94,6 +93,142 @@ angular.module("formsApp")
         let arExpandedVsCache = {}      //cache of expanded VS
 
         return {
+
+            updateAllHiso: function(Q) {
+
+                let that = this
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        //addMeta(section)
+                        if (section.item) {
+
+                            section.item.forEach(function (child) {
+
+                                if (child.item) {
+                                    child.item.forEach(function(gc) {
+                                        updateHiso(gc)
+                                    })
+                                } else  {
+                                    updateHiso(child)
+                                }
+                            })
+                        }
+
+                    })
+                }
+
+                function updateHiso(item) {
+                    let meta = that.getMetaInfoForItem(item)
+                    let dt = item.type
+
+                    let newMeta = that.getHisoDefaults(dt)
+
+                    meta.hisoDT = newMeta.hisoDT
+                    meta.hisoLength = newMeta.hisoLength
+                    meta.hisoLayout = newMeta.hisoLayout
+
+                    that.updateMetaInfoForItem(item,meta)
+
+                }
+
+
+            },
+
+            getHisoElementsList : function (Q) {
+                //a list of all elements with the hiso values. I'd prefer not to have to create *another* summary, but the others don't seem quite right
+                let lst = []
+                let that = this
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        //addMeta(section)
+                        if (section.item) {
+
+                            section.item.forEach(function (child) {
+
+                                if (child.item) {
+                                    child.item.forEach(function(gc) {
+                                        addMeta(gc)
+                                    })
+                                } else  {
+                                    addMeta(child)
+                                }
+                            })
+                        }
+
+                    })
+                }
+
+                return lst
+
+                function addMeta(item) {
+                    let meta = that.getMetaInfoForItem(item)
+                    lst.push({linkId:item.linkId,type:item.type,text:item.text,meta:meta})
+                }
+
+            },
+
+            getHisoDefaults(dt) {
+                //return the HISO defaults for a given Q datatype
+                let meta = {}
+                switch (dt) {
+                    case "string" :
+                        meta.hisoDT = "String"
+                        meta.hisoLength = 100
+                        meta.hisoLayout = "X(100)"
+                        break
+
+                    case "text" :
+                        meta.hisoDT = "String"
+                        meta.hisoLength = 1000
+                        meta.hisoLayout = "X(1000)"
+
+                        break
+
+                    case "integer" :
+                        meta.hisoDT = "Integer"
+                        meta.hisoLength = 3
+                        meta.hisoLayout = "N"
+
+                        break
+
+                    case "decimal" :
+                        meta.hisoDT = "Decimal"
+                        meta.hisoLength = 8
+                        meta.hisoLayout = "N"
+                        break
+
+                    case "boolean" :
+                        meta.hisoDT = "Boolean"
+                        meta.hisoLength = 1
+                        meta.hisoLayout = "X(1)"
+
+                        break
+
+                    case "date" :
+                        meta.hisoDT = "Date"
+                        meta.hisoLength = 8
+                        meta.hisoLayout = "CCYY[MM[DD]]"
+                        meta.hisoClass = "full date"
+                        break
+
+                    case "dateTime" :
+                    case "date":
+                        meta.hisoDT = "Date/time"
+                        meta.hisoLength = 12
+                        meta.hisoLayout = "YYYY[MM[DD]]"
+
+                        break
+                    case "choice" :
+                    case "open-choice" :
+                        meta.hisoLength = 18
+                        meta.hisoDT = "String"
+                        meta.hisoLayout = "X(18)"
+
+                        break
+                }
+                return meta
+
+            },
 
             checkForConditional(Q,linkId) {
                 //Find all items that have a conditional on the linkId (ie the enableWhen.question is the same as the linkId
@@ -833,7 +968,7 @@ angular.module("formsApp")
                 }
 
                 //hiso class
-                updateExtension(item,extHisoClass,"String",meta.hisoClass)
+                //updateExtension(item,extHisoClass,"String",meta.hisoClass)
                 updateExtension(item,extHisoLength,"Integer",meta.hisoLength)
                 updateExtension(item,extHisoDT,"String",meta.hisoDT)
                 updateExtension(item,extHisoLayout,"String",meta.hisoLayout)
@@ -991,12 +1126,13 @@ angular.module("formsApp")
                     meta.hidden = ar8[0].valueBoolean
                 }
 
-
+/*
                 //hiso code
                 let ar10 = this.findExtension(item,extHisoClass)
                 if (ar10.length > 0) {
                     meta.hisoClass = ar10[0].valueString
                 }
+               */
 //hiso code
                 let ar11 = this.findExtension(item,extHisoLength)
                 if (ar11.length > 0) {

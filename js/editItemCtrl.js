@@ -10,8 +10,8 @@ angular.module("formsApp")
 
             $scope.input = {}
             $scope.input.colCount = [0,1,2,3,4]
-            $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
-            $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
+           // $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
+           // $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
 
             if (item) {
                 if (hashAllItems && hashAllItems[item.linkId]) {
@@ -159,68 +159,13 @@ angular.module("formsApp")
 
             //has to be above check for new
             $scope.setHISODefaults = function(typ) {
-                switch (typ) {
-                    case "string" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 100
-                        $scope.meta.hisoLayout = "A(100)"
-                        $scope.meta.hisoClass = "free text"
-                        break
-                    case "reference" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 100
-                        $scope.meta.hisoLayout = "A(100)"
-                        $scope.meta.hisoClass = "free text"
-                        break
-                    case "text" :
-                        $scope.meta.hisoDT = "Alphanumeric (X)"
-                        $scope.meta.hisoLength = 1000
-                        $scope.meta.hisoLayout = "X(1000)"
-                        $scope.meta.hisoClass = "free text"
-                        break
+                let meta = formsSvc.getHisoDefaults(typ)
+                $scope.meta.hisoDT = meta.hisoDT
+                $scope.meta.hisoLength = meta.hisoLength
+                $scope.meta.hisoLayout = meta.hisoLayout
+              //  $scope.meta.hisoClass = meta.hisoClass
 
-                    case "integer" :
-                        $scope.meta.hisoDT = "Numeric (N)"
-                        $scope.meta.hisoLength = 3
-                        $scope.meta.hisoLayout = "N(3)"
-                        $scope.meta.hisoClass = "value"
-                        break
 
-                    case "decimal" :
-                        $scope.meta.hisoDT = "Numeric (N)"
-                        $scope.meta.hisoLength = 8
-                        $scope.meta.hisoLayout = "N(8)"
-                        $scope.meta.hisoClass = "value"
-                        break
-
-                    case "boolean" :
-                        $scope.meta.hisoDT = "Boolean"
-                        $scope.meta.hisoLength = 1
-                        $scope.meta.hisoLayout = "A(1)"
-                        $scope.meta.hisoClass = "value"
-                        break
-
-                    case "date" :
-                        $scope.meta.hisoDT = "Date"
-                        $scope.meta.hisoLength = 8
-                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
-                        $scope.meta.hisoClass = "full date"
-                        break
-
-                    case "dateTimeXX" :
-                        $scope.meta.hisoDT = "Date"
-                        $scope.meta.hisoLength = 12
-                        $scope.meta.hisoLayout = "CCYY[MM[DD]]"
-                        $scope.meta.hisoClass = "full date"
-                        break
-                    case "choice" :
-                    case "open-choice" :
-                        $scope.meta.hisoLength = 18
-                        $scope.meta.hisoDT = "Numeric (N)"
-                        $scope.meta.hisoLayout = "N(18)"
-                        $scope.meta.hisoClass = "code"
-                        break
-                }
 
             }
 

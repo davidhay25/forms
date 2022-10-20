@@ -4,6 +4,8 @@ angular.module("formsApp")
 
         return {
 
+
+
             setItemValue : function(sections,linkId,value,form,dt) {
                 //set the answerOption in the template for that linkid
                 if (! value) { return}
@@ -46,15 +48,9 @@ angular.module("formsApp")
                                 break
 
                         }
-
-
                     }
-
                 }
-
-
-
-
+                
             },
 
             makeDependencyGraph : function(audit,linkId){
@@ -187,7 +183,7 @@ angular.module("formsApp")
                     })
                 }
 
-                //now go through and update any depedencies to items in this item. We couldn't do it before as we needed the hashLinkId forst
+                //now go through and update any depedencies to items in this item. We couldn't do it before as we needed the hashLinkId first
                 updateDependencies(newItem,hashLinkId)
                 if (newItem.item) {
                     newItem.item.forEach(function (child) {
