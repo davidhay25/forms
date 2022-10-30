@@ -12,7 +12,9 @@
 
 
 
-                <button ng-show="newItem.text && newItem.linkId" class="btn btn-success pull-right"
+
+
+                <button ng-show="newItem.text && newItem.linkId && canEdit" class="btn btn-success pull-right"
                         ng-click="save()">
 
                     <div ng-show="editType == 'edit'">Save changes</div>
@@ -473,6 +475,7 @@
                 <br/>
 
                 <div ng-hide="newItem.answerOption.length > 0">
+
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <em>Enter the list of options - 1 per line. When finished, click the
@@ -491,61 +494,84 @@
 
                 </div>
 
+
+
                 <div ng-show="newItem.answerOption.length > 0">
-                    <table class="table table-bordered table-condensed">
-                    <tr><th>Display</th><th>Code</th><th>System</th><th></th><th></th><th></th></tr>
-                    <tr ng-repeat = "option in newItem.answerOption">
-                        <td>{{option.valueCoding.display}}</td>
-                        <td>{{option.valueCoding.code}}</td>
-                        <td>
-                            {{option.valueCoding.system}}
-                        </td>
 
-                        <td>
-                            <i class=" clickable glyphicon glyphicon-remove"
-                               ng-click = "removeAnswerOption($index)"></i>
-                        </td>
-                        <td>
-                            <i class=" clickable glyphicon glyphicon-arrow-up" ng-show="$index > 0"
-                                ng-click = "moveAnswerUp($index)"></i>
-                            <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < newItem.answerOption.length -1"
-                                ng-click = "moveAnswerDown($index)"></i>
+                    <!--
+                    <div class="pull-right">
+                        <div ng-click = "copyOptionsToClipboard()">Copy to clipboard</div>
+                    </div>
+                    -->
 
-                        </td>
-                        <td>
-                            <div ng-show = "newItem.initial[0].valueCoding.display == option.valueCoding.display">
-                                Is default
-                            </div>
+                    <uib-tabset>
+                        <uib-tab heading = "Table">
 
-                            <div class="clickable" ng-hide = "newItem.initial[0].valueCoding.display == option.valueCoding.display"
-                                 ng-click="setDefault(option.valueCoding)">Default</div>
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Display</th><th>Code</th><th>System</th><th></th><th></th><th></th></tr>
+                                <tr ng-repeat = "option in newItem.answerOption">
+                                    <td>{{option.valueCoding.display}}</td>
+                                    <td>{{option.valueCoding.code}}</td>
+                                    <td>
+                                        {{option.valueCoding.system}}
+                                    </td>
 
+                                    <td>
+                                        <i class=" clickable glyphicon glyphicon-remove"
+                                           ng-click = "removeAnswerOption($index)"></i>
+                                    </td>
+                                    <td>
+                                        <i class=" clickable glyphicon glyphicon-arrow-up" ng-show="$index > 0"
+                                           ng-click = "moveAnswerUp($index)"></i>
+                                        <i class=" clickable glyphicon glyphicon-arrow-down"  ng-show="$index < newItem.answerOption.length -1"
+                                           ng-click = "moveAnswerDown($index)"></i>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
-                        <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
-                        <td>
+                                    </td>
+                                    <td>
+                                        <div ng-show = "newItem.initial[0].valueCoding.display == option.valueCoding.display">
+                                            Is default
+                                        </div>
 
-                            <select class="form-control" ng-model="input.newAnswerSystem"
-                                    ng-options = "system.display for system in input.codeSystems"></select>
-                            <!--
-                            <input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/>
-                        -->
-                        </td>
-
-                        <td>
-                            <i ng-show="input.newAnswerDisplay"
-                               class="clickable glyphicon glyphicon-plus-sign"
-                               ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
-                        </td>
-                        <td></td>
-                        <td></td>
+                                        <div class="clickable" ng-hide = "newItem.initial[0].valueCoding.display == option.valueCoding.display"
+                                             ng-click="setDefault(option.valueCoding)">Default</div>
 
 
-                    </tr>
-                </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
+                                    <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
+                                    <td>
+
+                                        <select class="form-control" ng-model="input.newAnswerSystem"
+                                                ng-options = "system.display for system in input.codeSystems"></select>
+                                        <!--
+                                        <input type="text" class="form-control" placeholder="System" ng-model="newAnswerSystem"/>
+                                    -->
+                                    </td>
+
+                                    <td>
+                                        <i ng-show="input.newAnswerDisplay"
+                                           class="clickable glyphicon glyphicon-plus-sign"
+                                           ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading = "List">
+                            <textarea class="form-control" rows = "6" ng-model="input.answerOptionsAsText">
+
+                            </textarea>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
                 </div>
 
             </uib-tab>

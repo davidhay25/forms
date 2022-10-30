@@ -30,6 +30,23 @@ angular.module("formsApp")
 
             }
 
+            $scope.HISOdomainPopover = function(entry){
+                console.log(entry.options)
+                if (entry.options) {
+                    let lst = "<ul>"
+                    entry.options.forEach(function (entry) {
+                        if (entry.valueCoding) {
+                            lst += `<li>${entry.valueCoding.display}</li>`
+                        }
+
+                    })
+                    lst += "</ul>"
+                    return lst
+                } else {
+                    return "No options defined"
+                }
+
+            }
 
             //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
             $scope.$on('termImported',function(){
@@ -1256,6 +1273,13 @@ return
                         },
                         parent : function(){
                             return $scope.hashAllItems[node.parent]
+                        },
+                        canEdit : function (){
+                            if ($scope.miniQ && $scope.miniQ.checkedoutTo == 'me') {
+                                return true
+                            } else {
+                                return false
+                            }
                         }
                     }
                 }).result.then(
@@ -1333,6 +1357,13 @@ return
                                     return $scope.hashAllItems[node.id]
                                 }
 
+                            },
+                            canEdit : function (){
+                                if ($scope.miniQ && $scope.miniQ.checkedoutTo == 'me') {
+                                    return true
+                                } else {
+                                    return false
+                                }
                             }
                         }
                     }).result.then(

@@ -1,9 +1,10 @@
 angular.module("formsApp")
     .controller('editItemCtrl',
         function ($scope,formsSvc,item,itemTypes,editType,codeSystems,
-                  $http,insertType,hashAllItems,parent,$uibModal) {
+                  $http,insertType,hashAllItems,parent,$uibModal,canEdit) {
 
 
+            $scope.canEdit = canEdit
             $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
@@ -17,6 +18,16 @@ angular.module("formsApp")
                 if (hashAllItems && hashAllItems[item.linkId]) {
                     $scope.sectionItem = hashAllItems[item.linkId].section
                 }
+
+                if (item.answerOption) {
+                    $scope.input.answerOptionsAsText = ""
+                    item.answerOption.forEach(function (option) {
+                        $scope.input.answerOptionsAsText += option.valueCoding.display + "\r\n"
+                    })
+
+
+
+                }
             }
 
             //for a choice option, set the ())single) default
@@ -24,6 +35,39 @@ angular.module("formsApp")
                 $scope.newItem.initial = []         //remove any existing
                 $scope.newItem.initial[0] = {valueCoding : coding}
             }
+
+            $scope.copyOptionsToClipboardDEP = function(){
+                let txt = ""
+                $scope.newItem.answerOption.forEach(function (option) {
+                    txt += option.valueCoding.display + "\r\n"
+                })
+
+                navigator.clipboard.write(txt)
+
+                /*
+                //https://stackoverflow.com/questions/29267589/angularjs-copy-to-clipboard#42393479
+                var copyElement = document.createElement("span");
+                copyElement.appendChild(document.createTextNode(txt));
+                copyElement.id = 'tempCopyToClipboard';
+                angular.element(document.body.append(copyElement));
+
+                // select the text
+                var range = document.createRange();
+                range.selectNode(copyElement);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+
+                // copy & cleanup
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                copyElement.remove();
+*/
+
+                alert("List of items copied to clipboard")
+            }
+
+
+
 
             $scope.fillConcept = function(code,system) {
                 console.log(system,code)

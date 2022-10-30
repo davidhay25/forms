@@ -171,7 +171,7 @@ angular.module("formsApp")
                     }
 
 
-                    lst.push({linkId:item.linkId,type:item.type,text:item.text,meta:meta})
+                    lst.push({linkId:item.linkId,type:item.type,text:item.text,meta:meta,options:item.answerOption,description:meta.description})
                 }
 
             },
@@ -222,8 +222,16 @@ angular.module("formsApp")
                         break
 
                     case "dateTime" :
-                    case "date":
                         meta.hisoDT = "Date/time"
+                        meta.hisoLength = 18
+                        meta.hisoLayout = "YYYYMMDD:[HH:MM]"
+                        break
+
+
+
+
+                    case "date":
+                        meta.hisoDT = "Date"
                         meta.hisoLength = 12
                         meta.hisoLayout = "YYYY[MM[DD]]"
 
@@ -381,7 +389,7 @@ angular.module("formsApp")
 
                                 choiceItem.type = "choice"
 
-                                //set the column count and control type xtensions
+                                //set the column count and control type extensions
                                 choiceItem.extension = []
                                 choiceItem.extension.push({url:extColumnCount,valueInteger:1})
 

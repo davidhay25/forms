@@ -110,7 +110,7 @@
     </style>
 
     <script>
-        angular.module("formsApp",['ui.bootstrap','ngStorage','ui.checkbox',"firebase"]).config(function($locationProvider) {
+        angular.module("formsApp",['ngSanitize','ui.bootstrap','ngStorage','ui.checkbox',"firebase"]).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -251,7 +251,7 @@
 
             <div class="col-md-2">
                 <div class="navbar-text pull-right">
-                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit#heading=h.vctq46si6ggr" >
+                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit#heading=h.15g2a6nmry8b" >
                         Version: 4.0</a>
                 </div>
             </div>
@@ -619,6 +619,59 @@
 
                         </uib-tab>
 
+                        <uib-tab heading = "HISO view">
+                            <br/>
+                            <div>
+                                <em>Items only - exclude section and group</em>
+                                <div class="pull-right clickable"
+                                     ng-show="miniQ.checkedoutTo == 'me'"
+                                     ng-click="updateAllHiso()">Update all Hiso datatypes</div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="tableFixHead">
+                                <table class="table-condensed table table-bordered">
+                                    <thead>
+                                    <tr><th>Text</th><th>LinkId</th><th>Datatype</th><th>HISO Datatype</th><th>Length</th><th>Layout</th><th>Unit of measure</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="entry in hisoElementsList">
+                                        <td>{{entry.text}}
+                                            <div><em>{{entry.description}}</em></div>
+                                        </td>
+
+                                        <td>
+
+                                            <div class="clickable" ng-click="editItemFromLinkId(entry.linkId)"> {{entry.linkId}}</div>
+
+
+                                        </td>
+
+                                        <td width="7%">
+                                            <div ng-show="entry.type !== 'choice'">{{entry.type}}</div>
+                                            <div ng-show="entry.type == 'choice'">
+
+                                                <div class="clickableDotted"
+                                                     uib-popover-html="HISOdomainPopover(entry)"
+                                                     popover-placement="top"
+                                                     popover-trigger="'mouseenter'"> {{entry.type}} <span class="badge">{{entry.options.length}}</span></div>
+                                            </div>
+
+                                        </td>
+                                        <td>{{entry.meta.hisoDT}}</td>
+                                        <td>{{entry.meta.hisoLength}}</td>
+
+                                        <td>{{entry.meta.hisoLayout}}</td>
+                                        <td ng-class="entry.meta.UOMClass">{{entry.meta.UOM}}</td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+
+
+                        </uib-tab>
+
                         <uib-tab>
                             <uib-tab-heading>
                                 Dependencies
@@ -841,39 +894,7 @@
                                 </div>
 
                         </uib-tab>
-                        <uib-tab heading = "HISO metadata">
-                            <br/>
-                            <div>
-                                <em>Items only - exclude section and group</em>
-                                <div class="pull-right clickable"
-                                     ng-show="miniQ.checkedoutTo == 'me'"
-                                     ng-click="updateAllHiso()">Update all Hiso datatypes</div>
-                            </div>
-                            <div class="clearfix"></div>
-                            <div class="tableFixHead">
-                                <table class="table-condensed table table-bordered">
-                                    <thead>
-                                        <tr><th>LinkId</th><th>Text</th><th>Datatype</th><th>HISO Datatype</th><th>Length</th><th>Layout</th><th>Unit of measure</th></tr>
-                                    </thead>
-                                   <tbody>
-                                       <tr ng-repeat="entry in hisoElementsList">
-                                           <td><div class="clickable" ng-click="editItemFromLinkId(entry.linkId)"> {{entry.linkId}}</div></td>
-                                           <td>{{entry.text}}</td>
-                                           <td>{{entry.type}}</td>
-                                           <td>{{entry.meta.hisoDT}}</td>
-                                           <td>{{entry.meta.hisoLength}}</td>
 
-                                           <td>{{entry.meta.hisoLayout}}</td>
-                                           <td ng-class="entry.meta.UOMClass">{{entry.meta.UOM}}</td>
-                                       </tr>
-                                   </tbody>
-
-                                </table>
-                            </div>
-
-
-
-                        </uib-tab>
                         <uib-tab ng-show="false" heading = "Audit Report">
                             <!--<uib-tab heading = "HISO SpreadSheet"> -->
                             <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right" download="{{downloadLinkCsvName}}"
