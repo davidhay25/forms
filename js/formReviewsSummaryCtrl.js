@@ -110,8 +110,8 @@ angular.module("formsApp")
 
                         })
 
-                        let fle = arDownload.join("\r\n")
-
+                        let fle = "\ufeff" + arDownload.join("\r\n")
+                        //let fle =  "\ufeff" +  voHISO.fle // arHISO.join("\r\n")
                         $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))
                         var now = moment().format();
                         $scope.downloadLinkCsvName =  summary.Q.name + '_comments_' + now + '.csv';
