@@ -82,31 +82,7 @@ angular.module("formsApp")
                         hiso.guide = line.usageNotes
                         arHisoLine.push(hiso)
                         arFle.push(makeDownloadLine(hiso))
-/*
-                        switch (line.type) {        //todo - remove switch
-                            case "sectionXX" :
-                                hiso.name = line.name
-                                arHisoLine.push(hiso)       //only to the lines array - not to the csv array
-                                break
-                            case "groupXX" :
-                                break
-                            default :
-                                hiso.name = line.name
-                                hiso.definition = line.description
-                                hiso.sourceStandards = line.sourceStandard
-                                hiso.domain = line.dataDomain
-                                hiso.dataType = line.hisoDT
-                                hiso.uom = line.UOM
-                                hiso.layout = line.hisoLayout
-                                hiso.obligation = line.obligation
-                                hiso.guide = line.usageNotes
-                                arHisoLine.push(hiso)
-                                arFle.push(makeDownloadLine(hiso))
-                                //console.log(hiso)
-                                break
-                        }
 
-                        */
                     })
                 })
 
@@ -134,15 +110,19 @@ angular.module("formsApp")
                 function makeSafe(txt) {
                     if (txt) {
 
-                        txt = txt.replace(/’/g ,'');
-                        txt = txt.replace(/'/g ,'');
-                        txt = txt.replace(/"/g ,'');
-                        //txt = txt.replace(/,/g ,'","');
+                        //don't seem to use these when encoding as UTF8 - adding a BOM to the file before downloading...
+                      //temp  txt = txt.replace(/’/g ,"");
+                     //   txt = txt.replace(/‘/g ,'');
+                     //   txt = txt.replace(/'/g ,'');
+                      //  txt = txt.replace(/"/g ,'');
                         txt = txt.replace(/,/g ,'');
+
                         txt = txt.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
                         return txt
+                    } else {
+                        return ""
                     }
-                   return ""
+
                 }
             },
             createHtmlDownload : function(Q,lines) {
@@ -172,7 +152,7 @@ angular.module("formsApp")
                 ar.push('<br/>')
 
                 lines.forEach(function (lne) {
-                    console.log(lne)
+                   // console.log(lne)
                     if (lne.type == 'section') {
                         ar.push(`<h3>${lne.name}</h3>`)
                     } else {

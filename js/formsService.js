@@ -397,7 +397,7 @@ angular.module("formsApp")
 
                                 choiceItem.extension.push({url:extHisoLength,valueInteger:18})
                                 choiceItem.extension.push({url:extHisoDT,valueString:"string"})
-                                choiceItem.extension.push({url:extHisoLayout,valueString:"X18"})
+                                choiceItem.extension.push({url:extHisoLayout,valueString:"X(18)"})
                                 
                                 let ext = {url:extItemControl}
                                 ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"check-box"}]}

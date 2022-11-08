@@ -7,10 +7,8 @@ angular.module("formsApp")
                 function(data) {
                     $scope.systemConfig = data.data
                     console.log($scope.systemConfig)
-
                 }
             )
-
 
             //-----------  login & user stuff....
 
@@ -56,7 +54,7 @@ angular.module("formsApp")
             }
 
 
-
+/* - 9 nov
             //load all the disposition Observations for a Q
             $scope.loadDispositionsForQ = function(Q) {
                     delete $scope.dispositionsForQ
@@ -68,6 +66,6 @@ angular.module("formsApp")
                         }
                     )
             }
-
+*/
 
         })

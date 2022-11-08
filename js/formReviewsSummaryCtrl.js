@@ -37,13 +37,22 @@ angular.module("formsApp")
                                         item.comment = comp.valueString
                                     }
                                 })
-                                let key = `${Q_url}-${linkId}`
-                                hashObservations[key] = item
+                                //let key = `${Q_url}-${linkId}`
+                                //need to get the id of the QR that this Observation refers to from the 'derivedFrom' reference
+                                if (obs.derivedFrom && obs.derivedFrom.length > 0) {
+                                    let key = `${obs.derivedFrom[0].reference}-${linkId}`   //QR.id - linkId
+
+
+                                    //let key = `${Q_url}-${linkId}`
+                                    hashObservations[key] = item
+                                }
+
 
                             }
                         })
 
                         console.log(hashObservations)
+                        $scope.arComments = []
 
                         //now get the comments for each QR
                         bundle.entry.forEach(function (entry) {
@@ -51,7 +60,9 @@ angular.module("formsApp")
                                 let QR = entry.resource
                                 let arComments = processQR(summary.hashCommentItems,QR) // {linkId, text, sectionText,reviewer,comment}
                                 arComments.forEach(function (comment) {
-                                    let key = `${QR.questionnaire}-${comment.linkId}`
+                                    //let key = `${QR.questionnaire}-${comment.linkId}`
+                                    //let key = `${QR.questionnaire}-${comment.linkId}`
+                                    let key = `QuestionnaireResponse/${QR.id}-${comment.linkId}`
                                     if (hashObservations[key]) {
                                         //there is an observation that references this linkId in this QR
                                         let obj = hashObservations[key]
@@ -63,7 +74,7 @@ angular.module("formsApp")
 
                                 console.log(arComments)
 
-                                $scope.arComments =  $scope.arComments.concat(arComments)
+                                $scope.arComments = $scope.arComments.concat(arComments)
 
 
                                 //now attach the resolution (Observation) to the comment - if any
@@ -72,46 +83,54 @@ angular.module("formsApp")
                             }
                         })
 
+                        //now we can build the download
+                        //sort by section then comment text
+                        $scope.arComments.sort(function(a,b){
+                            let key1 = a.sectionText + a.text
+                            let key2 = b.sectionText + b.text
+                            if (key1 > key2) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        })
+
+                        //create download tsv
+                        let arDownload = []
+                        arDownload.push("Reviewer,Section,Item,Comment")
+                        $scope.arComments.forEach(function (item) {
+                            /*
+                                                let comment = item.comment
+                                                comment = comment.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
+                                                comment = comment.replace(/,/g ,'-');      //and the comma
+                                                let reviewer = item.reviewer.replace(/,/g ,'-');
+                            */
+                            let lne = cleanText(item.reviewer) + "," + item.sectionText + "," + item.text + "," + cleanText(item.comment) + "," + item.status + "," + cleanText(item.notes)
+                            arDownload.push(lne)
+
+                        })
+
+                        let fle = arDownload.join("\r\n")
+
+                        $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))
+                        var now = moment().format();
+                        $scope.downloadLinkCsvName =  summary.Q.name + '_comments_' + now + '.csv';
+
+
+
                     }
                 )
 
 
-                //sort by section then comment text
-                $scope.arComments.sort(function(a,b){
-                    let key1 = a.sectionText + a.text
-                    let key2 = b.sectionText + b.text
-                    if (key1 > key2) {
-                        return 1
-                    } else {
-                        return -1
-                    }
-                })
-
-                //create download tsv
-                let arDownload = []
-                arDownload.push("Reviewer,Section,Item,Comment")
-                $scope.arComments.forEach(function (item) {
-/*
-                    let comment = item.comment
-                    comment = comment.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
-                    comment = comment.replace(/,/g ,'-');      //and the comma
-                    let reviewer = item.reviewer.replace(/,/g ,'-');
-*/
-                    let lne = cleanText(item.reviewer) + "," + item.sectionText + "," + item.text + "," + cleanText(item.comment) + "," + item.status + "," + cleanText(item.notes)
-                    arDownload.push(lne)
-
-                })
-
-                let fle = arDownload.join("\r\n")
-
-                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))
-                var now = moment().format();
-                $scope.downloadLinkCsvName =  summary.Q.name + '_comments_' + now + '.csv';
 
                 function cleanText(text) {
-                    text = text.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
-                    text = text.replace(/,/g ,'-');      //and the comma
-                    return text
+                    if (text) {
+                        text = text.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
+                        text = text.replace(/,/g ,'-');      //and the comma
+                        return text
+                    }
+                    return ""
+
                 }
 
             }

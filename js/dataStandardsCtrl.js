@@ -451,7 +451,9 @@ angular.module("formsApp")
                 let voHISO = hisoSvc.createHisoArray($scope.exportJsonList)
                 //now construct the download data
 
-                let fle = voHISO.fle // arHISO.join("\r\n")
+                //prepent the BOM (byte order mark) - https://stackoverflow.com/questions/17879198/adding-utf-8-bom-to-string-blob#17879474
+                let fle =  "\ufeff" +  voHISO.fle // arHISO.join("\r\n")
+console.log(fle)
 
                 let uniquer = moment().format()
                 $scope.HisoDownloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))
