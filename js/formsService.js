@@ -197,14 +197,14 @@ angular.module("formsApp")
                     case "integer" :
                         meta.hisoDT = "Integer"
                         meta.hisoLength = 3
-                        meta.hisoLayout = "N"
+                        meta.hisoLayout = "N(3)"
 
                         break
 
                     case "decimal" :
                         meta.hisoDT = "Decimal"
                         meta.hisoLength = 8
-                        meta.hisoLayout = "N"
+                        meta.hisoLayout = "N(8)"
                         break
 
                     case "boolean" :
@@ -226,9 +226,6 @@ angular.module("formsApp")
                         meta.hisoLength = 18
                         meta.hisoLayout = "YYYYMMDD:[HH:MM]"
                         break
-
-
-
 
                     case "date":
                         meta.hisoDT = "Date"

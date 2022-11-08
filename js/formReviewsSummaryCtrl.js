@@ -33,8 +33,8 @@ angular.module("formsApp")
                                         item.linkId = linkId
                                         item.status = obs.valueCodeableConcept.coding[0].display
                                     }
-                                    if (comp.code.coding[0].code == "comment") {
-                                        item.comment = comp.valueString
+                                    if (comp.code.coding[0].code == "note") {
+                                        item.note = comp.valueString
                                     }
                                 })
                                 //let key = `${Q_url}-${linkId}`
@@ -67,7 +67,7 @@ angular.module("formsApp")
                                         //there is an observation that references this linkId in this QR
                                         let obj = hashObservations[key]
                                         comment.status = obj.status
-                                        comment.notes = obj.comment
+                                        comment.notes = obj.note
 
                                     }
                                 })
