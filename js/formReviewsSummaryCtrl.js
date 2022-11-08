@@ -97,14 +97,8 @@ angular.module("formsApp")
 
                         //create download tsv
                         let arDownload = []
-                        arDownload.push("Reviewer,Section,Item,Comment")
+                        arDownload.push("Reviewer,Section,Item,Comment,Status,Notes")
                         $scope.arComments.forEach(function (item) {
-                            /*
-                                                let comment = item.comment
-                                                comment = comment.replace(/\r\n|\r|\n/g ,' ');      //get rid of cr/lf
-                                                comment = comment.replace(/,/g ,'-');      //and the comma
-                                                let reviewer = item.reviewer.replace(/,/g ,'-');
-                            */
                             let lne = cleanText(item.reviewer) + "," + item.sectionText + "," + item.text + "," + cleanText(item.comment) + "," + item.status + "," + cleanText(item.notes)
                             arDownload.push(lne)
 
