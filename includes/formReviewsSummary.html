@@ -5,6 +5,10 @@
 
   <button class="btn btn-link" ng-click="refresh()">Refresh</button>
 
+  <div ng-show="loading" class="alert-warning alert">
+    Loading the data and generating the report. This can take a little while, so please be patient!
+  </div>
+
 
   <div class="row">
     <div class="col-md-3">
@@ -43,7 +47,7 @@
             <div class="tableFixHead">
                 <table class="table table-bordered table-condensed">
                   <thead>
-                      <tr><th>Reviewer</th><th>Section</th><th>Item text</th><th>Comment</th></tr>
+                      <tr><th>Reviewer</th><th>Section</th><th>Item text</th><th>Comment</th><th>Status</th><th>Dispose notes</th><th>Version</th></tr>
                   </thead>
                   <tbody>
                       <tr ng-repeat = "comment in arComments">
@@ -51,6 +55,9 @@
                         <td>{{comment.sectionText}}</td>
                         <td>{{comment.text}}</td>
                         <td>{{comment.comment}}</td>
+                        <td>{{comment.status}}</td>
+                        <td>{{comment.notes}}</td>
+                        <td>{{comment.version}}</td>
                       </tr>
                   </tbody>
                 </table>

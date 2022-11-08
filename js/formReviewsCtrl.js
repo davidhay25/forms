@@ -20,6 +20,37 @@ angular.module("formsApp")
             }
             loadActiveSR()
 
+            $scope.editQR = function(QR) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editQR.html',
+                    backdrop: 'static',
+                    size:'lg',
+                    controller: "editQRCtrl",
+                    resolve: {
+                        QR : function() {
+                            return QR
+                        }
+                    }
+                }).result.then(
+                    function (QR) {
+                        //update the QR. Only the textual elements will have changed - everything else should be OK.
+                        QR.status = "amended"
+                        console.log(QR)
+                        let qry = `/ds/fhir/QuestionnaireResponse/${QR.id}`
+                        $http.put(qry,QR).then(
+                            function () {
+                                alert("Amended QR has been saved")
+                            },
+                            function () {
+                                alert("There was an error and the amended QR has NOT been saved")
+                            }
+                        )
+
+
+                    })
+
+            }
+
 
             $scope.refresh = function() {
                 loadActiveSR()
@@ -225,11 +256,8 @@ angular.module("formsApp")
                     templateUrl: 'modalTemplates/disposition.html',
                     backdrop: 'static',
                     controller: function($scope,review,QR){
-
                         csDisposition = "http://clinfhir.com/fhir/CodeSystem/disposition-code"
-
                         $scope.QR = QR
-
                         let dispositionCode = {coding:[{code:"disposition",system:"http://clinfhir.com/fhir/CodeSystem/observation-code",display:"Disposition of Q comment"}]}
 
                         $scope.input = {}
@@ -249,8 +277,8 @@ angular.module("formsApp")
 
                             //obs.focus = {reference:QR.questionnaire}   //apparently it's OK to reference resources like this...
                             obs.focus = {reference:"QuestionnaireResponse/" + QR.id}       //this is a 'normal' reference -
-
                             obs.derivedFrom = {reference:`QuestionnaireResponse/${QR.id}`}
+
                             obs.status = "final"
                             //obs.category = category
                             obs.code = dispositionCode
@@ -261,6 +289,7 @@ angular.module("formsApp")
                                     display:$scope.input.disposition.display}]}
 
                             obs.component = []
+
                             obs.component.push({code:{coding:[{code:'comment'}],text:'comment'},valueString:review.answer[0].valueString})
                             obs.component.push({code:{coding:[{code:'reviewer'}],text:'reviewer'},valueString:QR.author.display})
                             obs.component.push({code:{coding:[{code:'authored'}],text:'authored'},valueDateTime:QR.authored})

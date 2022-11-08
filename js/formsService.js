@@ -368,7 +368,6 @@ angular.module("formsApp")
 
                                 //Insert a copy of item after conversion. It must be deleted at some point as the linkId's will be the same
                                 choiceItem = angular.copy(child)
-                                //sectionToUpdate = section
                                 pos = inx
                                 choiceItem.text = child.text + " (converted)"
                                 choiceItem.linkId = choiceItem.linkId + "-converted"
@@ -391,8 +390,15 @@ angular.module("formsApp")
 
                                 //set the column count and control type extensions
                                 choiceItem.extension = []
+
                                 choiceItem.extension.push({url:extColumnCount,valueInteger:1})
 
+                                //set the hiso defaults
+
+                                choiceItem.extension.push({url:extHisoLength,valueInteger:18})
+                                choiceItem.extension.push({url:extHisoDT,valueString:"string"})
+                                choiceItem.extension.push({url:extHisoLayout,valueString:"X18"})
+                                
                                 let ext = {url:extItemControl}
                                 ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"check-box"}]}
                                 choiceItem.extension.push(ext)

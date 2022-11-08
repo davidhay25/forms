@@ -31,7 +31,7 @@ console.log("Target server: " +targetServer)
 syncResources("Questionnaire")
 //syncResources("Observation")
 syncResources("QuestionnaireResponse")
-
+syncResources("Observation")
 
 async function syncResources(type) {
     let qry = sourceServer +  type

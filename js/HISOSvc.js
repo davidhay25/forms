@@ -133,6 +133,8 @@ angular.module("formsApp")
                 //convert put quotes around commas
                 function makeSafe(txt) {
                     if (txt) {
+
+                        txt = txt.replace(/’/g ,'');
                         txt = txt.replace(/'/g ,'');
                         txt = txt.replace(/"/g ,'');
                         //txt = txt.replace(/,/g ,'","');

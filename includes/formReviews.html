@@ -74,6 +74,11 @@
                                     class=" btn btn-link">Mark as review completed</button>
                         </div>
                     </div>
+
+                    <div>
+                        <button ng-show="selectedQR"  class="btn btn-link" ng-click="editQR(selectedQR)">Edit review form</button>
+                    </div>
+
                     <br/>
                     <!--
                     This will actually remove the QR - eg if profanity or PI in it

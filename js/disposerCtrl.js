@@ -44,7 +44,6 @@ angular.module("formsApp")
                 } else {
                     delete $scope.user
                 }
-
             });
 
             $scope.deleteForm = function(){
