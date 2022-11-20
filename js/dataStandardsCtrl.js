@@ -444,6 +444,8 @@ angular.module("formsApp")
 
                 //create a summary object suitable for the HISO table. Has functionality specific to HISO needs...
                 let hashAllItems = voReport.hashAllItems
+
+
                 $scope.exportJsonList = exportSvc.createJsonModel(Q,hashAllItems)
 
                 //create an array of HISO metadata - one line per element
