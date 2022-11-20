@@ -218,7 +218,12 @@ angular.module("formsApp")
                             }
 
                         } else {
-                            entry.obligation = "Optional"
+                            if (item.enableWhen) {
+                                entry.obligation = "Conditional"
+                            } else {
+                                entry.obligation = "Optional"
+                            }
+
                         }
                         
                         if (item.answerOption && (item.type == 'choice' || item.type== 'open-choice')) {

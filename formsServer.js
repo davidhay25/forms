@@ -34,7 +34,9 @@ sgMail
 const formsReceiverModule = require("./serverModuleFormsReceiver.js")
 const formsManagerModule = require("./serverModuleFormsManager.js")
 const dataServerModule = require("./serverModuleDataServer.js")
-const backupModule = require("./serverModuleBackup");
+const staticSiteModule = require("./serverModuleStaticSite.js")
+
+//const backupModule = require("./serverModuleBackup");
 
 //systemConfig is specific to a server environment - eg design, production etc
 //default to design (which enables the 'publish button')
@@ -85,6 +87,7 @@ app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application
 formsReceiverModule.setup(app,serverRoot)   //the module needs access to the app so that any processing errors can be logged
 formsManagerModule.setup(app,serverRoot,systemConfig)
 dataServerModule.setup(app,serverRoot,systemConfig)
+// staticSiteModule.setup(app,serverRoot,systemConfig)
 
 //return the system config so the client can adjust the UI (eg hide / show the publish button
 app.get('/config',function(req,res) {
