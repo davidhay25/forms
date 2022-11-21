@@ -123,14 +123,18 @@ angular.module("formsApp")
 
                     if (Q.item) {
                         Q.item.forEach(function (section){
-                            let sectionLines = {display:section.text,lines:[]}
+                            let sectionLines = {display:section.text,lines:[]}   //the lines in this section - groups are 'exploded'
                             arModel.push(sectionLines)
                             if (section.item) {
                                 section.item.forEach(function(child){
                                     makeEntry(child, formsSvc.getMetaInfoForItem(child), section,sectionLines.lines)
                                     if (child.item) {
                                         child.item.forEach(function (grandchild) {
-                                            makeEntry(grandchild, formsSvc.getMetaInfoForItem(grandchild), section,sectionLines.lines)
+                                            makeEntry(grandchild, formsSvc.getMetaInfoForItem(grandchild), section,sectionLines.lines,child)
+
+
+
+
                                         })
                                     }
                                 })
@@ -138,11 +142,11 @@ angular.module("formsApp")
                         })
                     }
 
-//console.log(arModel)
+
                     return arModel
 
                     //create a note based on any conditionals found in the item
-                    function getConditionalNote(item,hashAllItemsXXX) {
+                    function getConditionalNote(item) {
                         let note = ""
                         if (item.enableWhen) {
                             item.enableWhen.forEach(function (ew) {
@@ -169,7 +173,7 @@ angular.module("formsApp")
 
                     }
 
-                    function makeEntry(item,meta,section,ar) {
+                    function makeEntry(item,meta,section,ar,parent) {
                         //ignore 'reviewer comments' elements
                         if (item.code && item.code[0].system == csReview) {
                             return
@@ -207,10 +211,6 @@ angular.module("formsApp")
                                         entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerInteger
                                     }
 
-
-
-
-
                                 }
 
                             } else {
@@ -218,12 +218,20 @@ angular.module("formsApp")
                             }
 
                         } else {
+                            //check for individual conditonality
                             if (item.enableWhen) {
                                 entry.obligation = "Conditional"
                             } else {
                                 entry.obligation = "Optional"
                             }
 
+                        }
+
+                        //if there is a parent parameter, then this item is a member of a group. It will be conditional if the group is..
+                        if (parent) {
+                            if (parent.enableWhen) {
+                                entry.obligation = "Conditional"
+                            }
                         }
                         
                         if (item.answerOption && (item.type == 'choice' || item.type== 'open-choice')) {
