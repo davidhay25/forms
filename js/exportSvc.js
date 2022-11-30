@@ -119,6 +119,10 @@ angular.module("formsApp")
                     ////add guide for use , source standards, unit of measure, conditional
                     let hashAllItems = formsSvc.makeHashAllItems(Q)
 
+                    //1. If there is guide for use, it is displayed
+                    //2. If the item has enableWhen then add the source elements to the gyude for use
+                    //3. If the items parent has a conditional then make the item conditional and add the source element to the GFU
+
                     let arModel = []
 
                     if (Q.item) {
@@ -146,20 +150,28 @@ angular.module("formsApp")
                     return arModel
 
                     //create a note based on any conditionals found in the item
+                    //return an empty string if no conditionals
                     function getConditionalNote(item) {
                         let note = ""
                         if (item.enableWhen) {
                             item.enableWhen.forEach(function (ew) {
-                                let source = hashAllItems[ew.question]
+                                let source = hashAllItems[ew.question]      //the item this one is conditional on
                                 if (source) {
-                                    note += "'" + source.item.text + "' is equal to "
+
+                                    //todo need to check for other conditional operators...
+
+
+                                    note += "Mandatory when '" + source.item.text + "' is equal to "
+
+
                                     if (ew.answerCoding) {
                                         note += ew.answerCoding.display
-
+                                    } else if (ew.answerString) {
+                                        note +=  source.item.text + " = " + ew.answerString
                                     } else if (ew.answerBoolean) {
-                                        note += ew.answerBoolean
+                                        note += " true"
                                     } else {
-                                        note += "Unknown value"
+                                        note += " an unknown value"
                                     }
 
                                 } else {
@@ -188,15 +200,20 @@ angular.module("formsApp")
                         entry.description = meta.description || ""
                         entry.category = section.text
                         entry.usageNotes = meta.usageNotes || ""
-
+                        //entry.conditionalNotes = getConditionalNote(item)
                         entry.sourceStandard = meta.sourceStandard
 
                         entry.conditionalNotes = getConditionalNote(item)
 
-                        if (item.required) {
+
+
+                        if (item.required) {            //todo it's technically possible to have both required and conditional - but should be an error?
                             if (item.enableWhen) {
                                 let ew = item.enableWhen[0]
                                 entry.obligation = "Conditional"
+                                entry.usageNotes += getConditionalNote(item)
+
+                                /*
                                 let master = hashAllItems[ew.question]
                                 if (master) {
                                     entry.usageNotes = entry.usageNotes || ""
@@ -210,27 +227,29 @@ angular.module("formsApp")
                                     } else if (ew.answerInteger !== undefined) {
                                         entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerInteger
                                     }
-
                                 }
+                                */
+
+
 
                             } else {
                                 entry.obligation = "Mandatory"
                             }
-
                         } else {
-                            //check for individual conditonality
+                            //check for individual conditonality when the item is not required
                             if (item.enableWhen) {
                                 entry.obligation = "Conditional"
+                                entry.usageNotes += getConditionalNote(item)
                             } else {
                                 entry.obligation = "Optional"
                             }
-
                         }
 
                         //if there is a parent parameter, then this item is a member of a group. It will be conditional if the group is..
                         if (parent) {
                             if (parent.enableWhen) {
                                 entry.obligation = "Conditional"
+                                entry.usageNotes += getConditionalNote(parent)  //the conditional details are on the parent...
                             }
                         }
                         

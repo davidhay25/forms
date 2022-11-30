@@ -80,6 +80,10 @@ function setup(app,sr) {
                     })
                     .catch(function (error) {
                         //console.log(error);
+
+                        //added Nov 2022
+                        logError(error.response.data,QR)
+
                         res.status(error.response.status).json(error.response.data)
 
                     });

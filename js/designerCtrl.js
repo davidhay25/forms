@@ -22,7 +22,7 @@ angular.module("formsApp")
             )
 
             $scope.updateAllHiso = function(){
-                if (confirm("This will update all HISO information to default values (apart from Unot Of Measure). Are you sure you want to do this?")){
+                if (confirm("This will update all HISO information to default values (apart from Uniot Of Measure). Are you sure you want to do this?")){
                     formsSvc.updateAllHiso($scope.selectedQ)
                     $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
 
