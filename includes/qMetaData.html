@@ -21,7 +21,7 @@
                     Version
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
+                    <input  ng-disabled="miniQ.checkedoutTo !== 'me'" type="text" class="form-control"  ng-change="input.dirty = true" ng-model="selectedQ.version"/>
                 </div>
             </div>
 
@@ -30,7 +30,7 @@
                     Title
                 </div>
                 <div class="col-md-9">
-                   <textarea class="form-control" ng-model="selectedQ.title"
+                   <textarea ng-disabled="miniQ.checkedoutTo !== 'me'" class="form-control" ng-model="selectedQ.title"
                              ng-change="input.dirty = true">
 
                    </textarea>
@@ -44,7 +44,7 @@
                     Description
                 </div>
                 <div class="col-md-9">
-                       <textarea class="form-control" ng-model="selectedQ.description"
+                       <textarea  ng-disabled="miniQ.checkedoutTo !== 'me'" class="form-control" ng-model="selectedQ.description"
                                  ng-change="input.dirty = true">
                        </textarea>
 
@@ -109,7 +109,7 @@
                     Last updated
                 </div>
                 <div class="col-md-9">
-                    <input class="form-control"
+                    <input class="form-control" disabled = "disabled"
                            value="{{selectedQ.meta.lastUpdated | date : 'MMM dd  HH:mm'}} (Version:{{selectedQ.meta.versionId}})"/>
 
                 </div>
@@ -121,7 +121,7 @@
                     Q Status
                 </div>
                 <div class="col-md-9">
-                    <select class="form-control" ng-model="selectedQ.status"
+                    <select  ng-disabled="miniQ.checkedoutTo !== 'me'" class="form-control" ng-model="selectedQ.status"
                             ng-change="input.dirty = true"
                             ng-options="status for status in qStatus">
                     </select>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="col-md-9">
 
-                    <select class="form-control" ng-model="input.hisoStatus"
+                    <select  ng-disabled="miniQ.checkedoutTo !== 'me'"  class="form-control" ng-model="input.hisoStatus"
                             ng-change="input.dirty = true"
                             ng-options="status for status in arHisoStatus">
                     </select>
@@ -147,7 +147,7 @@
                     HISO number
                 </div>
                 <div class="col-md-9">
-                    <input type="text" class="form-control"  ng-change="input.dirty = true"  ng-model="input.hisoNumber"/>
+                    <input  ng-disabled="miniQ.checkedoutTo !== 'me'"  type="text" class="form-control"  ng-change="input.dirty = true"  ng-model="input.hisoNumber"/>
                 </div>
             </div>
 

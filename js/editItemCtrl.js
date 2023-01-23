@@ -343,6 +343,7 @@ angular.module("formsApp")
                     $scope.input.vs = {rendermode: $scope.meta.renderVS}
                 }
 
+
                 //the 'display as radio' for lists
                 if ($scope.meta.itemControl && $scope.meta.itemControl.coding) {
                     if ($scope.meta.itemControl.coding[0].code == 'radio-button') {

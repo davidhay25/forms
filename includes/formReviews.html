@@ -45,7 +45,7 @@
 
                                 <div ng-show="r.disposition">
                                     <table class="table">
-                                        <tr><td>Disposition</td><td>{{r.disposition.disposition}}</td></tr>
+                                        <tr><td>Disposition</td><td>{{r.disposition.dispositionDisplay}} ({{r.disposition.disposition}}) </td></tr>
                                         <tr><td>Entered by</td><td>{{r.disposition.reviewer}}</td></tr>
                                         <tr><td>Date</td><td>{{r.disposition.authored}}</td></tr>
                                         <tr><td>Note</td><td>{{r.disposition.note}}</td></tr>
@@ -56,6 +56,15 @@
                                     <button class="btn btn-link pull-right"
                                             ng-click="addDisposition(selectedQR,r)">Add disposition</button>
                                 </div>
+
+                                <div ng-show="r.disposition">
+                                    <button class="btn btn-link pull-right"
+                                            ng-click="editDisposition(r.disposition.observationId,r)">Edit disposition</button>
+                                 <!--   <pre>{{r | json}}</pre> -->
+                                </div>
+
+
+
                                 <div class="clearfix"></div>
                             </div>
 

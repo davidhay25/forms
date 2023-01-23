@@ -251,8 +251,8 @@
 
             <div class="col-md-2">
                 <div class="navbar-text pull-right">
-                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit#heading=h.15g2a6nmry8b" >
-                        Version: 4.0</a>
+                    <a target = "_blank" href="https://docs.google.com/document/d/1NZbaaI6_gQXqLo4eOmJwooutAoHso34HQtSZAcWxGlc/edit" >
+                        Version: 4.1</a>
                 </div>
             </div>
 
@@ -343,8 +343,12 @@
                                  ng-show="miniQ.hashFolderTag[input.selectedFolderTag]"
                                  ng-click="selectQ(miniQ)"
                                  ng-repeat="miniQ in allQ">
-                                {{miniQ.name}}
+                                {{miniQ.title}}
+                                <div ng-hide="miniQ.title">
+                                    Name:{{miniQ.name}}
+                                </div>
                                 <!--
+                                {{miniQ.name}}
                                 <div>{{Q.checkedoutTo}}</div>
                                 -->
 
@@ -634,16 +638,13 @@
                                     <tr><th>Text</th><th>LinkId</th><th>Datatype</th><th>HISO Datatype</th><th>Length</th><th>Layout</th><th>Unit of measure</th></tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="entry in hisoElementsList">
+                                    <tr ng-repeat="entry in hisoElementsList" ng-hide="entry.meta.exclude">
                                         <td>{{entry.text}}
                                             <div><em>{{entry.description}}</em></div>
                                         </td>
 
                                         <td>
-
                                             <div class="clickable" ng-click="editItemFromLinkId(entry.linkId)"> {{entry.linkId}}</div>
-
-
                                         </td>
 
                                         <td width="7%">

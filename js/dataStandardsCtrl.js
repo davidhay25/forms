@@ -108,6 +108,8 @@ angular.module("formsApp")
 
             }
 
+
+
             $scope.preview = function(){
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQR.html',
@@ -115,6 +117,42 @@ angular.module("formsApp")
                     controller: function($scope,QR) {
                         $scope.selectedQR = QR
                         console.log(QR)
+
+
+                        //doesn't work - https://stackoverflow.com/questions/22189544/print-a-div-using-javascript-in-angularjs-single-page-application#22189651
+                        $scope.printDEP = function () {
+
+                            let divName = "onePagePreview"
+
+                            var printContents = document.getElementById(divName).innerHTML;
+
+                            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                                var popupWin = window.open('', '_blank', 'width=600,height=600,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
+                                popupWin.window.focus();
+                                popupWin.document.write('<!DOCTYPE html><html><head>' +
+                                    '<link rel="stylesheet" type="text/css" href="style.css" />' +
+                                    '</head><body onload="window.print()"><div class="reward-body">' + printContents + '</div></body></html>');
+                                popupWin.onbeforeunload = function (event) {
+                                    popupWin.close();
+                                    return '.\n';
+                                };
+                                popupWin.onabort = function (event) {
+                                    popupWin.document.close();
+                                    popupWin.close();
+                                }
+                            } else {
+                                var popupWin = window.open('', '_blank', 'width=800,height=600');
+                                popupWin.document.open();
+                                popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</body></html>');
+                                popupWin.document.close();
+                            }
+                            popupWin.document.close();
+
+                            return true;
+                        }
+
+
+
                     },
                     size : 'lg',
                     resolve: {
@@ -455,7 +493,7 @@ angular.module("formsApp")
 
                 //prepent the BOM (byte order mark) - https://stackoverflow.com/questions/17879198/adding-utf-8-bom-to-string-blob#17879474
                 let fle =  "\ufeff" +  voHISO.fle // arHISO.join("\r\n")
-console.log(fle)
+//console.log(fle)
 
                 let uniquer = moment().format()
                 $scope.HisoDownloadLinkCsv = window.URL.createObjectURL(new Blob([fle],{type:"text/csv"}))

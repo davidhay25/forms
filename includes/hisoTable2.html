@@ -32,7 +32,7 @@
                 <th>Layout</th><th>Obligation</th><th>Guide for use</th></tr>
             </thead>
             <tbody>
-            <tr ng-repeat = "line in arHisoAllRows">
+            <tr ng-repeat = "line in arHisoAllRows" ng-hide="line.exclude">
 
                 <td style="background-color:#c0c0c0" colspan="9" ng-if = "line.type == 'section'"><strong>{{line.display}}</strong></td>
 

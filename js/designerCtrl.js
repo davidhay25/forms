@@ -27,7 +27,6 @@ angular.module("formsApp")
                     $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
 
                 }
-
             }
 
             $scope.HISOdomainPopover = function(entry){
@@ -78,15 +77,17 @@ angular.module("formsApp")
             //$scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
 
 
+            //codes updated Jan-23
 
             $scope.input.codeSystems = []   //used by the editItem function
             $scope.input.codeSystems.push({display:'SNOMED CT',url:'http://snomed.info/sct'})
-            $scope.input.codeSystems.push({display:'LOINC',url:'http://loinc.org'})
-            $scope.input.codeSystems.push({display:'UCUM',url:'http://unitsofmeasure.org'})
+            //$scope.input.codeSystems.push({display:'LOINC',url:'http://loinc.org'})
+            //$scope.input.codeSystems.push({display:'UCUM',url:'http://unitsofmeasure.org'})
 
             //don't change the rev-comment url!!!!
             $scope.input.codeSystems.push({display:'csReview',url:'http://clinfhir.com/fhir/CodeSystem/review-comment'})
-            $scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
+            //$scope.input.codeSystems.push({display:'Unknown',url:'http://unknown.com'})
+            //$scope.input.codeSystems.push({display:'workflow',url:'http://clinfhir.com/fhir/CodeSystem/review-workflow'})   //an item for workflow only - not included in the data standard
 
             //system url for folder tags
             $scope.tagFolderSystem = "http://clinfhir.com/fhir/NamingSystem/qFolderTag"

@@ -18,8 +18,11 @@
     <div class="modal-body">
 
 
+        <div id="onePagePreview">
+            <ng-include src="'includes/renderFormForDisplay.html'"></ng-include>
+        </div>
 
-        <ng-include src="'includes/renderFormForDisplay.html'"></ng-include>
+
 
 
 </div>
@@ -28,4 +31,7 @@
 
        <em>An example of what the form could look like when printed out.</em>
     </div>
+<!--
+    <button ng-click="print()" class="btn-link btn">Print</button>
+    -->
 </div>

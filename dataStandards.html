@@ -339,6 +339,8 @@
                                 to the right to submit comments.
                                 Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
                                     list of standards at the right.  Submit form when complete.
+                                    There is more detailed help available
+                                    <a target="_blank" href="https://docs.google.com/document/d/1Nn5pzfDaUAe4gXPYxEkLqk2wnlReBb4Tk9IovQ-lPlA/edit?usp=sharing">here</a>
                                     <br/>
                                     <div class="text-center" style="color: red; font-weight: bold">
                                         Previous forms and comments are shown as anonymous examples. Don't include any real data in this form!
@@ -399,10 +401,14 @@
                                 <br/>
                                 <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
                                 <br/>
+
                                 <div class="clickable" ng-show="formQR"
                                      ng-click="preview()">Single page</div>
 
+                                    <!--   will re-enable when the print function works OK
+-->
                                 <br/>
+
                                 <div>
                                     <button ng-show = "formQR"
                                             class="btn btn-danger center-block"

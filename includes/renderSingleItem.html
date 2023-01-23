@@ -30,7 +30,7 @@
                 <span>{{cell.item.prefix}}. </span>
                     <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
                 <span ng-show = "cell.item.required"> * </span>
-                <span ng-show = "cell.item.repeats"> (Mult.) </span>
+                <span ng-show = "cell.item.repeats"> <span style="color:purple">(Multiple are allowed)</span>  </span>
 
                 <span ng-show = "cell.meta.description">
 
@@ -105,6 +105,7 @@
 
                     <textarea ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                               ng-model="form[cell.item.linkId]" class="form-control"
+                              placeholder="{{cell.meta.placeholder}}"
                               ng-blur="makeQR(cell.item.linkId)"></textarea>
                 </div>
 
@@ -298,6 +299,7 @@
 
                     <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
                         <select class="form-control" ng-model="form[cell.item.linkId]"
+
                             ng-change="makeQR(cell.item.linkId)"
                             ng-options = "value.valueString for value in cell.item.answerOption"/>
                     </div>
@@ -307,6 +309,7 @@
                         <span ng-repeat="option in cell.item.answerOption">
 
                             <input type="radio" value="{{option}}"
+
                                    ng-change="makeQR(cell.item.linkId)"
                                    ng-model="form[cell.item.linkId]"/>
 
@@ -320,6 +323,7 @@
                 </div>
                 <div ng-hide = "cell.item.answerOption.length > 0">
                     <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                           placeholder="{{cell.meta.placeholder}}"
                            ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                            ng-model="form[cell.item.linkId]" />
                 </div>

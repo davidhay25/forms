@@ -64,6 +64,9 @@ angular.module("formsApp")
 
         extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
 
+        extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
+        extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
+
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
@@ -1000,6 +1003,8 @@ angular.module("formsApp")
                 updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
                 updateExtension(item,extHisoUOM,"String",meta.UOM)
 
+                updateExtension(item,extPlaceholder,"String",meta.placeholder)
+                updateExtension(item,extExclude,"Boolean",meta.exclude)
 
 
                // updateExtension(item,extHISOStatus,"Code",meta.HISOStatus)
@@ -1192,6 +1197,16 @@ angular.module("formsApp")
                 }
 
                 //updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
+
+                let ar18 = this.findExtension(item,extPlaceholder)
+                if (ar18.length > 0) {
+                    meta.placeholder = ar18[0].valueString
+                }
+
+                let ar19 = this.findExtension(item,extExclude)
+                if (ar19.length > 0) {
+                    meta.exclude = ar19[0].valueBoolean
+                }
 
 
                 return meta
@@ -1554,8 +1569,19 @@ angular.module("formsApp")
                 //if the item has answerValueSet and the rendering is dropdown or radio then fetch the values from the
                 //term server and add them to the meta (so they can't update the item). They will never be saved back....
                 //todo - this could be non-perormant when editing / previewing, do we care?
-                function fillFromValueSet(cell,termServer) {
+                //hinz todo
+                // move all this to a server module
+                // the server module will:
+                    // assume the VS Url may be versioned
+                    // check the local cache (for now, just use a memory object in the server - ?persist in the canshare server
+                    // if not present, then make a versioned call to the TS
+                    //save the expanded VS in the cache & return it
+                // this function will populate cell.meta.expandedVSOptions
 
+
+
+                function fillFromValueSet(cell,termServer) {
+                   // console.log('fillFromVS',cell)
                     if (cell.item.answerOption) {
                         //ATM there can be both answerOption and answerValueSet as an artifact of authoring (strictly incorrect).
                         //If there is an answerOption, then use that rather than the valueSet
@@ -1604,6 +1630,8 @@ angular.module("formsApp")
                             //this is a VS produced by someone else - likely the spec - use $expand on the term server
                             //let vs = cell.item.answerValueSet
                             //maximum number to return is 50
+
+                            console.log('fillFromVS',cell,vsUrl)
 
                             if (arExpandedVsCache[vsUrl]) {
                                 //present in the cache

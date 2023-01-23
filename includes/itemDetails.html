@@ -32,7 +32,16 @@
       <strong>Item is hidden</strong>
     </div>
     <div class="col-md-9">
+      Item is hidden, and will not be shown in the form. It will still appear in the HISO standard
+    </div>
+  </div>
 
+  <div class="row" ng-show="selectedNode.data.meta.exclude">
+    <div class="col-md-3">
+      <strong>Item is excluded </strong>
+    </div>
+    <div class="col-md-9">
+      Item is excluded from the HISO standard. This is generally used when a control is needed for the form.
     </div>
   </div>
 
@@ -63,6 +72,17 @@
       {{selectedNode.data.item.type}}
     </div>
   </div>
+
+  <div class="row" ng-show="selectedNode.data.meta.placeholder">
+    <div class="col-md-3">
+      Placeholder text
+    </div>
+    <div class="col-md-9">
+
+      {{selectedNode.data.meta.placeholder}}
+    </div>
+  </div>
+
 
   <div class="row" ng-show="selectedNode.data.item.required">
     <div class="col-md-3">

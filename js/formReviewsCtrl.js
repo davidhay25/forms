@@ -114,6 +114,8 @@ angular.module("formsApp")
             function makeDispositionDisplayObj(obs) {
                 let disposition = {}            //the actual disposition. Allow >1 per comment (though generally only 1)
                 disposition.disposition = obs.valueCodeableConcept.coding[0].code
+                disposition.dispositionDisplay = obs.valueCodeableConcept.coding[0].display
+                disposition.observationId = obs.id
                 if (obs.component) {
                     obs.component.forEach(function (comp) {
                         switch (comp.code.coding[0].code) {
@@ -249,6 +251,98 @@ angular.module("formsApp")
             //let reviewCommentsSystem = "http://canshare.com/cs/review-comment"      //todo move to service
 
 
+            //if being edited, grab the current observation & edit it
+            $scope.editDisposition = function(observationId,review) {
+                if (observationId) {
+                    $http.get('/ds/fhir/Observation/' + observationId).then(
+                        function(data) {
+                            //console.log(data.data)
+
+                            $uibModal.open({
+                                templateUrl: 'modalTemplates/editDisposition.html',
+                                backdrop: 'static',
+                                controller: function ($scope, observation) {
+                                    //console.log(observation)
+
+
+                                    $scope.input = {}
+                                    //copied from add - a bit ugly...
+                                    let csDisposition = "http://clinfhir.com/fhir/CodeSystem/disposition-code"
+                                    $scope.input.dispositionOptions = []
+                                    $scope.input.dispositionOptions.push({system:csDisposition,code:'accept','display':"Change fully accepted"})
+                                    $scope.input.dispositionOptions.push({system:csDisposition,code:'mod','display':"Change partially accepted"})
+                                    $scope.input.dispositionOptions.push({system:csDisposition,code:'decline','display':"Change not accepted"})
+                                    $scope.input.dispositionOptions.push({system:csDisposition,code:'noted','display':"Noted"})
+
+                                    let pos = -1
+                                    if (observation) {
+                                        //set the current note
+                                        if (observation.component) {
+                                            observation.component.forEach(function (comp,inx) {
+                                                if (comp.code.coding[0].code == 'note' ) {
+                                                    $scope.input.dispositionNote = comp.valueString
+                                                    pos = inx
+                                                }
+
+                                            })
+                                            //remove the note component
+                                            if (pos > -1) {
+                                                observation.component.splice(pos,1)
+                                            }
+                                        }
+
+                                        //set the current disposition
+                                        let currentDisposition = observation.valueCodeableConcept.coding[0].code
+                                        $scope.input.dispositionOptions.forEach(function (opt) {
+                                            if (opt.code == currentDisposition) {
+                                                $scope.input.disposition = opt
+                                            }
+                                        })
+
+                                    }
+
+                                    $scope.saveDisposition = function(){
+                                        if ($scope.input.dispositionNote) {
+                                            observation.component.push({code:{coding:[{code:'note'}],text:'note'},valueString:$scope.input.dispositionNote})
+                                        }
+
+                                        observation.valueCodeableConcept = {coding:[{system:"http://clinfhir.com/fhir/CodeSystem/disposition-codes",
+                                                code:$scope.input.disposition.code,
+                                                display:$scope.input.disposition.display}]}
+
+                                        $http.put('/ds/fhir/Observation/' + observationId,observation).then(
+                                            function(data) {
+                                               $scope.$close(observation)
+                                            }, function (err) {
+                                                alert(angular.toJson(err.data))
+                                            })
+
+
+                                    }
+
+
+                                },
+                                resolve: {
+                                    observation: function(){
+                                        return data.data
+                                    }
+
+                                }
+                            }).result.then(
+                                function (obs) {
+                                    review.disposition = makeDispositionDisplayObj(obs)
+                                    //updateReviewWithDispositions(review)
+
+                                })
+
+
+                        }, function(err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+                }
+
+            }
 
             //passes in a single review to update
             $scope.addDisposition = function(QR,review){

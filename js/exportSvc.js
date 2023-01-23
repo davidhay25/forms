@@ -204,6 +204,7 @@ angular.module("formsApp")
                         entry.sourceStandard = meta.sourceStandard
 
                         entry.conditionalNotes = getConditionalNote(item)
+                        entry.exclude = meta.exclude
 
 
 

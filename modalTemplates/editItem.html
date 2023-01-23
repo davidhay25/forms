@@ -119,13 +119,44 @@
                         <td>
                             <div class="row">
                                 <div class="col-sm-3 col-md-3">
-                                    <checkbox ng-model="newItem.repeats"></checkbox> Repeats
+                                    <checkbox ng-model="newItem.repeats"></checkbox>
+
+                                    <span uib-popover="This element can repeat"
+                                          popover-placement="top"
+                                          popover-trigger="'mouseenter'">Repeats</span>
+
+
                                 </div>
                                 <div class="col-sm-3 col-md-3">
-                                    <checkbox ng-model="newItem.required"></checkbox> Mandatory
+
+                                    <div ng-hide = "newItem.answerOption.length > 0">
+                                        <checkbox ng-model="newItem.required"></checkbox>
+
+                                        <span uib-popover="This is a mandatory (required) element"
+                                              popover-placement="top"
+                                              popover-trigger="'mouseenter'">Mandatory</span>
+                                    </div>
+                                    <div ng-show = "newItem.answerOption.length > 0">
+                                        (Can't be mandatory as there are possible values)
+                                    </div>
+
+
                                 </div>
                                 <div class="col-sm-3 col-md-3">
-                                    <checkbox ng-model="meta.hidden"></checkbox> Hidden
+                                    <checkbox ng-model="meta.hidden"></checkbox>
+
+                                    <span uib-popover="This element is not shown in the form (but is present in the standard)"
+                                          popover-placement="top"
+                                          popover-trigger="'mouseenter'">Hidden</span>
+
+
+                                </div>
+
+                                <div class="col-sm-3 col-md-3" ng-hide="insertType == 'section'">
+                                    <checkbox ng-model="meta.exclude"></checkbox>
+                                    <span uib-popover="Exclude this item from the standard"
+                                         popover-placement="top"
+                                         popover-trigger="'mouseenter'">Exclude</span>
                                 </div>
                             </div>
                         </td>
@@ -152,6 +183,19 @@
 
                                 <div class="col-sm-6">
 
+                                    <div ng-show = "newItem.type == 'text' || newItem.type == 'string'" >
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                Placeholder text
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control" ng-model = "meta.placeholder">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
                                     <div ng-show="(newItem.type == 'group' && insertType !== 'section') ||newItem.type == 'choice' ">
                                         <div class="row">
                                             <div class="col-sm-6 col-md-6">
@@ -175,6 +219,8 @@
                                         </div>
                                     </div>
                                 </div>
+
+
                                 <div class="col-sm-2">
                                     <button class="btn btn-link pull-right" ng-hide="fixType"
                                             ng-click="setHISODefaults(newItem.type)">Reset HISO
@@ -470,7 +516,7 @@
 
             </uib-tab>
 
-            <uib-tab ng-show="(newItem.type == 'choice' || newItem.type == 'open-choice')" >
+            <uib-tab ng-show="((newItem.type == 'choice' || newItem.type == 'open-choice') && (! newItem.required))" >
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
 

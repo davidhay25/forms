@@ -68,20 +68,23 @@ angular.module("formsApp")
 
                     sect.lines.forEach(function (line) {
                         //console.log(line)
-                        let hiso = {}
-                        //hiso.type = line.type
+                        if (! line.exclude) {
+                            let hiso = {}
+                            //hiso.type = line.type
 
-                        hiso.name = line.name
-                        hiso.definition = line.description
-                        hiso.sourceStandards = line.sourceStandard
-                        hiso.domain = line.dataDomain
-                        hiso.dataType = line.hisoDT
-                        hiso.uom = line.UOM
-                        hiso.layout = line.hisoLayout
-                        hiso.obligation = line.obligation
-                        hiso.guide = line.usageNotes
-                        arHisoLine.push(hiso)
-                        arFle.push(makeDownloadLine(hiso))
+                            hiso.name = line.name
+                            hiso.definition = line.description
+                            hiso.sourceStandards = line.sourceStandard
+                            hiso.domain = line.dataDomain
+                            hiso.dataType = line.hisoDT
+                            hiso.uom = line.UOM
+                            hiso.layout = line.hisoLayout
+                            hiso.obligation = line.obligation
+                            hiso.guide = line.usageNotes
+                            arHisoLine.push(hiso)
+                            arFle.push(makeDownloadLine(hiso))
+                        }
+
 
                     })
                 })
