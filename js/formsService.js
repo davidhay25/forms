@@ -1502,6 +1502,9 @@ angular.module("formsApp")
                                     section.rows.push(row)   //assume that the whole group fits in a single row...
 
                                 } else {
+                                    //
+
+
                                     //if the item isn't a group, then add it to column 1.
                                     let row = {}   //will have a single entry - left
                                     row.item = item

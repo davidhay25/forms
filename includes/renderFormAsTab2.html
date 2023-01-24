@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-3">
 
-        <div style="position: fixed">
+        <div>
             <h4>Sections</h4>
             <div class="list-group">
                 <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
@@ -26,19 +26,19 @@
                 </div>
             </div>
 
-        <br/>
+            <br/>
 
-        <div ng-show = "objFormTemplate.hiddenSections.length > 0">
-            <checkbox ng-model="input.showHidden"></checkbox>
-            Show hidden sections
-        </div>
+            <div ng-show = "objFormTemplate.hiddenSections.length > 0">
+                <checkbox ng-model="input.showHidden"></checkbox>
+                Show hidden sections
+            </div>
 
-        <div ng-show = "objFormTemplate.hiddenFields[selectedSection.linkId].length > 0">
-            <checkbox ng-model="input.showHidden"></checkbox>
-            Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
-        </div>
+            <div ng-show = "objFormTemplate.hiddenFields[selectedSection.linkId].length > 0">
+                <checkbox ng-model="input.showHidden"></checkbox>
+                Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
+            </div>
 
-        <div ng-show="objFormTemplate.attachments.length > 0">
+            <div ng-show="objFormTemplate.attachments.length > 0">
             <h4>Attachments</h4>
 
             <div ng-repeat ="att in objFormTemplate.attachments">
