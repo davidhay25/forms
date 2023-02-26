@@ -366,6 +366,12 @@ angular.module("formsApp")
                         let linkId = review.linkId      //the comment in the QR
 
                         $scope.saveDisposition = function(){
+
+                            if (! review.answer ) {
+                                alert ("There are no comments so no observation will be created.")
+                                return
+                            }
+
                             let obs = {resourceType:'Observation'}
                             obs.id = "disp-" + new Date().getTime()
 
@@ -385,6 +391,7 @@ angular.module("formsApp")
                             obs.component = []
 
                             obs.component.push({code:{coding:[{code:'comment'}],text:'comment'},valueString:review.answer[0].valueString})
+
                             obs.component.push({code:{coding:[{code:'reviewer'}],text:'reviewer'},valueString:QR.author.display})
                             obs.component.push({code:{coding:[{code:'authored'}],text:'authored'},valueDateTime:QR.authored})
                             obs.component.push({code:{coding:[{code:'linkId'}],text:'linkId'},valueString:review.linkId})

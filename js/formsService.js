@@ -1495,27 +1495,32 @@ angular.module("formsApp")
                                             //section.rows.push(row)   //assume that the whole group fits in a single row...
                                         }
 
-
-
                                     }
                                     //add the row even if there are no items in there yet
                                     section.rows.push(row)   //assume that the whole group fits in a single row...
 
                                 } else {
-                                    //
+                                    //2023-01-24
+
+                                    //if the item has a colcount > 0, and it's a choice then add a new row
+                                    if (false && meta.columnCount > 0) {
+
+                                    } else {
+                                        //if the item isn't a group, then add it to column 1.
+                                        let row = {}   //will have a single entry - left
+                                        row.item = item
+                                        row.meta = meta
+                                        let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                        fillFromValueSet(cell,termServer)
+                                        setDecoration(cell,item)
+                                        //row.left = [cell]             //make it an array to match the group
+                                        row['col1'] = [cell] //make it an array to match the group
+
+                                        section.rows.push(row)
+                                    }
 
 
-                                    //if the item isn't a group, then add it to column 1.
-                                    let row = {}   //will have a single entry - left
-                                    row.item = item
-                                    row.meta = meta
-                                    let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
-                                    fillFromValueSet(cell,termServer)
-                                    setDecoration(cell,item)
-                                    //row.left = [cell]             //make it an array to match the group
-                                    row['col1'] = [cell] //make it an array to match the group
 
-                                    section.rows.push(row)
 
                                 }
 

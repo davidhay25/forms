@@ -129,6 +129,15 @@
                                 </div>
                                 <div class="col-sm-3 col-md-3">
 
+
+                                    <checkbox ng-model="newItem.required"></checkbox>
+
+                                    <span uib-popover="This is a mandatory (required) element"
+                                          popover-placement="top"
+                                          popover-trigger="'mouseenter'">Mandatory</span>
+
+
+                                    <!--
                                     <div ng-hide = "newItem.answerOption.length > 0">
                                         <checkbox ng-model="newItem.required"></checkbox>
 
@@ -136,9 +145,12 @@
                                               popover-placement="top"
                                               popover-trigger="'mouseenter'">Mandatory</span>
                                     </div>
+
                                     <div ng-show = "newItem.answerOption.length > 0">
                                         (Can't be mandatory as there are possible values)
                                     </div>
+
+                                    -->
 
 
                                 </div>
@@ -516,7 +528,7 @@
 
             </uib-tab>
 
-            <uib-tab ng-show="((newItem.type == 'choice' || newItem.type == 'open-choice') && (! newItem.required))" >
+            <uib-tab ng-show="((newItem.type == 'choice' || newItem.type == 'open-choice'))" >
                 <uib-tab-heading>Possible values <span class="badge">{{newItem.answerOption.length}}</span> </uib-tab-heading>
                 <br/>
 
