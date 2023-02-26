@@ -2185,6 +2185,9 @@ angular.module("formsApp")
                 return QR
 
                 function getValue(item,value) {
+                    if (!value) {
+                        return
+                    }
                     let result;
                     switch (item.type) {
                         case "choice":

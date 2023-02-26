@@ -56,8 +56,6 @@
 
             <div ng-switch-when="group">
 
-
-
             </div>
 
             <div ng-switch-when="dateTime">
@@ -293,13 +291,20 @@
                 </div>
 
                 <div ng-hide = "cell.item.answerOption.length > 0">
-                    <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                    <input type="number"  ng-blur="makeQR(cell.item.linkId)"
                            placeholder="{{cell.meta.placeholder}}"
                            ng-model="form[cell.item.linkId]" class="form-control"/>
                 </div>
 
             </div>
 
+
+            <div ng-switch-when = "decimal" >
+                <input type="number"  ng-blur="makeQR(cell.item.linkId)"
+                       placeholder="{{cell.meta.placeholder}}"
+                       ng-model="form[cell.item.linkId]" class="form-control"/>
+
+            </div>
 
             <div ng-switch-when = "string" >
 
