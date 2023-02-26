@@ -182,7 +182,7 @@
                         <select class="form-control" ng-model="form[cell.item.linkId]"
                                 ng-change="makeQR(cell.item.linkId)"
                                 ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
-                            <option value=""></option>
+                            <option value="" disabled selected>{{cell.meta.placeholder}}</option>
 
                         </select>
                     </div>
@@ -294,6 +294,7 @@
 
                 <div ng-hide = "cell.item.answerOption.length > 0">
                     <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                           placeholder="{{cell.meta.placeholder}}"
                            ng-model="form[cell.item.linkId]" class="form-control"/>
                 </div>
 
@@ -340,6 +341,7 @@
 
             <div ng-switch-default>
                 <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                       placeholder="{{cell.meta.placeholder}}"
                        ng-model="form[cell.item.linkId]" class="form-control"/>
             </div>
 
