@@ -28,10 +28,22 @@ let targetServer = "http://localhost:9099/baseR4/"
 console.log("Source server: " + sourceServer)
 console.log("Target server: " +targetServer)
 
-syncResources("Questionnaire")
+console.log("")
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+
+readline.question(`Press any key to continue`, name => {
+
+    readline.close();
+    syncResources("Questionnaire")
 //syncResources("Observation")
-syncResources("QuestionnaireResponse")
-syncResources("Observation")
+    syncResources("QuestionnaireResponse")
+    syncResources("Observation")
+});
+
+
 
 async function syncResources(type) {
     let qry = sourceServer +  type
@@ -70,13 +82,15 @@ async function syncResources(type) {
 
             //now post to the target server
 
-            axios.post(targetServer,newBundle).then(
+            axios.post(targetServer,newBundle,{maxBodyLength:30000000}).then(
                 function(response) {
                     console.log(type)
                     console.log("Target server updated - " + newBundle.entry.length + " entries")
                 }
             ).catch(function (ex) {
-                console.log("error POSTing transaction to target server",ex.response.data)
+
+
+                console.log("error POSTing transaction to target server",ex.message)
 
                 //console.log(bundle)
 
