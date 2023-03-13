@@ -1,6 +1,6 @@
 angular.module("formsApp")
 
-    .service('termIOSvc', function() {
+    .service('termIOSvc', function(formsSvc) {
 
         return {
 
@@ -16,7 +16,7 @@ angular.module("formsApp")
                         section.item.forEach(function (child) {
                             if (child.type == 'group' && child.item) {
                                 child.item.forEach(function (grandChild) {
-                                    let ar = that.makeExportOneItem(grandChild,Q)
+                                    let ar = that.makeExportOneItem(grandChild,Q,section)
                                     if (ar.length > 0) {
                                         ar.push("")
                                         arAllExport = arAllExport.concat(ar)
@@ -25,7 +25,7 @@ angular.module("formsApp")
                                 })
                             } else {
                                 //this is a data item
-                                let ar = that.makeExportOneItem(child,Q)
+                                let ar = that.makeExportOneItem(child,Q,section)
                                 if (ar.length > 0) {
                                     ar.push("")
                                     arAllExport = arAllExport.concat(ar)
@@ -107,12 +107,45 @@ angular.module("formsApp")
                             })
                         }
                     }
-
                 }
+
+            },
+            "makeExportOneItem" : function(item,Q,section) {
+                //make an array with coding answerOptions for the item
+                let ar = []
+                let meta = formsSvc.getMetaInfoForItem(item)
+                //if (item.answerOption && item.type == 'choice') {
+                    ar.push(["Q",Q.name].join('\t'))
+                    ar.push(["Section",section.text].join('\t'))
+                    ar.push(["linkId",item.linkId].join('\t'))
+                    ar.push(["text",item.text].join('\t'))
+                    ar.push(["description",meta.description].join('\t'))
+                    //ar.push(item.description)
+                    ar.push("")
+                    ar.push("Display (edit)\tSystem (edit)\tCode (edit)\tCurrent system (leave)\tCurrent code (leave)")
+                    if (item.answerOption) {
+                        item.answerOption.forEach(function (value) {
+                            let arLne = []
+
+                            arLne.push(value.valueCoding.display)
+                            arLne.push(value.valueCoding.system)
+                            arLne.push(value.valueCoding.code)
+                            //arLne.push(value.valueCoding.system)
+                            //arLne.push(value.valueCoding.code)
+                            let lne = arLne.join('\t')
+                            console.log(lne)
+                            ar.push(lne)
+                        })
+                    }
+
+                    //ar.push("===========")
+                //}
+                //return ar
+                return ar  // .join('\r\n')
 
 
             },
-            "makeExportOneItem" : function(item,Q) {
+            "makeExportOneItemOLD" : function(item,Q) {
                 //make an array with coding answerOptions for the item
                 let ar = []
                 if (item.answerOption && item.type == 'choice') {

@@ -72,7 +72,7 @@ angular.module("formsApp")
 
             $scope.input = {}
 
-            $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display']
+            $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display','quantity']
 
             //$scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
 
@@ -409,6 +409,12 @@ angular.module("formsApp")
                             function (data) {
                                 delete QtoRevert.checkedoutTo
                                 alert("Local changes have been discarded")
+
+
+                                //finally, we can clear the local cache
+                                let nameInCache = "coq-" + $scope.selectedQ.url
+                                delete $localStorage[nameInCache]
+
                                 $scope.input.dirty = false;
                                 processQ(Q)
 
