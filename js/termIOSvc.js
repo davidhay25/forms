@@ -4,33 +4,49 @@ angular.module("formsApp")
 
         return {
 
-            "updateFromQFile" : function(){
 
-            },
             "makeExportQ" : function(Q) {
                 //make a term export
                 let that = this
                 let arAllExport = []
+
+                //need to create a hash of all items for the usage notes (needed for the conditional)
+                let hashAllItems = {}
+                Q.item.forEach(function (section) {
+                    hashAllItems[section.linkId] = section
+                    if (section.item) {
+                        section.item.forEach(function (child) {
+                            if (child.item) {
+                                child.item.forEach(function (gc) {
+                                    hashAllItems[gc.linkId] = gc
+                                })
+                            } else {
+                                hashAllItems[child.linkId] = child
+                            }
+
+                        })
+                    }
+                })
+
+
+
+                let arHeader = ["Section","Group","Item","linkId","qCode","qDisplay","qSystem","Extract type","DataType","Description","Obligation","Guide","Repeats","ValueSet","oCode","oDisplay","oTerm","oSystem"]
+                arAllExport.push(arHeader.join('\t'))
                 Q.item.forEach(function (section) {
                     if (section.item) {
                         section.item.forEach(function (child) {
                             if (child.type == 'group' && child.item) {
                                 child.item.forEach(function (grandChild) {
-                                    let ar = that.makeExportOneItem(grandChild,Q,section)
-                                    if (ar.length > 0) {
-                                        ar.push("")
-                                        arAllExport = arAllExport.concat(ar)
-                                    }
+                                    let ar = that.makeExportOneItem(arAllExport,grandChild,Q,section,child,hashAllItems)
+
 
                                 })
                             } else {
                                 //this is a data item
-                                let ar = that.makeExportOneItem(child,Q,section)
-                                if (ar.length > 0) {
-                                    ar.push("")
-                                    arAllExport = arAllExport.concat(ar)
-                                }
-                                //arAllExport = arAllExport.concat(that.makeExportOneItem(child))
+                                let ar = that.makeExportOneItem(arAllExport,child,Q,section,null,hashAllItems)
+
+
+
                             }
 
                         })
@@ -40,7 +56,7 @@ angular.module("formsApp")
                 return arAllExport
             },
 
-            "UpdateFromFile" : function (item,file,Q) {
+            "UpdateFromFileDEP" : function (item,file,Q) {
                 //assume that each line is an item in the options.
                 let linkId = item.linkId    //the item being updated
                 let arFile = file.split("\r\n")
@@ -110,7 +126,7 @@ angular.module("formsApp")
                 }
 
             },
-            "makeExportOneItem" : function(item,Q,section) {
+            "makeExportOneItemOLD" : function(item,Q,section) {
                 //make an array with coding answerOptions for the item
                 let ar = []
                 let meta = formsSvc.getMetaInfoForItem(item)
@@ -145,9 +161,165 @@ angular.module("formsApp")
 
 
             },
-            "makeExportOneItemOLD" : function(item,Q) {
+            "makeExportOneItem" : function(arExport,item,Q,section,group,hashAllItems) {
                 //make an array with coding answerOptions for the item
+                let extAoTerm = "http://clinfhir.com/fhir/StructureDefinition/cs-term"
+                let meta = formsSvc.getMetaInfoForItem(item)
+
+                //create the obigation and usage nnotes first
+                let vo = makeObligation(item,section,group,meta)
+
+                let usageNotes = vo.usageNotes
+                let obligation = vo.obligation
+
+
+/*
+                Section
+                Group
+                Item
+                link Id
+                Text                ???
+                Question code
+                Question display
+                Question system
+                FHIR resource type
+                Data type
+                Options             ???
+                Description
+                Obligation
+                Guide for use
+                 Repeatable
+                Value set
+
+
+                Display*
+                Code*
+                Term*
+                System*
+                    */
+
+                //first make the summary for the item
                 let ar = []
+                ar.push(section.text)           //section
+                if (group) {                    //group
+                    ar.push(group.text)
+                } else {
+                    ar.push("")
+                }
+                ar.push(item.text)              //item
+                ar.push(item.linkId)            //linkId
+                if (item.code) {
+                    let code = item.code[0]
+                    ar.push(code.code || "")
+                    ar.push(code.display || "")
+                    ar.push(code.system || "")
+                } else {
+                    ar.push("")             //code
+                    ar.push("")             //display
+                    ar.push("")             //system
+                }
+
+                ar.push("")                 //extract resource type
+                ar.push(item.type)          //datatype
+                ar.push(meta.description || "")
+                ar.push(obligation)                 //obligation
+                ar.push(usageNotes)                 //guide for use
+
+                if (item.repeats) {
+                    ar.push("Yes")
+                } else {
+                    ar.push("No")
+                }
+                ar.push(item.answerValueSet || "")
+
+                //now add the as a line to the export file
+                arExport.push(ar.join('\t'))
+
+                //now for any options - adding code, display, term,system
+                if (item.answerOption) {
+                    item.answerOption.forEach(function (ao) {
+                        //let arStart = angular.copy(ar)
+                        let arStart = Array(ar.length).fill('');
+
+                        let coding = ao.valueCoding
+                        arStart.push(coding.code || "")
+                        arStart.push(coding.display || "")
+
+                        let arExt = formsSvc.findExtension(ao,extAoTerm)
+                        if (arExt.length > 0) {
+                            let term = arExt[0].valueString
+                            arStart.push(term)
+                        } else {
+                            arStart.push("")
+                        }
+
+                        arStart.push(coding.system || "")
+                        arExport.push(arStart.join('\t'))
+                    })
+                }
+
+
+                function getConditionalNote(item) {
+                    let note = ""
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ew) {
+
+                            let sourceItem = hashAllItems[ew.question]      //the item this one is conditional on
+                            if (sourceItem) {
+
+                                //todo need to check for other conditional operators...
+
+
+                                note += "Use when '" + sourceItem.text + "' is equal to "
+
+
+                                if (ew.answerCoding) {
+                                    note += ew.answerCoding.code
+                                    if (ew.answerCoding.display) {
+                                        note += ` (${ew.answerCoding.display})`
+                                    }
+                                } else if (ew.answerString) {
+                                    note +=  sourceItem.text + " = " + ew.answerString
+                                } else if (ew.answerBoolean) {
+                                    note += " true"
+                                } else {
+                                    note += " an unknown value"
+                                }
+
+                            } else {
+                                note += "No item with a linkId of '"+ew.question + "' was found."
+                            }
+                        })
+
+                    }
+                    return note
+
+
+                }
+
+
+                function makeObligation(item,section,group,meta) {
+                    let obligation = "Optional"
+                    let usageNotes = meta.usageNotes || ""
+                    if (item.enableWhen) {
+                        obligation = "Conditional"
+                        usageNotes += getConditionalNote(item)
+                    }
+                    //if there is a parent parameter, then this item is a member of a group. It will be conditional if the group is..
+                    if (group) {
+                        if (group.enableWhen) {
+                            obligation = "Conditional"
+                            usageNotes += getConditionalNote(parent)  //the conditional details are on the parent...
+                        }
+                    }
+                    return {obligation : obligation, usageNotes : usageNotes}
+
+                }
+
+
+
+/*
+                //let ar = []
                 if (item.answerOption && item.type == 'choice') {
                     ar.push(["Q",Q.name].join('\t'))
                     ar.push(["linkId",item.linkId].join('\t'))
@@ -173,7 +345,7 @@ angular.module("formsApp")
                 //return ar
                 return ar  // .join('\r\n')
 
-
+*/
             }
 
         }

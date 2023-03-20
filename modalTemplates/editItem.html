@@ -567,10 +567,12 @@
                         <uib-tab heading = "Table">
 
                             <table class="table table-bordered table-condensed">
-                                <tr><th>Display</th><th>Code</th><th>System</th><th></th><th></th><th></th></tr>
+                                <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th><th></th><th></th><th></th></tr>
                                 <tr ng-repeat = "option in newItem.answerOption">
+
                                     <td>{{option.valueCoding.display}}</td>
                                     <td>{{option.valueCoding.code}}</td>
+                                    <td>{{option.term}}</td>
                                     <td>
                                         {{option.valueCoding.system}}
                                     </td>
@@ -600,6 +602,7 @@
                                 <tr>
                                     <td><input type="text" class="form-control" placeholder="Display" ng-model="input.newAnswerDisplay"/> </td>
                                     <td><input type="text" class="form-control" placeholder="Code" ng-model="input.newAnswerCode"/> </td>
+                                    <td><input type="text" class="form-control" placeholder="Term" ng-model="input.newAnswerTerm"/> </td>
                                     <td>
 
                                         <select class="form-control" ng-model="input.newAnswerSystem"
@@ -612,7 +615,7 @@
                                     <td>
                                         <i ng-show="input.newAnswerDisplay"
                                            class="clickable glyphicon glyphicon-plus-sign"
-                                           ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay)"></i>
+                                           ng-click = "addAnswerOption(input.newAnswerCode,input.newAnswerSystem.url,input.newAnswerDisplay,input.newAnswerTerm)"></i>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -626,6 +629,19 @@
 
                             </textarea>
                         </uib-tab>
+                        <uib-tab heading="Edit">
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th><th></th><th></th><th></th></tr>
+                                <tr ng-repeat = "option in newItem.answerOption">
+                                    <td><input type="text" ng-model="option.valueCoding.display"/></td>
+                                    <td><input type="text" ng-model="option.valueCoding.code"/></td>
+                                    <td><input type="text" ng-model="option.term"/></td>
+                                    <td><input type="text" ng-model="option.valueCoding.system"/></td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+
+
                     </uib-tabset>
 
 

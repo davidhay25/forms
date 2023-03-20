@@ -67,6 +67,8 @@ angular.module("formsApp")
         extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
         extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
 
+        //let extAoTerm = "http://clinfhir.com/fhir/StructureDefinition/cs-term"
+
         //extensionUrl.extRenderVS = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-render-vs"
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"

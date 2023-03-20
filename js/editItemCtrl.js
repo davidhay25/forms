@@ -4,12 +4,15 @@ angular.module("formsApp")
                   $http,insertType,hashAllItems,parent,$uibModal,canEdit) {
 
 
+            let extAoTerm = "http://clinfhir.com/fhir/StructureDefinition/cs-term"
+
             $scope.canEdit = canEdit
             $scope.parent = parent
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
 
             $scope.input = {}
+            $scope.input.aoedit= {}
             $scope.input.colCount = [0,1,2,3,4]
            // $scope.input.hisoClass = ["code","free text","value","identifier","full date","partial date"]
            // $scope.input.hisoDT = ["Alphabetic (A)","Date","Date/Time","Numeric (N)","Alphanumeric (X)","Boolean"]
@@ -22,6 +25,12 @@ angular.module("formsApp")
                 if (item.answerOption) {
                     $scope.input.answerOptionsAsText = ""
                     item.answerOption.forEach(function (option) {
+                        let ar = formsSvc.findExtension(option,extAoTerm)
+                        if (ar.length > 0) {
+                            option.term = ar[0].valueString
+                        }
+
+
                         $scope.input.answerOptionsAsText += option.valueCoding.display + "\r\n"
                     })
 
@@ -528,7 +537,7 @@ angular.module("formsApp")
 
 
             //when adding a new answer option which is a Coding
-            $scope.addAnswerOption = function(code,system,display){
+            $scope.addAnswerOption = function(code,system,display,term){
                 if ($scope.newItem.answerValueSet) {
                     alert("You can't have both a ValueSet and list of options.")
                     return
@@ -539,6 +548,7 @@ angular.module("formsApp")
                 opt.valueCoding.code = code
                 opt.valueCoding.system = system
                 opt.valueCoding.display = display
+                opt.term = term
 
                 //let the selected system remain
                 delete $scope.input.newAnswerCode
@@ -586,6 +596,19 @@ angular.module("formsApp")
                     alert("You have entered text into the options box without parsing...")
                     return
                 }
+
+
+                if ($scope.newItem.answerOption) {
+                    //add the term extension if needed
+                    $scope.newItem.answerOption.forEach(function (opt) {
+                        if (opt.term) {
+                            opt.extension = []      //assume only 1 extension for now
+                            opt.extension.push({url:extAoTerm,valueString:opt.term})
+                            delete opt.term
+                        }
+                    })
+                }
+
 
                 if ($scope.input.vs && $scope.input.vs.rendermode) {
                     $scope.meta.renderVS = $scope.input.vs.rendermode
