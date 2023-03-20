@@ -161,7 +161,7 @@ angular.module("formsApp")
                                     //todo need to check for other conditional operators...
 
 
-                                    note += "Mandatory when '" + source.item.text + "' is equal to "
+                                    note += "Use when '" + source.item.text + "' is equal to "
 
 
                                     if (ew.answerCoding) {
