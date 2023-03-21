@@ -327,9 +327,12 @@ angular.module("formsApp")
 
             },
 
-            fixDependencies : function(Q,arMapping) {
+            fixDependencies : function(Q,hash,linkId) {
                 //adjust dependencies based on mapping array (produced by editCodes = but could be editItem)
-
+                //hash (map of changes) is keyed on current source system|code and contains a valueCoding
+                //eg {mysystem|mycode:{valueCoding:{system: code:}
+                //linkId is the element that was changed
+/*
                 if (arMapping.length < 1) {
                     return
                 }
@@ -341,7 +344,7 @@ angular.module("formsApp")
                     let key = map.original.valueCoding.system + "|" + map.original.valueCoding.code
                     hash[key] = map.mapped
                 })
-
+*/
                 //now go through the Q looking for dependencies that match this key and update them
 
                 if (Q.item) {
@@ -367,22 +370,18 @@ angular.module("formsApp")
                     if (item.enableWhen) {
 
                         item.enableWhen.forEach(function (dep) {
-
-                            if (dep.answerCoding) {
-                                let key = dep.answerCoding.system + "|" + dep.answerCoding.code
-                                if (hash[key]) {
-                                    //this is a dependency that may needs to be changed
-
-                                    console.log(hash[key])
-                                    dep.answerCoding.system = hash[key].valueCoding.system
-                                    dep.answerCoding.code = hash[key].valueCoding.code
-
+                            //only look to make changes if the dependency is on the item that was changed...
+                            if (dep.question == linkId) {
+                                if (dep.answerCoding) {
+                                    let key = dep.answerCoding.system + "|" + dep.answerCoding.code
+                                    if (hash[key]) {
+                                        //this is a dependency that may needs to be changed
+                                        console.log(hash[key])
+                                        dep.answerCoding.system = hash[key].valueCoding.system
+                                        dep.answerCoding.code = hash[key].valueCoding.code
+                                    }
                                 }
-
                             }
-
-
-
 
                         })
                     }

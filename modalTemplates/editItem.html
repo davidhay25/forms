@@ -631,14 +631,15 @@
                         </uib-tab>
                         <uib-tab heading="Edit">
                             <table class="table table-bordered table-condensed">
-                                <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th><th></th><th></th><th></th></tr>
+                                <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th></tr>
                                 <tr ng-repeat = "option in newItem.answerOption">
-                                    <td><input type="text" ng-model="option.valueCoding.display"/></td>
-                                    <td><input type="text" ng-model="option.valueCoding.code"/></td>
-                                    <td><input type="text" ng-model="option.term"/></td>
-                                    <td><input type="text" ng-model="option.valueCoding.system"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.display"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.code"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.term"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.system"/></td>
                                 </tr>
                             </table>
+                            <em>If the code and/or system is updated here, dependencies will also be updated.</em>
                         </uib-tab>
 
 

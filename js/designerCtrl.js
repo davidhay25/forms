@@ -319,6 +319,8 @@ angular.module("formsApp")
             }
 
             $scope.codeGroup = function (node) {
+                alert("Note that any changes here will not fix dependencies. Planning to move functionity into the item editor and deprecate this option")
+
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editCodes.html',
                     backdrop: 'static',
@@ -340,7 +342,9 @@ angular.module("formsApp")
 
 
                         //replace any dependencies on any of the options in the list
-                        qSvc.fixDependencies($scope.selectedQ,vo.mapping)
+
+                        //how passing in the hash - if I decide to keep this dialog
+                        //tmp todo qSvc.fixDependencies($scope.selectedQ,vo.mapping)
 
 
 
@@ -596,7 +600,6 @@ angular.module("formsApp")
                         $scope.itemsInDependency.push(key)
                     })
                 }
-
 
 
                 let container = document.getElementById(graphContainer);
@@ -1291,35 +1294,46 @@ return
                     }
                 }).result.then(
 
-                    function (updatedItem) {
-                        if (updatedItem) {
+                    function (vo) {
+                        if (vo) {
+                            let updatedItem = vo.item
+                            let map = vo.map
+                            if (updatedItem) {
 
-                            let originalLinkId
-                            //if the linkId has changed, then pass the original linkId into the editItem service so the original can be replaced...
-                            if (updatedItem.linkId !== item.linkId) {
-                                originalLinkId = item.linkId
+                                //actually, not allowing the linkId to be changed any more...
+                                let originalLinkId
+                                //if the linkId has changed, then pass the original linkId into the editItem service so the original can be replaced...
+                                if (updatedItem.linkId !== item.linkId) {
+                                    originalLinkId = item.linkId
+                                }
+
+                                //replace the previous item with the updated one
+                                qSvc.editItem($scope.selectedQ, updatedItem, originalLinkId)
+
+                                if (Object.keys(map).length > 0) {
+                                    //if the map has keys, then the codes for some options were changed. Check the dependencies
+                                    qSvc.fixDependencies($scope.selectedQ, map, item.linkId)
+
+                                }
+
+                                $scope.treeIdToSelect = updatedItem.linkId
+
+                                $scope.updateLocalCache()
+                                //improves the screen re-draw
+                                $timeout(
+                                    function () {
+                                        $scope.drawQ($scope.selectedQ, false)
+                                        updateReport()
+                                        $scope.makeQDependancyAudit()
+
+
+                                    }, 5
+                                )
+
+
+                                // $scope.makeQDependancyAudit()
                             }
 
-                            //replace the previous item with the updated one
-                            qSvc.editItem($scope.selectedQ,updatedItem,originalLinkId)
-
-                            $scope.treeIdToSelect = updatedItem.linkId
-                           //temp  $scope.drawQ($scope.selectedQ,false)
-                            $scope.updateLocalCache()
-
-                            //improves the screen re-draw
-                            $timeout(
-                                function(){
-                                    $scope.drawQ($scope.selectedQ,false)
-                                    updateReport()
-                                    $scope.makeQDependancyAudit()
-
-
-                                },5
-                            )
-
-
-                         // $scope.makeQDependancyAudit()
                         }
                     })
             }
@@ -1374,7 +1388,10 @@ return
                             }
                         }
                     }).result.then(
-                    function (item) {
+                    function (vo) {
+
+                        let item = vo.item
+
                         if (item) {
                             if (currentLevel == 'root') {
                                 //this is a section - directly off the root

@@ -6,11 +6,10 @@ angular.module("formsApp")
 
             let server = formsSvc.getServers().termServer //let server = "https://r4.ontoserver.csiro.au/fhir/"
 
-
-
             $scope.mode = "designer"  //other is valueSet
 
             $scope.clone = angular.copy(item)
+
             if (item.code) {
                 $scope.itemCode = item.code[0].code
             }
@@ -18,10 +17,7 @@ angular.module("formsApp")
 
             let hashConceptCode = {}
 
-            //if there is a url, retrieve any existing VS from the canshare server
-            if ($scope.clone.url) {
 
-            }
 
             $scope.save = function() {
 
@@ -37,7 +33,6 @@ angular.module("formsApp")
                     item.answerOption.forEach(function (ao,inx) {
                         let map = {original:ao,mapped:$scope.clone.answerOption[inx]}
                         arMapping.push(map)
-
                     })
                 }
 

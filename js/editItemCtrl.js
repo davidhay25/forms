@@ -23,8 +23,20 @@ angular.module("formsApp")
                 }
 
                 if (item.answerOption) {
+                    //make a copy of the original so that if codes are changes then the dependenciew can be updated
+                    $scope.originalAnswerOption = [] //angular.copy(item.answerOption)
+
+
                     $scope.input.answerOptionsAsText = ""
-                    item.answerOption.forEach(function (option) {
+                    item.answerOption.forEach(function (option,inx) {
+
+                        //add a clone of the original to the original array
+                        let clone = angular.copy(option)
+                        clone.inx = inx         //so we knwo which was the original one if the order in the list is changed
+                        option.inx = inx        //this will match the clone
+                        $scope.originalAnswerOption.push(clone)
+
+
                         let ar = formsSvc.findExtension(option,extAoTerm)
                         if (ar.length > 0) {
                             option.term = ar[0].valueString
@@ -33,8 +45,6 @@ angular.module("formsApp")
 
                         $scope.input.answerOptionsAsText += option.valueCoding.display + "\r\n"
                     })
-
-
 
                 }
             }
@@ -604,8 +614,41 @@ angular.module("formsApp")
                         if (opt.term) {
                             opt.extension = []      //assume only 1 extension for now
                             opt.extension.push({url:extAoTerm,valueString:opt.term})
-                            delete opt.term
+                            delete opt.term         //this is not al element of Coding
                         }
+                    })
+
+                }
+
+                //now create the map that can be used to update the dependencies.
+                //for each option in $scope.originalAnswerOption see what the new one is
+                let map = {}     //key is the original code & system
+                $scope.originalAnswerOption.forEach(function (originalOption) {
+                    let inx = originalOption.inx
+                    //now locate the option in newItem.answerOption that has the same inx.
+                    //we're not concerned with new ones, as they almost certainly won't have and dependencies to be updated
+                    if ($scope.newItem.answerOption) {
+                        $scope.newItem.answerOption.forEach(function (opt) {
+                            if (opt.inx == inx) {
+                                //this is the matching option (there can only be 1). Check the code+system to see if they are the same
+                                let newKey =   opt.valueCoding.system + "|" + opt.valueCoding.code  //the current key
+                                let originalKey = originalOption.valueCoding.system + "|" + originalOption.valueCoding.code //the original key
+                                if (newKey !== originalKey) {
+                                    //either the code or the system (or both) have changed. Add to the map
+                                    map[originalKey] = opt      //this will be changed
+                                }
+                            }
+
+                        })
+                    } else {
+                        //this is an item that was deleted. We don't manage that yet...
+                    }
+                })
+
+                //now we can remove the inx from the coding
+                if ($scope.newItem.answerOption) {
+                    $scope.newItem.answerOption.forEach(function (opt) {
+                        delete opt.inx
                     })
                 }
 
@@ -657,7 +700,8 @@ angular.module("formsApp")
 
                 delete $scope.newItem.tmp
 
-                $scope.$close($scope.newItem)
+                //pass back both the updated item and the map of changes to options...
+                $scope.$close({item:$scope.newItem,'map':map})
 
             }
 
