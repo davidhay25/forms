@@ -623,27 +623,30 @@ angular.module("formsApp")
                 //now create the map that can be used to update the dependencies.
                 //for each option in $scope.originalAnswerOption see what the new one is
                 let map = {}     //key is the original code & system
-                $scope.originalAnswerOption.forEach(function (originalOption) {
-                    let inx = originalOption.inx
-                    //now locate the option in newItem.answerOption that has the same inx.
-                    //we're not concerned with new ones, as they almost certainly won't have and dependencies to be updated
-                    if ($scope.newItem.answerOption) {
-                        $scope.newItem.answerOption.forEach(function (opt) {
-                            if (opt.inx == inx) {
-                                //this is the matching option (there can only be 1). Check the code+system to see if they are the same
-                                let newKey =   opt.valueCoding.system + "|" + opt.valueCoding.code  //the current key
-                                let originalKey = originalOption.valueCoding.system + "|" + originalOption.valueCoding.code //the original key
-                                if (newKey !== originalKey) {
-                                    //either the code or the system (or both) have changed. Add to the map
-                                    map[originalKey] = opt      //this will be changed
+                if ($scope.originalAnswerOption) {
+                    $scope.originalAnswerOption.forEach(function (originalOption) {
+                        let inx = originalOption.inx
+                        //now locate the option in newItem.answerOption that has the same inx.
+                        //we're not concerned with new ones, as they almost certainly won't have and dependencies to be updated
+                        if ($scope.newItem.answerOption) {
+                            $scope.newItem.answerOption.forEach(function (opt) {
+                                if (opt.inx == inx) {
+                                    //this is the matching option (there can only be 1). Check the code+system to see if they are the same
+                                    let newKey =   opt.valueCoding.system + "|" + opt.valueCoding.code  //the current key
+                                    let originalKey = originalOption.valueCoding.system + "|" + originalOption.valueCoding.code //the original key
+                                    if (newKey !== originalKey) {
+                                        //either the code or the system (or both) have changed. Add to the map
+                                        map[originalKey] = opt      //this will be changed
+                                    }
                                 }
-                            }
 
-                        })
-                    } else {
-                        //this is an item that was deleted. We don't manage that yet...
-                    }
-                })
+                            })
+                        } else {
+                            //this is an item that was deleted. We don't manage that yet...
+                        }
+                    })
+
+                }
 
                 //now we can remove the inx from the coding
                 if ($scope.newItem.answerOption) {

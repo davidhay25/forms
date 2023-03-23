@@ -32,10 +32,7 @@ angular.module("formsApp")
 
 
         return {
-            //generate the treedata for a LM
-            //the parent of an item:
-            // is the
-            //options = {arResources}
+
             //assume all references are to GUID - reference pattern = urn:uuid:{target ersource id}
 
             makeGraph: function (options) {
@@ -56,6 +53,7 @@ angular.module("formsApp")
                 options.arResources.forEach(function(item) {
                     let resource = angular.copy(item.resource)
                     arResources.push(resource)
+                    /*
                     if (resource.contained) {
                         resource.contained.forEach(function (cr) {
                             //let id = '#' + cr.id
@@ -66,13 +64,15 @@ angular.module("formsApp")
                             }
 
                         })
-                    }
+                    */
                 })
 
 
                 //create the nodes...
                 arResources.forEach(function(resource,inx) {
                     //let resource = item.resource
+                    let url = `urn:uuid:${resource.id}`
+                    /* assume uuid
                     let url = resource.id
                     if (resource.id.substr(0,1) == '#') {
                        //'# url =  "#" + resource.id    //this is to a conained resource
@@ -83,7 +83,7 @@ angular.module("formsApp")
                         //url =  "urn:uuid:" + resource.id    //assume all references are to uuids
                         url =  resource.resourceType + "/" + resource.id    //assume all references are to uuids
                     }
-
+*/
 
 
                     objNodes[url] = resource
@@ -158,7 +158,10 @@ angular.module("formsApp")
                 };
 
 
-                console.log(missingReferences)
+                if (missingReferences) {
+                    console.log(missingReferences)
+                }
+
 
                 return {graphData : data};
 

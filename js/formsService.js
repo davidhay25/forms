@@ -34,9 +34,10 @@ angular.module("formsApp")
         extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
 
         extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
-        extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
-        extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
-        extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
+        //extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
+        //extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
+        extExtractType = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+        //extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
 
         extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
 
@@ -56,7 +57,7 @@ angular.module("formsApp")
 
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
         extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
-        extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
+        //extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
         extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
 
         extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
@@ -960,9 +961,9 @@ angular.module("formsApp")
                     updateExtension(item,extUrlObsExtract,"Boolean",meta.extraction.extractObservation)
 
                     updateExtension(item,extExtractNotes,"String",meta.extraction.notes)
-                    updateExtension(item,extExtractPath,"String",meta.extraction.path)
-                    updateExtension(item,extExtractType,"String",meta.extraction.type)
-                    updateExtension(item,extExtractNone,"Boolean",meta.extraction.none)
+                    //updateExtension(item,extExtractPath,"String",meta.extraction.path)
+                    updateExtension(item,extExtractType,"Code",meta.extraction.type)
+                    //updateExtension(item,extExtractNone,"Boolean",meta.extraction.none)
 
                 }
 
@@ -1002,7 +1003,7 @@ angular.module("formsApp")
                 updateExtension(item,extVerification,"String",meta.verification)
                 updateExtension(item,extNotes,"String",meta.notes)
 
-                updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
+               // updateExtension(item,extHL7v2Mapping,"String",meta.v2mapping)
                 updateExtension(item,extHisoUOM,"String",meta.UOM)
 
                 updateExtension(item,extPlaceholder,"String",meta.placeholder)
@@ -1072,25 +1073,27 @@ angular.module("formsApp")
                     meta.extraction.notes = ar1[0].valueString
                 }
 
+                /* use the item.definition field
                 let ar1b = this.findExtension(item,extExtractPath)
                 if (ar1b.length > 0) {
                     meta.extraction = meta.extraction || {}
                     meta.extraction.path = ar1b[0].valueString
                 }
+                */
 
                 let ar1c = this.findExtension(item,extExtractType)
                 if (ar1c.length > 0) {
                     meta.extraction = meta.extraction || {}
-                    meta.extraction.type = ar1c[0].valueString
+                    meta.extraction.type = ar1c[0].valueCode
                 }
-
+/*
                 let ar1d = this.findExtension(item,extExtractNone)
                 if (ar1d.length > 0) {
                     meta.extraction = meta.extraction || {}
                     meta.extraction.none = ar1d[0].valueBoolean
                 }
 
-
+*/
                 //now look for description
                 let arDesc = this.findExtension(item,extDescription)
                 if (arDesc.length > 0) {
@@ -1187,12 +1190,12 @@ angular.module("formsApp")
                 if (ar15.length > 0) {
                     meta.notes= ar15[0].valueString
                 }
-
+/*
                 let ar16 = this.findExtension(item,extHL7v2Mapping)
                 if (ar16.length > 0) {
                     meta.v2mapping= ar16[0].valueString
                 }
-
+*/
                 let ar17 = this.findExtension(item,extHisoUOM)
                 if (ar17.length > 0) {
                     meta.UOM = ar17[0].valueString

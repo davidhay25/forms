@@ -109,8 +109,26 @@ function setup(app,sr) {
     })
 
 
-    //perform the extraction from an FSH. Used for testing and display in the EHR module
+    //use the Reference Implementation test extraction function
+    app.post('/fr/ri/testExtract',async function(req,res){
+        let bundle = req.body
+        //let url = "http://ri.canshare.co.nz:9300/testExtraction"
+        let url = "http://localhost:9300/testExtraction"
+console.log(url)
+        try {
+            let result = await axios.post(url,bundle)
+            res.json(result.data)
+        } catch (ex) {
+            if (ex.response) {
+                res.status(400).json(ex.response.data)
+            } else {
+                res.status(500).json(ex)
+            }
+        }
 
+    })
+
+    //perform the extraction from an FSH. Used for testing and display in the EHR module
     app.post('/fr/testextract',async function(req,res){
         try {
             let QR = extractQRFromBundle(req.body)

@@ -443,26 +443,35 @@
 
 
                 <div class="row">
-                    <div class="col-md-6 col-sm-6">
-                        <h3>Resource</h3>
+                    <div class="col-md-6">
+                        <br/><br/>
 
                         <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Represent as Observation
                         <br/><br/>
 
-                        <strong>Resource type</strong>
-                        <input class="form-control" ng-model="meta.extraction.type"/>
-                        <em class="pull-right">If not Observation</em>
-                        <br/><br/>
+                        <div ng-hide = "meta.extraction.extractObservation">
 
-                        <strong>Path in resource</strong>
-                        <input class="form-control" ng-model="meta.extraction.path"/>
-                        <br/><br/>
+
+                            <strong>Resource type</strong>
+                            <input class="form-control"
+                                   placeholder="eg Procedure"
+                                   ng-model="meta.extraction.type"/>
+                            <em class="pull-right">If not Observation</em>
+                            <br/><br/>
+
+                            <strong>Path in resource</strong>
+                            <input class="form-control"
+                                   ng-model="newItem.definition"/>
+
+                            <em>eg http://hl7.org/fhir/Procedure#Procedure.code</em>
+                            <br/> <br/>
+                        </div>
 
                         <strong>Resource mapping Notes</strong>
                         <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
 
                     </div>
-
+<!--
                     <div class="col-md-6 col-sm-6">
                         <br/><br/>
                         <checkbox ng-model="meta.extraction.none"> </checkbox> Not mapped
@@ -474,6 +483,8 @@
                         <strong>HL7 Version 2 notes</strong>
                         <textarea class="form-control" ng-model="meta.extraction.v2mapping"></textarea>
                     </div>
+                    -->
+
                 </div>
 
 

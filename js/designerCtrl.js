@@ -862,17 +862,94 @@ angular.module("formsApp")
             //see what resources are generated on a submit (and any errors)
             $scope.testSubmit = function () {
                 if ($scope.selectedQR) {
-                    let url = "/fr/testextract"
-
+                    //this will send the test extraxtion request to the customOps endpoint of the Reference Implementation
+                    let url = '/fr/ri/testExtract'
+                    //let url = "/fr/testextract"
+                    //need a test patient
+                    let patient = {resourceType:"Patient",id:createUUID(),name:[{text:"John Doe"}],
+                        identifier:[{system:"http://canshare.co.nz/designer", value:createUUID()}]}
+                    let bundle = {'resourceType':'Bundle',type:'transaction',entry:[]}  //was a collection type
+                    bundle.entry.push({resource:patient})
                     if ($scope.submitChart) {
                         $scope.submitChart.destroy()
                     }
 
-                    let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
+                    //add in the Q - the version we're working on won't be in the forms server
+                    //we make a clone so we can update the identifier - perhaps remove the unneeded extensions as well?
+                    let clone = angular.copy($scope.selectedQ)
+                    clone.identifier = {system:"http://canshare.co.nz/designer", value:new Date().getTime()}
+
+                    bundle.entry.push({resource:clone})
+
+                    $scope.selectedQR.questionnaire =clone.url
+                    $scope.selectedQR.identifier = {system:"http://canshare.co.nz/designer", value:createUUID()}
+                    $scope.selectedQR.subject = {reference:`urn:uuid:${patient.id}`}
+
+                    //these are created with the QR. todo - are they really needed
+                    delete $scope.selectedQR.contained
+                    delete $scope.selectedQR.author
+
                     bundle.entry.push({resource:$scope.selectedQR})
 
+
+                    //need to add a ServiceRequest
+                    let SR = {resourceType:"ServiceRequest",id:createUUID(),identifier:[{system:"http://canshare.co.nz/designer", value:createUUID()}]}
+                    SR.subject = {reference:`urn:uuid:${patient.id}`}
+                    bundle.entry.push({resource:SR})
+                    //POST the bundle to the extraction routine (the local server will call the RI)
                     $http.post(url,bundle).then(
                         function(data) {
+                            //returns {bundle: oo:}
+                            $scope.extractedResources = []
+
+                            if (data.data.bundle) {
+                                data.data.bundle.entry.forEach(function (entry) {
+                                    if (entry.resource.resourceType !== 'Questionnaire') {
+                                        //don't include the questionnnaire in the graph - it has no references
+                                        $scope.extractedResources.push({resource:entry.resource,OO:{},valie:true})
+                                    }
+
+
+                                    // todo -  convert the above to promise based...
+                                    $timeout(function(){
+                                        let vo = graphSvc.makeGraph({arResources: $scope.extractedResources})
+
+                                        let container = document.getElementById('submitGraph');
+                                        let graphOptions = {
+                                            physics: {
+                                                enabled: true,
+                                                barnesHut: {
+                                                    gravitationalConstant: -10000,
+                                                }
+                                            }
+                                        };
+                                        $scope.submitChart = new vis.Network(container, vo.graphData, graphOptions);
+
+                                        $scope.submitChart.on("click", function (obj) {
+                                            let nodeId = obj.nodes[0];  //get the first node
+                                            let node = vo.graphData.nodes.get(nodeId);
+
+                                            if (node.data && node.data.resource) {
+                                                $scope.selectResource({resource:node.data.resource,OO:{}})
+                                                $scope.$digest()
+                                            }
+
+
+
+                                        })
+
+                                        $scope.submitChart.on("stabilizationIterationsDone", function () {
+                                            $scope.submitChart.setOptions( { physics: false } );
+                                        });
+
+
+                                    },1000)  //was 2000ms
+
+
+
+                                })
+                            }
+/*
 
                             $scope.extractedResources = []
 
@@ -889,7 +966,8 @@ angular.module("formsApp")
                                     }
                                 )
                             })
-
+                            */
+/*
                             //create the graph
                             // todo -  convert the above to promise based...
                             $timeout(function(){
@@ -926,14 +1004,23 @@ angular.module("formsApp")
 
                             },2000)
 
-
+*/
 
                         }, function(err) {
                             alert(angular.toJson(err.data))
-                            console.log(err)
+                            console.log(err.data)
                         }
                     )
                 }
+
+
+                function createUUID() {
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    })
+                }
+
             }
 
             $scope.selectResource = function(item) {

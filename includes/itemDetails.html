@@ -205,18 +205,18 @@
     </div>
     <div class="col-md-9">
 
-
+<!--
       <div ng-show="selectedNode.data.meta.extraction.none">
         No Mapping defined
       </div>
-
+-->
       <div ng-show="selectedNode.data.meta.extraction.extractObservation">
         Extract as Observation
       </div>
 
-      <div ng-show="selectedNode.data.meta.extraction.type || selectedNode.data.meta.extraction.path">
+      <div ng-show="selectedNode.data.meta.extraction.type || selectedNode.data.item.definition">
         <span ng-show="selectedNode.data.meta.extraction.type">Type: </span>{{selectedNode.data.meta.extraction.type}}
-        <span ng-show="selectedNode.data.meta.extraction.path"> Path: </span>{{selectedNode.data.meta.extraction.path}}
+        <span ng-show="selectedNode.data.item.definition"> Path: </span>{{selectedNode.data.item.definition}}
       </div>
 
 
