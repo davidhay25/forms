@@ -8,6 +8,22 @@ angular.module("formsApp")
 
             $scope.canEdit = canEdit
             $scope.parent = parent
+
+            //Used by mapping so we can show the extraction resource type - parentMeta.extraction.type
+            if (parent) {
+                $scope.parentMeta = formsSvc.getMetaInfoForItem(parent.item)
+            }
+
+            //set the full definition value for a definition based resource extraction mapping
+            $scope.completeMappingPath = function (text) {
+                if ($scope.parentMeta) {
+                    let type = $scope.parentMeta.extraction.type
+
+                    $scope.newItem.definition = `http://hl7.org/fhir/${type}#${type}.${text}`
+                }
+
+            }
+
             $scope.editType = editType  //editType id 'new' or 'edit'
             $scope.insertType = insertType  //insertType is 'section' or 'child' or 'grandchild' ?or group
 

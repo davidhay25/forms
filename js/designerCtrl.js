@@ -15,9 +15,6 @@ angular.module("formsApp")
                 function(data) {
                     $scope.systemConfig = data.data
                     console.log($scope.systemConfig)
-                    //if ($scope.systemConfig.type == 'public') {
-                       // alert("You can't edit Standards directly on the public site. The app will be set to read-only (ie checkout will be disabled).")
-                    //}
                 }
             )
 
@@ -27,6 +24,47 @@ angular.module("formsApp")
                     $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
 
                 }
+            }
+
+            //update the Q context.
+            $scope.updateContext = function(ctxString) {
+                let ar = []
+                //need to preserve other contexts
+                if ($scope.selectedQ.useContext) {
+                    $scope.selectedQ.useContext.forEach(function (uc) {
+                        if (uc.code !== 'canshare') {
+                            ar.push(uc)
+                        }
+                    })
+                }
+                //at this point have all other contexts
+                ar.push({code:'canshare',valueCodeableConcept:{text:ctxString}})
+                $scope.selectedQ.useContext = ar
+
+                $scope.updateLocalCache()
+
+            }
+
+            $scope.addProcedure = function() {
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    templateUrl: 'modalTemplates/addProcedure.html',
+                    controller: 'addProcedureCtrl'
+                }).result.then(
+                    function (group) {
+                        if (group) {
+                            let parentLinkId = node.data.item.linkId
+
+                            $scope.selectedQ = qSvc.addItem($scope.selectedQ,parentLinkId,group)
+                            $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
+                            $scope.updateLocalCache()
+                            $scope.input.dirty = true;
+
+                            updateReport()
+                            $scope.makeQDependancyAudit()
+                        }
+                    })
             }
 
             $scope.HISOdomainPopover = function(entry){
@@ -73,6 +111,8 @@ angular.module("formsApp")
             $scope.input = {}
 
             $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display','quantity']
+
+            $scope.input.arQContext = ['report','request','general']
 
             //$scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
 
@@ -307,8 +347,6 @@ angular.module("formsApp")
                             $scope.drawQ($scope.selectedQ,false)    //will re-create the tree...
                             $scope.updateLocalCache()
                             $scope.input.dirty = true;
-
-
 
                             updateReport()
                             $scope.makeQDependancyAudit()
@@ -1582,7 +1620,7 @@ return
                 delete $scope.input.hisoStatus
                 delete $scope.dependencyAudit
 
-                //$timeout(function(){},1)
+
 
                 let qry = `/ds/fhir/Questionnaire/${QtoSelect.id}`
                 let now = new Date(), start = new Date()
@@ -1677,8 +1715,22 @@ return
                 //delete $scope.showLoading
                 $scope.selectedQ = Q
 
-                $scope.checkoutIdentifier = formsSvc.getCheckoutIdentifier(Q)  //the identifier of who has checked this out (if any)
+                //set the context of use
+                delete $scope.currentQContext
+                if (Q.useContext && Q.useContext.length > 0) {      //only look at the first UC for now.
+                    Q.useContext.forEach(function (uc) {
+                        if (uc.code == 'canshare') {
+                            //todo - for now, just use the CC.text element. add coding later...
+                            $scope.input.currentQContext = uc.valueCodeableConcept.text
+                        }
 
+
+                    })
+
+
+                }
+
+                $scope.checkoutIdentifier = formsSvc.getCheckoutIdentifier(Q)  //the identifier of who has checked this out (if any)
                 $scope.input.hisoStatus = formsSvc.getHisoStatus(Q)
                 $scope.input.hisoNumber = formsSvc.getHisoNumber(Q)
                 now = new Date()
@@ -1689,6 +1741,7 @@ return
                 $scope.hisoElementsList = formsSvc.getHisoElementsList(Q)
                 $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
                 $scope.makeQDependancyAudit()
+
                 makeCsvAndDownload(Q,vo.hashAllItems)
                 makeQDownload(Q)
 

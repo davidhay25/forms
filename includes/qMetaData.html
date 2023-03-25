@@ -115,6 +115,23 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-3">
+                    Context of use
+                </div>
+                <div class="col-md-9">
+                    <select class="form-control" ng-model="input.currentQContext"
+                            ng-change="updateContext(input.currentQContext)"
+                            ng-options="ctx for ctx in input.arQContext">
+
+
+                    </select>
+
+
+
+                </div>
+            </div>
+
 
             <div class="row">
                 <div class="col-md-3">

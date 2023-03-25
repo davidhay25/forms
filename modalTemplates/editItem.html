@@ -444,33 +444,68 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <br/><br/>
 
-                        <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Represent as Observation
-                        <br/><br/>
+                        <div ng-hide="newItem.type == 'group' || parentMeta.extraction.type">
+                            <br/><br/>
+                            <checkbox ng-model="meta.extraction.extractObservation"> </checkbox> Represent as Observation
+                        </div>
+
+
 
                         <div ng-hide = "meta.extraction.extractObservation">
 
 
-                            <strong>Resource type</strong>
-                            <input class="form-control"
-                                   placeholder="eg Procedure"
-                                   ng-model="meta.extraction.type"/>
-                            <em class="pull-right">If not Observation</em>
-                            <br/><br/>
+                            <div ng-show = "newItem.type == 'group'">
+                                <strong>Resource type</strong>
+                                <input class="form-control"
+                                       placeholder="eg Procedure"
+                                       ng-model="meta.extraction.type"/>
 
-                            <strong>Path in resource</strong>
-                            <input class="form-control"
-                                   ng-model="newItem.definition"/>
+                                <span class="clickable"
+                                      ng-click="meta.extraction.type = 'Procedure'">Procedure</span>
+                                <span class="clickable"
+                                      ng-click="meta.extraction.type = 'Condition'">Condition</span>
 
-                            <em>eg http://hl7.org/fhir/Procedure#Procedure.code</em>
-                            <br/> <br/>
+                                <em class="pull-right">If not Observation</em>
+                                <br/><br/>
+                            </div>
+
+                            <div ng-hide = "newItem.type == 'group'">
+
+                                <div ng-show="parentMeta.extraction.type">
+
+                                    Extracted resource type: {{parentMeta.extraction.type}}
+                                    <br/><br/>
+                                </div>
+
+
+                                <strong>Path in resource</strong>
+                                <input class="form-control"
+                                       ng-model="newItem.definition"/>
+
+                                <em>eg http://hl7.org/fhir/Procedure#Procedure.code</em>
+                                <div class="clickable pull-right"
+                                     ng-click="completeMappingPath(newItem.definition)">Complete</div>
+
+                                <br/> <br/>
+                            </div>
+
+
+
+
+
+
+
                         </div>
 
-                        <strong>Resource mapping Notes</strong>
-                        <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
+
 
                     </div>
+                    <div class="col-md-6">
+                        <strong>Resource mapping Notes</strong>
+                        <textarea class="form-control" ng-model="meta.extraction.notes"> </textarea>
+                    </div>
+
 <!--
                     <div class="col-md-6 col-sm-6">
                         <br/><br/>

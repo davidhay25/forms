@@ -1,0 +1,73 @@
+
+<div>
+    <!--<div ng-controller="newResourceCtrl">-->
+    <style>
+        .model-vlg {
+
+        }
+    </style>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-7 col-sm-7">
+                <h3 class="modal-title">Add procedure question</h3>
+            </div>
+
+            <div class="col-md-5 col-sm-5">
+
+                <button ng-show="input.userText" class="btn btn-primary pull-right" ng-click="save()">Add question</button>
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-sm-6">
+                Patterns:
+                <ul class="list-group">
+
+                    <li class="list-group-item"
+                        ng-click="selectPattern(pattern)"
+                        ng-repeat="pattern in patterns">
+                        {{pattern.display}}
+                    </li>
+
+                </ul>
+            </div>
+            <div class="col-sm-6">
+
+                <strong>Question text to display to the user</strong>
+                <input type="text" class="form-control" ng-model="input.userText"/>
+
+                <br/>
+
+                <div ng-show="input.selectedPattern.key=='specify-coding'">
+                    <strong>Text for 'yes, it was done'</strong>
+                    <input type="text" class="form-control" ng-model="input.yesText"/>
+                    <br/>
+                    <strong>Text for 'no, it was not done'</strong>
+                    <input type="text" class="form-control" ng-model="input.noText"/>
+                    <br/>
+                </div>
+
+                <checkbox></checkbox> Should a negative answer still create a Procedure
+
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+
+
+    <div class="modal-header">
+
+    </div>
+</div>
