@@ -21,6 +21,10 @@
 
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
+
+
+
+
     <style>
         .myScroll {
             height: 500px;
@@ -71,6 +75,11 @@
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+
 
     <style>
         #graph {
@@ -291,6 +300,15 @@
 
                 <uib-tabset  ng-show="selectedQ">
 
+                    <!--
+
+                    <uib-tab heading = "Forms directive">
+                        <renderform q="selectedQ" qr="formQR"></renderform>
+                    </uib-tab>
+
+                    -->
+
+
                     <uib-tab>
                         <uib-tab-heading>
                             <span>Form</span>
@@ -347,11 +365,20 @@
                                     </div>
                                 </div>
 
+
+                                <renderform q="selectedQ" qr="formQR"></renderform>
+
+                                <!-- this was the original form...
+
                                 <div ng-controller="formsCtrl">
 
                                     <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
 
                                 </div>
+                                -->
+
+
+
                             </div>
 
                             <div class="col-md-2">

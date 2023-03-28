@@ -120,14 +120,11 @@
                     Context of use
                 </div>
                 <div class="col-md-9">
-                    <select class="form-control" ng-model="input.currentQContext"
+                    <select  ng-disabled="miniQ.checkedoutTo !== 'me'" class="form-control" ng-model="input.currentQContext"
                             ng-change="updateContext(input.currentQContext)"
                             ng-options="ctx for ctx in input.arQContext">
 
-
                     </select>
-
-
 
                 </div>
             </div>

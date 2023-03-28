@@ -359,7 +359,10 @@ angular.module("formsApp")
                         break
                     case "choice" :
                     case "open-choice":
-                        ew.answerCoding = $scope.input.ewAnswerConcept.valueCoding
+                        if ($scope.input.ewAnswerConcept) {
+                            ew.answerCoding = $scope.input.ewAnswerConcept.valueCoding
+                        }
+
                         break
                 }
                 $scope.newItem.enableWhen = $scope.newItem.enableWhen || []
@@ -664,10 +667,11 @@ angular.module("formsApp")
 
                 }
 
-                //now we can remove the inx from the coding
+                //now we can remove the inx and term from the coding
                 if ($scope.newItem.answerOption) {
                     $scope.newItem.answerOption.forEach(function (opt) {
                         delete opt.inx
+                        delete opt.term
                     })
                 }
 

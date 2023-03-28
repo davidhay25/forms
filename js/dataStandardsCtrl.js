@@ -46,6 +46,15 @@ angular.module("formsApp")
                 }
             }
 
+
+
+            //when the forms directive creates a QR it emits this event
+            $scope.$on('qrCreated',function(event,vo1) {
+
+
+                $scope.formQR = vo1.QR
+            })
+
             //functions to support form submission
 
             //the QR is created in formsCtrl, but we need it in this scope and using the reviewer details
@@ -58,14 +67,22 @@ angular.module("formsApp")
                 $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
                     $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
 
+
+
+
+
             }
 
+/*
             $scope.$on("qrCreated",function(ev,qr){
+                console.log("qrCreated event called")
                 //need to construct a QR that has the reviewers name in it.
-                makeQR()
+                //temp  - don't want to do this right now  makeQR()
                //console.log($scope.formQR)
 
            })
+*/
+
 
             $scope.showAboutSite = function() {
                 let allClosed = true
@@ -104,8 +121,6 @@ angular.module("formsApp")
                 }
 
 
-
-
             }
 
 
@@ -120,7 +135,7 @@ angular.module("formsApp")
 
 
                         //doesn't work - https://stackoverflow.com/questions/22189544/print-a-div-using-javascript-in-angularjs-single-page-application#22189651
-                        $scope.printDEP = function () {
+                        $scope.print = function () {
 
                             let divName = "onePagePreview"
 
@@ -203,7 +218,9 @@ angular.module("formsApp")
                 //$scope.makeQR()  //updates $scope.QR
                 //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
 
-                if ($scope.formQR.item.length == 0) {
+
+
+                if (! $scope.formQR ||  $scope.formQR.item.length == 0) {
                     alert("You must enter some data first!")
                     return
                 }
@@ -215,7 +232,61 @@ angular.module("formsApp")
 
                 if (confirm("Are you sure you're ready to submit this form? You should only do this once the form is complete.")){
 
-                    makeQR()        //make a final copy of the QR that definately has the revieers details in it
+
+                    //now need to add the review details to the QR - in $scope.formQR
+                    //
+
+
+                   // $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
+                     //   $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
+
+
+                    let reviewerName = $scope.input.reviewerName
+                    let reviewOrganization = $scope.input.reviewerOrganization
+                    let reviewerEmail = $scope.input.reviewerEmail
+
+                    //the author will always be a PR
+                    let PR = {resourceType:"PractitionerRole",id:"pr1"}
+
+
+                    let display = ""
+
+                    PR.practitioner = {display: reviewerName}
+                    display += reviewerName
+
+/*
+                    if (practitioner) {
+                        PR.practitioner = {reference:practitioner}
+                        if (practitioner.name) {
+                            display += getHN(practitioner.name[0])
+                        }
+                    } else {
+                        let practitionerName = reviewerName || "No practitioner supplied"
+                        PR.practitioner = {display: practitionerName}
+                        display += practitionerName
+                    }
+                    */
+
+                    if (reviewOrganization) {
+                        PR.organization = {display:reviewOrganization}
+                        display += " at " + reviewOrganization
+                    }
+
+                    if (reviewerEmail) {
+                        PR.telecom = [{system:'email',value:reviewerEmail}]
+
+                    }
+                    PR.text = {status:'generated'}
+                    PR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>"+display+"</div>"
+
+                    $scope.formQR.contained = [PR]
+                    $scope.formQR.author = {reference:'#pr1',display:display}
+
+
+
+                    //-------------------------------------------
+
+                    //makeQR()        //make a final copy of the QR that definately has the revieers details in it
                     let bundle = {'resourceType':'Bundle',type:'collection',entry:[]}
 
                     if (! $scope.input.canPublish) {
@@ -446,6 +517,7 @@ angular.module("formsApp")
 
             }
 
+            //all the function to display a Q - called from $scope. loadQ()
             $scope.viewModel = function(Q) {
 
                 delete $scope.errorOO

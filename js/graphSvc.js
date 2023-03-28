@@ -158,7 +158,7 @@ angular.module("formsApp")
                 };
 
 
-                if (missingReferences) {
+                if (missingReferences && Object.keys(missingReferences).length > 0) {
                     console.log(missingReferences)
                 }
 

@@ -136,7 +136,10 @@
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
 
+    <!-- temp
     <script src="js/formsCtrl.js"></script>
+
+    -->
     <script src="js/formReviewsCtrl.js"></script>
     <script src="js/qSvc.js"></script>
     <script src="js/newQCtrl.js"></script>
@@ -171,6 +174,11 @@
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+
 
     <script>
         const firebaseConfig = {
@@ -811,14 +819,27 @@
                                     <br/>
 
 
-                                    <div ng-controller="formsCtrl">
-                                            <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
+
+                                    <renderform q="selectedQ" qr="selectedQR"></renderform>
+
+
+                                    <!--
+                                      <div ng-controller="formsCtrl">
+                                        <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
                                     </div>
+
+                                    -->
+
 
                                 </uib-tab>
 
+
+
                                 <uib-tab heading = "Preview">
+                                    <qrdisplay qr="selectedQR" q="selectedQ"></qrdisplay>
+                                    <!--
                                     <ng-include src = "'includes/renderFormForDisplay.html'"></ng-include>
+                                    -->
                                 </uib-tab>
 
 
@@ -840,7 +861,7 @@
                                 </uib-tab>
 
                                 <uib-tab ng-show="selectedQR" heading = "Test QR submission">
-                                    <button class="btn btn-link pull-right" ng-click="testSubmit()">Test submission</button>
+                                    <button class="btn btn-link pull-right" ng-click="testSubmit(selectedQR)">Test submission</button>
 
                                     <div class="row">
                                         <div class="col-md-3">
@@ -851,8 +872,11 @@
                                                      ng-repeat = "item in extractedResources">
 
                                                     <span class="pull-right">
+                                                        <span class="badge">{{item.OO.length}}</span>
+                                                        <!--
                                                         <i ng-show = "item.valid" style="color: green" class="glyphicon glyphicon-thumbs-up"></i>
                                                         <i ng-hide = "item.valid" style="color: red" class="glyphicon glyphicon-thumbs-down"></i>
+                                                        -->
                                                     </span>
 
                                                     {{item.resource.resourceType}}
@@ -869,11 +893,21 @@
                                                 <uib-tab heading="Json">
                                                     <pre>{{selectedResource | json}}</pre>
                                                 </uib-tab>
-                                                <uib-tab heading="Validation result">
+
+                                                <uib-tab>
+                                                    <uib-tab-heading>Validation Summary <span class="badge">{{selectedResourceValidation.length}}</span> </uib-tab-heading>
+                                                    <ul>
+                                                        <li ng-repeat = "iss in selectedResourceValidation">
+                                                            {{iss.diagnostics}}
+                                                        </li>
+                                                    </ul>
+
+
+                                                </uib-tab>
+                                                <uib-tab heading="Validation details">
                                                     <pre>{{selectedResourceValidation | json}}</pre>
 
                                                 </uib-tab>
-
                                             </uib-tabset>
 
                                         </div>

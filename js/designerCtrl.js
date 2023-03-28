@@ -17,6 +17,23 @@ angular.module("formsApp")
                     console.log($scope.systemConfig)
                 }
             )
+/*
+            //when the forms directive in forms preview creates a QR it emits this event
+            $scope.$on('qrCreated',function(event,vo1) {
+             //   $scope.selectedQR = vo1.QR
+            })
+*/
+
+/*
+            $scope.$watch('selectedQ',function(){
+                console.log("Hit!")
+                $scope.$broadcast("q-updated")
+            })
+
+
+*/
+
+
 
             $scope.updateAllHiso = function(){
                 if (confirm("This will update all HISO information to default values (apart from Uniot Of Measure). Are you sure you want to do this?")){
@@ -32,13 +49,16 @@ angular.module("formsApp")
                 //need to preserve other contexts
                 if ($scope.selectedQ.useContext) {
                     $scope.selectedQ.useContext.forEach(function (uc) {
-                        if (uc.code !== 'canshare') {
-                            ar.push(uc)
+                        if (uc.code) {
+                            if (uc.code.system !== 'http://canshare.co.nz/CodeSystem/Questionnaire' && uc.code.code !== "qtype") {
+                                ar.push(uc)
+                            }
                         }
+
                     })
                 }
                 //at this point have all other contexts
-                ar.push({code:'canshare',valueCodeableConcept:{text:ctxString}})
+                ar.push({code:{system:'http://canshare.co.nz/CodeSystem/questionnaire-options',code:'qtype'},valueCodeableConcept:{text:ctxString}})
                 $scope.selectedQ.useContext = ar
 
                 $scope.updateLocalCache()
@@ -92,10 +112,13 @@ angular.module("formsApp")
                 updateReport()
             })
 
+            /*
             //When the QR is created in formCtrl it emits an event
             $scope.$on('qrCreated',function(evt,qr){
                 $scope.selectedQR = qr
             })
+
+            */
 
             //load all the disposition Observations for a Q
             $scope.loadDispositionsForQDEP = function(Q) {
@@ -898,8 +921,8 @@ angular.module("formsApp")
             //let termServer = "https://r4.ontoserver.csiro.au/fhir/"
 
             //see what resources are generated on a submit (and any errors)
-            $scope.testSubmit = function () {
-                if ($scope.selectedQR) {
+            $scope.testSubmit = function (QR) {
+                if (QR) {
                     //this will send the test extraxtion request to the customOps endpoint of the Reference Implementation
                     let url = '/fr/ri/testExtract'
                     //let url = "/fr/testextract"
@@ -907,7 +930,7 @@ angular.module("formsApp")
                     let patient = {resourceType:"Patient",id:createUUID(),name:[{text:"John Doe"}],
                         identifier:[{system:"http://canshare.co.nz/designer", value:createUUID()}]}
                     let bundle = {'resourceType':'Bundle',type:'transaction',entry:[]}  //was a collection type
-                    bundle.entry.push({resource:patient})
+                    bundle.entry.push({resource:patient,fullUrl:`urn:uuid:${patient.id}`})
                     if ($scope.submitChart) {
                         $scope.submitChart.destroy()
                     }
@@ -917,37 +940,69 @@ angular.module("formsApp")
                     let clone = angular.copy($scope.selectedQ)
                     clone.identifier = {system:"http://canshare.co.nz/designer", value:new Date().getTime()}
 
-                    bundle.entry.push({resource:clone})
+                    bundle.entry.push({resource:clone,fullUrl:`urn:uuid:${clone.id}`})
 
-                    $scope.selectedQR.questionnaire =clone.url
-                    $scope.selectedQR.identifier = {system:"http://canshare.co.nz/designer", value:createUUID()}
-                    $scope.selectedQR.subject = {reference:`urn:uuid:${patient.id}`}
+                    QR.questionnaire =clone.url
+                    QR.identifier = {system:"urn:ietf:rfc:3986", value:"urn:uuid:" + createUUID()}
+                    QR.subject = {reference:`urn:uuid:${patient.id}`}
 
                     //these are created with the QR. todo - are they really needed
-                    delete $scope.selectedQR.contained
-                    delete $scope.selectedQR.author
+                    delete QR.contained
+                    delete QR.author
 
-                    bundle.entry.push({resource:$scope.selectedQR})
+                    bundle.entry.push({resource:QR,fullUrl:`urn:uuid:${QR.id}`})
 
 
                     //need to add a ServiceRequest
                     let SR = {resourceType:"ServiceRequest",id:createUUID(),identifier:[{system:"http://canshare.co.nz/designer", value:createUUID()}]}
                     SR.subject = {reference:`urn:uuid:${patient.id}`}
-                    bundle.entry.push({resource:SR})
+                    SR.status = "active"
+                    SR.intent = "order"
+                    bundle.entry.push({resource:SR,fullUrl:`urn:uuid:${SR.id}`})
                     //POST the bundle to the extraction routine (the local server will call the RI)
                     $http.post(url,bundle).then(
                         function(data) {
                             //returns {bundle: oo:}
                             $scope.extractedResources = []
 
+                            //make an array of OO issues by location. Ignore issues with no location
+                            let issueSummary = {}
+                            if (data.data.oo) {
+                                data.data.oo.issue.forEach(function (iss) {
+                                    if (iss.location) {
+                                        //only take the first location - the second is the line number in the bundle...
+
+                                        let ar = iss.location[0].split('[')
+                                        if (ar.length > 1) {
+                                            let l = ar[1]   // 2].resource
+                                            let g = l.indexOf(']')
+                                            let pos = l.slice(0,g)      //this is the position in the bundle
+                                            issueSummary[pos] = issueSummary[pos] || []
+                                            issueSummary[pos].push(iss)
+
+                                            //console.log(pos + " " + iss.location)
+
+                                        } else {
+                                            console.log(iss.location + " can't determine location")
+                                        }
+                                    }
+                                })
+                            }
+
+
                             if (data.data.bundle) {
-                                data.data.bundle.entry.forEach(function (entry) {
+                                data.data.bundle.entry.forEach(function (entry,inx) {
                                     if (entry.resource.resourceType !== 'Questionnaire') {
                                         //don't include the questionnnaire in the graph - it has no references
-                                        $scope.extractedResources.push({resource:entry.resource,OO:{},valie:true})
+                                        let ar = issueSummary[inx]
+                                        $scope.extractedResources.push({
+                                            resource: entry.resource,
+                                            OO: ar,
+                                            valid: true
+                                        })
                                     }
 
-
+                                })
                                     // todo -  convert the above to promise based...
                                     $timeout(function(){
                                         let vo = graphSvc.makeGraph({arResources: $scope.extractedResources})
@@ -971,21 +1026,15 @@ angular.module("formsApp")
                                                 $scope.selectResource({resource:node.data.resource,OO:{}})
                                                 $scope.$digest()
                                             }
-
-
-
                                         })
-
                                         $scope.submitChart.on("stabilizationIterationsDone", function () {
                                             $scope.submitChart.setOptions( { physics: false } );
                                         });
-
-
                                     },1000)  //was 2000ms
 
 
 
-                                })
+                              //  })
                             }
 /*
 
@@ -1352,6 +1401,7 @@ return
 
                     updateReport()
                 }
+                $scope.$broadcast("q-updated")      //for the forms directive
 
 
 
@@ -1432,6 +1482,11 @@ return
                                     originalLinkId = item.linkId
                                 }
 
+                                //todo - to test out the directive
+                                $scope.input.selectedQ = $scope.selectedQ
+
+                                $scope.$broadcast("q-updated")
+
                                 //replace the previous item with the updated one
                                 qSvc.editItem($scope.selectedQ, updatedItem, originalLinkId)
 
@@ -1440,9 +1495,8 @@ return
                                     qSvc.fixDependencies($scope.selectedQ, map, item.linkId)
 
                                 }
-
                                 $scope.treeIdToSelect = updatedItem.linkId
-
+                                $scope.$broadcast("q-updated")      //for the forms directive
                                 $scope.updateLocalCache()
                                 //improves the screen re-draw
                                 $timeout(
@@ -1542,6 +1596,8 @@ return
                            // $scope.input.dirty = true;
 
                             //updateReport()
+
+                            $scope.$broadcast("q-updated")      //for the forms directive
 
                             //improves the screen re-draw
                             $timeout(
@@ -1713,16 +1769,20 @@ return
             //set up the UI for the selected Q
             function processQ(Q) {
                 //delete $scope.showLoading
+                delete $scope.input.currentQContext
                 $scope.selectedQ = Q
 
                 //set the context of use
                 delete $scope.currentQContext
                 if (Q.useContext && Q.useContext.length > 0) {      //only look at the first UC for now.
                     Q.useContext.forEach(function (uc) {
-                        if (uc.code == 'canshare') {
+
+
+                        if (uc.code.system == 'http://canshare.co.nz/CodeSystem/questionnaire-options' && uc.code.code == "qtype") {
                             //todo - for now, just use the CC.text element. add coding later...
                             $scope.input.currentQContext = uc.valueCodeableConcept.text
                         }
+
 
 
                     })
@@ -1919,14 +1979,7 @@ return
                         $("#designTree").jstree("select_node",  $scope.treeIdToSelect);
                         delete $scope.treeIdToSelect
                     }
-/*
-                    //restore state
-                    $scope.treeData.forEach(function(node){
-                        if (node.id == data.node.id){
-                            node.state.opened = data.node.state.opened;
-                        }
-                    });
-*/
+
 
                 })
             }

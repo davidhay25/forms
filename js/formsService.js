@@ -14,59 +14,60 @@ angular.module("formsApp")
         let extensionUrl = {}
 
         //termServer = "https://r4.ontoserver.csiro.au/fhir/"
-        termServer = "https://terminz.azurewebsites.net/fhir/"
+        let termServer = "https://terminz.azurewebsites.net/fhir/"
 
-        validationServer = "http://localhost:9099/baseR4/"
+        let validationServer = "http://localhost:9099/baseR4/"
 
-        HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
+        let HPIRoot = "http://home.clinfhir.com:8054/baseR4/"
 
-        csHisoNumber = "https://standards.digital.health.nz/ns/hiso-number"
+        let csHisoNumber = "https://standards.digital.health.nz/ns/hiso-number"
 
-        extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
-        extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
-        extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
-        extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+        let extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        let extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+        let extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
+        let extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
 
         //todo fsh doesn't underatnd expression extension...
         //extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
 
-        extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
+        let extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
 
-        extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
+        let extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
         //extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
-        //extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
-        extExtractType = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+        // let extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
+
+        let extExtractType = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         //extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
 
-        extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
+        let extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
 
-        extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
-        extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
+        let extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
+        let extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
 
-        extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
+        let extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
-        extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
-        extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
-        extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
-        extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
+        let extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
+        let extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
+        let extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
+        let extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
 
-        extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
-        extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
-        extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
+        let extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
+        let extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
+        let extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
        // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
-        extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
+        let extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
         //extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
-        extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
+        let extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
 
-        extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
-        extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
+        let extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
+        let extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
 
-        extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
+        let extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
 
-        extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
-        extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
+        let extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
+        let extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
 
         //let extAoTerm = "http://clinfhir.com/fhir/StructureDefinition/cs-term"
 
@@ -74,7 +75,7 @@ angular.module("formsApp")
         extensionUrl.extCanPublish = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer"
         extensionUrl.extPublishOia = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaireresponse-can-publish-reviewer-oia"
 
-        canShareServer = "http://canshare/fhir/"
+        let canShareServer = "http://canshare/fhir/"
 
         //ballotList
 
