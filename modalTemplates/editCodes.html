@@ -58,7 +58,7 @@
 
                     <div class="row">
                         <div class="col-md-8">
-                            <input autoFocus class='form-control' type="text" ng-model="itemCode"/>
+                            <input autoFocus disabled="disabled" class='form-control' type="text" ng-model="itemCode"/>
                         </div>
                         <div class="col-md-4">
                             <button class="btn btn-link" ng-click="selectConcept(null,itemCode)">Check</button>
@@ -73,10 +73,10 @@
                                 <!--
                                 {{row.valueCoding.display}}
 -->
-                                <input type="text" class="form-control" ng-model="row.valueCoding.display"/>
+                                <input disabled="disabled" type="text" class="form-control" ng-model="row.valueCoding.display"/>
 
                             </td>
-                            <td> <input type="text" class="form-control" ng-model="row.valueCoding.code"/></td>
+                            <td> <input disabled="disabled" type="text" class="form-control" ng-model="row.valueCoding.code"/></td>
                             <td><button class="btn btn-link" ng-click="selectConcept(row,row.valueCoding.code)">Check</button> </td>
                         </tr>
                     </table>

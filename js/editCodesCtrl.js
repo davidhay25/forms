@@ -73,7 +73,11 @@ angular.module("formsApp")
             $scope.selectConcept = function (ao,code) {
                 $scope.selectedAnswerOption = ao
                 delete $scope.err
-                code = code || "195967001"
+                if (! code) {
+                    alert("There isn't aan item code, so I'll use asthma (195967001) just to show you how it works")
+                    code = code || "195967001"
+                }
+
 
                 delete $scope.children
                 delete $scope.parents

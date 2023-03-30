@@ -380,7 +380,7 @@ angular.module("formsApp")
             }
 
             $scope.codeGroup = function (node) {
-                alert("Note that any changes here will not fix dependencies. Planning to move functionity into the item editor and deprecate this option")
+                alert("Note that this is view only as any changes here will not fix dependencies. May allow this later...")
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editCodes.html',

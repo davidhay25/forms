@@ -1,0 +1,59 @@
+<div>
+  <div class="row">
+    <div class="col-md-6">
+
+      <br/>
+
+      <div id="reviewTree"></div>
+    </div>
+
+    <div class="col-md-6">
+
+
+
+      <uib-tabset>
+        <uib-tab heading="Item details">
+            <div class="banner"> {{selectedNode.data.item.text}}</div>
+
+            <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
+
+
+
+        </uib-tab>
+
+        <uib-tab heading="report">
+          <qrdisplay q="q" qr="qr"></qrdisplay>
+
+        </uib-tab>
+
+          <uib-tab heading="QR Json">
+            <pre>{{qr | json}}</pre>
+          </uib-tab>
+
+
+        <uib-tab heading="Json">
+          <pre>{{selectedNode.data.item | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+
+      <div>
+        <h4>Review comments</h4>
+        <div ng-repeat = "item in selectedNode.data.section.reviewItem">
+          {{item.text}}
+          <textarea class="form-control" ng-model="form[item.linkId]"></textarea>
+        </div>
+
+        <!--
+        <pre>{{selectedNode.data.section.reviewItem | json}}</pre>
+        -->
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+</div>

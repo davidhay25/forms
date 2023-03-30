@@ -19,6 +19,9 @@ angular.module('formsApp')
                     console.log("q updated broadcast")
                     if ($scope.q) {
                         $timeout(function(){
+
+                            $scope.form = {}    //todo - is this right re-set all the form data when re-building the template
+
                             let vo = renderFormsSvc.makeFormTemplate($scope.q, $scope.form)
                             if (vo) {
                                 $scope.formTemplate = vo.template
@@ -49,6 +52,9 @@ angular.module('formsApp')
                        console.log('watch')
                         delete $scope.selectedSection       //c;ears the current section display
                         if ($scope.q) {
+
+
+
                             let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
                             if (vo) {
                                 $scope.formTemplate = vo.template
@@ -77,7 +83,7 @@ angular.module('formsApp')
                 //when a top level item is selected in the tabbed interface
                 $scope.selectSection = function(section) {
                     $scope.selectedSection = section
-                    console.log(section)
+                    //console.log(section)
                 }
 
 

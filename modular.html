@@ -8,6 +8,9 @@
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
     <script src="js/libs/moment.min.js"></script>
     <script src="js/libs/jstree.min.js"></script>
 
@@ -17,8 +20,7 @@
 
     <script src="js/libs/angular-sanitize.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
 
     <style>
         .myScroll {
@@ -106,7 +108,63 @@
     </nav>
 
 
-        <renderform q="input.selectedQ" qr="selectedQR"></renderform>
+        <uib-tabset>
+            <uib-tab heading = "Explorer">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div id="fullTree"></div>
+                    </div>
+
+                    <div class="col-md-8">
+<!--
+                        {{selectedNode.id}}
+                        {{selectedNode.data.level}}
+-->
+                        <uib-tabset>
+                            <uib-tab heading="Json">
+                                <ng-include src="'includes/itemDetails.html'"></ng-include>
+                            </uib-tab>
+
+                            <uib-tab heading="Json">
+                                <pre>{{selectedNode.data.item | json}}</pre>
+                            </uib-tab>
+                        </uib-tabset>
+
+
+                    </div>
+                </div>
+
+            </uib-tab>
+            <uib-tab heading = "Forms">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>Chapters</h4>
+                       <div class="list-group">
+                           <div ng-class="{'list-group-item':true,listItemSelected:Q.id == input.selectedQ.id}"
+                                ng-click="selectQ(Q)"
+                                style="cursor: pointer"
+                                ng-repeat="Q in allQ">
+                               {{Q.title}}
+
+                           </div>
+                       </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <renderform q="input.selectedQ" qr="selectedQR"></renderform>
+                    </div>
+
+                </div>
+
+
+
+
+
+            </uib-tab>
+        </uib-tabset>
+
 
 
 

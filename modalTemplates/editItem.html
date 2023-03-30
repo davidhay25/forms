@@ -195,6 +195,21 @@
 
                                 <div class="col-sm-6">
 
+                                    <div ng-show = "newItem.type == 'boolean'" >
+
+                                        <div ng-hide = 'newItem.initial[0].valueBoolean'>
+                                            <button class="btn-link btn-link" ng-click = "setDefaultBoolean(true)">Set default true</button>
+                                        </div>
+
+                                        <div ng-show = 'newItem.initial[0].valueBoolean'>
+                                            <button class="btn-link btn-link" ng-click = "setDefaultBoolean(false)">Defaults to true. Set default false</button>
+                                        </div>
+
+
+
+                                    </div>
+
+
                                     <div ng-show = "newItem.type == 'text' || newItem.type == 'string' || newItem.type == 'decimal' || newItem.type == 'integer' || newItem.type == 'choice'" >
                                         <div class="row">
                                             <div class="col-sm-4">
@@ -675,6 +690,7 @@
 
                             </textarea>
                         </uib-tab>
+
                         <uib-tab heading="Edit">
                             <table class="table table-bordered table-condensed">
                                 <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th></tr>
@@ -687,6 +703,21 @@
                             </table>
                             <em>If the code and/or system is updated here, dependencies will also be updated.</em>
                         </uib-tab>
+                        <uib-tab heading="Terminology">
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Display</th><th>Code</th><th>Term</th><th>System</th></tr>
+                                <tr ng-repeat = "option in newItem.answerOption">
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.display"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.code"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.term"/></td>
+                                    <td><input type="text" class="form-control" ng-model="option.valueCoding.system"/></td>
+                                    <td><span class="clickable"
+                                              ng-click="lookupCoding(option.valueCoding.system,option.valueCoding.code)">Lookup</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+
 
 
                     </uib-tabset>

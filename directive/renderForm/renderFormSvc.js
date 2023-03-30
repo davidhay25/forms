@@ -57,6 +57,73 @@ angular.module("formsApp")
 
         return {
 
+            makeTreeFromQ : function(Q) {
+                // a recursive form of the tree generation
+
+                let hashItem = {}
+                let treeData = []
+                let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
+                treeData.push(root)
+
+                function addItemToTree(parent,item,level,sectionItem) {
+                    let idForThisItem =  item.linkId
+                    hashItem[item.linkId] = item
+
+                    let thisItem = angular.copy(item)
+                    delete thisItem.item
+
+                    //check to see if this item is a review item
+                    if (item.code) {
+                        console.log(item.code)
+                        item.code.forEach(function (code) {
+                            if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
+                                sectionItem.reviewItem.push(item)
+                            }
+                        })
+                    }
+
+                    let text = item.text
+                    if (text.length > 50) {
+                        text = text.slice(0,47) + "..."
+                    }
+
+                    let node = {id:idForThisItem,text:text,parent:parent,data:{section:sectionItem,item:item}}
+                    treeData.push(node)
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            let newLevel = "item"
+                            if (child.item) {
+                                newLevel = 'group'
+                            }
+                            addItemToTree(idForThisItem,child,newLevel,sectionItem)
+                        })
+                    }
+                }
+
+                function addQToTree(Q) {
+                    //create a parent for this Q
+                    let qParentId = `root`
+                    //let node = {id:qParentId,text:Q.title || `q${ctr}`,parent:"root",data:{level:'chapter'}}
+
+                   // treeData.push(node)
+                    Q.item.forEach(function (item) {
+                        let section = angular.copy(item)
+                        delete section.item
+                        section.reviewItem = []
+                        addItemToTree(qParentId,item,'section',section)
+                    })
+                }
+
+
+                addQToTree(Q)
+
+                return {treeData: treeData,hashItem:hashItem}
+
+
+
+
+            },
+
             expandVS : function(url,filter) {
                 let deferred = $q.defer()
                 //for now, go directly to the term server. Might want to bounce it through the nodejs server eventually
@@ -287,7 +354,7 @@ angular.module("formsApp")
                     hashValues[linkId] = dataItem
                 })
 
-                console.log(hashValues)
+                //console.log(hashValues)
 
                 let QR1 = {resourceType:"QuestionnaireResponse",status:'completed',item:[]}
                 QR1.questionnaire = Q.url
@@ -341,7 +408,7 @@ angular.module("formsApp")
                                         QR1.item.push(sectionItem)
                                     }
                                     //now craete an item that can be added to the section
-                                    let leafItem = {linkId:child.linkId, answer:[]}
+                                    let leafItem = {linkId:child.linkId, text: child.text,answer:[]}
                                     sectionItem.item.push(leafItem)      //add the leaf item to the section
 
                                     let v = hashValues[child.linkId]        //the value in the form
@@ -631,7 +698,7 @@ angular.module("formsApp")
             //return vo {template, hiddenFields, hiddenSections}
             //template is an array of section objects
             //section has rows array where a row has
-            //pass in the formdata to allow initial values to be set....
+            //pass in the formdata to allow  values to be set....
 
             makeFormTemplate : function(Q,formData) {
                 if (!Q) {
@@ -656,6 +723,7 @@ angular.module("formsApp")
 
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
+
                         hashItem[sectionItem.linkId] = {item:sectionItem,meta:section.meta}
                         if (section.meta.hidden) {
                             hiddenSections.push(section)
@@ -688,29 +756,31 @@ angular.module("formsApp")
 
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
-                                                hashItem[child.linkId] = {item:child,meta:childMeta}
+                                                //hidden items don't apper in the form at all.
+                                                if (! meta.hidden) {
+                                                    hashItem[child.linkId] = {item:child,meta:childMeta}
 
-                                                let side = 'col' + col
-                                                let cell = {item:child,meta:childMeta}
-                                                fillFromValueSet(cell,termServer)
-                                                setDecoration(cell,child)
-                                                setDefaultValue(child,formData)
-                                                row[side] = row[side] || []
-                                                row[side].push(cell)
+                                                    let side = 'col' + col
+                                                    let cell = {item:child,meta:childMeta}
+                                                    fillFromValueSet(cell,termServer)
+                                                    setDecoration(cell,child)
+                                                    setDefaultValue(child,formData)
+                                                    row[side] = row[side] || []
+                                                    row[side].push(cell)
 
-                                                //dirty = true
+                                                    if (col % meta.columnCount == 0) {
+                                                        //add the current row, and move on to the next..
+                                                        section.rows.push(row)
+                                                        row = {}
+                                                        row.meta = meta
+                                                        row.group = item        //need to group to be able to check show/hide for all rows in a group...
+                                                        col = 1
 
-                                                if (col % meta.columnCount == 0) {
-                                                    //add the current row, and move on to the next..
-                                                    section.rows.push(row)
-                                                    row = {}
-                                                    row.meta = meta
-                                                    row.group = item        //need to group to be able to check show/hide for all rows in a group...
-                                                    col = 1
-
-                                                } else {
-                                                    col++
+                                                    } else {
+                                                        col++
+                                                    }
                                                 }
+
                                             })
 
                                             if (row.col1) {
@@ -810,10 +880,33 @@ angular.module("formsApp")
                 function setDefaultValue(item,formData) {
                     //console.log(item)
                     if (item.initial && item.initial.length > 0) {
-                        //right now, only coding
-                        let iCoding = item.initial[0].valueCoding
-                        if (iCoding) {
-                            formData[item.linkId] = {valueCoding:iCoding}
+                        //right now, only coding & bool, and only a single initial
+
+
+                        if (item.initial[0].valueCoding) {
+                            let iCoding = item.initial[0].valueCoding
+                            if (iCoding) {
+                               // formData[item.linkId] = {valueCoding:iCoding}
+
+                                //need to set it to the answeroption for the dropdown to display the result
+                                if (item.answerOption) {
+                                    item.answerOption.forEach(function (opt) {
+                                        if (opt.valueCoding) {
+                                            if (opt.valueCoding.code == iCoding.code && opt.valueCoding.system == iCoding.system) {
+                                                formData[item.linkId] = opt //{valueCoding:opt}
+                                            }
+                                        }
+
+                                    })
+                                }
+
+
+
+
+                            }
+                        }
+                        if (item.initial[0].valueBoolean) {
+                            formData[item.linkId] = true
                         }
 
 

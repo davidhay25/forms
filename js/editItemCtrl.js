@@ -18,7 +18,6 @@ angular.module("formsApp")
             $scope.completeMappingPath = function (text) {
                 if ($scope.parentMeta) {
                     let type = $scope.parentMeta.extraction.type
-
                     $scope.newItem.definition = `http://hl7.org/fhir/${type}#${type}.${text}`
                 }
 
@@ -63,6 +62,25 @@ angular.module("formsApp")
                     })
 
                 }
+
+                //if it's a boolean - set the initialValue
+              //  if (item.type == 'boolean' && item.initial && item.initial.length > 0) {
+
+               // }
+
+            }
+
+            $scope.setDefaultBoolean = function(on) {
+                $scope.newItem.initial = []         //remove any existing
+                if (on) {
+                    $scope.newItem.initial[0] = {valueBoolean: true}
+                }
+
+            }
+
+            //lookup the value in the term server
+            $scope.lookupCoding = function(system,code) {
+
             }
 
             //for a choice option, set the ())single) default

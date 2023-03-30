@@ -173,12 +173,27 @@
 
                     <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio' || cell.displayHint == 'check-box'">
 
-                        <select class="form-control" ng-model="form[cell.item.linkId]"
-                                ng-change="makeQR(cell.item.linkId)"
-                                ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
-                            <option value="" disabled selected>{{cell.meta.placeholder}}</option>
+                        <div class="row">
+                            <div class="col-md-11 col-sm-11">
+                                <select class="form-control" ng-model="form[cell.item.linkId]"
+                                        ng-change="makeQR(cell.item.linkId)"
+                                        ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
 
-                        </select>
+                                    <option value="" disabled selected>{{cell.meta.placeholder}}</option>
+
+
+                                </select>
+                            </div>
+                            <!--
+                            <div class="col-md-1 col-sm-1">
+                                <button type="button" class="btn btn-default" ng-click="clearValue(cell)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </div>
+                            -->
+                        </div>
+
+
                     </div>
 
 

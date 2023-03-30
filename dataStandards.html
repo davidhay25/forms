@@ -73,6 +73,8 @@
     <script src="js/filters.js"></script>
     <script src="js/HISOSvc.js"></script>
 
+    <script src="js/"></script>
+
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
 
@@ -80,6 +82,7 @@
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
 
+    <script src="directive/renderForm/renderFormAsTreeDir.js"></script>
 
     <style>
         #graph {
@@ -307,6 +310,14 @@
                     </uib-tab>
 
                     -->
+
+                    <uib-tab heading="Review tree">
+                        <renderformastree q="selectedQ" qr="treeReviewQR">
+
+                        </renderformastree>
+
+                    </uib-tab>
+
 
 
                     <uib-tab>
