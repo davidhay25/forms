@@ -18,6 +18,17 @@
             <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
 
 
+          <div>
+            <h4>Review comments</h4>
+            <div ng-repeat = "item in selectedNode.data.section.reviewItem">
+              {{item.text}}
+              <textarea class="form-control" ng-model="form[item.linkId]"></textarea>
+            </div>
+
+            <!--
+            <pre>{{selectedNode.data.section.reviewItem | json}}</pre>
+            -->
+          </div>
 
         </uib-tab>
 
@@ -36,17 +47,7 @@
         </uib-tab>
       </uib-tabset>
 
-      <div>
-        <h4>Review comments</h4>
-        <div ng-repeat = "item in selectedNode.data.section.reviewItem">
-          {{item.text}}
-          <textarea class="form-control" ng-model="form[item.linkId]"></textarea>
-        </div>
 
-        <!--
-        <pre>{{selectedNode.data.section.reviewItem | json}}</pre>
-        -->
-      </div>
 
     </div>
   </div>
