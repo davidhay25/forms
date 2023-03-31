@@ -4,7 +4,14 @@ const axios = require('axios').default;
 let serverRoot
 
 let globals = require("./globals.json")
+const fs = require("fs");
 //console.log(globals.hello)
+
+//const serverBase = "http://localhost:9099/baseR4/"
+const serverBase = "http://localhost:9099/fhir/"
+
+//a folder that, if it exists, will have a copy of the Q when they are checked in, out or reverted
+const backupFolder = "/tmp/cs-backups"
 
 let debug = true
 let db
@@ -46,10 +53,22 @@ function setup(app,sr) {
         //console.log(QR)
         if (QR) {
             QR.id = createId()  // createUUID();
+
+            //save a copy of the QR in the backup folder
+
+            if (fs.existsSync(backupFolder)) {
+                let fileName = `${backupFolder}/${QR.resourceType}-${QR.id}.json`
+                fs.writeFileSync(fileName,JSON.stringify(QR))
+            } else {
+                console.log(`folder ${backupFolder} does not exist, so the QR was not saved in it.`);
+            }
+
+
             try {
+
+
+                //really, the only thing this will do is to create the SR
                 let result = await extractResources(QR)
-
-
                 if (result.resourceType == "OperationOutcome") {
                     //this indicates an error extracting resources. Return the OO and exit..
                     logError(result,QR)
@@ -57,11 +76,13 @@ function setup(app,sr) {
                     return
                 }
 
-
-
-
                 let arResources = result.obs     //An array of created observations todo - and others, rename
                 if (debug) {console.log('arResources',arResources)}
+
+
+
+
+
                 //need to add other resources to provenance
                 //let provenance = resources.provenance
 
@@ -69,96 +90,102 @@ function setup(app,sr) {
                 let bundle = {resourceType: "Bundle", type: 'transaction', entry: []}
                 bundle.entry.push(createEntry(QR))
 
-                arResources.forEach(function (observation) {
-                    bundle.entry.push(createEntry(observation))
-                })
-
-                axios.post('http://localhost:9099/baseR4/', bundle)
-                    .then(function (response) {
-                        //console.log(response);
-                        res.status(response.status).json(response.data)
-                    })
-                    .catch(function (error) {
-                        //console.log(error);
-
-                        //added Nov 2022
-                        logError(error.response.data,QR)
-
-                        res.status(error.response.status).json(error.response.data)
-
-                    });
-
-            } catch (ex) {
-                res.status(500).json(ex.message)
-            }
-        } else {
-            res.status(400).json({msg:"Bundle does not contain a QR resource"})
-        }
-
-        function createEntry(resource) {
-            //assume that these are all POST with uuid as id...
-            //not any more! - id's are all assigned by the client to support moving resources to another server
-            let entry = {}
-            entry.fullUrl = serverRoot + resource.resourceType + "/" + resource.id // "urn:uuid:" + resource.id
-            entry.resource = resource
-            //entry.request = {method:'POST',url:resource.resourceType}
-            entry.request = {method:'PUT',url:resource.resourceType + "/" + resource.id}
-            return entry
-        }
-
-    })
 
 
-    //use the Reference Implementation test extraction function
-    app.post('/fr/ri/testExtract',async function(req,res){
-        let bundle = req.body
-        //let url = "http://ri.canshare.co.nz:9300/testExtraction"
-        let url = "http://localhost:9300/testExtraction"
-console.log(url)
-        try {
-            let result = await axios.post(url,bundle)
-            res.json(result.data)
-        } catch (ex) {
-            if (ex.response) {
-                res.status(400).json(ex.response.data)
-            } else {
-                res.status(500).json(ex)
-            }
-        }
+               arResources.forEach(function (observation) {
+                   bundle.entry.push(createEntry(observation))
+               })
 
-    })
 
-    //perform the extraction from an FSH. Used for testing and display in the EHR module
-    app.post('/fr/testextract',async function(req,res){
-        try {
-            let QR = extractQRFromBundle(req.body)
-            //console.log(QR)
-            if (QR) {
-                let resources = await extractResources(QR)
-                res.json(resources)
-            } else {
-                res.status(400).json({msg:"Bundle does not contain a QR resource"})
-            }
 
-        } catch (ex) {
-            res.status(500).json(ex.message)
-        }
-    })
+               axios.post(serverBase, bundle)
+                   .then(function (response) {
+                       //console.log(response);
+                       res.status(response.status).json(response.data)
+                   })
+                   .catch(function (error) {
+                       //console.log(error);
+
+                       //added Nov 2022
+                       logError(error.response.data,QR)
+
+                       res.status(error.response.status).json(error.response.data)
+
+                   });
+
+           } catch (ex) {
+               res.status(500).json(ex.message)
+           }
+
+
+       } else {
+           res.status(400).json({msg:"Bundle does not contain a QR resource"})
+       }
+
+       function createEntry(resource) {
+           //assume that these are all POST with uuid as id...
+           //not any more! - id's are all assigned by the client to support moving resources to another server
+           let entry = {}
+           entry.fullUrl = serverRoot + resource.resourceType + "/" + resource.id // "urn:uuid:" + resource.id
+           entry.resource = resource
+           //entry.request = {method:'POST',url:resource.resourceType}
+           entry.request = {method:'PUT',url:resource.resourceType + "/" + resource.id}
+           return entry
+       }
+
+   })
+
+
+   //use the Reference Implementation test extraction function
+   app.post('/fr/ri/testExtract',async function(req,res){
+       let bundle = req.body
+       //let url = "http://ri.canshare.co.nz:9300/testExtraction"
+       let url = "http://localhost:9300/testExtraction"
+//console.log(url)
+       try {
+           let result = await axios.post(url,bundle)
+           res.json(result.data)
+       } catch (ex) {
+           if (ex.response) {
+               res.status(400).json(ex.response.data)
+           } else {
+               res.status(500).json(ex)
+           }
+       }
+
+   })
+
+   //perform the extraction from an FSH. Used for testing and display in the EHR module
+   app.post('/fr/testextract',async function(req,res){
+       try {
+           let QR = extractQRFromBundle(req.body)
+           //console.log(QR)
+           if (QR) {
+               let resources = await extractResources(QR)
+               res.json(resources)
+           } else {
+               res.status(400).json({msg:"Bundle does not contain a QR resource"})
+           }
+
+       } catch (ex) {
+           res.status(500).json(ex.message)
+       }
+   })
 }
 
 //get the QR from the bundle.
 function extractQRFromBundle(bundle) {
-    let QR;
-    //console.log(bundle)
-    if (bundle && bundle.entry) {
-        bundle.entry.forEach(function (entry){
-            let resource = entry.resource
-            if (resource && resource.resourceType == 'QuestionnaireResponse'){
-                QR = resource
-            }
-        })
-    }
-    return QR
+   let QR;
+   //console.log(bundle)
+   if (bundle && bundle.entry) {
+       bundle.entry.forEach(function (entry){
+           let resource = entry.resource
+           if (resource && resource.resourceType == 'QuestionnaireResponse'){
+               QR = resource
+           }
+       })
+   }
+   return QR
 
 }
 
@@ -168,52 +195,52 @@ function extractQRFromBundle(bundle) {
 //https://medium.com/software-development-turkey/using-async-await-with-axios-edf8a0fed4b1
 async function extractResources(QR) {
 
-    //get the Questionnaire. for now, get it derectly from the hapi server...
-    let qUrl = QR.questionnaire
-    if (! qUrl) {
-        return makeOO("No questionnaire element in the QR")
-    }
+   //get the Questionnaire. for now, get it derectly from the hapi server...
+   let qUrl = QR.questionnaire
+   if (! qUrl) {
+       return makeOO("No questionnaire element in the QR")
+   }
 
-    //retrieve the Q
-    let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
-    let response = await axios.get(url)
+   //retrieve the Q
+   let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
+   let response = await axios.get(url)
 
-    let bundle = response.data
-    //if (debug) {console.log('arResources',arResources)}
-    if (bundle.entry && bundle.entry.length == 1) {
-        //the Q was retrieved
-        let Q = bundle.entry[0].resource    //todo - assume only 1
+   let bundle = response.data
 
-        //retrieve Observations (and potentially other resources)
-        let resources = performObservationExtraction(Q,QR)
+   if (bundle.entry && bundle.entry.length == 1) {
+       //the Q was retrieved
+       let Q = bundle.entry[0].resource    //todo - assume only 1
 
-        // now create other resources (and track with provenance). The provenance was created and populated during resource extraction
-        let provenance = resources.provenance
+       //retrieve Observations (and potentially other resources)
+       let resources = performObservationExtraction(Q,QR)
 
-        let cp = null
+       // now create other resources (and track with provenance). The provenance was created and populated during resource extraction
+       let provenance = resources.provenance
 
-        //the service request for a revire request - always added ATM as being used for forms development
-        //could add other SR's as needed - or a task
+       let cp = null
 
-        let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request",Q)      //todo refactor names of vo returned
-        //provenance.target = provenance.target || []
-        //provenance.target.push({reference: "urn:uuid:"+ sr.id})
-        provenance.target.push({reference: "ServiceRequest/"+ sr.id})
-        resources.obs.push(sr)          //not really all obs...
+       //the service request for a revire request - always added ATM as being used for forms development
+       //could add other SR's as needed - or a task
 
-        //to support more sophisticated workflow
-        let task = createTask(QR,sr)
-        //provenance.target.push({reference: "urn:uuid:"+ task.id})
-        provenance.target.push({reference: "Task/"+ task.id})
-        resources.obs.push(task)          //not really all obs...
+       let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request",Q)      //todo refactor names of vo returned
+       //provenance.target = provenance.target || []
+       //provenance.target.push({reference: "urn:uuid:"+ sr.id})
+       provenance.target.push({reference: "ServiceRequest/"+ sr.id})
+       resources.obs.push(sr)          //not really all obs...
+
+       //to support more sophisticated workflow
+       let task = createTask(QR,sr)
+       //provenance.target.push({reference: "urn:uuid:"+ task.id})
+       provenance.target.push({reference: "Task/"+ task.id})
+       resources.obs.push(task)          //not really all obs...
 
 /* not used now, but keep...
-        //generate MDM referral (servicerequest) if requested by QR
-        if (resources.QRHash['mdmreferral']) {
-            let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral",Q)      //todo refactor names of vo returned
-            provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
-            resources.obs.push(srMDM)          //not really all obs...
-        }
+       //generate MDM referral (servicerequest) if requested by QR
+       if (resources.QRHash['mdmreferral']) {
+           let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral",Q)      //todo refactor names of vo returned
+           provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
+           resources.obs.push(srMDM)          //not really all obs...
+       }
 */
 
 

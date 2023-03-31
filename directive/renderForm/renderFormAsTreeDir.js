@@ -77,11 +77,19 @@ angular.module('formsApp')
                         //seems to be the node selection event...
 
                         if (data.node) {
+                            delete $scope.selectedGroup
                             $scope.selectedNode = data.node;
                             console.log(data.node)
 
-                            $scope.cell = {item:$scope.selectedNode.data.item}
-                            $scope.cell.meta = {}
+                            //this will update the item display in the right pane
+                            $scope.cell = {item:$scope.selectedNode.data.item} //it's an item
+                            $scope.cell.meta = {}   //todo - may want to populate this...
+
+                            //if the item has sub-items, then it is either a group or a section
+                            if ($scope.cell.item) {
+                                $scope.selectedGroup = $scope.cell.item
+                            }
+
                         }
 
                         $scope.$digest();       //as the event occurred outside of angular...
@@ -106,10 +114,6 @@ angular.module('formsApp')
                     $scope.selectedSection = section
                     //console.log(section)
                 }
-
-
-
-
 
 
             }

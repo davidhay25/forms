@@ -2,8 +2,10 @@
 //
 const axios = require('axios').default;
 let prepopData = require("./prePopData.json")
+const fs = require("fs");
 
-
+//a folder that, if it exists, will have a copy of the Q when they are checked in, out or reverted
+const backupFolder = "/tmp/cs-backups"
 
 function setup(app,serverRoot,systemConfig) {
 
@@ -185,6 +187,9 @@ function setup(app,serverRoot,systemConfig) {
         axios.post(url,resource)
             .then(function (response){
                 //console.log(response.data)
+
+
+
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
@@ -206,6 +211,10 @@ function setup(app,serverRoot,systemConfig) {
         axios.post(url,resource)
             .then(function (response){
                 //console.log(response.data)
+
+
+
+
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){
@@ -249,6 +258,19 @@ function setup(app,serverRoot,systemConfig) {
         axios.put(url,resource,{maxBodyLength:Infinity,maxContentLength:Infinity})
             .then(function (response){
                 //console.log('r',response.data)
+
+                //this code saves the Q as a file on the design server (updated as the Q is updated)
+                //this is another backup - and there is a separate process that will save that to a git repo
+
+
+                if (fs.existsSync(backupFolder)) {
+                    let fileName = `${backupFolder}/${resource.resourceType}-${resource.id}.json`
+                    fs.writeFileSync(fileName,JSON.stringify(resource))
+                } else {
+                    console.log(`folder ${backupFolder} does not exist, so the ${resource.resourceType} was not saved in it.`);
+                }
+
+
                 res.status(response.status).json(response.data)
             })
             .catch(function (err){

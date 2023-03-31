@@ -1,5 +1,9 @@
 // forms manager API
 const axios = require('axios').default;
+const fs = require('fs')
+
+//a folder that, if it exists, will have a copy of the Q when they are checked in, out or reverted
+const backupFolder = "/tmp/cs-backups"
 
 function setup(app,serverRoot,systemConfig) {
 
@@ -22,13 +26,28 @@ function setup(app,serverRoot,systemConfig) {
         //only the design server supports Q update by Id (PUT)
         //note that there are actually 2 endpoints responding to this, one in the design & another in public
         //the only difference is that the one on the public site requires authorization
+        //called when a Q is checked out (to set the checkout indicator) and when it is checked in...
         app.put('/fm/fhir/Questionnaire/:id',function(req,res){
 
             let Q = req.body
             let url = serverRoot + "Questionnaire/" + Q.id
             //console.log(url)
+            console.log(`Saving ${Q.id}`)
             axios.put(url,Q)
                 .then(function (response){
+
+                    //this code saves the Q as a file on the design server (updated as the Q is updated)
+                    //this is another backup - and there is a separate process that will save that to a git repo
+
+                    if (fs.existsSync(backupFolder)) {
+                        let fileName = `${backupFolder}/${Q.resourceType}-${Q.id}.json`
+                        fs.writeFileSync(fileName,JSON.stringify(Q))
+                    } else {
+                        console.log(`folder ${backupFolder} does not exist, so the Q was not saved in it.`);
+                    }
+
+
+
                     res.status(response.status).json(response.data)
                 })
                 .catch(function (err){
@@ -68,6 +87,8 @@ function setup(app,serverRoot,systemConfig) {
         //THIS HAS CHANGED. We now do assume that the id of the questionnaire is the same on both
         //design and public servers - set when the Q is created in design. So the public server accepts
         //a PUT to the location of the Q - though must be authorized
+
+        //todo - why should the public site need to PUT a Q????
 
         //this endpoint (exposed only by the public server) required authentication.
         // Functionally it's otherwise the same as the one exposed by the design site

@@ -15,7 +15,23 @@
         <uib-tab heading="Item details">
             <div class="banner"> {{selectedNode.data.item.text}}</div>
 
-            <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
+            <uib-tabset>
+              <uib-tab heading="Item">
+                <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
+              </uib-tab>
+              <uib-tab heading="Section / Group">
+
+                <div ng-repeat="item in selectedGroup.item">
+                  {{item.text}}
+                </div>
+
+                <hr/>
+                <pre>{{selectedGroup | json}}</pre>
+
+              </uib-tab>
+            </uib-tabset>
+
+
 
 
           <div>
