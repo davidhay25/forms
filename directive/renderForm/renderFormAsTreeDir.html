@@ -15,10 +15,16 @@
         <uib-tab heading="Item details">
             <div class="banner"> {{selectedNode.data.item.text}}</div>
 
-            <uib-tabset>
-              <uib-tab heading="Item">
+
+
+
+                <ng-include src ="'directive/renderForm/itemDetailsForTree.html'"></ng-include>
+<hr/>
+                <h5 ng-show="selectedNode.data.item">Enter example answer:</h5>
                 <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
-              </uib-tab>
+
+
+                <!--
               <uib-tab heading="Section / Group">
 
                 <div ng-repeat="item in selectedGroup.item">
@@ -29,26 +35,23 @@
                 <pre>{{selectedGroup | json}}</pre>
 
               </uib-tab>
-            </uib-tabset>
+                -->
 
 
 
 
-          <div>
-            <h4>Review comments</h4>
+
+          <div ng-show="selectedNode.data.section.reviewItem.length > 0">
+            <h5>Review comments</h5>
             <div ng-repeat = "item in selectedNode.data.section.reviewItem">
               {{item.text}}
               <textarea class="form-control" ng-model="form[item.linkId]"></textarea>
             </div>
-
-            <!--
-            <pre>{{selectedNode.data.section.reviewItem | json}}</pre>
-            -->
           </div>
 
         </uib-tab>
 
-        <uib-tab heading="report">
+        <uib-tab heading="Report">
           <qrdisplay q="q" qr="qr"></qrdisplay>
 
         </uib-tab>

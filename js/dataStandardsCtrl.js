@@ -10,6 +10,15 @@ angular.module("formsApp")
                 QIdfromUrl = search.substr(1)
             }
 
+            //qrCreated is emitted by the directives that can collect data - form & tree.
+            //as they are siblings, this function broadcasts an event so that the QR
+            //in each one can be updated even when data changes in the other
+            $scope.$on('qrCreated',function(ev,vo){
+                console.log('qrcreated')
+                $scope.parentScopeQR = vo.QR        //for the report tab
+                $scope.$broadcast("externalQRUpdate",{QR:vo.QR})
+            })
+
             //system url for author tags
           //  let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 

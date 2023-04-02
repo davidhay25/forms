@@ -6,7 +6,8 @@ angular.module('formsApp')
             scope: {
                 //@ reads the attribute value, = provides two-way binding, & works with functions
                 q: '=',
-                qr : '='
+                qr : '=',
+                form: '='
             },
 
             templateUrl: 'directive/renderForm/renderFormAsTreeDir.html',
@@ -26,15 +27,29 @@ angular.module('formsApp')
                 //we used to remove the values of hidden items, but that started causing an infinite digest error when in a directive. dunno why...
                 $scope.notShown = {}
 
+                $scope.$on('externalQRUpdate',function (ev,vo) {
+                    console.log('externalQRUpdate')
+                    $scope.qr = vo.QR
+                   // $scope.makeQR()
+                })
+/*
+                $scope.$watch(
+                    function() {return $scope.qr},
+                    function() {
+                        console.log('QR updated')
+                    })
+*/
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
 
                         if ($scope.q) {
                             //$scope.selectedQ = $
+                            console.log('Q updated')
                             delete $scope.selectedNode
                             let vo = renderFormsSvc.makeTreeFromQ($scope.q)
-                            $scope.hashItem = vo.hashItem
+                            //$scope.hashItem = vo.hashItem
+                            $scope.hashAllItems = vo.hashItem
 
                             //console.log(vo.treeData)
                             //show sections
@@ -61,14 +76,7 @@ angular.module('formsApp')
                 }
 
                 let drawTree = function(treeData){
-                    //console.log(treeData)
-         /*           treeData.forEach(function (item) {
-                        item.state.opened = true
-                        if (item.parent == 'root') {
-                            item.state.opened = false;
-                        }
-                    })
-*/
+
                     $('#reviewTree').jstree('destroy');
 
                     let x = $('#reviewTree').jstree(
@@ -83,7 +91,7 @@ angular.module('formsApp')
 
                             //this will update the item display in the right pane
                             $scope.cell = {item:$scope.selectedNode.data.item} //it's an item
-                            $scope.cell.meta = {}   //todo - may want to populate this...
+                            $scope.cell.meta = renderFormsSvc.getMetaInfoForItem($scope.selectedNode.data.item) // {}   //todo - may want to populate this...
 
                             //if the item has sub-items, then it is either a group or a section
                             if ($scope.cell.item) {

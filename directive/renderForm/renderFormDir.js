@@ -6,7 +6,8 @@ angular.module('formsApp')
             scope: {
                 //@ reads the attribute value, = provides two-way binding, & works with functions
                 q: '=',
-                qr : '='
+                qr : '=',
+                form : "="
             },
 
             templateUrl: 'directive/renderForm/renderFormDir.html',
@@ -14,22 +15,33 @@ angular.module('formsApp')
 
                 $scope.datePopup = {}
 
+                $scope.$on("externalQRUpdate",function(ev,vo){
+                    console.log("externalQRUpdate")
+                    $scope.qr = vo.QR
+
+
+                    //not working...  renderFormsSvc.setControls($scope.input.formTemplate,$scope.input.form)
+
+                  //  $scope.makeQR() - causes a stack overflow
+                })
+
+
                 //for some reason when the q changes, the change doesn't ripple through to the directive, so $scope.$broadcast is needed
+                //this is used by the designer...
                 $scope.$on("q-updated",function(){
                     console.log("q updated broadcast")
                     if ($scope.q) {
                         $timeout(function(){
 
-                            $scope.form = {}    //todo - is this right re-set all the form data when re-building the template
+                            $scope.input.form = {}    //todo - is this right re-set all the form data when re-building the template
 
-                            let vo = renderFormsSvc.makeFormTemplate($scope.q, $scope.form)
+                            let vo = renderFormsSvc.makeFormTemplate($scope.q, $scope.input.form)
                             if (vo) {
-                                $scope.formTemplate = vo.template
+                                $scope.input.formTemplate = vo.template
                                 $scope.hashItem = vo.hashItem
 
                             }
                         },1000)
-
                     }
                 })
 
@@ -39,8 +51,9 @@ angular.module('formsApp')
                     // $scope.datePopup.opened = true
                 }
 
-                $scope.form = {}        //a hash containing form data entered by the user
                 $scope.input = {};
+                $scope.input.form = {}        //a hash containing form data entered by the user
+
 
                 //a hash of items that failed the most current dependency check
                 //we used to remove the values of hidden items, but that started causing an infinite digest error when in a directive. dunno why...
@@ -49,20 +62,20 @@ angular.module('formsApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                       console.log('watch')
+                       console.log('Q updated')
                         delete $scope.selectedSection       //c;ears the current section display
                         if ($scope.q) {
 
 
 
-                            let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
+                            let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
                             if (vo) {
-                                $scope.formTemplate = vo.template
+                                $scope.input.formTemplate = vo.template
                                 $scope.hashItem = vo.hashItem
 
                             }
                         } else {
-                           // delete $scope.formTemplate
+                           // delete $scope.input.formTemplate
                             //delete $scope.hashItem
                         }
 
@@ -74,23 +87,20 @@ angular.module('formsApp')
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
 
-                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
+                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
-                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem})
+                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.input.form,hashItem:$scope.hashItem})
 
                 }
 
                 //when a top level item is selected in the tabbed interface
                 $scope.selectSection = function(section) {
                     $scope.selectedSection = section
-                    //console.log(section)
                 }
 
 
                 //called by a cell to indicate if it should be shown
                 $scope.showConditional = function (cell,form) {
-                   // console.log(cell.item.linkId)
-
 
                     if (! cell.meta) {
                         console.log(cell.item.text + " no meta")
@@ -100,9 +110,6 @@ angular.module('formsApp')
                     if (! $scope.input.showHidden &&  cell.meta && cell.meta.hidden) {
                         return false
                     }
-
-
-                    //let copy = angular.copy($scope.form)
 
                     let copyItem = angular.copy(cell.item)
                     let show = renderFormsSvc.checkConditional(copyItem,form)
@@ -117,7 +124,7 @@ angular.module('formsApp')
                     $scope.notShown[cell.item.linkId] = ! show
                     if (!show) {
                         //**** this is causing an infinite digest issue with some forms - specifically ancillary studies
-                       //delete $scope.form[cell.item.linkId]
+                       //delete $scope.input.form[cell.item.linkId]
                      //   $scope.notShown[cell.item.linkId] = true
 
                         //delete form[cell.item.linkId]
@@ -130,12 +137,8 @@ angular.module('formsApp')
                 //code to show (or not) a conditional group - limited to Coding comparisons ATM
                 $scope.showConditionalGroup = function(group,form) {
 
-
-
                     if (group) {
 
-
-                        //let show = renderFormsSvc.checkConditional(group,$scope.form)
                         let show = renderFormsSvc.checkConditional(group,form)
 
                         return show

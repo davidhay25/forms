@@ -57,6 +57,39 @@ angular.module("formsApp")
 
         return {
 
+            setControls : function (template,data) {
+                //set the values for dropdowns
+
+
+                function setOneControl(item) {
+                    if (item.type == 'choice' && item.answerOption && data[item.linkId]) {
+                        console.log(item.linkId,data[item.linkId])
+                        item.answerOption.forEach(function (ao) {
+                            if (data[item.linkId] && data[item.linkId].valueCoding) {
+                                if (ao.valueCoding.code == data[item.linkId].valueCoding.code) {
+                                    data[item.linkId].valueCoding = ao.valueCoding
+                                }
+                            }
+
+                        })
+
+                    }
+
+                    if (item.item) {
+                        console.log(item.item)
+                        item.item.forEach(function (child) {
+                            setOneControl(child)
+                        })
+                    }
+
+                }
+
+                template.forEach(function (section) {
+                    setOneControl(section.item)
+                })
+
+            },
+
             makeTreeFromQ : function(Q) {
                 // a recursive form of the tree generation
 
@@ -87,8 +120,16 @@ angular.module("formsApp")
                         text = text.slice(0,47) + "..."
                     }
 
+
+
                     let node = {id:idForThisItem,text:text,parent:parent,data:{section:sectionItem,item:item}}
+
+                    let iconFile = "icons/icon-q-" + item.type + ".png"
+                    node.icon = iconFile
+
                     treeData.push(node)
+
+                    //now look at any sub children
                     if (item.item) {
                         item.item.forEach(function (child) {
                             let newLevel = "item"
@@ -116,6 +157,20 @@ angular.module("formsApp")
 
 
                 addQToTree(Q)
+
+                //now that we have completed the tree array (and populated hashItem)
+                //we can make the conditional display a bit nicer by adding the text for the question
+
+                treeData.forEach(function (node) {
+                    if (node.data && node.data.item.enableWhen) {
+                        node.data.item.enableWhen.forEach(function (ew) {
+                            if (hashItem[ew.question]) {
+                                ew.questionText = hashItem[ew.question].text
+                            }
+
+                        })
+                    }
+                })
 
                 return {treeData: treeData,hashItem:hashItem}
 

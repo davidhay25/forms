@@ -13,7 +13,7 @@
 
                     <div class="col-md-6" >
                         <div uib-popover="{{child.linkId}}"
-                             popover-placement="left"
+                             popover-placement="right"
                              popover-trigger="'mouseenter'">{{child.text}}</div>
                     </div>
                     <div class="col-md-6" >
@@ -34,7 +34,7 @@
             </div>
             <div ng-show = "child.item">    <!-- this is a group - it has child items itself-->
                 <em  uib-popover="{{child.linkId}}"
-                     popover-placement="left"
+                     popover-placement="right"
                      popover-trigger="'mouseenter'">{{child.text}}</em>
 
                 <div ng-repeat = "gc in child.item">
@@ -42,7 +42,7 @@
                         <div ng-hide="input.hiddenFields[gc.linkId]">
                         <div class="col-md-6" >
                             <div style="padding-left: 8px"  uib-popover="{{gc.linkId}}"
-                                 popover-placement="top"
+                                 popover-placement="right"
                                  popover-trigger="'mouseenter'">{{gc.text}}</div>
                         </div>
                         <div class="col-md-6">

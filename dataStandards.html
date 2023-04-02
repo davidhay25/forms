@@ -311,28 +311,7 @@
 
                     -->
 
-                    <uib-tab heading="Review tree">
-                        <renderformastree q="selectedQ" qr="treeReviewQR">
-
-                        </renderformastree>
-
-                    </uib-tab>
-
-
-
-                    <uib-tab>
-                        <uib-tab-heading>
-                            <span>Form</span>
-                        </uib-tab-heading>
-
-                        <br/>
-
-                        <div ng-show="input.showHelp">
-                            <div class="alert alert-info">
-                                This is help
-                            </div>
-
-                        </div>
+                    <uib-tab heading="Review Standard">
 
                         <div ng-show="errorOO">
                             <div class="alert alert-danger">
@@ -349,25 +328,20 @@
                             </div>
                         </div>
 
-
-
-
                         <div ng-show = "formState == 'complete'">
                             <div class="alert alert-success">
                                 Thanks for your input. Your form and comments have been submitted.
                             </div>
                         </div>
 
-
-
                         <div ng-hide = "formState == 'complete' " class="row">
-                            <div class="col-md-10">
+                            <div class="col-md-12">
                                 <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
-                                a form. It can be used to make comments by entering them in the comments
-                                elements on the form. You need to enter (at least) your name in the Reviewer details
-                                to the right to submit comments.
-                                Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
-                                    list of standards at the right.  Submit form when complete.
+                                    a form. It can be used to make comments by entering them in the comments
+                                    elements on the form. You need to enter (at least) your name in the Reviewer details
+                                    to the right to submit comments.
+                                    Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
+                                    list of standards at the left.  Submit form when complete.
                                     There is more detailed help available
                                     <a target="_blank" href="https://docs.google.com/document/d/1Nn5pzfDaUAe4gXPYxEkLqk2wnlReBb4Tk9IovQ-lPlA/edit?usp=sharing">here</a>
                                     <br/>
@@ -375,96 +349,105 @@
                                         Previous forms and comments are shown as anonymous examples. Don't include any real data in this form!
                                     </div>
                                 </div>
-
-
-                                <renderform q="selectedQ" qr="formQR"></renderform>
-
-                                <!-- this was the original form...
-
-                                <div ng-controller="formsCtrl">
-
-                                    <ng-include src = "'includes/renderFormAsTab2.html'"></ng-include>
-
-                                </div>
-                                -->
-
-
-
-                            </div>
-
-                            <div class="col-md-2">
-
-                                <div ng-show="input.showTechnical" >
-                                    <div  style="padding:8px; background-color: #eeeeee">
-                                        <h4>Technical functions</h4>
-
-                                        <div><button class="btn btn-link" ng-click="viewQR(formQR)">Show QR</button> </div>
-
-                                    </div>
-
-                                    <br/>
-                                </div>
-
-                                <div style="padding:8px; background-color: #eeeeee">
-
-                                <h4>Reviewer details</h4>
-                                <input type = text ng-model = "input.reviewerName"
-                                       placeholder = "Reviewer name"
-                                       class="form-control"/>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerOrganization"
-                                           placeholder = "Organisation"
-                                           class="form-control"/>
-                                </div>
-                                <div>
-                                    <input type = text ng-model = "input.reviewerEmail"
-                                           placeholder = "Email"
-                                           class="form-control"/>
-                                </div>
-
-                                <h5>Permissions</h5>
-
-                                <div
-                                        uib-popover="When checked, indicates that the persons name can be included in public summaries"
-                                        popover-placement="left"
-                                        popover-trigger="'mouseenter'"
-                                        >
-                                    <checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
-                                <div  uib-popover="When checked, the persons name can be included in Official Information Act requests"
-                                      popover-placement="left"
-                                      popover-trigger="'mouseenter'">
-                                    <checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request
-                                </div>
-
-                                <br/>
-                                <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
-                                <br/>
-
-                                <div class="clickable" ng-show="formQR"
-                                     ng-click="preview()">Single page</div>
-
-                                    <!--   will re-enable when the print function works OK
--->
-                                <br/>
-
-                                <div>
-                                    <button ng-show = "formQR"
-                                            class="btn btn-danger center-block"
-                                            ng-click="submitForm()">Submit feedback</button>
-                                </div>
-
-                                <br/>
-
-                            </div>
                             </div>
 
                         </div>
 
 
+                        <div class="row">
+                            <div class="col-md-10">
+                                <uib-tabset>
+                                    <uib-tab heading="Tree">
+                                        <renderformastree q="selectedQ" qr="treeReviewQR" form="input.formData">
+
+                                        </renderformastree>
+                                    </uib-tab>
+                                    <uib-tab heading="Form">
+
+                                        <renderform q="selectedQ" qr="formQR" form="input.formData"></renderform>
+
+                                    </uib-tab>
+                                    <uib-tab heading="Report">
+                                        <qrdisplay q="q" qr="parentScopeQR"></qrdisplay>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                            </div>
+
+                            <div class="col-md-2">
+
+                                    <div ng-show="input.showTechnical" >
+                                        <div  style="padding:8px; background-color: #eeeeee">
+                                            <h4>Technical functions</h4>
+
+                                            <div><button class="btn btn-link" ng-click="viewQR(formQR)">Show QR</button> </div>
+
+                                        </div>
+
+                                        <br/>
+                                    </div>
+
+                                    <div style="padding:8px; background-color: #eeeeee">
+
+                                        <h4>Reviewer details</h4>
+                                        <input type = text ng-model = "input.reviewerName"
+                                               placeholder = "Reviewer name"
+                                               class="form-control"/>
+                                        <div>
+                                            <input type = text ng-model = "input.reviewerOrganization"
+                                                   placeholder = "Organisation"
+                                                   class="form-control"/>
+                                        </div>
+                                        <div>
+                                            <input type = text ng-model = "input.reviewerEmail"
+                                                   placeholder = "Email"
+                                                   class="form-control"/>
+                                        </div>
+
+                                        <h5>Permissions</h5>
+
+                                        <div
+                                                uib-popover="When checked, indicates that the persons name can be included in public summaries"
+                                                popover-placement="left"
+                                                popover-trigger="'mouseenter'"
+                                        >
+                                            <checkbox ng-model="input.canPublish"></checkbox> Can publish</div>
+                                        <div  uib-popover="When checked, the persons name can be included in Official Information Act requests"
+                                              popover-placement="left"
+                                              popover-trigger="'mouseenter'">
+                                            <checkbox ng-model="input.includeOIA"></checkbox> Include in OIA request
+                                        </div>
+
+                                        <br/>
+                                        <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
+                                        <br/>
+
+                                        <div class="clickable" ng-show="formQR"
+                                             ng-click="preview()">Single page</div>
+
+                                        <!--   will re-enable when the print function works OK
+    -->
+                                        <br/>
+
+                                        <div>
+                                            <button ng-show = "formQR"
+                                                    class="btn btn-danger center-block"
+                                                    ng-click="submitForm()">Submit feedback</button>
+                                        </div>
+
+                                        <br/>
+
+                                    </div>
+                                </div>
+
+
+                        </div>
+
 
                     </uib-tab>
 
-                    <uib-tab heading="Tree">
+
+                    <uib-tab heading="Tree (deprecated)">
                         <br/>
                         <div class="row">
                             <div class="col-md-6">
