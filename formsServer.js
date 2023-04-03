@@ -50,8 +50,10 @@ try {
 }
 //serverRoot = serverRoot ||
 //allows multiple instances of the app (with associated hapi) on the same VM. Not actually using this ATM
-let serverRoot = systemConfig.serverRoot  || "http://localhost:9099/fhir/"      //this is from a container
-//let serverRoot = systemConfig.serverRoot  || "http://localhost:9099/baseR4/"
+
+
+//let serverRoot = systemConfig.serverRoot  || "http://localhost:9099/fhir/"      //this is from a container
+let serverRoot = systemConfig.serverRoot  || "http://localhost:9099/baseR4/"
 console.log("FHIR Server root " + serverRoot)
 
 //port is the port the server is listening on

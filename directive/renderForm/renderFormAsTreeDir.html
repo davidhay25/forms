@@ -10,19 +10,39 @@
     <div class="col-md-6">
 
 
+        <div ng-show="selectedNode.data.item.type !== 'group'">
 
-      <uib-tabset>
-        <uib-tab heading="Item details">
+
             <div class="banner"> {{selectedNode.data.item.text}}</div>
 
-
-
-
+            <div ng-show="selectedNode ">
                 <ng-include src ="'directive/renderForm/itemDetailsForTree.html'"></ng-include>
+            </div>
+
+
+            <!--
 <hr/>
                 <h5 ng-show="selectedNode.data.item">Enter example answer:</h5>
                 <ng-include src ="'directive/renderForm/renderSingleItem.html'"></ng-include>
+-->
 
+            <hr/>
+
+            <div style="padding:8px; background-color: #eeeeee">
+
+            <div class="row" ng-show="selectedNode.data.section.reviewItem.length > 0">
+                <div class = 'col-md-3'>
+                    <em>Comment for this item</em>
+                </div>
+                <div class = 'col-md-7'>
+                    <textarea class="form-control" ng-model="input.newComment"></textarea>
+                </div>
+                <div class = 'col-md-2'>
+                    <button class="btn btn-primary"
+                            ng-click="addNewComment(input.newComment,selectedNode.data.item,selectedNode.data.section.reviewItem[0])">
+                        Add</button>
+                </div>
+            </div>
 
                 <!--
               <uib-tab heading="Section / Group">
@@ -37,35 +57,17 @@
               </uib-tab>
                 -->
 
-
-
-
-
           <div ng-show="selectedNode.data.section.reviewItem.length > 0">
-            <h5>Review comments</h5>
+            <h5>Section comments</h5>
             <div ng-repeat = "item in selectedNode.data.section.reviewItem">
               {{item.text}}
-              <textarea class="form-control" ng-model="form[item.linkId]"></textarea>
+              <textarea class="form-control" rows="5" ng-model="form[item.linkId]"></textarea>
+                <em>All comments for items in this section. You can edit this text directly.</em>
             </div>
           </div>
 
-        </uib-tab>
-
-        <uib-tab heading="Report">
-          <qrdisplay q="q" qr="qr"></qrdisplay>
-
-        </uib-tab>
-
-          <uib-tab heading="QR Json">
-            <pre>{{qr | json}}</pre>
-          </uib-tab>
-
-
-        <uib-tab heading="Json">
-          <pre>{{selectedNode.data.item | json}}</pre>
-        </uib-tab>
-      </uib-tabset>
-
+            </div>
+        </div>
 
 
     </div>

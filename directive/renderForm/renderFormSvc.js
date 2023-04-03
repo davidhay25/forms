@@ -93,6 +93,8 @@ angular.module("formsApp")
             makeTreeFromQ : function(Q) {
                 // a recursive form of the tree generation
 
+                let that = this
+
                 let hashItem = {}
                 let treeData = []
                 let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
@@ -123,6 +125,9 @@ angular.module("formsApp")
 
 
                     let node = {id:idForThisItem,text:text,parent:parent,data:{section:sectionItem,item:item}}
+
+                    node.data.meta = that.getMetaInfoForItem(item)
+
 
                     let iconFile = "icons/icon-q-" + item.type + ".png"
                     node.icon = iconFile

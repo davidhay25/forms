@@ -1,10 +1,11 @@
-
+<!-- Shows the details for an item selected in the tree view-->
 <div>
 
 
-
-
-
+<!--
+  <pre>{{selectedNode.data.meta}}</pre>
+  <pre>{{selectedNode.data.item}}</pre>
+  -->
 
   <div class="row" ng-show="selectedNode.data.meta.description">
     <div class="col-md-3">
@@ -70,10 +71,12 @@
       Answer options
     </div>
     <div class="col-md-9">
-      <div ng-repeat = "option in selectedNode.data.item.answerOption">
+      <ul>
+      <li ng-repeat = "option in selectedNode.data.item.answerOption">
           {{option.valueInteger}}{{option.valueString}}
           {{option.valueCoding.display}}
-      </div>
+      </li>
+      </ul>
     </div>
   </div>
 

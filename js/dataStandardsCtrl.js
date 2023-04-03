@@ -19,6 +19,12 @@ angular.module("formsApp")
                 $scope.$broadcast("externalQRUpdate",{QR:vo.QR})
             })
 
+            $scope.$on('qrCreated',function(event,vo1) {
+
+
+                $scope.formQR = vo1.QR
+            })
+
             //system url for author tags
           //  let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"
 
@@ -58,11 +64,7 @@ angular.module("formsApp")
 
 
             //when the forms directive creates a QR it emits this event
-            $scope.$on('qrCreated',function(event,vo1) {
 
-
-                $scope.formQR = vo1.QR
-            })
 
             //functions to support form submission
 
@@ -514,6 +516,9 @@ angular.module("formsApp")
                         $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
 
                         makeCsvAndDownload(data.data,vo.hashAllItems)
+
+                        //hide the standards list
+                        $scope.input.togglePane()
 
                     }, function (err) {
                         alert(angular.toJson(err.data))

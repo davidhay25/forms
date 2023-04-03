@@ -71,6 +71,17 @@ angular.module('formsApp')
                 );
 
 
+                $scope.addNewComment = function(txt,item,groupComment) {
+console.log(txt,item,groupComment)
+
+                    $scope.form[groupComment.linkId] = $scope.form[groupComment.linkId] || ""
+                    $scope.form[groupComment.linkId] += item.text + ": " + txt + "\n"
+
+                    delete $scope.input.newComment
+
+                    $scope.makeQR()
+                }
+
                 $scope.showConditional = function(){
                     return true
                 }
@@ -86,10 +97,12 @@ angular.module('formsApp')
 
                         if (data.node) {
                             delete $scope.selectedGroup
+                            delete $scope.input.newComment
                             $scope.selectedNode = data.node;
-                            console.log(data.node)
+                            //console.log(data.node)
 
                             //this will update the item display in the right pane
+                            //todo - may no longer be needed if we don't allow data entry via the tree
                             $scope.cell = {item:$scope.selectedNode.data.item} //it's an item
                             $scope.cell.meta = renderFormsSvc.getMetaInfoForItem($scope.selectedNode.data.item) // {}   //todo - may want to populate this...
 

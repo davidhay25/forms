@@ -12,10 +12,15 @@
                     <div ng-hide="input.hiddenFields[child.linkId]">
 
                     <div class="col-md-6" >
+                        {{child.text}}
+                        <!--
                         <div uib-popover="{{child.linkId}}"
                              popover-placement="right"
                              popover-trigger="'mouseenter'">{{child.text}}</div>
+                        -->
                     </div>
+
+
                     <div class="col-md-6" >
                         <div ng-repeat = "ans in child.answer">
                             {{ans.valueString}}

@@ -370,6 +370,10 @@
                                     <uib-tab heading="Report">
                                         <qrdisplay q="q" qr="parentScopeQR"></qrdisplay>
                                     </uib-tab>
+
+                                    <uib-tab heading = "QR">
+                                        <pre>{{parentScopeQR | json}}</pre>
+                                    </uib-tab>
                                 </uib-tabset>
 
                             </div>
