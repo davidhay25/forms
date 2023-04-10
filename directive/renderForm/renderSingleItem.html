@@ -229,14 +229,14 @@
                         <div ng-hide="cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'lookup'">
                             <select class="form-control" ng-model="input.form[cell.item.linkId]"
                                     ng-change="makeQR(cell.item.linkId)"
-                            <!--  ng-options = "concept.display for concept in cell.meta.expandedVSOptions"> -->
+
                                     ng-options = "concept.display for concept in cell.item.answerOption">
                                 <option value=""></option>
                             </select>
                         </div>
 
 
-
+                        <!--  ng-options = "concept.display for concept in cell.meta.expandedVSOptions"> -->
 
 
 

@@ -15,15 +15,17 @@ angular.module("formsApp")
             //in each one can be updated even when data changes in the other
             $scope.$on('qrCreated',function(ev,vo){
                 console.log('qrcreated')
-                $scope.parentScopeQR = vo.QR        //for the report tab
-                $scope.$broadcast("externalQRUpdate",{QR:vo.QR})
+                // {QR, formData, hashItem}
+               // $scope.parentScopeQR = vo.QR        //for the report tab
+                $scope.formQR = vo.QR
+                $scope.$broadcast("externalQRUpdate",vo)
             })
 
-            $scope.$on('qrCreated',function(event,vo1) {
+       //     $scope.$on('qrCreated',function(event,vo1) {
 
 
-                $scope.formQR = vo1.QR
-            })
+              //  $scope.formQR = vo1.QR
+         //   })
 
             //system url for author tags
           //  let tagAuthorSystem = "http://clinfhir.com/fhir/NamingSystem/qAuthorTag"

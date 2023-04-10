@@ -16,8 +16,20 @@ angular.module('formsApp')
                 $scope.datePopup = {}
 
                 $scope.$on("externalQRUpdate",function(ev,vo){
-                    console.log("externalQRUpdate")
+                    //console.log("externalQRUpdate")
                     $scope.qr = vo.QR
+                    console.log(vo.formData)
+
+                    //if the source was something else - ie the tree - then add the formdata to the local set of data
+                    //this is especially the reviewer comments..
+                    if (vo.source !== 'form') {
+                        Object.keys(vo.formData).forEach(function (key) {
+                            $scope.input.form[key] = vo.formData[key]
+                        })
+                    }
+
+
+                    //$scope.form =
 
 
                     //not working...  renderFormsSvc.setControls($scope.input.formTemplate,$scope.input.form)
@@ -52,7 +64,7 @@ angular.module('formsApp')
                 }
 
                 $scope.input = {};
-                $scope.input.form = {}        //a hash containing form data entered by the user
+                $scope.input.form = {}        //a hash containing form data entered by the user. It is also updated in the externalQRUpdate handler
 
 
                 //a hash of items that failed the most current dependency check
@@ -89,7 +101,7 @@ angular.module('formsApp')
 
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
-                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.input.form,hashItem:$scope.hashItem})
+                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.input.form,hashItem:$scope.hashItem,source:'form'})
 
                 }
 

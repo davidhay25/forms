@@ -7,8 +7,8 @@ let globals = require("./globals.json")
 const fs = require("fs");
 //console.log(globals.hello)
 
-//const serverBase = "http://localhost:9099/baseR4/"
-const serverBase = "http://localhost:9099/fhir/"
+const serverBase = "http://localhost:9099/baseR4/"
+//const serverBase = "http://localhost:9099/fhir/"
 
 //a folder that, if it exists, will have a copy of the Q when they are checked in, out or reverted
 const backupFolder = "/tmp/cs-backups"
@@ -50,7 +50,7 @@ function setup(app,sr) {
     app.post('/fr/fhir/receiveQR',async function(req,res){
 
         let QR = extractQRFromBundle(req.body)
-        //console.log(QR)
+        console.log("receiveQR")
         if (QR) {
             QR.id = createId()  // createUUID();
 
@@ -95,8 +95,6 @@ function setup(app,sr) {
                arResources.forEach(function (observation) {
                    bundle.entry.push(createEntry(observation))
                })
-
-
 
                axios.post(serverBase, bundle)
                    .then(function (response) {

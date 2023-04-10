@@ -30,6 +30,15 @@ angular.module('formsApp')
                 $scope.$on('externalQRUpdate',function (ev,vo) {
                     console.log('externalQRUpdate')
                     $scope.qr = vo.QR
+
+
+                    //if the source was something else - ie the form - then add the formdata to the local set of data
+                    //this is especially the reviewer comments..
+                    if (vo.source !== 'tree') {
+                        Object.keys(vo.formData).forEach(function (key) {
+                            $scope.form[key] = vo.formData[key]
+                        })
+                    }
                    // $scope.makeQR()
                 })
 /*
@@ -110,23 +119,19 @@ console.log(txt,item,groupComment)
                             if ($scope.cell.item) {
                                 $scope.selectedGroup = $scope.cell.item
                             }
-
                         }
-
                         $scope.$digest();       //as the event occurred outside of angular...
                     })
-
-
                 }
 
 
                 //note that this is called every time there is a change (eg keypress) in the forms component
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
-
+//console.log('makeQR')
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
-                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem})
+                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem,source:'tree'})
 
                 }
 

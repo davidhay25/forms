@@ -62,9 +62,6 @@
 
     <script src="js/formsCtrl.js"></script>
 
-
-
-
     <script src="js/viewQRCtrl.js"></script>
 
     <script src="js/qSvc.js"></script>
@@ -72,8 +69,9 @@
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/HISOSvc.js"></script>
-
+<!--
     <script src="js/"></script>
+    -->
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -336,8 +334,8 @@
 
                         <div ng-hide = "formState == 'complete' " class="row">
                             <div class="col-md-12">
-                                <div class="rounded-box alert alert-warning">This tab is a representation of the Data Standard as
-                                    a form. It can be used to make comments by entering them in the comments
+                                <div class="rounded-box alert alert-warning">This tab has representations of the Data Standard as
+                                    a tree or a form. Either can be used to make comments by entering them in the comments
                                     elements on the form. You need to enter (at least) your name in the Reviewer details
                                     to the right to submit comments.
                                     Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
@@ -368,11 +366,11 @@
 
                                     </uib-tab>
                                     <uib-tab heading="Report">
-                                        <qrdisplay q="q" qr="parentScopeQR"></qrdisplay>
+                                        <qrdisplay q="q" qr="formQR"></qrdisplay>
                                     </uib-tab>
 
                                     <uib-tab heading = "QR">
-                                        <pre>{{parentScopeQR | json}}</pre>
+                                        <pre>{{formQR | json}}</pre>
                                     </uib-tab>
                                 </uib-tabset>
 
@@ -425,12 +423,12 @@
                                         <br/>
                                         <div class="clickable" ng-click="prepopFromEhr()">Prepop from EHR</div>
                                         <br/>
+                                        <!--
+                                                                               <div class="clickable" ng-show="formQR"
+                                                                                    ng-click="preview()">Single page</div>
 
-                                        <div class="clickable" ng-show="formQR"
-                                             ng-click="preview()">Single page</div>
-
-                                        <!--   will re-enable when the print function works OK
-    -->
+                                                                                 will re-enable when the print function works OK
+                                           -->
                                         <br/>
 
                                         <div>

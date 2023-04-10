@@ -30,7 +30,7 @@ angular.module("formsApp")
 
 
 
-                let arHeader = ["Section","Group","Item","linkId","qCode","qDisplay","qSystem","Extract type","DataType","Description","Obligation","Guide","Repeats","ValueSet","oCode","oDisplay","oTerm","oSystem"]
+                let arHeader = ["Section","Group","Item","linkId","qCode","qDisplay","qSystem","Extract type","DataType","Description","Obligation","Condition","Guide for use","Repeats","Hidden","Exclude","ValueSet","oDisplay","oCode","oTerm","oSystem"]
                 arAllExport.push(arHeader.join('\t'))
                 Q.item.forEach(function (section) {
                     if (section.item) {
@@ -210,26 +210,35 @@ angular.module("formsApp")
                 ar.push(item.linkId)            //linkId
                 if (item.code) {
                     let code = item.code[0]
-                    ar.push(code.code || "")
                     ar.push(code.display || "")
+                    ar.push(code.code || "")
+
                     ar.push(code.system || "")
                 } else {
-                    ar.push("")             //code
                     ar.push("")             //display
+                    ar.push("")             //code
                     ar.push("")             //system
                 }
 
                 ar.push("")                 //extract resource type
                 ar.push(item.type)          //datatype
-                ar.push(meta.description || "")
-                ar.push(obligation)                 //obligation
-                ar.push(usageNotes)                 //guide for use
+                ar.push(cleanText(meta.description) || "")
+                ar.push(cleanText(obligation) )                //obligation
+                ar.push("")                                     //condition
+                ar.push(cleanText(usageNotes) )                //guide for use
 
                 if (item.repeats) {
                     ar.push("Yes")
                 } else {
                     ar.push("No")
                 }
+                if (meta.hidden) {
+                    ar.push("")                                     //hidden
+                } else {
+                    ar.push("hidden")
+                }
+
+                ar.push("")                                     //exclude
                 ar.push(item.answerValueSet || "")
 
                 //now add the as a line to the export file
@@ -312,11 +321,22 @@ angular.module("formsApp")
                             usageNotes += getConditionalNote(parent)  //the conditional details are on the parent...
                         }
                     }
+
+                    if (item.required) {
+                        obligation = "Mandatory"
+                    }
+
                     return {obligation : obligation, usageNotes : usageNotes}
 
                 }
 
 
+                function cleanText(txt) {
+                    if (txt) {
+                        txt = txt.replace(/(\r\n|\n|\r)/gm, " ");
+                    }
+
+                }
 
 /*
                 //let ar = []

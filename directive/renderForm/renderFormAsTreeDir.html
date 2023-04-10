@@ -7,8 +7,13 @@
       <div id="reviewTree"></div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-6" ng-show="selectedNode">
 
+
+        <div ng-show = "selectedNode.data.item.type == 'group'">
+            Expand the tree, then select the specific item to view
+
+        </div>
 
         <div ng-show="selectedNode.data.item.type !== 'group'">
 
@@ -57,16 +62,19 @@
               </uib-tab>
                 -->
 
+            </div>
           <div ng-show="selectedNode.data.section.reviewItem.length > 0">
             <h5>Section comments</h5>
+              <div style="padding:8px; background-color: #eeeeee">
             <div ng-repeat = "item in selectedNode.data.section.reviewItem">
               {{item.text}}
-              <textarea class="form-control" rows="5" ng-model="form[item.linkId]"></textarea>
+              <textarea class="form-control" rows="5" ng-model="form[item.linkId]"
+                        ng-change="makeQR(item.linkId)"></textarea>
                 <em>All comments for items in this section. You can edit this text directly.</em>
             </div>
           </div>
+          </div>
 
-            </div>
         </div>
 
 

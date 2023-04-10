@@ -100,6 +100,8 @@ angular.module("formsApp")
                 let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
                 treeData.push(root)
 
+
+
                 function addItemToTree(parent,item,level,sectionItem) {
                     let idForThisItem =  item.linkId
                     hashItem[item.linkId] = item
@@ -107,7 +109,7 @@ angular.module("formsApp")
                     let thisItem = angular.copy(item)
                     delete thisItem.item
 
-                    //check to see if this item is a review item
+                    //check to see if this item is a review item. If so, add it to the list of all review items this section
                     if (item.code) {
                         console.log(item.code)
                         item.code.forEach(function (code) {
@@ -122,8 +124,6 @@ angular.module("formsApp")
                         text = text.slice(0,47) + "..."
                     }
 
-
-
                     let node = {id:idForThisItem,text:text,parent:parent,data:{section:sectionItem,item:item}}
 
                     node.data.meta = that.getMetaInfoForItem(item)
@@ -132,7 +132,22 @@ angular.module("formsApp")
                     let iconFile = "icons/icon-q-" + item.type + ".png"
                     node.icon = iconFile
 
-                    treeData.push(node)
+                    //if this is a review item text box then don't add to the tree
+                    let canAdd = true
+                    if (item.code) {
+                        console.log(item.code)
+                        item.code.forEach(function (code) {
+                            if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
+                                canAdd = false
+                            }
+                        })
+                    }
+
+                    if (canAdd) {
+                        treeData.push(node)
+                    }
+
+
 
                     //now look at any sub children
                     if (item.item) {
