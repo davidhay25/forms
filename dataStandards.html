@@ -361,8 +361,16 @@
                                         </renderformastree>
                                     </uib-tab>
                                     <uib-tab heading="Form">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <renderform q="selectedQ" qr="formQR" form="input.formData"></renderform>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <qrdisplay q="q" qr="formQR"></qrdisplay>
+                                            </div>
+                                        </div>
 
-                                        <renderform q="selectedQ" qr="formQR" form="input.formData"></renderform>
+
 
                                     </uib-tab>
                                     <uib-tab heading="Report">

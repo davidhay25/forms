@@ -7,3 +7,4 @@ Thumbs.db
 logs
 **/backups
 artifacts/systemConfig.json
+backup
