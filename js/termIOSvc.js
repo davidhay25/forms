@@ -275,13 +275,22 @@ angular.module("formsApp")
                 } else {
                     ar.push("No")
                 }
+
                 if (meta.hidden) {
-                    ar.push("")                                     //hidden
+                    ar.push("yes")                                     //hidden
                 } else {
-                    ar.push("hidden")
+                    ar.push("")
                 }
 
-                ar.push("")                                     //exclude
+                if (meta.exclude) {
+                    ar.push("yes")                                     //hidden
+                } else {
+                    ar.push("")
+                }
+
+                //ar.push("")                                     //exclude
+
+
                 ar.push(item.answerValueSet || "")
 
                 //now add the as a line to the export file
