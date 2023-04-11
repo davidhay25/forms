@@ -172,6 +172,31 @@ angular.module("formsApp")
                 let usageNotes = vo.usageNotes
                 let obligation = vo.obligation
 
+//Section	Group	Item	linkId	qCode	qDisplay	qSystem	Extract type	DataType	Description	Obligation	Condition	Guide for use	Repeats	Hidden	Exclude	ValueSet	oDisplay	oCode	oTerm	oSystem
+                /*
+               "Section",
+               "Group",
+               "Item",
+               "linkId",
+               "qCode",
+               "qDisplay",
+               "qSystem",
+               "Extract type",
+               "DataType",
+               "Description",
+               "Obligation",
+               "Condition",
+               "Guide for use","
+               Repeats",
+               "Hidden",
+               "Exclude","
+               ValueSet",
+               "oDisplay",
+               oCode",
+               "oTerm",
+               oSystem"]
+
+                * */
 
 /*
                 Section
@@ -210,21 +235,39 @@ angular.module("formsApp")
                 ar.push(item.linkId)            //linkId
                 if (item.code) {
                     let code = item.code[0]
-                    ar.push(code.display || "")
                     ar.push(code.code || "")
+                    ar.push(code.display || "")
 
                     ar.push(code.system || "")
                 } else {
-                    ar.push("")             //display
                     ar.push("")             //code
+                    ar.push("")             //display
+
                     ar.push("")             //system
                 }
 
-                ar.push("")                 //extract resource type
+                let extract = ""  //what is extracted from this item (if any)
+                if (meta.extraction) {
+                    if (meta.extraction.extractObservation) {
+                        extract = "Observation"
+                    } else if (meta.extraction.type) {
+                        extract = meta.extraction.type
+                    }
+                }
+                if (item.definition) {
+                    extract = item.definition
+                }
+
+
+                ar.push(extract)                 //extract resource type
+
+
+
+
                 ar.push(item.type)          //datatype
                 ar.push(cleanText(meta.description) || "")
                 ar.push(cleanText(obligation) )                //obligation
-                ar.push("")                                     //condition
+                ar.push(getConditionalNote(item))                                     //condition
                 ar.push(cleanText(usageNotes) )                //guide for use
 
                 if (item.repeats) {
@@ -251,8 +294,9 @@ angular.module("formsApp")
                         let arStart = Array(ar.length).fill('');
 
                         let coding = ao.valueCoding
-                        arStart.push(coding.code || "")
                         arStart.push(coding.display || "")
+                        arStart.push(coding.code || "")
+
 
                         let arExt = formsSvc.findExtension(ao,extAoTerm)
                         if (arExt.length > 0) {
@@ -266,6 +310,7 @@ angular.module("formsApp")
                         arExport.push(arStart.join('\t'))
                     })
                 }
+
 
 
                 function getConditionalNote(item) {
@@ -334,8 +379,9 @@ angular.module("formsApp")
                 function cleanText(txt) {
                     if (txt) {
                         txt = txt.replace(/(\r\n|\n|\r)/gm, " ");
-                    }
 
+                    }
+                    return txt
                 }
 
 /*

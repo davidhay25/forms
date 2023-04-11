@@ -3,7 +3,7 @@
 angular.module("formsApp")
     .controller('designerCtrl',
         function ($scope,$http,formsSvc,$uibModal,$localStorage,qSvc,exportSvc, fhirSvc,
-                  terminologySvc,graphSvc,$timeout,$window,modalService) {
+                  terminologySvc,graphSvc,$timeout,$window,modalService,termIOSvc) {
 
             //see if there was a Q url passed in the initial query. If so, it will be selected once the Q's have loaded...
             let search = $window.location.search;
@@ -105,13 +105,37 @@ angular.module("formsApp")
 
             }
 
+            // ---------- the full download
+            //function that downloads a file
+            function download(filename, text) {
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+            $scope.downloadTSV = function () {
+
+                let ar = termIOSvc.makeExportQ($scope.selectedQ)
+                let content = ar.join('\r\n')
+                console.log(content)
+                let name = $scope.selectedQ.name.replace(/\s+/g, '')  //remove all spaces - shouldn't be needed,
+                let fileName = "termDownloadQ-"+name + ".tsv"
+                download(fileName,content)
+
+            }
+            //----------------
+
+/*
             //when the terminology import has imported answerOptions, it emits this event so the UI can be updated
             $scope.$on('termImported',function(){
                 $scope.drawQ($scope.selectedQ)  //in dashboard.js
                 $scope.input.dirty = true   //in dashboard.js
                 updateReport()
             })
-
+*/
             /*
             //When the QR is created in formCtrl it emits an event
             $scope.$on('qrCreated',function(evt,qr){
@@ -133,7 +157,7 @@ angular.module("formsApp")
 
             $scope.input = {}
 
-            $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display','quantity']
+            $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display','quantity','attachment']
 
             $scope.input.arQContext = ['report','request','general']
 
