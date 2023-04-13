@@ -11,16 +11,16 @@ let axios = require('axios')
 let fileRoot="backups/"
 
 //the server to copy resources from
-//let sourceServer = "http://design.canshare.co.nz/ds/fhir/"
-let sourceServer = "https://canshare.co.nz/ds/fhir/"
+let sourceServer = "http://design.canshare.co.nz/ds/fhir/"
+//let sourceServer = "https://canshare.co.nz/ds/fhir/"
 
 //let sourceServer = "http://localhost:9090/ds/fhir/"
 
 //the server to copy resources to
-let targetServer = "http://localhost:9099/baseR4/"
+//let targetServer = "http://localhost:9099/baseR4/"
 
 //let targetServer = "http://design.canshare.co.nz:9999/baseR4/"
-
+let targetServer = "http://test.canshare.co.nz:9099/baseR4/"
 
 //let targetServer = "http://backup.canshare.co.nz:9099/baseR4/"
 //let targetServer = "http://188.166.76.237:9099/baseR4/"  //the backup server
@@ -39,8 +39,8 @@ readline.question(`Press any key to continue`, name => {
     readline.close();
     syncResources("Questionnaire")
 //syncResources("Observation")
-    syncResources("QuestionnaireResponse")
-    syncResources("Observation")
+   // syncResources("QuestionnaireResponse")
+   // syncResources("Observation")
 });
 
 

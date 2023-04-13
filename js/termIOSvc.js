@@ -271,21 +271,21 @@ angular.module("formsApp")
                 ar.push(cleanText(usageNotes) )                //guide for use
 
                 if (item.repeats) {
-                    ar.push("Yes")
+                    ar.push("yes")
                 } else {
-                    ar.push("No")
+                    ar.push("no")
                 }
 
                 if (meta.hidden) {
                     ar.push("yes")                                     //hidden
                 } else {
-                    ar.push("")
+                    ar.push("no")
                 }
 
                 if (meta.exclude) {
-                    ar.push("yes")                                     //hidden
+                    ar.push("yes")                                     //exclude
                 } else {
-                    ar.push("")
+                    ar.push("no")
                 }
 
                 //ar.push("")                                     //exclude
