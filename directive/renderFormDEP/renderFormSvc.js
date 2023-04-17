@@ -415,7 +415,7 @@ angular.module("formsApp")
                 }
             },
 
-            makeQR :  function(Q,form,dataUrl) {
+            makeQR :  function(Q,form,hashItem) {
                 let that = this
 
                 //new script...
@@ -425,6 +425,7 @@ angular.module("formsApp")
                 Object.keys(form).forEach(function (linkId) {
                     let dataItem = form[linkId]
                     let canShow = that.checkConditional(dataItem,form)
+                    //console.log(linkId,canShow,dataItem)
                     hashValues[linkId] = dataItem
                 })
 
@@ -440,7 +441,7 @@ angular.module("formsApp")
                         section.item.forEach(function (child) {
                             //a child can be a group or a leaf element
                             if (child.item) {
-                                //this is a group. it won't have a value (though can have other attributes like a code)
+                                //this is a group. it won't have a value (though can have otehr attributes like a code)
                                 let groupItem = null
                                 child.item.forEach(function (gc) {
                                     //this is a child (grandchild) grandchild of the group
@@ -457,7 +458,7 @@ angular.module("formsApp")
                                             sectionItem.item.push(groupItem)
                                         }
 
-                                        let leafItem = {linkId:gc.linkId,  answer:[], text:gc.text}
+                                        let leafItem = {linkId:gc.linkId,  answer:[]}
                                         groupItem.item.push(leafItem)
 
                                         let v = hashValues[gc.linkId]        //the value in the form
@@ -754,13 +755,6 @@ angular.module("formsApp")
                             result = {valueInteger : parseInt(value)}
                             break
 
-                        case "attachment" :
-
-                            result = {valueAttachment: {contentType:"image/png",data:btoa(value)}}
-
-                            //result = attValue
-                            break
-
                         default :
                             result = {valueString : value}
                         //itemToAdd.answer.push({valueString : value})
@@ -930,27 +924,17 @@ angular.module("formsApp")
                                 } else {
                                     //2023-01-24
 
-                                    //if the type is 'attachment' then assume it's a drawing. A drawing can't be in a group
-                                    if (item.type == 'attachment') {
-                                        section.imageDetails = {linkId:item.linkId,imageName:item.text}     //todo is text the right element to use?
+                                    //if the item isn't a group, then add it to column 1.
+                                    let row = {}   //will have a single entry - left
+                                    row.item = item
+                                    row.meta = meta
+                                    let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                    fillFromValueSet(cell,termServer)
+                                    setDecoration(cell,item)
+                                    setDefaultValue(item,formData)
+                                    row['col1'] = [cell] //make it an array to match the group
 
-                                    } else {
-                                        //if the item isn't a group, then add it to column 1.
-                                        let row = {}   //will have a single entry - left
-                                        row.item = item
-                                        row.meta = meta
-                                        let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
-                                        fillFromValueSet(cell,termServer)
-                                        setDecoration(cell,item)
-                                        setDefaultValue(item,formData)
-                                        row['col1'] = [cell] //make it an array to match the group
-
-                                        section.rows.push(row)
-
-                                    }
-
-
-
+                                    section.rows.push(row)
 
 
                                 }

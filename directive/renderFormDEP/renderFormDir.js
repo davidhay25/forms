@@ -7,7 +7,7 @@ angular.module('formsApp')
                 //@ reads the attribute value, = provides two-way binding, & works with functions
                 q: '=',
                 qr : '=',
-                form : "="          //todo I don't think this is being used & could be removed when I get back to the forms app
+                form : "="
             },
 
             templateUrl: 'directive/renderForm/renderFormDir.html',
@@ -28,7 +28,12 @@ angular.module('formsApp')
                         })
                     }
 
+
+                    //$scope.form =
+
+
                     //not working...  renderFormsSvc.setControls($scope.input.formTemplate,$scope.input.form)
+
                   //  $scope.makeQR() - causes a stack overflow
                 })
 
@@ -72,11 +77,14 @@ angular.module('formsApp')
                        console.log('Q updated')
                         delete $scope.selectedSection       //c;ears the current section display
                         if ($scope.q) {
+
+
+
                             let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
                             if (vo) {
                                 $scope.input.formTemplate = vo.template
                                 $scope.hashItem = vo.hashItem
-console.log(vo.template)
+
                             }
                         } else {
                            // delete $scope.input.formTemplate
@@ -91,75 +99,17 @@ console.log(vo.template)
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
 
-                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form)
+                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.input.form,hashItem:$scope.hashItem,source:'form'})
 
                 }
 
-                //when a section is selected
+                //when a top level item is selected in the tabbed interface
                 $scope.selectSection = function(section) {
-
-                    //console.log(section.imageDetails)
-
-                    //section.imageDetails = {imageName:"left-breast.png",linkId:"image"}        //temp
                     $scope.selectedSection = section
-                    if (section.imageDetails) {
-                        //the section has an associated image. load and display it
-
-                        setDrawing(section.imageDetails.imageName)
-
-                        $scope.formPane = "col-md-6"
-                        $scope.drawingPane = "col-md-3"
-                    } else {
-
-                        $scope.formPane = "col-md-9"
-                        $scope.drawingPane = "col-md-0"
-                    }
                 }
 
-                $scope.resetDrawing = function(){
-                    setDrawing($scope.selectedSection.imageDetails.imageName)
-                    delete $scope.input.form[$scope.selectedSection.imageDetails.linkId]
-                    $timeout(function(){
-                        $scope.makeQR()
-                    },100)
-                }
-
-                setDrawing = function (imageName) {
-                    let canvas = document.getElementById('drawingCanvas')
-                    let context = canvas.getContext('2d')
-                    const image = new Image()
-                    image.src = `images/${imageName}`
-                    image.onload = function () {
-                        context.drawImage(image, 0, 0)
-                    }
-
-                    canvas.addEventListener('mousedown', function(event) {
-                        //console.log('dn',event.offsetX,event.offsetY)
-                        // isDrawing = true;
-                        startX = event.offsetX;
-                        startY = event.offsetY;
-                        context.beginPath();
-                        context.arc(startX, startY, 7, 0, 2 * Math.PI);
-                        context.stroke();
-
-                        //save the dataUrl on the scope
-                        //let canvas1 = document.getElementById('drawingCanvas');
-                        //let dataURL = canvas1.toDataURL()
-
-                        //$scope.dataUrl = canvas1.toDataURL()
-                        //console.log(dataURL)
-
-                        $scope.input.form[$scope.selectedSection.imageDetails.linkId] = canvas.toDataURL()
-                        $timeout(function(){
-                            $scope.makeQR()
-                        },100)
-
-
-                    });
-
-                }
 
                 //called by a cell to indicate if it should be shown
                 $scope.showConditional = function (cell,form) {

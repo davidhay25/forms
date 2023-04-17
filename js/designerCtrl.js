@@ -36,7 +36,7 @@ angular.module("formsApp")
 
 
             $scope.updateAllHiso = function(){
-                if (confirm("This will update all HISO information to default values (apart from Uniot Of Measure). Are you sure you want to do this?")){
+                if (confirm("This will update all HISO information to default values (apart from Unit Of Measure). Are you sure you want to do this?")){
                     formsSvc.updateAllHiso($scope.selectedQ)
                     $scope.hisoElementsList = formsSvc.getHisoElementsList($scope.selectedQ)
 
@@ -50,7 +50,7 @@ angular.module("formsApp")
                 if ($scope.selectedQ.useContext) {
                     $scope.selectedQ.useContext.forEach(function (uc) {
                         if (uc.code) {
-                            if (uc.code.system !== 'http://canshare.co.nz/CodeSystem/Questionnaire' && uc.code.code !== "qtype") {
+                            if (uc.code.system !== 'http://canshare.co.nz/fhir/CodeSystem/questionnaire' && uc.code.code !== "qtype") {
                                 ar.push(uc)
                             }
                         }
@@ -58,7 +58,8 @@ angular.module("formsApp")
                     })
                 }
                 //at this point have all other contexts
-                ar.push({code:{system:'http://canshare.co.nz/CodeSystem/questionnaire-options',code:'qtype'},valueCodeableConcept:{text:ctxString}})
+                let ctx = {text:ctxString,coding:[{system:"http://canshare.co.nz/fhir/CodeSystem/questionnaire-type",code:ctxString}]}
+                ar.push({code:{system:'http://canshare.co.nz/fhir/CodeSystem/questionnaire',code:'qtype'},valueCodeableConcept:{text:ctxString}})
                 $scope.selectedQ.useContext = ar
 
                 $scope.updateLocalCache()
@@ -1382,6 +1383,8 @@ return
                     $scope.input.dirty = true;
                     $scope.editingQ = false
 
+                    $scope.$broadcast("q-updated")
+
                     updateReport()
                 }
 
@@ -1398,6 +1401,8 @@ return
                     $scope.updateLocalCache()
                     $scope.input.dirty = true;
                     $scope.editingQ = false
+
+                    $scope.$broadcast("q-updated")
 
                     updateReport()
                 }
@@ -1800,18 +1805,11 @@ return
                 delete $scope.currentQContext
                 if (Q.useContext && Q.useContext.length > 0) {      //only look at the first UC for now.
                     Q.useContext.forEach(function (uc) {
-
-
-                        if (uc.code.system == 'http://canshare.co.nz/CodeSystem/questionnaire-options' && uc.code.code == "qtype") {
+                        if (uc.code.system == 'http://canshare.co.nz/fhir/CodeSystem/questionnaire' && uc.code.code == "qtype") {
                             //todo - for now, just use the CC.text element. add coding later...
                             $scope.input.currentQContext = uc.valueCodeableConcept.text
                         }
-
-
-
                     })
-
-
                 }
 
                 $scope.checkoutIdentifier = formsSvc.getCheckoutIdentifier(Q)  //the identifier of who has checked this out (if any)
@@ -1820,7 +1818,7 @@ return
                 now = new Date()
 
                 let vo = formsSvc.generateQReport(Q)
-                console.log("Time to generate report ",moment().diff(now))
+                //console.log("Time to generate report ",moment().diff(now))
                 $scope.report = vo.report
                 $scope.hisoElementsList = formsSvc.getHisoElementsList(Q)
                 $scope.hashAllItems = vo.hashAllItems       //{item: dependencies: }}
