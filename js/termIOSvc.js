@@ -303,8 +303,15 @@ angular.module("formsApp")
                         let arStart = Array(ar.length).fill('');
 
                         let coding = ao.valueCoding
-                        arStart.push(coding.display || "")
-                        arStart.push(coding.code || "")
+                        if (coding) {
+                            arStart.push(coding.display || "")
+                            arStart.push(coding.code || "")
+                        } else {
+                            //this is where there are answerOptions that aren't codings - eg string
+                            arStart.push("")
+                            arStart.push("")
+                        }
+
 
 
                         let arExt = formsSvc.findExtension(ao,extAoTerm)
@@ -314,8 +321,13 @@ angular.module("formsApp")
                         } else {
                             arStart.push("")
                         }
+                        
+                        if (coding) {
+                            arStart.push(coding.system || "")
+                        } else {
+                            arStart.push("")
+                        }
 
-                        arStart.push(coding.system || "")
                         arExport.push(arStart.join('\t'))
                     })
                 }
