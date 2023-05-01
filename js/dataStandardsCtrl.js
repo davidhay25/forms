@@ -415,7 +415,8 @@ angular.module("formsApp")
             $scope.allMdm = []                  //Mdm
             $scope.allActnow = []              //actnow
 
-            $scope.tags = ['All']
+            //$scope.tags = ['All']
+            $scope.tags = []
             $scope.hisoStatuses = []
             $http.get(qry).then(
                 function (data) {
@@ -482,14 +483,41 @@ angular.module("formsApp")
                                     $scope.allQ.push(Q)         //note that this is a minimal Q
                                 }
 
-
-
                             }
 
-                            $scope.input.selectedTag = $scope.tags[0]
-                            $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
+
+
+                           // $scope.input.selectedTag = $scope.tags[0]
+                           // $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
 
                         })
+
+                        //sort by title or name
+                        $scope.allQ.sort(function(a,b){
+                            let txtA = a.title || a.name
+                            let txtB = b.title || b.name
+                            if (txtA > txtB) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        })
+
+                        //sort tags
+                        $scope.tags.sort(function (a,b) {
+                            if (a.toLowerCase() > b.toLowerCase()) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+
+                        })
+                        //insert the 'All' tag
+                        $scope.tags.splice(0,0,"All")
+
+
+                        $scope.input.selectedTag = $scope.tags[0]
+                        $scope.input.selectedHisoStatus = $scope.hisoStatuses[0]
 
                         //-----------
                         if (QIdfromUrl) {

@@ -644,9 +644,8 @@ angular.module("formsApp")
                     return
                 }
 
-
                 //for a checkbox, the repeats should be set.
-                if ($scope.input.vs.rendermode == "check-box") {
+                if ($scope.input.vs && $scope.input.vs.rendermode == "check-box") {
                     $scope.newItem.repeats = true
                 }
 
