@@ -50,7 +50,7 @@ angular.module("formsApp")
                 if ($scope.selectedQ.useContext) {
                     $scope.selectedQ.useContext.forEach(function (uc) {
                         if (uc.code) {
-                            if (uc.code.system !== 'http://canshare.co.nz/fhir/CodeSystem/questionnaire' && uc.code.code !== "qtype") {
+                            if (uc.code.system !== 'http://terminology.hl7.org/CodeSystem/usage-context-type' && uc.code.code !== "focus") {
                                 ar.push(uc)
                             }
                         }
@@ -58,8 +58,8 @@ angular.module("formsApp")
                     })
                 }
                 //at this point have all other contexts
-                let ctx = {text:ctxString,coding:[{system:"http://canshare.co.nz/fhir/CodeSystem/questionnaire-type",code:ctxString}]}
-                ar.push({code:{system:'http://canshare.co.nz/fhir/CodeSystem/questionnaire',code:'qtype'},valueCodeableConcept:{text:ctxString}})
+              //  let ctx = {text:ctxString,coding:[{system:"http://canshare.co.nz/fhir/CodeSystem/questionnaire-type",code:ctxString}]}
+                ar.push({code:{system:'http://terminology.hl7.org/CodeSystem/usage-context-type',code:'focus'},valueCodeableConcept:{text:ctxString}})
                 $scope.selectedQ.useContext = ar
 
                 $scope.updateLocalCache()
@@ -160,7 +160,7 @@ angular.module("formsApp")
 
             $scope.input.itemTypes = ['string','text','boolean','decimal','integer','date','dateTime', 'choice','group','display','quantity','attachment']
 
-            $scope.input.arQContext = ['report','request','general']
+            $scope.input.arQContext = ['report','request','general','other']
 
             //$scope.input.itemTypes = ['string','quantity','text','boolean','decimal','integer','date','dateTime', 'choice','open-choice','group','reference','display']
 
@@ -1805,7 +1805,7 @@ return
                 delete $scope.currentQContext
                 if (Q.useContext && Q.useContext.length > 0) {      //only look at the first UC for now.
                     Q.useContext.forEach(function (uc) {
-                        if (uc.code.system == 'http://canshare.co.nz/fhir/CodeSystem/questionnaire' && uc.code.code == "qtype") {
+                        if (uc.code.system == 'http://terminology.hl7.org/CodeSystem/usage-context-type' && uc.code.code == "focus") {
                             //todo - for now, just use the CC.text element. add coding later...
                             $scope.input.currentQContext = uc.valueCodeableConcept.text
                         }
@@ -2092,19 +2092,19 @@ return
 
 
                             $scope.allQ.push(miniQ)
-                            //console.log(entry.resource.extension)
 
-/*
-                            //populate tag list - todo this should go...
-                            if (entry.resource && entry.resource.meta && entry.resource.meta.tag) {
-                                entry.resource.meta.tag.forEach(function (tag) {
-                                    if (tag.system == $scope.tagFolderSystem) {
-                                        $scope.folderTags[tag.code] = tag
-                                    }
-                                })
+
+                        })
+
+                        //sort by title
+                        $scope.allQ.sort(function(a,b){
+                            let n1 = a.title || a.name
+                            let n2 = b.title || b.name
+                            if (n1 > n2) {
+                                return 1
+                            } else {
+                                return -1
                             }
-                            */
-
                         })
 
                         if ($scope.QfromUrl) {

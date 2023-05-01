@@ -10,7 +10,7 @@ angular.module("formsApp")
                 QIdfromUrl = search.substr(1)
             }
 
-            //qrCreated is emitted by the directives that can collect data - form & tree.
+            //qrCreated is emitted by the directives that can collect data - just the form now.
             //as they are siblings, this function broadcasts an event so that the QR
             //in each one can be updated even when data changes in the other
             $scope.$on('qrCreated',function(ev,vo){
@@ -18,10 +18,38 @@ angular.module("formsApp")
                 // {QR, formData, hashItem}
                // $scope.parentScopeQR = vo.QR        //for the report tab
                 $scope.formQR = vo.QR
-                $scope.$broadcast("externalQRUpdate",vo)
+                console.log($scope.formQR)
+
+                //todo - this was when I was allowing data to be entered in the tree...
+                //$scope.$broadcast("externalQRUpdate",vo)
             })
 
-       //     $scope.$on('qrCreated',function(event,vo1) {
+
+            $scope.$on('commentsUpdated',function(ev,vo) {
+                console.log('commentsUpdated',vo.hashComments)
+                $scope.hashComments = vo.hashComments  //the comments are incorproated into the QR my makeQR
+
+               // makeQR()
+
+                return
+
+                //a copy of the form data. We don't want to update the one that the form is using
+                //as the comments from the hash would appear in the comment fields...
+                let model = angular.copy($scope.form)
+
+                //updates the items marked as comments (using the code.system)
+                //If I was doing this again I'd use an extension, but that will require updating the disposer. Perhaps another time...
+                formsSvc.addCommentsToModel($scope.selectedQ,vo.hashComments,model)
+
+                makeQR(model)
+
+                //$scope.form
+
+
+
+            })
+
+
 
 
               //  $scope.formQR = vo1.QR
@@ -76,12 +104,24 @@ angular.module("formsApp")
 
             function makeQR() {
                 let patient = null
+
+
+                //before building the QR, the comments from the tree need to be incorporated.
+                //use a clone of the model data so the displayed form is not updated
+                let formData = angular.copy($scope.form)
+
+                //updates the items marked as comments (using the code.system)
+                //If I was doing this again I'd use an extension, but that will require updating the disposer. Perhaps another time...
+                formsSvc.addCommentsToModel($scope.selectedQ,$scope.hashComments,formData)
+
+
+
+
+
                 let practitioner = null
-                $scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
+//$scope.formQR = formsSvc.makeQR($scope.selectedQ, $scope.form,null,patient,practitioner,
+                $scope.formQR = formsSvc.makeQR($scope.selectedQ, formData ,null,patient,practitioner,
                     $scope.input.reviewerName,$scope.input.reviewerOrganization,$scope.input.reviewerEmail)
-
-
-
 
 
             }
@@ -148,7 +188,7 @@ angular.module("formsApp")
 
 
                         //doesn't work - https://stackoverflow.com/questions/22189544/print-a-div-using-javascript-in-angularjs-single-page-application#22189651
-                        $scope.print = function () {
+                        $scope.printDEP = function () {
 
                             let divName = "onePagePreview"
 
@@ -178,8 +218,6 @@ angular.module("formsApp")
 
                             return true;
                         }
-
-
 
                     },
                     size : 'lg',
@@ -228,6 +266,11 @@ angular.module("formsApp")
             }
 
             $scope.submitForm = function() {
+
+                //don't rebuild the QR here. It is created by the commentsUpdated event handler which
+                //incorporates comments from the tree into the QR using a copy of the model.
+                //This function will add the reviewer details to the QR before submitting
+
                 //$scope.makeQR()  //updates $scope.QR
                 //let QR = formsSvc.makeQR($scope.selectedQ,$scope.form,$scope.hashItem)
 
@@ -296,6 +339,9 @@ angular.module("formsApp")
                     $scope.formQR.author = {reference:'#pr1',display:display}
 
 
+
+                    console.log($scope.formQR)
+                    //return      //temp
 
                     //-------------------------------------------
 

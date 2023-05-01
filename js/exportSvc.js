@@ -160,10 +160,18 @@ angular.module("formsApp")
 
                                     //todo need to check for other conditional operators...
 
+                                    //The conditional can either be mandatory or optional
+                                    let t = "Optional"
+                                    if (item.required) {
+                                        t = "Mandatory"
+                                    }
 
-                                    note += "Use when '" + source.item.text + "' is equal to "
+
+                                    //note += "Use when '" + source.item.text + "' is equal to "
+                                    note += t + " on a response of " // '" + source.item.text + "' is equal to "
 
 
+                                    note += "'"
                                     if (ew.answerCoding) {
                                         note += ew.answerCoding.display
                                     } else if (ew.answerString) {
@@ -173,6 +181,9 @@ angular.module("formsApp")
                                     } else {
                                         note += " an unknown value"
                                     }
+
+                                    note += "' for " + source.item.text
+
 
                                 } else {
                                     note += "No item with a linkId of '"+ew.question + "' was found."
@@ -212,25 +223,8 @@ angular.module("formsApp")
                             if (item.enableWhen) {
                                 let ew = item.enableWhen[0]
                                 entry.obligation = "Conditional"
-                                entry.usageNotes += getConditionalNote(item)
-
-                                /*
-                                let master = hashAllItems[ew.question]
-                                if (master) {
-                                    entry.usageNotes = entry.usageNotes || ""
-
-                                    if (ew.answerCoding) {
-                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerCoding.code
-                                    } else if (ew.answerBoolean) {
-                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerBoolean
-                                    } else if (ew.answerString) {
-                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerString
-                                    } else if (ew.answerInteger !== undefined) {
-                                        entry.usageNotes += "Mandatory when " + master.item.text + " = " + ew.answerInteger
-                                    }
-                                }
-                                */
-
+                               // entry.usageNotes += getConditionalNote(item)
+                                entry.usageNotes = getConditionalNote(item) + ". " + entry.usageNotes
 
 
                             } else {
@@ -240,7 +234,8 @@ angular.module("formsApp")
                             //check for individual conditonality when the item is not required
                             if (item.enableWhen) {
                                 entry.obligation = "Conditional"
-                                entry.usageNotes += getConditionalNote(item)
+                                //entry.usageNotes += getConditionalNote(item)
+                                entry.usageNotes = getConditionalNote(item) + ". " + entry.usageNotes
                             } else {
                                 entry.obligation = "Optional"
                             }
@@ -250,7 +245,8 @@ angular.module("formsApp")
                         if (parent) {
                             if (parent.enableWhen) {
                                 entry.obligation = "Conditional"
-                                entry.usageNotes += getConditionalNote(parent)  //the conditional details are on the parent...
+                                entry.usageNotes = getConditionalNote(parent) + ". " + entry.usageNotes
+                                //entry.usageNotes += getConditionalNote(parent)  //the conditional details are on the parent...
                             }
                         }
                         

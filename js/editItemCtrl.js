@@ -645,6 +645,12 @@ angular.module("formsApp")
                 }
 
 
+                //for a checkbox, the repeats should be set.
+                if ($scope.input.vs.rendermode == "check-box") {
+                    $scope.newItem.repeats = true
+                }
+
+
                 if ($scope.newItem.answerOption) {
                     //add the term extension if needed
                     $scope.newItem.answerOption.forEach(function (opt) {

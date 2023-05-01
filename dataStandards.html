@@ -22,9 +22,6 @@
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
 
-
-
-
     <style>
         .myScroll {
             height: 500px;
@@ -75,6 +72,7 @@
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
+
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
@@ -332,59 +330,60 @@
                             </div>
                         </div>
 
-                        <div ng-hide = "formState == 'complete' " class="row">
-                            <div class="col-md-12">
-                                <div class="rounded-box alert alert-warning">This tab has representations of the Data Standard as
-                                    a tree or a form. Either can be used to make comments by entering them in the comments
-                                    elements on the form. You need to enter (at least) your name in the Reviewer details
-                                    to the right to submit comments.
-                                    Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
-                                    list of standards at the left.  Submit form when complete.
-                                    There is more detailed help available
-                                    <a target="_blank" href="https://docs.google.com/document/d/1Nn5pzfDaUAe4gXPYxEkLqk2wnlReBb4Tk9IovQ-lPlA/edit?usp=sharing">here</a>
-                                    <br/>
-                                    <div class="text-center" style="color: red; font-weight: bold">
-                                        Previous forms and comments are shown as anonymous examples. Don't include any real data in this form!
+                        <div ng-hide = "formState == 'complete' " >
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="rounded-box alert alert-warning">This tab has representations of the Data Standard as
+                                        a tree or a form. Either can be used to make comments by entering them in the comments
+                                        elements on the form. You need to enter (at least) your name in the Reviewer details
+                                        to the right to submit comments.
+                                        Click <span class="clickable" ng-click="input.togglePane()"><strong>here</strong></span> to hide/show the
+                                        list of standards at the left.  Submit form when complete.
+                                        There is more detailed help available
+                                        <a target="_blank" href="https://docs.google.com/document/d/1Nn5pzfDaUAe4gXPYxEkLqk2wnlReBb4Tk9IovQ-lPlA/edit?usp=sharing">here</a>
+                                        <br/>
+                                        <div class="text-center" style="color: red; font-weight: bold">
+                                            Previous forms and comments are shown as anonymous examples. Don't include any real data in this form!
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                        </div>
 
 
-                        <div class="row">
-                            <div class="col-md-10">
-                                <uib-tabset>
-                                    <uib-tab heading="Tree">
-                                        <renderformastree q="selectedQ" qr="treeReviewQR" form="input.formData">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <uib-tabset>
+                                        <uib-tab heading="Tree">
+                                            <renderformastree q="selectedQ" qr="treeReviewQR" form="input.formData">
 
-                                        </renderformastree>
-                                    </uib-tab>
-                                    <uib-tab heading="Form">
-                                        <div class="row">
-                                            <div class="col-md-8">
-                                                <renderform q="selectedQ" qr="formQR" form="input.formData"></renderform>
+                                            </renderformastree>
+                                        </uib-tab>
+                                        <uib-tab heading="Form">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <renderform q="selectedQ" qr="formQR" form="input.formData"></renderform>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <qrdisplay q="q" qr="formQR"></qrdisplay>
+                                                </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <qrdisplay q="q" qr="formQR"></qrdisplay>
-                                            </div>
-                                        </div>
 
 
 
-                                    </uib-tab>
-                                    <uib-tab heading="Report">
-                                        <qrdisplay q="q" qr="formQR"></qrdisplay>
-                                    </uib-tab>
+                                        </uib-tab>
+                                        <uib-tab heading="Report">
+                                            <qrdisplay q="q" qr="formQR"></qrdisplay>
+                                        </uib-tab>
 
-                                    <uib-tab heading = "QR">
-                                        <pre>{{formQR | json}}</pre>
-                                    </uib-tab>
-                                </uib-tabset>
+                                        <uib-tab heading = "QR">
+                                            <pre>{{formQR | json}}</pre>
+                                        </uib-tab>
+                                    </uib-tabset>
 
-                            </div>
+                                </div>
 
-                            <div class="col-md-2">
+                                <div class="col-md-2">
 
                                     <div ng-show="input.showTechnical" >
                                         <div  style="padding:8px; background-color: #eeeeee">
@@ -451,13 +450,18 @@
                                 </div>
 
 
+                            </div>
+
+
+
                         </div>
+
 
 
                     </uib-tab>
 
 
-                    <uib-tab heading="Tree (deprecated)">
+                    <uib-tab ng-show="false" heading="Tree (deprecated)">
                         <br/>
                         <div class="row">
                             <div class="col-md-6">
@@ -772,8 +776,6 @@
                                 </div>
 
 
-
-
                             </div>
                             <div class="col-md-10">
                                 <iframe width="100%" height = "800px" ng-src="{{selectedDocumentLocation | trustUrl}}"></iframe>
@@ -782,7 +784,7 @@
                         </div>
                     </uib-tab>
 
-                    <uib-tab ng-show="input.showTechnical" heading="HL7 v2 segments">
+                    <uib-tab ng-show="false" heading="HL7 v2 segments">
                        <br/>
 
 

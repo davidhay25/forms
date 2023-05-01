@@ -52,41 +52,33 @@ angular.module("formsApp")
                 })
 
                 //add all the issues in the OO to the list
-                if (OO && OO.issue) {
-                    OO.issue.forEach(function (iss) {
-                        if (iss.location) {
-                            let loc = iss.location[0]  //Bundle.entry[2].resource
-                            let ar = loc.split('[')
-                            if (ar.length > 1) {
-                                let l = ar[1]   // 2].resource
-                                let g = l.indexOf(']')
-                                let pos = l.slice(0,g)
+                OO.issue.forEach(function (iss) {
+                    if (iss.location) {
+                        let loc = iss.location[0]  //Bundle.entry[2].resource
+                        let ar = loc.split('[')
+                        if (ar.length > 1) {
+                            let l = ar[1]   // 2].resource
+                            let g = l.indexOf(']')
+                            let pos = l.slice(0,g)
+                            //console.log(pos,loc)
 
-
-                                let resourceAtIndex = lstResources[pos]
-                                if (resourceAtIndex) {
-                                    let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
-                                    if (iss.severity == 'error') {
-                                        totalErrors++
-                                    }
-                                    resourceAtIndex.issues.push(item)
-                                } else {
-                                    unknownIssues.push(iss)
-                                }
-
-                            } else {
-                                unknownIssues.push(iss)
+                            let resourceAtIndex = lstResources[pos]
+                            let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+                            if (iss.severity == 'error') {
+                                totalErrors++
                             }
-
-
+                            resourceAtIndex.issues.push(item)
                         } else {
-                            //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
                             unknownIssues.push(iss)
                         }
 
-                    })
-                }
 
+                    } else {
+                        //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
+                        unknownIssues.push(iss)
+                    }
+
+                })
 
                 return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues}
 
@@ -99,13 +91,8 @@ angular.module("formsApp")
 
                 //let objColours = {}
                 let missingReferences = {}      //where a resource references a missing entry...
-                let focusResourceRef
-                if (options.focusResource) {    //this is an actual resource instance
-                    focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}`
-                }
 
-
-                var arNodes = [], arEdges = [], edge;
+                var arNodes = [], arEdges = [];
                 var objNodes = {};
 
                 var allReferences = [];
@@ -145,7 +132,7 @@ angular.module("formsApp")
                         arNodes.push(node);
 
                         var refs = [];
-                        findReferences(refs,resource,resource.resourceType);    //locate all the outbound references for this element
+                        findReferences(refs,resource,resource.resourceType);
                         let cRefs = []
 
                         refs.forEach(function(ref){
@@ -154,82 +141,34 @@ angular.module("formsApp")
                         })
                     }
 
+
+
+
                 });
 
-               // console.log(objNodes)
+                console.log(objNodes)
 
-                //if there's a focusResource, then assemble a hash of all resources that it references, or that reference it
-
-                let hashResourcesToInclude = {}     //when there is a focus resource, this will be a hash of resources that have a reference with it
-                hashResourcesToInclude[focusResourceRef] = true     //include the focus resource
-                let refToInclude = []  //references to include
                 allReferences.forEach(function(ref){
-                    let targetNode = objNodes[ref.targ];    //the node that the reference points to...
+                    let targetNode = objNodes[ref.targ];
                     if (targetNode) {
                         //var label = $filter('dropFirstInPath')(ref.path);
                         let ar = ref.path.split('.')
                         ar.splice(0,1)
                         let label = ar.join('.')
-                        edge = {id: 'e' + arEdges.length +1,
+                        arEdges.push({id: 'e' + arEdges.length +1,
                             from: ref.src.id,
                             to: ref.targ, // targetNode.id,
-                            label: label,arrows : {to:true}}
-                      //  arEdges.push(edge)
-                     //   arEdges.push({id: 'e' + arEdges.length +1,
-                      //      from: ref.src.id,
-                       //     to: ref.targ, // targetNode.id,
-                           // label: label,arrows : {to:true}})
-
-
-                        //console.log(focusResourceRef, ref.src.id,ref.targ)
-                        if (focusResourceRef) {
-                            if (ref.src.id == focusResourceRef) {
-                                hashResourcesToInclude[ref.targ] = true
-                                refToInclude.push(ref)
-                                //console.log('include src')
-                                arEdges.push(edge)
-                            }
-
-                            if ( ref.targ == focusResourceRef) {
-                                hashResourcesToInclude[ref.src.id] = true
-                                refToInclude.push(ref)
-                                //console.log('include targ')
-                                arEdges.push(edge)
-                            }
-
-                        } else {
-                            arEdges.push(edge)
-                        }
-
+                            label: label,arrows : {to:true}})
                     } else {
-
-                        console.log('>>>>>>> error Node Id '+ref.targ + ' is not present. (From '+ ref.src.id)
+                        console.log('>>>>>>> error Node Id '+ref.targ + ' is not present')
                     }
                 });
-
-                //console.log(focusResourceRef,hashResourcesToInclude)
-
-                //create an array of nodes, excluding those that don't have a refence with the focus resource
-                let arNodes1 = []
-
-                arNodes.forEach(function (node) {
-                    if (focusResourceRef) {
-                        if (hashResourcesToInclude[node.id]) {
-                            arNodes1.push(node)
-                        }
-                    } else {
-                        arNodes1.push(node)
-                     //   edge.id = 'e' + arEdges.length + 1
-                      //  arEdges.push(edge)
-                    }
-
-                })
 
                 let nodes;
                 let edges;
 
                 //nodes = new vis.DataSet(arNodes);
-                nodes = new vis.DataSet(arNodes1)
+                nodes = new vis.DataSet(arNodes)
                 edges = new vis.DataSet(arEdges);
 
 
@@ -249,35 +188,22 @@ angular.module("formsApp")
 
                         //if it's an object, does it have a child called 'reference'?
 
-                       // if (angular.isArray(node.id,value)) {
                         if (angular.isArray(value)) {
-                            //console.log(value)
                             value.forEach(function(obj,inx) {
                                 //examine each element in the array
                                 if (obj) {  //somehow null's are getting into the array...
                                     var lpath = nodePath + '.' + key;
-                                    if (obj.reference || obj.valueReference) {
+                                    if (obj.reference) {
                                         //this is a reference!
 //console.log(obj)
+                                        //there are also circumstances where this is an element name
+                                        //mar 15 - 2022
 
-
-                                        //This is a 'normal' reference - from a defined element
-                                        if (obj.reference) {
-                                            let thing = obj.reference;
-                                            //there are also circumstances where this is an element name
-                                            //mar 15 - 2022
-
-                                            if (thing.reference) {
-                                                thing = thing.reference
-                                            }
-                                            refs.push({path: lpath, reference: obj.reference})
+                                        let thing = obj.reference;
+                                        if (thing.reference) {
+                                            thing = thing.reference
                                         }
-
-
-                                        //for extensions, the element name is 'valueReference'
-                                        if (obj.valueReference) {
-                                            refs.push({path: lpath, reference: obj.valueReference.reference})
-                                        }
+                                        refs.push({path: lpath, reference: obj.reference})
 
                                     } else {
                                         //if it's not a reference, then does it have any children?

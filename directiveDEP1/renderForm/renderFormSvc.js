@@ -57,59 +57,6 @@ angular.module("formsApp")
 
         return {
 
-            //
-            addCommentsToModel : function(Q,hashComments,hashModel){
-                //hashCommnents are comments, hashModel is the data model (keyed bu linkId),
-                //strategy is to work through the tree 'top down' (by section). Keep a running total of the comments.
-                //when we come across a marked comment item (code.system = 'http://clinfhir.com/fhir/CodeSystem/review-comment') then add the running total to any existing comment there and clear the running total
-                //the last item in the tree should be a comment item!
-
-                if (! hashComments) {
-                    return
-                }
-
-                let runningComments = ""
-                let reviewerCommentSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
-
-                function checkItem(item) {
-                    if (hashComments[item.linkId]) {
-                        runningComments += item.text +': ' + hashComments[item.linkId] + "\n"
-                    }
-
-                    if (runningComments && item.code && item.code.length > 0 && item.code[0].system == reviewerCommentSystem) {
-                        //this is a comment item, and there are comments to add
-
-                        if (hashModel[item.linkId]) {
-                            runningComments = hashModel[item.linkId] + "\n" + runningComments
-                        }
-
-                        hashModel[item.linkId] = runningComments
-                        runningComments = ""
-                    }
-
-                    if (item.item) {
-                        item.item.forEach(function (child) {
-                            checkItem(child)
-                        })
-                    }
-
-                }
-
-                if (Q && Q.item) {
-                    Q.item.forEach(function (section) {
-                        checkItem(section)
-                    })
-
-                    console.log(runningComments)
-                }
-
-
-
-
-            },
-
-
-
             setControls : function (template,data) {
                 //set the values for dropdowns
 
@@ -162,18 +109,15 @@ angular.module("formsApp")
                     let thisItem = angular.copy(item)
                     delete thisItem.item
 
-                    /* - not doing this now...
                     //check to see if this item is a review item. If so, add it to the list of all review items this section
                     if (item.code) {
-                        //console.log(item.code)
+                        console.log(item.code)
                         item.code.forEach(function (code) {
                             if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
                                 sectionItem.reviewItem.push(item)
                             }
                         })
                     }
-
-                   */
 
                     let text = item.text
                     if (text.length > 50) {
@@ -187,7 +131,7 @@ angular.module("formsApp")
 
                     let iconFile = "icons/icon-q-" + item.type + ".png"
                     node.icon = iconFile
-/*
+
                     //if this is a review item text box then don't add to the tree
                     let canAdd = true
                     if (item.code) {
@@ -198,13 +142,12 @@ angular.module("formsApp")
                             }
                         })
                     }
-
+canAdd = true
                     if (canAdd) {
                         treeData.push(node)
                     }
-                    */
 
-                    treeData.push(node)
+
 
                     //now look at any sub children
                     if (item.item) {
@@ -227,7 +170,7 @@ angular.module("formsApp")
                     Q.item.forEach(function (item) {
                         let section = angular.copy(item)
                         delete section.item
-                        //section.reviewItem = []
+                        section.reviewItem = []
                         addItemToTree(qParentId,item,'section',section)
                     })
                 }
@@ -480,30 +423,9 @@ angular.module("formsApp")
                 //first assemble a hash of values by key. A value will remain if it is not hidden due to conditional, or the item has a definitiomhas the de
                 let hashValues = {}
                 Object.keys(form).forEach(function (linkId) {
-                    //linkId can either be just the linkId or - if the item is multiple - can be {linkId}--{inx} as set in renderSingleItem
                     let dataItem = form[linkId]
-                    if (dataItem) {
-                        if (linkId.indexOf('--') == -1) {
-                            //this is where the item does not repeat
-                            //let dataItem = form[linkId]
-                            //as a single item can have multiple values, make hashValues an array of values
-                            hashValues[linkId] = [dataItem]
-                        } else {
-                            //this is an example where there could be more than one value.
-                            //add it to the array of values for this item
-                            let ar = linkId.split('--')
-                            let correctedLinkId = ar[0]
-                            hashValues[correctedLinkId] = hashValues[correctedLinkId] || []
-                            hashValues[correctedLinkId].push(dataItem)
-                        }
-                    }
-
-                    /*
-                    let dataItem = form[linkId]
-                    //let canShow = that.checkConditional(dataItem,form)
-                    //as a single item can have multiple values, make hashValues an array of values
-                    hashValues[linkId] = [dataItem]
-                    */
+                    let canShow = that.checkConditional(dataItem,form)
+                    hashValues[linkId] = dataItem
                 })
 
                 //console.log(hashValues)
@@ -514,15 +436,15 @@ angular.module("formsApp")
                 //the top level items - sections - directly off the Q root...
                 Q.item.forEach(function (section) {
                     let sectionItem = null
-                    if (section.item && that.checkConditional(section,form) ) {  //check that the section is enabled (otherwise we get validation issues)
+                    if (section.item) {
                         section.item.forEach(function (child) {
                             //a child can be a group or a leaf element
-                            if (child.item && that.checkConditional(child,form) ) {  //check that the group is enabled (otherwise we get validation issues)
+                            if (child.item) {
                                 //this is a group. it won't have a value (though can have other attributes like a code)
                                 let groupItem = null
                                 child.item.forEach(function (gc) {
                                     //this is a child (grandchild) grandchild of the group
-                                    if (hashValues[gc.linkId] && hashValues[gc.linkId].length > 0) {
+                                    if (hashValues[gc.linkId]) {
                                         //this grandchild has a value. Before we can add it, we need to check whether a section& group exist
                                         if (! sectionItem) {
                                             //no there isn't - add it to the top level of the QR
@@ -538,23 +460,12 @@ angular.module("formsApp")
                                         let leafItem = {linkId:gc.linkId,  answer:[], text:gc.text}
                                         groupItem.item.push(leafItem)
 
-                                        let arValues = hashValues[gc.linkId]        //all the values for this item
-                                        arValues.forEach(function (v) {
-                                            let result = getValue(gc,v)
-                                            if (result) {
-                                                leafItem.answer = leafItem.answer ||[]
-                                                leafItem.answer.push(result)
-                                            }
-                                        })
-                                        /*
                                         let v = hashValues[gc.linkId]        //the value in the form
-
                                         let result = getValue(gc,v)
                                         if (result) {
                                             leafItem.answer = leafItem.answer ||[]
                                             leafItem.answer.push(result)
                                         }
-                                        */
 
                                     }
 
@@ -562,38 +473,24 @@ angular.module("formsApp")
 
                             } else {
                                 //this is a leaf directly off the section
-                                if (hashValues[child.linkId] && hashValues[child.linkId].length > 0) {
+                                if (hashValues[child.linkId]) {
                                     //there is a value, so it should be added to the QR (as a child of he section.
-                                    //First, is there a section item?
+                                    //First, is there a seciton item?
                                     if (! sectionItem) {
                                         //no there isn't - add it to the top level of the QR
                                         sectionItem = {linkId : section.linkId,text:section.text,item: []}
                                         QR1.item.push(sectionItem)
                                     }
                                     //now craete an item that can be added to the section
-
                                     let leafItem = {linkId:child.linkId, text: child.text,answer:[]}
                                     sectionItem.item.push(leafItem)      //add the leaf item to the section
 
-
-                                    let arValues = hashValues[child.linkId]        //all the values for this item
-                                    arValues.forEach(function (v) {
-                                        let result = getValue(child,v)
-                                        if (result) {
-                                            leafItem.answer = leafItem.answer ||[]
-                                            leafItem.answer.push(result)
-                                        }
-                                    })
-
-                                    /*
                                     let v = hashValues[child.linkId]        //the value in the form
-                                    let result = getValue(child,v[0])
+                                    let result = getValue(child,v)
                                     if (result) {
                                         leafItem.answer = leafItem.answer ||[]
                                         leafItem.answer.push(result)
                                     }
-                                    */
-
                                 }
                             }
 
@@ -606,11 +503,9 @@ angular.module("formsApp")
 
                 return QR1
 
-
-
                         //---------------------
 
-/*
+
                 //todo - working on multiple values for a single linkId.
                 //the form var is a hash keyed by the linkId containing the value (if any).
                 // For now, make that an array = and only take the first value when processing. Later - allow more than one
@@ -659,7 +554,11 @@ angular.module("formsApp")
                             //let canShow = that.checkConditional(child,)
 
                             if (arValues !== undefined && arValues.length > 0) {        //is there a value for this item. Won't be if this is a group...
-
+                               /* if (! parentItem) {
+                                    parentItem = {linkId : section.linkId,text:section.text,item: []}
+                                    QR.item.push(parentItem)
+                                }
+*/
                                 arValues.forEach(function (value) {
                                     let result = getValue(child,value)
                                     if (result ) {
@@ -721,7 +620,14 @@ angular.module("formsApp")
                                         arValues.forEach(function (v) {
                                             let result = getValue(gcItem,v)
                                             if (result) {
-
+/*
+                                                if (! gcRootItem) {
+                                                    //the root hasn't been created
+                                                    gcRootItem = {linkId:child.linkId,text:child.text}
+                                                    parentItem.item = parentItem.item || []
+                                                    parentItem.item.push(gcRootItem)
+                                                }
+*/
 
                                                 gcItemToInsert.answer = gcItemToInsert.answer ||[]
                                                 gcItemToInsert.answer.push(result)
@@ -779,8 +685,6 @@ angular.module("formsApp")
                 })
 
                 return QR
-
-                */
 
                 function getValue(item,value) {
                     if (value == undefined) {       //can't just use 'if value' as booleans can be false
@@ -848,12 +752,6 @@ angular.module("formsApp")
 
                         case "integer" :
                             result = {valueInteger : parseInt(value)}
-                            break
-
-                        case "quantity" :
-
-                            result = {valueQuantity : {value:parseFloat(value)}}
-
                             break
 
                         case "attachment" :
@@ -1030,6 +928,7 @@ angular.module("formsApp")
                                     section.rows.push(row)   //assume that the whole group fits in a single row...
 
                                 } else {
+                                    //2023-01-24
 
                                     //if the type is 'attachment' then assume it's a drawing. A drawing can't be in a group
                                     if (item.type == 'attachment') {
@@ -1073,18 +972,6 @@ angular.module("formsApp")
                     //console.log(item)
                     if (item.initial && item.initial.length > 0) {
                         //right now, only coding & bool, and only a single initial
-
-                        if (item.initial[0].valueString) {
-                            formData[item.linkId] = item.initial[0].valueString
-                        }
-
-                        if (item.initial[0].valueInteger) {
-                            formData[item.linkId] = item.initial[0].valueInteger
-                        }
-
-                        if (item.initial[0].valueQuantity) {
-                            formData[item.linkId] = item.initial[0].valueQuantity
-                        }
 
 
                         if (item.initial[0].valueCoding) {

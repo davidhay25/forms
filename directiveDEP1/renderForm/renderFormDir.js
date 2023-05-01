@@ -15,30 +15,6 @@ angular.module('formsApp')
 
                 $scope.datePopup = {}
 
-                //called when the question mark icon is clicked...
-                $scope.showItemDetails = function(item,meta) {
-                    //emit as an event so the hosting app can do something with it...
-                    let clone = angular.copy(item)
-                    delete clone.item
-                    $scope.$emit('itemDetail',{item:clone,meta:meta})
-
-                    console.log(item,meta)
-                }
-
-                $scope.$on('commentsUpdated',function(ev,vo) {
-                    console.log('commentsUpdated in dir', vo.hashComments)
-                    $scope.hashComments = vo.hashComments  //the comments are incorproated into the QR my makeQR
-                    $scope.makeQR()         //create a new QR that will have the comments
-
-
-                })
-
-                $scope.$on('prepop',function (ev,vo) {
-                    
-                })
-
-                /* - I don't believe this is now used
-
                 $scope.$on("externalQRUpdate",function(ev,vo){
                     //console.log("externalQRUpdate")
                     $scope.qr = vo.QR
@@ -55,8 +31,9 @@ angular.module('formsApp')
                     //not working...  renderFormsSvc.setControls($scope.input.formTemplate,$scope.input.form)
                   //  $scope.makeQR() - causes a stack overflow
                 })
-*/
-                
+
+               
+
 
                 //for some reason when the q changes, the change doesn't ripple through to the directive, so $scope.$broadcast is needed
                 //this is used by the designer...
@@ -78,13 +55,6 @@ angular.module('formsApp')
                 })
 
 
-                //if there is already data for an item, update the 'initial' value of the corresponding Q
-                //this will set the contron (dropdown & bool) to the value
-                let setupInitial = function () {
-                    //right now, doing this in lab (as it's the only area where pre-pop is currently done. refactor if needed
-
-                }
-
                 $scope.openDate = function(linkId) {
                     $scope.datePopup[linkId] = {opened:true}
                     // $scope.datePopup.opened = true
@@ -93,46 +63,10 @@ angular.module('formsApp')
                 $scope.input = {};
                 $scope.input.form = {}        //a hash containing form data entered by the user. It is also updated in the externalQRUpdate handler
 
+
                 //a hash of items that failed the most current dependency check
                 //we used to remove the values of hidden items, but that started causing an infinite digest error when in a directive. dunno why...
                 $scope.notShown = {}
-
-                //if the form variable is set from the outside, it is assumed to contain data in the same format as input.form - a hash of values by linkId
-                $scope.$watch(
-                    function() {return $scope.form},
-                    function() {
-                        //don't do this here ATM. Right now this is being done for labs in labSvc - if needed elsewhere then refactor
-                        //I think there will be an issue with non-simple values
-                        /*
-                        console.log('form:',$scope.form)
-                        //copy any values into input.form to act as pre=pop
-                        $timeout(function(){
-                            if ($scope.form) {
-                                Object.keys($scope.form).forEach(function (key) {
-                                    console.log(key,$scope.form[key])
-                                    //the values in the array are value[x] (as they come from the QR initially).
-                                    //we need to convert them into the format used bu the builder
-
-                                    let obj = $scope.form[key]
-                                    //todo - check for other datatypes
-                                    if (obj.valueString) {
-                                        $scope.input.form[key] = obj.valueString
-                                    }
-                                    if (obj.valueInteger) {
-                                        $scope.input.form[key] = obj.valueInteger
-                                    }
-
-
-                                })
-
-
-
-                            }
-                        },500)
-*/
-
-                    }
-                )
 
                 $scope.$watch(
                     function() {return $scope.q},
@@ -142,17 +76,8 @@ angular.module('formsApp')
                         if ($scope.q) {
                             let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
                             if (vo) {
-                                $scope.input.formTemplate = vo.template     //an array of sections
+                                $scope.input.formTemplate = vo.template
                                 $scope.hashItem = vo.hashItem
-
-                                //console.log(vo.template)
-
-                                $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
-
-
-
-                               // }
-
 console.log(vo.template)
                             }
                         } else {
@@ -168,17 +93,7 @@ console.log(vo.template)
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
 
-                    //before building the QR, the comments from the tree need to be incorporated.
-                    //use a clone of the model data so the displayed form is not updated
-                    let formData = angular.copy($scope.input.form)
-
-                    //updates the items marked as comments (using the code.system)
-                    //If I was doing this again I'd use an extension, but that will require updating the disposer. Perhaps another time...
-                    renderFormsSvc.addCommentsToModel($scope.q,$scope.hashComments,formData)
-
-
-                    //$scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form)
-                    $scope.qr = renderFormsSvc.makeQR($scope.q, formData)
+                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.input.form)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.input.form,hashItem:$scope.hashItem,source:'form'})
 

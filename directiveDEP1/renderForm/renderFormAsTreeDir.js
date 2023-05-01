@@ -11,7 +11,7 @@ angular.module('formsApp')
             },
 
             templateUrl: 'directive/renderForm/renderFormAsTreeDir.html',
-            controller: function($scope,renderFormsSvc,$timeout,$rootScope){
+            controller: function($scope,renderFormsSvc,$timeout,renderFormsSvc){
 
                 // #changed
 
@@ -20,7 +20,7 @@ angular.module('formsApp')
                 $scope.form = {}        //a hash containing form data entered by the user
                 $scope.input = {};
 
-                $scope.input.comments = {}      //comments entered against an individual item
+                $scope.input.comments = {}
 
                 $scope.datePopup = {}
                 $scope.openDate = function(linkId) {
@@ -85,7 +85,7 @@ angular.module('formsApp')
                 );
 
 
-                $scope.addNewCommentDEP = function(txt,item,groupComment) {
+                $scope.addNewComment = function(txt,item,groupComment) {
 //console.log(txt,item,groupComment)
 
                     // #changed
@@ -143,27 +143,11 @@ angular.module('formsApp')
                 }
 
 
-                //The tree view doesn't allow data entry, so it cannot create a QR. Instead it
-                //uses $emit to send the hash of comments to the parent app.
-
-                $scope.updateComments = function () {
-                    $rootScope.$broadcast('commentsUpdated',{hashComments:$scope.input.comments})
-
-                }
-
-
-                $scope.makeQRDEP = function() {
-console.log('makeQR')
-                    //need to add the individual comments against items (in $scope.input.comments) to the form data (in $scope.form)
-
-
-
-
-
-                    $scope.qr = renderFormsSvc.makeQR($scope.q, model,$scope.hashItem)
-                    //$scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
-
-
+                //note that this is called every time there is a change (eg keypress) in the forms component
+                //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
+                $scope.makeQR = function() {
+//console.log('makeQR')
+                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem,source:'tree'})
 
