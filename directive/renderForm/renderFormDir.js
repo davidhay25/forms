@@ -22,11 +22,11 @@ angular.module('formsApp')
                     delete clone.item
                     $scope.$emit('itemDetail',{item:clone,meta:meta})
 
-                    console.log(item,meta)
+                  //  console.log(item,meta)
                 }
 
                 $scope.$on('commentsUpdated',function(ev,vo) {
-                    console.log('commentsUpdated in dir', vo.hashComments)
+                   // console.log('commentsUpdated in dir', vo.hashComments)
                     $scope.hashComments = vo.hashComments  //the comments are incorproated into the QR my makeQR
                     $scope.makeQR()         //create a new QR that will have the comments
 
@@ -61,7 +61,7 @@ angular.module('formsApp')
                 //for some reason when the q changes, the change doesn't ripple through to the directive, so $scope.$broadcast is needed
                 //this is used by the designer...
                 $scope.$on("q-updated",function(){
-                    console.log("q updated broadcast")
+                   // console.log("q updated broadcast")
                     if ($scope.q) {
                         $timeout(function(){
 
@@ -85,6 +85,12 @@ angular.module('formsApp')
 
                 }
 
+                $scope.resetForm = function() {
+                    console.log('reset')
+                    $scope.input.form = {}  //reset all the data
+                    setupQ()
+                }
+
                 $scope.openDate = function(linkId) {
                     $scope.datePopup[linkId] = {opened:true}
                     // $scope.datePopup.opened = true
@@ -103,33 +109,7 @@ angular.module('formsApp')
                     function() {
                         //don't do this here ATM. Right now this is being done for labs in labSvc - if needed elsewhere then refactor
                         //I think there will be an issue with non-simple values
-                        /*
-                        console.log('form:',$scope.form)
-                        //copy any values into input.form to act as pre=pop
-                        $timeout(function(){
-                            if ($scope.form) {
-                                Object.keys($scope.form).forEach(function (key) {
-                                    console.log(key,$scope.form[key])
-                                    //the values in the array are value[x] (as they come from the QR initially).
-                                    //we need to convert them into the format used bu the builder
 
-                                    let obj = $scope.form[key]
-                                    //todo - check for other datatypes
-                                    if (obj.valueString) {
-                                        $scope.input.form[key] = obj.valueString
-                                    }
-                                    if (obj.valueInteger) {
-                                        $scope.input.form[key] = obj.valueInteger
-                                    }
-
-
-                                })
-
-
-
-                            }
-                        },500)
-*/
 
                     }
                 )
@@ -137,7 +117,9 @@ angular.module('formsApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                       console.log('Q updated')
+                      // console.log('Q updated')
+                        setupQ()
+                        /*
                         delete $scope.selectedSection       //c;ears the current section display
                         if ($scope.q) {
                             let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
@@ -145,24 +127,26 @@ angular.module('formsApp')
                                 $scope.input.formTemplate = vo.template     //an array of sections
                                 $scope.hashItem = vo.hashItem
 
-                                //console.log(vo.template)
-
                                 $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
-
-
-
-                               // }
-
-console.log(vo.template)
                             }
-                        } else {
-                           // delete $scope.input.formTemplate
-                            //delete $scope.hashItem
                         }
+                        */
 
                     }
                 );
 
+                function setupQ () {
+                    delete $scope.selectedSection       //c;ears the current section display
+                    if ($scope.q) {
+                        let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
+                        if (vo) {
+                            $scope.input.formTemplate = vo.template     //an array of sections
+                            $scope.hashItem = vo.hashItem
+
+                            $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
+                        }
+                    }
+                }
 
                 //note that this is called every time there is a change (eg keypress) in the forms component
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
@@ -187,7 +171,7 @@ console.log(vo.template)
                 //when a section is selected
                 $scope.selectSection = function(section) {
 
-                    //console.log(section.imageDetails)
+
 
                     //section.imageDetails = {imageName:"left-breast.png",linkId:"image"}        //temp
                     $scope.selectedSection = section
@@ -231,12 +215,7 @@ console.log(vo.template)
                         context.arc(startX, startY, 7, 0, 2 * Math.PI);
                         context.stroke();
 
-                        //save the dataUrl on the scope
-                        //let canvas1 = document.getElementById('drawingCanvas');
-                        //let dataURL = canvas1.toDataURL()
 
-                        //$scope.dataUrl = canvas1.toDataURL()
-                        //console.log(dataURL)
 
                         $scope.input.form[$scope.selectedSection.imageDetails.linkId] = canvas.toDataURL()
                         $timeout(function(){

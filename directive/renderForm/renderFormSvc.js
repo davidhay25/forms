@@ -100,7 +100,7 @@ angular.module("formsApp")
                         checkItem(section)
                     })
 
-                    console.log(runningComments)
+                  //  console.log(runningComments)
                 }
 
 
@@ -116,7 +116,7 @@ angular.module("formsApp")
 
                 function setOneControl(item) {
                     if (item.type == 'choice' && item.answerOption && data[item.linkId]) {
-                        console.log(item.linkId,data[item.linkId])
+                       // console.log(item.linkId,data[item.linkId])
                         item.answerOption.forEach(function (ao) {
                             if (data[item.linkId] && data[item.linkId].valueCoding) {
                                 if (ao.valueCoding.code == data[item.linkId].valueCoding.code) {
@@ -129,7 +129,7 @@ angular.module("formsApp")
                     }
 
                     if (item.item) {
-                        console.log(item.item)
+                       // console.log(item.item)
                         item.item.forEach(function (child) {
                             setOneControl(child)
                         })
@@ -1219,12 +1219,12 @@ angular.module("formsApp")
                             //let vs = cell.item.answerValueSet
                             //maximum number to return is 50
 
-                            console.log('fillFromVS',cell,vsUrl)
+                            //console.log('fillFromVS',cell,vsUrl)
 
                             if (arExpandedVsCache[vsUrl]) {
                                 //present in the cache
                                 cell.meta.expandedVSOptions = arExpandedVsCache[vsUrl]
-                                console.log('cache hit')
+                               // console.log('cache hit')
                             } else {
                                 let qry =  termServer + "ValueSet/$expand?url=" + vsUrl + "&count=50"
 
