@@ -86,9 +86,14 @@ angular.module('formsApp')
                 }
 
                 $scope.resetForm = function() {
-                    console.log('reset')
-                    $scope.input.form = {}  //reset all the data
-                    setupQ()
+                    let msg = "Resetting the form will clear all form data and feedback. Please submit feedback prior to resetting. Are you sure you wish to continue?"
+                 
+                    if (confirm(msg)) {
+                        $scope.input.form = {}  //reset all the data
+                        setupQ()
+                    }
+
+
                 }
 
                 $scope.openDate = function(linkId) {
