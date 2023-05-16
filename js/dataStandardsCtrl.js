@@ -28,7 +28,8 @@ angular.module("formsApp")
             $scope.$on('commentsUpdated',function(ev,vo) {
                 console.log('commentsUpdated',vo.hashComments)
                 $scope.hashComments = vo.hashComments  //the comments are incorproated into the QR my makeQR
-
+                //$scope.$broadcast('commentsUpdated',vo.hashComments)
+                //$scope.$broadcast('sendCommentsToRenderFormDir',vo.hashComments)
                // makeQR()
 
                 return
@@ -277,6 +278,7 @@ angular.module("formsApp")
 
 
                 if (! $scope.formQR ||  $scope.formQR.item.length == 0) {
+                    console.log($scope.formQR)
                     alert("You must enter some data first!")
                     return
                 }
