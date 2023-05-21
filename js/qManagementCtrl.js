@@ -10,7 +10,7 @@ angular.module("formsApp")
             //create a list of all Q
 
             loadAllQ = function() {
-                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description"
+                let url = "/ds/fhir/Questionnaire?_elements=url,title,name,description,status"
 
                 $http.get(url).then(
                     function (data) {
