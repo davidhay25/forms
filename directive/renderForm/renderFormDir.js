@@ -148,7 +148,24 @@ angular.module('formsApp')
                             $scope.input.formTemplate = vo.template     //an array of sections
                             $scope.hashItem = vo.hashItem
 
-                            $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
+                            console.log($scope.input.formTemplate[0])
+
+                            let inx = -1
+                            for (const section of $scope.input.formTemplate){
+                                inx++
+                                if (! section.meta.hidden) {
+                                    break
+                                }
+                            }
+                            $scope.selectSection($scope.input.formTemplate[inx])
+
+
+
+                            //temp $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
+
+
+
+
                         }
                     }
                 }
