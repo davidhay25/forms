@@ -10,6 +10,11 @@ angular.module("formsApp")
                 QIdfromUrl = search.substr(1)
             }
 
+
+            $scope.toggleVisible = function () {
+                $scope.showData = ! $scope.showData
+            }
+
             //qrCreated is emitted by the directives that can collect data - just the form now.
             //as they are siblings, this function broadcasts an event so that the QR
             //in each one can be updated even when data changes in the other

@@ -190,11 +190,12 @@
         <div ng-hide="showData">
             <div class="alert alert-warning">
                 These standards have been deprecated. Please contact <strong>canshare@teaho.govt.nz</strong> if you need access to them.
+                <div class="pull-right" ng-click="toggleVisible()">_</div>
             </div>
         </div>
 
 
-        <div ng-cloak class="row">
+        <div ng-show="showData"  ng-cloak class="row">
 
             <div ng-class="input.leftPane">
 
